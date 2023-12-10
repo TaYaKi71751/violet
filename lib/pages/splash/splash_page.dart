@@ -166,8 +166,8 @@ class _SplashPageState extends State<SplashPage> {
   };
 
   Future<void> checkAuth() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (prefs.getBool('checkauthalready') == null) {
+    final prefs = await MultiPreferences.getInstance();
+    if ((await prefs.getBool('checkauthalready')) == null) {
       await prefs.setBool('checkauthalready', true);
       if (await Permission.manageExternalStorage.request() ==
           PermissionStatus.denied) {
@@ -217,8 +217,9 @@ class _SplashPageState extends State<SplashPage> {
 
     // this may be slow down to loading
     _changeMessage('check network...');
-    var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult != ConnectivityResult.none) {
+    var connectivityResult;
+    if(!Platform.isLinux) connectivityResult = await (Connectivity().checkConnectivity());
+    if (Platform.isLinux || connectivityResult != ConnectivityResult.none) {
       _changeMessage('loading script...');
       await ScriptManager.init();
     }
@@ -238,8 +239,8 @@ class _SplashPageState extends State<SplashPage> {
     //     await Logger.exportLog();
     //   } catch (_) {}
 
-    final prefs = await SharedPreferences.getInstance();
-    if (prefs.getInt('db_exists') == 1 && !widget.switching) {
+    final prefs = await MultiPreferences.getInstance();
+    if (((await prefs.getInt('db_exists')) == 1) && !widget.switching) {
       if (connectivityResult != ConnectivityResult.none) {
         try {
           _changeMessage('check sync...');

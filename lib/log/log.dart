@@ -62,6 +62,7 @@ class Logger {
 
     if (!Platform.environment.containsKey('FLUTTER_TEST')) {
       await lock.synchronized(() async {
+        await init();
         await logFile.writeAsString('[${DateTime.now().toUtc()}] $msg\n',
             mode: FileMode.append);
       });

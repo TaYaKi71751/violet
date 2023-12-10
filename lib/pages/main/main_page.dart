@@ -284,8 +284,8 @@ class _MainPageState extends ThemeSwitchableState<MainPage>
     }).then((value) async {
       if (updateContinued) return;
 
-      final prefs = await SharedPreferences.getInstance();
-      if (prefs.getBool('usevioletserver_check') != null) return;
+      final prefs = await MultiPreferences.getInstance();
+      if ((await prefs.getBool('usevioletserver_check')) != null) return;
 
       var bb = await showYesNoDialog(
           context, Translations.of(context).trans('violetservermsg'));
@@ -475,9 +475,9 @@ class _VersionAreaWidgetState extends State<_VersionAreaWidget> {
   }
 
   _onSyncPressed() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await MultiPreferences.getInstance();
     var latestDB = SyncManager.getLatestDB().getDateTime();
-    var lastDB = prefs.getString('databasesync');
+    var lastDB = await prefs.getString('databasesync');
 
     if (lastDB != null &&
         latestDB.difference(DateTime.parse(lastDB)).inHours < 1) {

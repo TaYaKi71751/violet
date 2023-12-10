@@ -4,48 +4,55 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:flutter/services.dart';
 
-class DataBaseManager {
+class SettingsManager {
   String? dbPath;
   Database? db;
-  static DataBaseManager? _instance;
+  static SettingsManager? _instance;
 
-  DataBaseManager({this.dbPath});
+  SettingsManager({this.dbPath});
 
-  static DataBaseManager create(String dbPath) {
-    return DataBaseManager(dbPath: dbPath);
+  static SettingsManager create(String dbPath) {
+    return SettingsManager(dbPath: dbPath);
   }
 
   @protected
   @mustCallSuper
-  Future<void> dispose() async {
+  void dispose() async {
     print('close: ${dbPath!}');
-    await db?.close();
-    db = null;
+    if (db != null) db!.close();
   }
 
-  static Future<DataBaseManager> getInstance() async {
+  static Future<SettingsManager> getInstance() async {
     if (_instance == null) {
-      late final String dbPath;
-      if (Platform.environment.containsKey('FLUTTER_TEST')) {
-        dbPath = join(Directory.current.path, 'test/db/data.db');
-      } else {
-        if(Platform.isAndroid || Platform.isIOS){
-          dbPath = Platform.isAndroid
-              ? '${(await getApplicationDocumentsDirectory()).path}/data/data.db'
-              : '${await getDatabasesPath()}/data.db';
-        } else if(Platform.isLinux){
-          var home = '';
-          Platform.environment.forEach((key, value) {
-            if(key == 'HOME'){
-              home = value;
-            }
-          });
-          dbPath = '${home}/.violet/data.db';
-        }
+      var home = '';
+      if(Platform.isLinux){
+        Platform.environment.forEach((key, value) {
+          if(key == 'HOME'){
+            home = value;
+          }
+        });
+      }
+      var dbPath = (Platform.isLinux)
+        ? '${home}/.violet/settings.db'
+        : '';
+      if(!(await File(dbPath).exists())){
+        await File(dbPath).create(recursive: true);
+        final sharedLibraryPath = 'assets/db/null.db';
+        final sharedLibraryContent = await rootBundle.load(sharedLibraryPath);
+
+        final libraryFile = File('${dbPath}');
+        final createdFile = await libraryFile.create();
+        final openFile = await createdFile.open(mode: FileMode.write);
+        final writtenFile =
+            await openFile.writeFrom(Uint8List.view(sharedLibraryContent.buffer));
+        await writtenFile.close();
+
+        
       }
       _instance = create(dbPath);
       await _instance!.open();
@@ -54,16 +61,28 @@ class DataBaseManager {
   }
 
   static Future<void> reloadInstance() async {
-    final db = _instance?.db;
-    _instance?.db = null;
+    var home = '';
+    if(Platform.isLinux){
+      Platform.environment.forEach((key, value) {
+        if(key == 'HOME'){
+          home = value;
+        }
+      });
+    }
+    var dbPath = (Platform.isLinux)
+      ? '${home}/.violet/settings.db'
+      : '';
+    _instance = create(dbPath);
   }
 
-  Future<void> open() async {
+  Future open() async {
     db ??= await openDatabase(dbPath!);
   }
 
-  Future<void> checkOpen() async {
-    if (!(db?.isOpen ?? false)) {
+  Future checkOpen() async {
+    if(db != null){
+      if (!db!.isOpen) db = await openDatabase(dbPath!);
+    } else if(db == null){
       db = await openDatabase(dbPath!);
     }
   }
@@ -105,15 +124,5 @@ class DataBaseManager {
   Future<void> delete(String name, String where, List<dynamic> args) async {
     await checkOpen();
     await db!.delete(name, where: where, whereArgs: args);
-  }
-
-  Future<bool> test() async {
-    try {
-      final x = await query('SELECT count(*) FROM HitomiColumnModel');
-      if ((x[0]['count(*)'] as int) < 5000) return false;
-      return true;
-    } catch (e) {
-      return false;
-    }
   }
 }

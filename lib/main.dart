@@ -3,6 +3,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
@@ -28,24 +29,34 @@ import 'package:violet/pages/lock/lock_screen.dart';
 import 'package:violet/pages/splash/splash_page.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/style/palette.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite/sqflite.dart';
 
 Future<void> main() async {
   runZonedGuarded<Future<void>>(() async {
+    // https://stackoverflow.com/questions/66971604/sqlite-with-flutter-desktop-windows
+    if (Platform.isWindows || Platform.isLinux) {
+        // Initialize FFI
+        sqfliteFfiInit();
+        // Change the default factory
+        databaseFactory = databaseFactoryFfi;
+    }
+
     WidgetsFlutterBinding.ensureInitialized();
 
-    await FlutterDownloader.initialize(); // @dependent: android
+    if(Platform.isAndroid || Platform.isIOS) await FlutterDownloader.initialize(); // @dependent: android
     FlareCache.doesPrune = false;
     FlutterError.onError = recordFlutterError;
 
-    await initFirebase();
+    if(Platform.isAndroid || Platform.isIOS) await initFirebase();
     await Settings.initFirst();
-    await warmupFlare();
+    if(Platform.isAndroid || Platform.isIOS) await warmupFlare();
 
     runApp(const MyApp());
   }, (exception, stack) async {
     Logger.error('[async-error] E: $exception\n$stack');
 
-    await FirebaseCrashlytics.instance.recordError(exception, stack);
+    if(Platform.isAndroid || Platform.isIOS) await FirebaseCrashlytics.instance.recordError(exception, stack);
   });
 }
 
@@ -67,15 +78,15 @@ Future<void> recordFlutterError(FlutterErrorDetails flutterErrorDetails) async {
       '[unhandled-error] E: ${flutterErrorDetails.exceptionAsString()}\n'
       '${flutterErrorDetails.stack}');
 
-  await FirebaseCrashlytics.instance.recordFlutterError(flutterErrorDetails);
+  if(Platform.isAndroid || Platform.isIOS) FirebaseCrashlytics.instance.recordFlutterError(flutterErrorDetails);
 }
 
 Future<void> initFirebase() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // check user-id is set
-  final prefs = await SharedPreferences.getInstance();
-  var id = prefs.getString('fa_userid');
+  final prefs = await MultiPreferences.getInstance();
+  var id = await prefs.getString('fa_userid');
   if (id == null) {
     id = sha1.convert(utf8.encode(DateTime.now().toString())).toString();
     prefs.setString('fa_userid', id);
@@ -153,7 +164,7 @@ class MyApp extends StatelessWidget {
         Settings.useLockScreen ? const LockScreen() : const SplashPage();
 
     final navigatorObservers = [
-      FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
+      if(Platform.isAndroid || Platform.isIOS) FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
     ];
 
     return GetMaterialApp(

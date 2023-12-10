@@ -6,7 +6,7 @@ import os
 import os.path
 import re
 
-target = 'ios'
+target = 'linux'
 
 def process_dart(path):
     f = open(path, 'r')
