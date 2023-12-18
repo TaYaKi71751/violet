@@ -251,8 +251,6 @@ class SyncManager {
 
   static String createRawdbPostfix(String lang) {
     switch (lang) {
-      case 'global':
-        return '.7z';
       case 'ko':
         return '-korean.7z';
       case 'zh':
@@ -261,6 +259,9 @@ class SyncManager {
         return '-japanese.7z';
       case 'en':
         return '-english.7z';
+      case 'global':
+      default:
+        return '.7z';
     }
 
     throw Exception('not reachable');
@@ -268,8 +269,6 @@ class SyncManager {
 
   static String createRawdbPostfixiOS(String lang) {
     switch (lang) {
-      case 'global':
-        return '.db';
       case 'ko':
         return '-korean.db';
       case 'zh':
@@ -278,6 +277,9 @@ class SyncManager {
         return '-japanese.db';
       case 'en':
         return '-english.db';
+      case 'global':
+      default:
+        return '.db';
     }
 
     throw Exception('not reachable');
@@ -285,8 +287,6 @@ class SyncManager {
 
   static String translateToLanguage(String lang) {
     switch (lang) {
-      case 'global':
-        return '';
       case 'ko':
         return 'korean';
       case 'zh':
@@ -295,6 +295,9 @@ class SyncManager {
         return 'japanese';
       case 'en':
         return 'english';
+      case 'global':
+      default:
+        return '';
     }
 
     throw Exception('not reachable');
