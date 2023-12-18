@@ -331,6 +331,15 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
     } catch (e, st) {
       Logger.error('[DBDownload] E: $e\n'
           '$st');
+
+      setState(() {
+        downloading = false;
+        baseString = (
+          '[DBDownload] E: $e\n'
+            '$st'
+        );
+      });
+      return;
       if(_throw) throw e;
     }
 
