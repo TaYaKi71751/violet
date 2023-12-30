@@ -21,10 +21,19 @@ jobs:
         with:
           python-version: '3.8'
       - name: Preprocess
+        if: ${{ ( github.event.pull_request.head.sha == "" && github.event.merge_group.head_sha == "" ) && ( secrets.SECRET_SALT && secrets.SECRET_WSALT ) }}
         run: | 
           cd lib/server
           wget -q ${{ secrets.SECRET_SALT }}
           wget -q ${{ secrets.SECRET_WSALT }}
+          cd ../..
+          python3 preprocess-ios.py
+      - name: Preprocess
+        if: ${{ github.event.pull_request.head.sha || github.event.merge_group.head_sha }}
+        run: | 
+          cd lib/server
+          echo 'String getValid(String vToken) { return vToken; }' >> salt.dart
+          cp salt.dart wsalt.dart
           cd ../..
           python3 preprocess-ios.py
       - name: Podfile
@@ -67,10 +76,19 @@ jobs:
         with:
           python-version: '3.8'
       - name: Preprocess
+        if: ${{ ( github.event.pull_request.head.sha == "" && github.event.merge_group.head_sha == "" ) && ( secrets.SECRET_SALT && secrets.SECRET_WSALT ) }}
         run: | 
           cd lib/server
           wget -q ${{ secrets.SECRET_SALT }}
           wget -q ${{ secrets.SECRET_WSALT }}
+          cd ../..
+          python3 preprocess-android.py
+      - name: Preprocess
+        if: ${{ github.event.pull_request.head.sha || github.event.merge_group.head_sha }}
+        run: | 
+          cd lib/server
+          echo 'String getValid(String vToken) { return vToken; }' >> salt.dart
+          cp salt.dart wsalt.dart
           cd ../..
           python3 preprocess-android.py
       - name: Build
