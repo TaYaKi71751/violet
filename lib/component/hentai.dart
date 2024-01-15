@@ -1,6 +1,8 @@
 // This source code is a part of Project Violet.
 // Copyright (C) 2020-2024. violet-team. Licensed under the Apache-2.0 License.
 
+import 'dart:math';
+
 import 'package:html/parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:violet/component/eh/eh_headers.dart';
@@ -282,11 +284,27 @@ class HentaiManager {
   }
 
   static Future<QueryResult> idQueryEhentai(String id) async {
-    final listHtml = await EHSession.requestString(
-        'https://e-hentai.org/?next=${(int.parse(id) + 1)}');
-    final href =
-        parse(listHtml).querySelector('a[href*="/g/$id/"]')?.attributes['href'];
-    final hash = href!.split('/').lastWhere((element) => element.isNotEmpty);
+    String? hash;
+    try {
+      final listHtml = await EHSession.requestString(
+          'https://e-hentai.org/?next=${(int.parse(id) + 1)}');
+      final href = parse(listHtml)
+          .querySelector('a[href*="/g/$id/"]')
+          ?.attributes['href'];
+      hash = href!.split('/').lastWhere((element) => element.isNotEmpty);
+    } catch (_) {}
+    if (hash == null) {
+      try {
+        // Expunged
+        final listHtml = await EHSession.requestString(
+            'https://e-hentai.org/?next=${(int.parse(id) + 1)}&f_sh=on');
+        final href = parse(listHtml)
+            .querySelector('a[href*="/g/$id/"]')
+            ?.attributes['href'];
+        hash = href!.split('/').lastWhere((element) => element.isNotEmpty);
+      } catch (_) {}
+    }
+
     final html = await EHSession.requestString(
         'https://e-hentai.org/g/$id/$hash/?p=0&inline_set=ts_m');
     final articleEh = EHParser.parseArticleData(html);
@@ -300,11 +318,26 @@ class HentaiManager {
   }
 
   static Future<QueryResult> idQueryExhentai(String id) async {
-    final listHtml = await EHSession.requestString(
-        'https://exhentai.org/?next=${(int.parse(id) + 1)}');
-    final href =
-        parse(listHtml).querySelector('a[href*="/g/$id/"]')?.attributes['href'];
-    final hash = href!.split('/').lastWhere((element) => element.isNotEmpty);
+    String? hash;
+    try {
+      final listHtml = await EHSession.requestString(
+          'https://exhentai.org/?next=${(int.parse(id) + 1)}');
+      final href = parse(listHtml)
+          .querySelector('a[href*="/g/$id/"]')
+          ?.attributes['href'];
+      hash = href!.split('/').lastWhere((element) => element.isNotEmpty);
+    } catch (_) {}
+    if (hash == null) {
+      try {
+        // Expunged
+        final listHtml = await EHSession.requestString(
+            'https://exhentai.org/?next=${(int.parse(id) + 1)}&f_sh=on');
+        final href = parse(listHtml)
+            .querySelector('a[href*="/g/$id/"]')
+            ?.attributes['href'];
+        hash = href!.split('/').lastWhere((element) => element.isNotEmpty);
+      } catch (_) {}
+    }
     final html = await EHSession.requestString(
         'https://exhentai.org/g/$id/$hash/?p=0&inline_set=ts_m');
     final articleEh = EHParser.parseArticleData(html);
@@ -327,13 +360,29 @@ class HentaiManager {
             {
               var ehash = qr.ehash();
               if (ehash == null) {
-                final listHtml = await EHSession.requestString(
-                    'https://e-hentai.org/?next=${(qr.id() + 1)}');
-                final href = parse(listHtml)
-                    .querySelector('a[href*="/g/${qr.id()}/"]')
-                    ?.attributes['href'];
-                ehash =
-                    href!.split('/').lastWhere((element) => element.isNotEmpty);
+                try {
+                  final listHtml = await EHSession.requestString(
+                      'https://e-hentai.org/?next=${(qr.id() + 1)}');
+                  final href = parse(listHtml)
+                      .querySelector('a[href*="/g/${qr.id()}/"]')
+                      ?.attributes['href'];
+                  ehash = href!
+                      .split('/')
+                      .lastWhere((element) => element.isNotEmpty);
+                } catch (_) {}
+              }
+              if (ehash == null) {
+                try {
+                  // Expunged try
+                  final listHtml = await EHSession.requestString(
+                      'https://e-hentai.org/?next=${(qr.id() + 1)}&f_sh=on');
+                  final href = parse(listHtml)
+                      .querySelector('a[href*="/g/${qr.id()}/"]')
+                      ?.attributes['href'];
+                  ehash = href!
+                      .split('/')
+                      .lastWhere((element) => element.isNotEmpty);
+                } catch (_) {}
               }
               final html = await EHSession.requestString(
                   'https://e-hentai.org/g/${qr.id()}/$ehash/?p=0&inline_set=ts_m');
@@ -353,13 +402,29 @@ class HentaiManager {
             {
               var ehash = qr.ehash();
               if (ehash == null) {
-                final listHtml = await EHSession.requestString(
-                    'https://exhentai.org/?next=${(qr.id() + 1)}');
-                final href = parse(listHtml)
-                    .querySelector('a[href*="/g/${qr.id()}/"]')
-                    ?.attributes['href'];
-                ehash =
-                    href!.split('/').lastWhere((element) => element.isNotEmpty);
+                try {
+                  final listHtml = await EHSession.requestString(
+                      'https://exhentai.org/?next=${(qr.id() + 1)}');
+                  final href = parse(listHtml)
+                      .querySelector('a[href*="/g/${qr.id()}/"]')
+                      ?.attributes['href'];
+                  ehash = href!
+                      .split('/')
+                      .lastWhere((element) => element.isNotEmpty);
+                } catch (_) {}
+              }
+              if (ehash == null) {
+                try {
+                  // Expunged try
+                  final listHtml = await EHSession.requestString(
+                      'https://exhentai.org/?next=${(qr.id() + 1)}&f_sh=on');
+                  final href = parse(listHtml)
+                      .querySelector('a[href*="/g/${qr.id()}/"]')
+                      ?.attributes['href'];
+                  ehash = href!
+                      .split('/')
+                      .lastWhere((element) => element.isNotEmpty);
+                } catch (_) {}
               }
               final html = await EHSession.requestString(
                   'https://exhentai.org/g/${qr.id()}/$ehash/?p=0&inline_set=ts_m');
