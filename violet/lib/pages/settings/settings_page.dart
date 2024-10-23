@@ -809,6 +809,37 @@ class _SettingsPageState extends State<SettingsPage>
           if (Settings.searchNetwork)
             InkWell(
               customBorder: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(8.0),
+                      bottomRight: Radius.circular(8.0))),
+              child: ListTile(
+                leading: Icon(
+                  MdiIcons.searchWeb,
+                  color: Settings.majorColor,
+                ),
+                title: Text(Translations.instance!.trans('excludetagnetwork')),
+                trailing: Switch(
+                  value: Settings.excludeTagNetwork,
+                  onChanged: (newValue) async {
+                    await Settings.setExcludeTagOnWeb(newValue);
+                    setState(() {
+                      _shouldReload = true;
+                    });
+                  },
+                  activeTrackColor: Settings.majorColor,
+                  activeColor: Settings.majorAccentColor,
+                ),
+              ),
+              onTap: () async {
+                await Settings.setExcludeTagOnWeb(!Settings.excludeTagNetwork);
+                setState(() {
+                  _shouldReload = true;
+                });
+              },
+            ),
+          if (Settings.searchNetwork)
+            InkWell(
+              customBorder: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(8.0)),
               ),
               child: ListTile(

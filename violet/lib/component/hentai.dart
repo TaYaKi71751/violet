@@ -588,7 +588,7 @@ class HentaiManager {
   static Future<List<QueryResult>> searchEHentai(String what,
       [int next = 0, bool exh = false]) async {
     final search = Uri.encodeComponent(
-        Settings.includeTagNetwork ? '${Settings.includeTags} ${what}' : what);
+        '${Settings.includeTagNetwork ? '${Settings.includeTags} ' : ''}$what${Settings.excludeTagNetwork ? ' ${Settings.excludeTags.where((e) => e.trim() != '').map((e) => '-$e').join(' ').trim()}' : ''}');
     final url =
         'https://e${exh ? 'x' : '-'}hentai.org/?${next == 0 ? '' : 'next=$next&'}f_cats=${Settings.searchCategory}&f_search=$search&advsearch=1&f_sname=on&f_stags=on${Settings.searchExpunged ? '&f_sh=on' : ''}&f_spf=&f_spt=';
 

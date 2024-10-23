@@ -52,6 +52,7 @@ class Settings {
   static late List<String> searchRule;
   static late bool searchNetwork;
   static late bool includeTagNetwork;
+  static late bool excludeTagNetwork;
   static late bool searchExpunged;
   static late int searchCategory;
 
@@ -200,6 +201,7 @@ class Settings {
             .split('|');
     searchNetwork = await _getBool('searchnetwork');
     includeTagNetwork = await _getBool('includetagnetwork');
+    excludeTagNetwork = await _getBool('excludetagnetwork');
     searchExpunged = await _getBool('searchexpunged');
     searchCategory = await _getInt('searchcategory', 993);
 
@@ -701,6 +703,12 @@ class Settings {
     includeTagNetwork = nn;
 
     await prefs.setBool('includetagnetwork', nn);
+  }
+
+  static Future<void> setExcludeTagOnWeb(bool nn) async {
+    excludeTagNetwork = nn;
+
+    await prefs.setBool('excludetagnetwork', nn);
   }
 
   static Future<void> setSearchExpunged(bool nn) async {
