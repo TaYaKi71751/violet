@@ -203,14 +203,14 @@ jobs:
           try {
             Invoke-WebRequest -Uri $secretSaltUrl -UseBasicParsing -OutFile "salt.dart"
           } catch {
-            "String getValid(String vToken) { return vToken; }" | Out-File -FilePath "salt.dart"
+            "String getValid(String vToken) { return vToken; }" | Out-File -Encoding "UTF8" -FilePath "salt.dart"
           }
 
           # Try downloading SECRET_WSALT
           try {
             Invoke-WebRequest -Uri $secretWSaltUrl -UseBasicParsing -OutFile "wsalt.dart"
           } catch {
-            "String getValid(String vToken) { return vToken; }" | Out-File -FilePath "wsalt.dart"
+            "String getValid(String vToken) { return vToken; }" | Out-File -Encoding "UTF8" -FilePath "wsalt.dart"
           }
           cd ../..
 
