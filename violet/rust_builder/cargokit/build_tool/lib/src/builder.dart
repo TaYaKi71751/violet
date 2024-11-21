@@ -12,6 +12,7 @@ import 'options.dart';
 import 'rustup.dart';
 import 'target.dart';
 import 'util.dart';
+import 'dart:io';
 
 final _log = Logger('builder');
 
@@ -90,6 +91,11 @@ class BuildEnvironment {
       manifestDir: manifestDir,
     );
     final crateInfo = CrateInfo.load(manifestDir);
+    String javaHome = Environment.javaHome;
+    if(Platform.isMacOS && (new File('/usr/libexec/java_home')).existsSync()){
+      javaHome = Process.runSync('/usr/libexec/java_home',[]).stdout.toString().replaceAll('\n', '').replaceAll('\r', '');
+    }
+    
     return BuildEnvironment(
       configuration: buildConfiguration,
       crateOptions: crateOptions,
@@ -101,7 +107,7 @@ class BuildEnvironment {
       androidNdkVersion: isAndroid ? Environment.ndkVersion : null,
       androidMinSdkVersion:
           isAndroid ? int.parse(Environment.minSdkVersion) : null,
-      javaHome: isAndroid ? Environment.javaHome : null,
+      javaHome: isAndroid ? javaHome : null,
     );
   }
 }

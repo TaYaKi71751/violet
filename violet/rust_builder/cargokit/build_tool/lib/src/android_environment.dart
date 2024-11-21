@@ -72,6 +72,15 @@ class AndroidEnvironment {
       'sdkmanager$sdkManagerExtension',
     );
 
+    if(!(new File(sdkManager)).existsSync()){
+      sdkManager = path.join(
+        sdkPath,
+        'tools',
+        'bin',
+        'sdkmanager$sdkManagerExtension'
+      );
+    }
+
     if (!(new File(sdkManager)).existsSync()) {
       sdkManager = path.join('sdkmanager$sdkManagerExtension');
     }
