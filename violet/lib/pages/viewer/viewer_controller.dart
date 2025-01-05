@@ -288,7 +288,7 @@ class ViewerController extends GetxController {
             as List<dynamic>;
     messages = tmessages
         .map((e) => (
-              double.parse(e['MatchScore'] as String),
+              e['MatchScore'] as double,
               e['Id'] as int,
               e['Page'] as int,
               double.parse(e['Correctness'].toString()),

@@ -2,15 +2,14 @@
 // Copyright (C) 2020-2024. violet-team. Licensed under the Apache-2.0 License.
 
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:violet/component/hentai.dart';
+import 'package:violet/component/hitomi/message_search.dart';
 import 'package:violet/component/hitomi/tag_translate.dart';
 import 'package:violet/component/image_provider.dart';
-import 'package:violet/network/wrapper.dart' as http;
 import 'package:violet/other/dialogs.dart';
 import 'package:violet/pages/common/utils.dart';
 import 'package:violet/pages/lab/lab/search_message_rank.dart';
@@ -34,7 +33,6 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
       <(double, int, int, double, List<double>)>[];
   TextEditingController text = TextEditingController(text: '은근슬쩍');
   String latestSearch = '은근슬쩍';
-  List<(String, String, int)>? autocompleteTarget;
 
   @override
   void initState() {
@@ -43,9 +41,10 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
     Future.delayed(const Duration(milliseconds: 100)).then((value) async {
       var tmessages = (await VioletServer.searchMessage('contains', text.text))
           as List<dynamic>;
+
       messages = tmessages
           .map((e) => (
-                double.parse(e['MatchScore'] as String),
+                e['MatchScore'] as double,
                 e['Id'] as int,
                 e['Page'] as int,
                 e['Correctness'] as double,
@@ -64,20 +63,7 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
 
       await ScriptManager.refresh();
 
-      setState(() {});
-    });
-
-    Future.delayed(const Duration(milliseconds: 100)).then((value) async {
-      const url =
-          'https://raw.githubusercontent.com/project-violet/violet-message-search/master/SORT-COMBINE.json';
-
-      var m = jsonDecode((await http.get(url)).body) as Map<String, dynamic>;
-
-      autocompleteTarget = m.entries
-          .map((e) => (e.key, TagTranslate.disassembly(e.key), e.value as int))
-          .toList();
-
-      autocompleteTarget!.sort((x, y) => y.$3.compareTo(x.$3));
+      await MessageSearch.init();
 
       setState(() {});
     });
@@ -296,7 +282,7 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
                         selected.toLowerCase(), text.text)) as List<dynamic>;
                     messages = tmessages
                         .map((e) => (
-                              double.parse(e['MatchScore'] as String),
+                              e['MatchScore'] as double,
                               e['Id'] as int,
                               e['Page'] as int,
                               e['Correctness'] as double,
@@ -321,16 +307,16 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
               Expanded(
                 child: TypeAheadField(
                   suggestionsCallback: (pattern) async {
-                    if (autocompleteTarget == null) {
+                    if (MessageSearch.autocompleteTarget.isEmpty) {
                       return <(String, String, int)>[];
                     }
 
                     var ppattern = TagTranslate.disassembly(pattern);
 
-                    return autocompleteTarget!
+                    return MessageSearch.autocompleteTarget
                         .where((element) => element.$2.startsWith(ppattern))
                         .toList()
-                      ..addAll(autocompleteTarget!
+                      ..addAll(MessageSearch.autocompleteTarget
                           .where((element) =>
                               !element.$2.startsWith(ppattern) &&
                               element.$2.contains(ppattern))
@@ -414,7 +400,7 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
             as List<dynamic>;
     messages = tmessages
         .map((e) => (
-              double.parse(e['MatchScore'] as String),
+              e['MatchScore'] as double,
               e['Id'] as int,
               e['Page'] as int,
               double.parse(e['Correctness'].toString()),
