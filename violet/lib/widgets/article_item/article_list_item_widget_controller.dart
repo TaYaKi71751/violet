@@ -8,13 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:intl/intl.dart';
-import 'package:violet/component/hentai.dart';
-import 'package:violet/component/image_provider.dart';
 import 'package:violet/database/user/bookmark.dart';
 import 'package:violet/database/user/record.dart';
 import 'package:violet/model/article_list_item.dart';
+import 'package:violet/pages/common/utils.dart';
 import 'package:violet/settings/settings.dart';
-import 'package:violet/widgets/article_item/image_provider_manager.dart';
 
 class ArticleListItemWidgetController extends GetxController {
   final ArticleListItem articleListItem;
@@ -130,15 +128,7 @@ class ArticleListItemWidgetController extends GetxController {
   }
 
   setProvider() async {
-    VioletImageProvider provider;
-
-    if (!ProviderManager.isExists(articleListItem.queryResult.id())) {
-      provider =
-          await HentaiManager.getImageProvider(articleListItem.queryResult);
-      ProviderManager.insert(articleListItem.queryResult.id(), provider);
-    } else {
-      provider = await ProviderManager.get(articleListItem.queryResult.id());
-    }
+    final provider = await getImageProvider(articleListItem.queryResult);
 
     thumbnail.value = await provider.getThumbnailUrl();
     headers.value = await provider.getHeader(0);

@@ -17,8 +17,6 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_down_button/pull_down_button.dart';
-import 'package:violet/component/hentai.dart';
-import 'package:violet/component/image_provider.dart';
 import 'package:violet/database/user/bookmark.dart';
 import 'package:violet/database/user/record.dart';
 import 'package:violet/log/log.dart';
@@ -150,22 +148,11 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
     return FutureBuilder(
       future:
           Future.delayed(const Duration(milliseconds: 100)).then((value) async {
-        VioletImageProvider provider;
-
-        if (ProviderManager.isExists(articleId)) {
-          provider = await ProviderManager.get(articleId);
-        } else {
-          final query =
-              (await HentaiManager.idSearch(articleId.toString())).results;
-          provider = await HentaiManager.getImageProvider(query[0]);
-          await provider.init();
-          ProviderManager.insert(query[0].id(), provider);
-        }
-
-        return (
-          imagesUrlForEvict![index] = await provider.getImageUrl(page),
-          await provider.getHeader(page)
-        );
+        final provider = await getImageProviderFromId(articleId);
+        final image = await provider.getImageUrl(page);
+        final header = await provider.getHeader(page);
+        imagesUrlForEvict![index] = image;
+        return (image, header);
       }),
       builder:
           (context, AsyncSnapshot<(String, Map<String, String>)> snapshot) {

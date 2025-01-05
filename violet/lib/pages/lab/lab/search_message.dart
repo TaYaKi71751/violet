@@ -6,10 +6,8 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:violet/component/hentai.dart';
 import 'package:violet/component/hitomi/message_search.dart';
 import 'package:violet/component/hitomi/tag_translate.dart';
-import 'package:violet/component/image_provider.dart';
 import 'package:violet/other/dialogs.dart';
 import 'package:violet/pages/common/utils.dart';
 import 'package:violet/pages/lab/lab/search_message_rank.dart';
@@ -18,7 +16,6 @@ import 'package:violet/pages/segment/platform_navigator.dart';
 import 'package:violet/script/script_manager.dart';
 import 'package:violet/server/violet.dart';
 import 'package:violet/util/evict_image_urls.dart';
-import 'package:violet/widgets/article_item/image_provider_manager.dart';
 import 'package:violet/widgets/v_cached_network_image.dart';
 
 class LabSearchMessage extends StatefulWidget {
@@ -95,22 +92,12 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
                 return FutureBuilder(
                   future: Future.delayed(const Duration(milliseconds: 100))
                       .then((value) async {
-                    VioletImageProvider provider;
-                    if (ProviderManager.isExists(e.id)) {
-                      provider = await ProviderManager.get(e.id);
-                    } else {
-                      final query =
-                          (await HentaiManager.idSearch(e.id.toString()))
-                              .results;
-                      provider = await HentaiManager.getImageProvider(query[0]);
-                      await provider.init();
-                      ProviderManager.insert(query[0].id(), provider);
-                    }
+                    final provider = await getImageProviderFromId(e.id);
+                    final image = await provider.getImageUrl(e.page);
+                    final header = await provider.getHeader(e.page);
+                    _urls![index] = image;
 
-                    return (
-                      _urls![index] = await provider.getImageUrl(e.page),
-                      await provider.getHeader(e.page)
-                    );
+                    return (image, header);
                   }),
                   builder: (context,
                       AsyncSnapshot<(String, Map<String, String>)> snapshot) {
@@ -258,22 +245,10 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
                   onChanged: (String? value) async {
                     if (value == selected) return;
                     messages.clear();
-
                     setState(() {
                       selected = value!;
                     });
-
-                    messages = (await VioletServer.searchMessage(
-                        'contains', text.text))!;
-
-                    evictImageUrls(_urls);
-
-                    _height = List<double>.filled(messages.length, 0);
-                    _keys = List<GlobalKey>.generate(
-                        messages.length, (index) => GlobalKey());
-                    _urls = List<String>.filled(messages.length, '');
-
-                    setState(() {});
+                    _doSearch();
                   },
                 ),
               ),
@@ -367,9 +342,13 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
     if (latestSearch == text.text) return;
     latestSearch = text.text;
     messages.clear();
-
     setState(() {});
-    messages = (await VioletServer.searchMessage('contains', text.text))!;
+    _doSearch();
+  }
+
+  _doSearch() async {
+    messages =
+        (await VioletServer.searchMessage(selected.toLowerCase(), text.text))!;
 
     evictImageUrls(_urls);
 

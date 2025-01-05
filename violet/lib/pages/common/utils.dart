@@ -44,15 +44,7 @@ Future showArticleInfoRaw({
     queryResult = await HentaiManager.idQueryWeb('$id');
   }
 
-  late final VioletImageProvider provider;
-  if (ProviderManager.isExists(id)) {
-    provider = await ProviderManager.get(id);
-  } else {
-    provider = await HentaiManager.getImageProvider(queryResult);
-    await provider.init();
-    ProviderManager.insert(id, provider);
-  }
-
+  final provider = await getImageProvider(queryResult);
   final thumbnail = await provider.getThumbnailUrl();
   final headers = await provider.getHeader(0);
 
@@ -99,4 +91,26 @@ Future showArticleInfoRaw({
       );
     },
   );
+}
+
+Future<VioletImageProvider> getImageProviderFromId(int id) async {
+  if (ProviderManager.isExists(id)) {
+    return await ProviderManager.get(id);
+  }
+
+  final query = (await HentaiManager.idSearch(id.toString())).results;
+  return getImageProvider(query[0]);
+}
+
+Future<VioletImageProvider> getImageProvider(QueryResult queryResult) async {
+  final id = queryResult.id();
+  if (ProviderManager.isExists(id)) {
+    return await ProviderManager.get(id);
+  }
+
+  final provider = await HentaiManager.getImageProvider(queryResult);
+  await provider.init();
+  ProviderManager.insert(id, provider);
+
+  return provider;
 }
