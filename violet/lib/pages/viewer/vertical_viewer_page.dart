@@ -411,19 +411,19 @@ class _VerticalViewerPageState extends State<VerticalViewerPage>
   _isExistsMessageSearchLayer(int index) {
     return c.search.value &&
         c.imgHeight[index] != 0 &&
-        c.messages.where((element) => element.$3 == index).isNotEmpty;
+        c.messages.where((element) => element.page == index).isNotEmpty;
   }
 
   _messageSearchLayer(int index) {
     final ratio = c.imgHeight[index] / c.realImgHeight[index];
     final messages =
-        c.messages.where((element) => element.$3 == index).toList();
+        c.messages.where((element) => element.page == index).toList();
 
     final boxes = messages.map((e) {
-      var brtx = e.$5[0];
-      var brty = e.$5[1];
-      var brbx = e.$5[2];
-      var brby = e.$5[3];
+      var brtx = e.rect[0];
+      var brty = e.rect[1];
+      var brbx = e.rect[2];
+      var brby = e.rect[3];
 
       return Positioned(
         top: brty * ratio - 4,

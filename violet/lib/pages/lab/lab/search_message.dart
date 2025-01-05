@@ -29,8 +29,7 @@ class LabSearchMessage extends StatefulWidget {
 }
 
 class _LabSearchMessageState extends State<LabSearchMessage> {
-  List<(double, int, int, double, List<double>)> messages =
-      <(double, int, int, double, List<double>)>[];
+  List<MessageSearchResult> messages = <MessageSearchResult>[];
   TextEditingController text = TextEditingController(text: '은근슬쩍');
   String latestSearch = '은근슬쩍';
 
@@ -39,20 +38,7 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
     super.initState();
 
     Future.delayed(const Duration(milliseconds: 100)).then((value) async {
-      var tmessages = (await VioletServer.searchMessage('contains', text.text))
-          as List<dynamic>;
-
-      messages = tmessages
-          .map((e) => (
-                e['MatchScore'] as double,
-                e['Id'] as int,
-                e['Page'] as int,
-                e['Correctness'] as double,
-                (e['Rect'] as List<dynamic>)
-                    .map((e) => double.parse(e.toString()))
-                    .toList()
-              ))
-          .toList();
+      messages = (await VioletServer.searchMessage('contains', text.text))!;
 
       if (_height == null) {
         _height = List<double>.filled(messages.length, 0);
@@ -105,18 +91,16 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
               cacheExtent: height * 3.0,
               itemCount: messages.length,
               itemBuilder: (BuildContext ctxt, int index) {
-                // if (messages.length == 0) return Container();
-                var e = messages[index];
-
+                final e = messages[index];
                 return FutureBuilder(
                   future: Future.delayed(const Duration(milliseconds: 100))
                       .then((value) async {
                     VioletImageProvider provider;
-                    if (ProviderManager.isExists(e.$2)) {
-                      provider = await ProviderManager.get(e.$2);
+                    if (ProviderManager.isExists(e.id)) {
+                      provider = await ProviderManager.get(e.id);
                     } else {
                       final query =
-                          (await HentaiManager.idSearch(e.$2.toString()))
+                          (await HentaiManager.idSearch(e.id.toString()))
                               .results;
                       provider = await HentaiManager.getImageProvider(query[0]);
                       await provider.init();
@@ -124,8 +108,8 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
                     }
 
                     return (
-                      _urls![index] = await provider.getImageUrl(e.$3),
-                      await provider.getHeader(e.$3)
+                      _urls![index] = await provider.getImageUrl(e.page),
+                      await provider.getHeader(e.page)
                     );
                   }),
                   builder: (context,
@@ -146,8 +130,8 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
                             ),
                           ),
                           ListTile(
-                            title: Text('${e.$2} (${e.$3 + 1} Page)'),
-                            subtitle: Text('Score: ${e.$1}'),
+                            title: Text('${e.id} (${e.page + 1} Page)'),
+                            subtitle: Text('Score: ${e.matchScore}'),
                           ),
                         ],
                       );
@@ -155,7 +139,7 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
                     return InkWell(
                       onTap: () async {
                         FocusScope.of(context).unfocus();
-                        showArticleInfoById(context, e.$2);
+                        showArticleInfoById(context, e.id);
                       },
                       splashColor: Colors.white,
                       child: Column(
@@ -221,10 +205,10 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
                                     (context, AsyncSnapshot<Size> snapshot2) {
                                   if (!snapshot2.hasData) return Container();
 
-                                  var brtx = e.$5[0];
-                                  var brty = e.$5[1];
-                                  var brbx = e.$5[2];
-                                  var brby = e.$5[3];
+                                  var brtx = e.rect[0];
+                                  var brty = e.rect[1];
+                                  var brbx = e.rect[2];
+                                  var brby = e.rect[3];
 
                                   var w = snapshot2.data!.width;
 
@@ -251,8 +235,8 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
                             ],
                           ),
                           ListTile(
-                            title: Text('${e.$2} (${e.$3 + 1} Page)'),
-                            subtitle: Text('Score: ${e.$1}'),
+                            title: Text('${e.id} (${e.page + 1} Page)'),
+                            subtitle: Text('Score: ${e.matchScore}'),
                           ),
                         ],
                       ),
@@ -273,24 +257,14 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
                   value: selected,
                   onChanged: (String? value) async {
                     if (value == selected) return;
-                    messages = <(double, int, int, double, List<double>)>[];
+                    messages.clear();
 
                     setState(() {
                       selected = value!;
                     });
-                    var tmessages = (await VioletServer.searchMessage(
-                        selected.toLowerCase(), text.text)) as List<dynamic>;
-                    messages = tmessages
-                        .map((e) => (
-                              e['MatchScore'] as double,
-                              e['Id'] as int,
-                              e['Page'] as int,
-                              e['Correctness'] as double,
-                              (e['Rect'] as List<dynamic>)
-                                  .map((e) => double.parse(e.toString()))
-                                  .toList(),
-                            ))
-                        .toList();
+
+                    messages = (await VioletServer.searchMessage(
+                        'contains', text.text))!;
 
                     evictImageUrls(_urls);
 
@@ -392,23 +366,10 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
   Future<void> _onModifiedText() async {
     if (latestSearch == text.text) return;
     latestSearch = text.text;
-    messages = <(double, int, int, double, List<double>)>[];
+    messages.clear();
 
     setState(() {});
-    var tmessages =
-        (await VioletServer.searchMessage(selected.toLowerCase(), text.text))
-            as List<dynamic>;
-    messages = tmessages
-        .map((e) => (
-              e['MatchScore'] as double,
-              e['Id'] as int,
-              e['Page'] as int,
-              double.parse(e['Correctness'].toString()),
-              (e['Rect'] as List<dynamic>)
-                  .map((e) => double.parse(e.toString()))
-                  .toList()
-            ))
-        .toList();
+    messages = (await VioletServer.searchMessage('contains', text.text))!;
 
     evictImageUrls(_urls);
 
