@@ -6,6 +6,7 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:violet/component/hitomi/message_search.dart';
 import 'package:violet/database/user/bookmark.dart';
 import 'package:violet/database/user/record.dart';
 import 'package:violet/log/log.dart';
@@ -416,45 +417,45 @@ class VioletServer {
     }
   }
 
-  static Future<dynamic> searchMessage(String type, String what) async {
+  static Future<List<MessageSearchResult>?> searchMessage(
+      String type, String what) async {
     final gg = await http.get(
       '${Settings.searchMessageAPI}/$type/${Uri.encodeFull(what)}',
       headers: _vwHeader(),
     );
 
     if (gg.statusCode != 200) {
-      return gg.statusCode;
+      return null;
     }
 
     try {
-      final result = (jsonDecode(gg.body) as List<dynamic>);
-      return result;
+      return MessageSearchResult.fromJson(gg.body);
     } catch (e, st) {
       Logger.error('[API-searchMessage] E: $e\n'
           '$st');
 
-      return 900;
+      return null;
     }
   }
 
-  static Future<dynamic> searchMessageWord(int articleId, String what) async {
+  static Future<List<MessageSearchResult>?> searchMessageWord(
+      int articleId, String what) async {
     final gg = await http.get(
       '${Settings.searchMessageAPI}/wcontains/$articleId/${Uri.encodeFull(what)}',
       headers: _vwHeader(),
     );
 
     if (gg.statusCode != 200) {
-      return gg.statusCode;
+      return null;
     }
 
     try {
-      final result = (jsonDecode(gg.body) as List<dynamic>);
-      return result;
+      return MessageSearchResult.fromJson(gg.body);
     } catch (e, st) {
       Logger.error('[API-searchMessageWord] E: $e\n'
           '$st');
 
-      return 900;
+      return null;
     }
   }
 

@@ -24,3 +24,36 @@ class MessageSearch {
     autocompleteTarget.sort((x, y) => y.$3.compareTo(x.$3));
   }
 }
+
+class MessageSearchResult {
+  final double matchScore;
+  final int id;
+  final int page;
+  final double correctness;
+  final List<double> rect;
+
+  MessageSearchResult({
+    required this.matchScore,
+    required this.id,
+    required this.page,
+    required this.correctness,
+    required this.rect,
+  });
+
+  static List<MessageSearchResult> fromJson(String json) {
+    final result = jsonDecode(json) as List<dynamic>;
+    return result
+        .map(
+          (e) => MessageSearchResult(
+            matchScore: e['MatchScore'] as double,
+            id: e['Id'] as int,
+            page: e['Page'] as int,
+            correctness: e['Correctness'] as double,
+            rect: (e['Rect'] as List<dynamic>)
+                .map((e) => double.parse(e.toString()))
+                .toList(),
+          ),
+        )
+        .toList();
+  }
+}
