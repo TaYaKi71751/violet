@@ -1,12 +1,18 @@
 import { WinstonModule } from 'nest-winston';
 
 const { format, transports } = require('winston');
-const { combine, timestamp, printf, json, splat, prettyPrint } = format;
+const { combine, errors, timestamp, printf, json, splat, prettyPrint } = format;
 
 require('winston-daily-rotate-file');
 
-const myFormat = printf(({ level, message, label, timestamp }) => {
-  return `${timestamp} - ${level}: ${JSON.stringify(message, null, 2)}`;
+const myFormat = printf((x) => {
+  const { level, message, label, timestamp, stack } = x;
+  const log = `${timestamp} - ${level}: ${JSON.stringify(message, null, 2)}`;
+  if (stack === undefined) {
+    return log;
+  } else {
+    return `${log}\n${stack}`;
+  }
 });
 
 const transport = new transports.DailyRotateFile({
@@ -15,6 +21,13 @@ const transport = new transports.DailyRotateFile({
 });
 
 export const logger = WinstonModule.createLogger({
-  format: combine(timestamp(), json(), splat(), prettyPrint(), myFormat),
+  format: combine(
+    errors({ stack: true }),
+    timestamp(),
+    json(),
+    splat(),
+    prettyPrint(),
+    myFormat,
+  ),
   transports: [transport],
 });
