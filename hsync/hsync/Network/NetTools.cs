@@ -27,7 +27,7 @@ namespace hsync.Network
                 var headers = new Dictionary<string, string>();
                 // headers["accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8";
                 // headers["user-agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.3";
-                // headers["referer"] = "https://hitomi.la/reader/1234.html";
+                task.Referer = "https://hitomi.la/reader/2996584.html#24-25";
                 task.Headers = headers;
                 task.CompleteCallbackString = (str) =>
                 {
