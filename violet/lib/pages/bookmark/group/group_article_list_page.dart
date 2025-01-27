@@ -189,7 +189,7 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
 
     // TODO: fix bug that all sub widgets are loaded simultaneously
     // so, this occured memory leak and app crash
-    final articleList = alignType.isGridLike
+    final articleList = !alignType.isGridLike
         ? scrollView
         : PrimaryScrollController(
             controller: _scroll,
