@@ -99,6 +99,7 @@ class HentaiIndex {
       final subdir = Platform.isAndroid ? '/data' : '';
       final directory = await getApplicationDocumentsDirectory();
       final path = File('${directory.path}$subdir/index.json');
+      if (!await path.exists()) return;
       final text = path.readAsStringSync();
       tagCount = jsonDecode(text);
     }
