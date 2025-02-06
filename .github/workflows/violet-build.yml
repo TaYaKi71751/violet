@@ -41,8 +41,9 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || github.event.merge_group.head_sha }}
 
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@main
         with:
+          distribution: 'temurin'
           java-version: "17.x"
 
       - uses: subosito/flutter-action@v1
@@ -129,8 +130,9 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || github.event.merge_group.head_sha }}
 
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@main
         with:
+          distribution: 'temurin'
           java-version: "17.x"
 
       - uses: subosito/flutter-action@v2
@@ -173,8 +175,9 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || github.event.merge_group.head_sha }}
 
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@main
         with:
+          distribution: 'temurin'
           java-version: "17.x"
 
       - uses: subosito/flutter-action@v2
