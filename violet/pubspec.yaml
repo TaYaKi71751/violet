@@ -148,6 +148,7 @@ dependencies:
     path: rust_builder
   flutter_rust_bridge: 2.0.0-dev.24
   json_annotation: ^4.9.0
+  open_file_macos: ^0.1.0
 
 dev_dependencies:
   flutter_test:
