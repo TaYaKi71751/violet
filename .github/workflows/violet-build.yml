@@ -103,6 +103,7 @@ jobs:
           pod install
           pod update
           cd ..
+          bash replace.sh
 
       - name: Build
         run: |
