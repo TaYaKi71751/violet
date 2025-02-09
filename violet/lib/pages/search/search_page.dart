@@ -700,10 +700,6 @@ class ResultPanelWidget extends StatelessWidget {
             ),
           );
         }
-      default:
-        return const Center(
-          child: Text('Error :('),
-        );
     }
   }
 
