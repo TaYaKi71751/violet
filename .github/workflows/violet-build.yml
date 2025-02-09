@@ -43,13 +43,13 @@ jobs:
 
       - uses: actions/setup-java@main
         with:
-          distribution: 'temurin'
+          distribution: "temurin"
           java-version: "17.x"
 
       - uses: subosito/flutter-action@v1
         with:
           channel: "stable"
-          flutter-version: 3.24.2
+          flutter-version: 3.27.4
 
       - uses: dtolnay/rust-toolchain@stable
 
@@ -80,7 +80,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-          flutter-version: 3.24.2
+          flutter-version: 3.27.4
 
       - uses: actions/setup-python@v2
         with:
@@ -132,13 +132,13 @@ jobs:
 
       - uses: actions/setup-java@main
         with:
-          distribution: 'temurin'
+          distribution: "temurin"
           java-version: "17.x"
 
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-          flutter-version: 3.24.2
+          flutter-version: 3.27.4
 
       - uses: actions/setup-python@v2
         with:
@@ -177,13 +177,13 @@ jobs:
 
       - uses: actions/setup-java@main
         with:
-          distribution: 'temurin'
+          distribution: "temurin"
           java-version: "17.x"
 
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-          flutter-version: 3.24.2
+          flutter-version: 3.27.4
 
       - uses: actions/setup-python@v2
         with:

@@ -34,11 +34,11 @@ dependencies:
   animated_widgets: ^1.1.0
   animations:
   apple_pencil_double_tap: ^0.0.2
-  archive: ^3.6.1 
+  archive: ^3.6.1
   async:
   auto_animated: ^3.0.1
   azlistview:
-    git: https://github.com/violet-dev/azlistview 
+    git: https://github.com/violet-dev/azlistview
   badges: ^3.1.2
   bloc: ^8.1.2
   bubble_tab_indicator: ^0.1.6
@@ -53,7 +53,7 @@ dependencies:
   #     path: charts_flutter
   # charts_flutter: ^0.12.0
   community_charts_flutter: ^1.0.1
-  connectivity_plus: ^6.0.5 
+  connectivity_plus: ^6.0.5
   convert:
   country_pickers:
     git:
@@ -78,7 +78,11 @@ dependencies:
   firebase_analytics: ^10.1.1
   firebase_crashlytics: ^3.0.12
   # flare_dart:
-  flare_flutter: ^3.0.2
+  flare_flutter:
+    git:
+      url: https://github.com/mbfakourii/Flare-Flutter.git
+      path: flare_flutter
+      ref: remove_hashValues
   flutter_cache_manager: ^3.3.0
   flutter_colorpicker:
     git:
@@ -110,7 +114,7 @@ dependencies:
   http: ^1.1.0
   image: ^4.1.4
   image_crop:
-    git: https://github.com/litang0908/image_crop
+    git: https://github.com/donkizzy/image_crop
   image_size_getter: ^2.1.2
   intl: ^0.19.0
   kdtree: ^0.2.0
@@ -160,8 +164,6 @@ dev_dependencies:
   flutter_lints: ^3.0.0
   chopper_generator: ^8.0.0
   swagger_dart_code_generator: ^2.10.4
-  integration_test:
-    sdk: flutter
 
 dependency_overrides:
   intl: ^0.18.1
@@ -205,7 +207,7 @@ flutter:
     - assets/lottie/28446-floward-gift-box.json
 
     - assets/icons/pixiv.ico
-    
+
     - shorebird.yaml
 
   # An image asset can refer to one or more resolution-specific "variants", see
