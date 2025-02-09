@@ -164,8 +164,6 @@ dev_dependencies:
   flutter_lints: ^3.0.0
   chopper_generator: ^8.0.0
   swagger_dart_code_generator: ^2.10.4
-  integration_test:
-    sdk: flutter
 
 dependency_overrides:
   intl: ^0.18.1
