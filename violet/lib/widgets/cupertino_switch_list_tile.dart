@@ -98,7 +98,8 @@ class CupertinoSwitchListTile extends StatelessWidget {
       child: CupertinoSwitch(
         value: value,
         onChanged: onChanged,
-        activeColor: activeColor ?? Theme.of(context).colorScheme.secondary,
+        activeTrackColor:
+            activeColor ?? Theme.of(context).colorScheme.secondary,
       ),
     );
     return MergeSemantics(

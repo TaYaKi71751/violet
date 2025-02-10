@@ -403,7 +403,9 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
   recovery() {
     if (widget.item.thumbnail() != null &&
         (widget.item.thumbnail()!.contains('e-hentai') ||
-            widget.item.thumbnail()!.contains('exhentai'))) return;
+            widget.item.thumbnail()!.contains('exhentai'))) {
+      return;
+    }
     _recovery();
   }
 

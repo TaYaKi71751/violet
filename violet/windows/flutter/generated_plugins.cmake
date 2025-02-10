@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus
   firebase_core
+  flutter_inappwebview_windows
   flutter_js
   fullscreen_window
   local_auth_windows

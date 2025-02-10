@@ -43,7 +43,9 @@ class UpdateSyncManager {
     if (majorVersion == ver[0] &&
         minorVersion == ver[1] &&
         patchVersion < ver[2] &&
-        enableSensitiveUpdate) return true;
+        enableSensitiveUpdate) {
+      return true;
+    }
     return false;
   }
 

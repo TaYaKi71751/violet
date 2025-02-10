@@ -365,10 +365,10 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
                 '${dir.path}/daily.zip');
 
             final inputStream = InputFileStream('${dir.path}/daily.zip');
-            final archive = ZipDecoder().decodeBuffer(inputStream);
+            final archive = ZipDecoder().decodeBytes(inputStream.toUint8List());
             for (final file in archive.files) {
               if (file.name == 'violet/assets/daily/crop-bookmarks.json') {
-                final outputStream = OutputStream();
+                final outputStream = OutputMemoryStream();
                 file.writeContent(outputStream);
 
                 final json = jsonDecode(utf8.decode(outputStream.getBytes()));

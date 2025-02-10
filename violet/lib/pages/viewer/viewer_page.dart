@@ -5,6 +5,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:apple_pencil_double_tap/apple_pencil_double_tap.dart';
+import 'package:apple_pencil_double_tap/entities/preferred_action.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -191,7 +192,7 @@ class _ViewerPageState extends State<ViewerPage> {
       },
     );
 
-    ApplePencilDoubleTap().listen((PreferredDoubleTapAction preferedAction) {
+    ApplePencilDoubleTap().listen(v1Callback: (PreferredAction preferedAction) {
       if (ModalRoute.of(context)!.isCurrent) {
         c.next();
       }

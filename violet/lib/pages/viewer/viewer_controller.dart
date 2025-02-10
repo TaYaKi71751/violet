@@ -145,7 +145,9 @@ class ViewerController extends GetxController {
   jump(int page) {
     if (page < 0) return;
     if (page >= maxPage &&
-        (!secondPageToSecondPage.value || page >= maxPage + 1)) return;
+        (!secondPageToSecondPage.value || page >= maxPage + 1)) {
+      return;
+    }
 
     this.page.value = page;
 
@@ -163,7 +165,9 @@ class ViewerController extends GetxController {
   move(int page) {
     if (page < 0) return;
     if (page >= maxPage &&
-        (!secondPageToSecondPage.value || page >= maxPage + 1)) return;
+        (!secondPageToSecondPage.value || page >= maxPage + 1)) {
+      return;
+    }
 
     if (!animation.value) {
       jump(page);
