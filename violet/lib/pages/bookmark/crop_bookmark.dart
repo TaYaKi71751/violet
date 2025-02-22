@@ -32,7 +32,6 @@ import 'package:violet/settings/settings.dart';
 import 'package:violet/util/evict_image_urls.dart';
 import 'package:violet/widgets/article_item/image_provider_manager.dart';
 import 'package:violet/widgets/cupertino_switch_list_tile.dart';
-import 'package:violet/widgets/v_cached_network_image.dart';
 
 class CropBookmarkPage extends StatefulWidget {
   const CropBookmarkPage({super.key, this.bookmarks});
