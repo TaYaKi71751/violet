@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:archive/archive_io.dart';
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -498,6 +499,65 @@ class _CropImageWidgetState extends State<CropImageWidget> {
       cropRawRect.bottom / viewRawSize.height,
     );
 
+    final image = ExtendedImage.network(
+      widget.url,
+      fit: BoxFit.contain,
+      alignment: Alignment.topLeft,
+      headers: widget.headers,
+      retries: 100,
+      timeRetry: const Duration(milliseconds: 300),
+      clearMemoryCacheWhenDispose: true,
+      handleLoadingProgress: true,
+      loadStateChanged: (ExtendedImageState state) {
+        if (state.extendedImageLoadState == LoadState.failed) {
+          state.reLoadImage();
+          return const Center(
+            child: SizedBox(
+              width: 30,
+              height: 30,
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        if (state.extendedImageInfo == null) {
+          return Center(
+            child: SizedBox(
+              width: 30,
+              height: 30,
+              child: CircularProgressIndicator(
+                value: state.loadingProgress == null
+                    ? null
+                    : state.loadingProgress!.cumulativeBytesLoaded /
+                        state.loadingProgress!.expectedTotalBytes!,
+              ),
+            ),
+          );
+        }
+
+        return state.completedWidget;
+      },
+    );
+
+    // TODO: remove me
+    // final image = VCachedNetworkImage(
+    //   fit: BoxFit.contain,
+    //   alignment: Alignment.topLeft,
+    //   fadeInDuration: const Duration(microseconds: 500),
+    //   fadeInCurve: Curves.easeIn,
+    //   imageUrl: widget.url,
+    //   httpHeaders: widget.headers,
+    //   progressIndicatorBuilder: (context, string, progress) {
+    //     return Center(
+    //       child: SizedBox(
+    //         width: 30,
+    //         height: 30,
+    //         child: CircularProgressIndicator(value: progress.progress),
+    //       ),
+    //     );
+    //   },
+    // );
+
     final imageArea = AspectRatio(
       aspectRatio: cropRawAspectRatio,
       child: Transform.scale(
@@ -509,23 +569,7 @@ class _CropImageWidgetState extends State<CropImageWidget> {
               -cropRawRect.top / translateRatio),
           child: ClipRect(
             clipper: RectClipper(cropRect),
-            child: VCachedNetworkImage(
-              fit: BoxFit.contain,
-              alignment: Alignment.topLeft,
-              fadeInDuration: const Duration(microseconds: 500),
-              fadeInCurve: Curves.easeIn,
-              imageUrl: widget.url,
-              httpHeaders: widget.headers,
-              progressIndicatorBuilder: (context, string, progress) {
-                return Center(
-                  child: SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: CircularProgressIndicator(value: progress.progress),
-                  ),
-                );
-              },
-            ),
+            child: image,
           ),
         ),
       ),
