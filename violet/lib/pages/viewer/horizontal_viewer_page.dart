@@ -238,47 +238,6 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
     late final Widget viewWidget;
     final height = MediaQuery.of(context).size.height;
 
-    Widget wrappingGestureDetector(Widget child, int index) {
-      return GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        child: child,
-        onLongPress: () {
-          if (c.provider.useFileSystem) {
-            PlatformNavigator.navigateSlide(
-              context,
-              f.ImageCropBookmark(
-                url: c.provider.uris[index],
-                articleId: c.articleId,
-                page: index,
-              ),
-            );
-          } else if (c.provider.useProvider) {
-            PlatformNavigator.navigateSlide(
-              context,
-              p.ImageCropBookmark(
-                url: c.urlCache[index]!.value,
-                headers: c.headerCache[index],
-                articleId: c.articleId,
-                page: index,
-              ),
-            );
-          }
-        },
-      );
-    }
-
-    void sizeNotification(int imageIndex, ImageInfo imageInfo) {
-      if (alreadyCalculated[imageIndex]) return;
-      alreadyCalculated[imageIndex] = true;
-      sizes[imageIndex] = Size(
-          imageInfo.image.width.toDouble(), imageInfo.image.height.toDouble());
-
-      // TODO: how to optimize this logic?
-      WidgetsBinding.instance.addPostFrameCallback(
-        (_) => sizeNoti.value = !sizeNoti.value,
-      );
-    }
-
     if (c.provider.useFileSystem) {
       if (c.onTwoPage.value) {
         var firstIndex = index * 2;
@@ -410,21 +369,7 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     if (c.maxPage > firstIndex && firstIndex >= 0)
-                      wrappingGestureDetector(
-                        Image(
-                          image: ExtendedNetworkImageProvider(
-                            c.urlCache[firstIndex]!.value,
-                            headers: c.headerCache[firstIndex],
-                            cache: true,
-                            retries: 10,
-                            timeRetry: const Duration(milliseconds: 300),
-                          )..resolve(ImageConfiguration.empty).addListener(
-                                ImageStreamListener((imageInfo, _) {
-                              sizeNotification(firstIndex, imageInfo);
-                            })),
-                        ),
-                        firstIndex,
-                      )
+                      imageWidget(firstIndex)
                     else if (c.secondPageToSecondPage.value && firstIndex == -1)
                       SizedBox(
                         width: sizes[0].aspectRatio * height,
@@ -436,21 +381,7 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
                         height: sizes.last.height,
                       ),
                     if (c.maxPage > secondIndex && secondIndex >= 0)
-                      wrappingGestureDetector(
-                        Image(
-                          image: ExtendedNetworkImageProvider(
-                            c.urlCache[secondIndex]!.value,
-                            headers: c.headerCache[secondIndex],
-                            cache: true,
-                            retries: 10,
-                            timeRetry: const Duration(milliseconds: 300),
-                          )..resolve(ImageConfiguration.empty).addListener(
-                                ImageStreamListener((imageInfo, _) {
-                              sizeNotification(secondIndex, imageInfo);
-                            })),
-                        ),
-                        secondIndex,
-                      )
+                      imageWidget(secondIndex)
                     else if (c.secondPageToSecondPage.value &&
                         secondIndex == -1)
                       SizedBox(
@@ -546,5 +477,81 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
         child: wrappingGestureDetector(viewWidget, index),
       );
     }
+  }
+
+  Widget wrappingGestureDetector(Widget child, int index) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      child: child,
+      onLongPress: () {
+        if (c.provider.useFileSystem) {
+          PlatformNavigator.navigateSlide(
+            context,
+            f.ImageCropBookmark(
+              url: c.provider.uris[index],
+              articleId: c.articleId,
+              page: index,
+            ),
+          );
+        } else if (c.provider.useProvider) {
+          PlatformNavigator.navigateSlide(
+            context,
+            p.ImageCropBookmark(
+              url: c.urlCache[index]!.value,
+              headers: c.headerCache[index],
+              articleId: c.articleId,
+              page: index,
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  void sizeNotification(int imageIndex, ImageInfo imageInfo) {
+    if (alreadyCalculated[imageIndex]) return;
+    alreadyCalculated[imageIndex] = true;
+    sizes[imageIndex] = Size(
+        imageInfo.image.width.toDouble(), imageInfo.image.height.toDouble());
+
+    // TODO: how to optimize this logic?
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => sizeNoti.value = !sizeNoti.value,
+    );
+  }
+
+  Widget imageWidget(int index) {
+    final provider = ExtendedNetworkImageProvider(
+      c.urlCache[index]!.value,
+      headers: c.headerCache[index],
+      cache: true,
+      retries: 10,
+      timeRetry: const Duration(milliseconds: 300),
+    );
+
+    provider
+        .resolve(ImageConfiguration.empty)
+        .addListener(ImageStreamListener((imageInfo, _) {
+      sizeNotification(index, imageInfo);
+    }));
+
+    final image = Image(
+      key: c.imgKeys[index],
+      errorBuilder: (context, error, stackTrace) {
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            setState(() {
+              provider.evict();
+              c.imgKeys[index] = GlobalKey();
+            });
+          }
+        });
+
+        return const SizedBox.shrink();
+      },
+      image: provider,
+    );
+
+    return wrappingGestureDetector(image, index);
   }
 }
