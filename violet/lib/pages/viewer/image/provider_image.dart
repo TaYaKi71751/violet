@@ -78,6 +78,7 @@ class _ProviderImageState extends State<ProviderImage> {
       fit: BoxFit.cover,
       filterQuality: SettingsWrapper.imageQuality,
       clearMemoryCacheWhenDispose: true,
+      clearMemoryCacheIfFailed: true,
       handleLoadingProgress: true,
       loadStateChanged: _loadStateChanged,
       cacheHeight: Settings.useLowPerf

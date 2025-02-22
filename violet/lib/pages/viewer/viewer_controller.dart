@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
 import 'package:violet/component/hitomi/message_search.dart';
+import 'package:violet/log/log.dart';
 import 'package:violet/pages/viewer/others/preload_page_view.dart';
 import 'package:violet/pages/viewer/others/scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:violet/pages/viewer/viewer_page_provider.dart';
@@ -233,6 +234,9 @@ class ViewerController extends GetxController {
             : null,
       ),
       context,
+      onError: (error, stackTrace) {
+        Logger.error('[precache-error] E: $error\n$stackTrace');
+      },
     );
   }
 
