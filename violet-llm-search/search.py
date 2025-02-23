@@ -18,7 +18,7 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 
 class VectorSearch:
-    def __init__(self, model: str = "groq"):
+    def __init__(self, model: str = "groq", prompt_type: str = "general"):
         """벡터 검색을 위한 초기화"""
         self.embeddings = HuggingFaceEmbeddings(
             # model_name="jhgan/ko-sroberta-multitask",
@@ -40,6 +40,7 @@ class VectorSearch:
             length_function=len,
         )
         self.model = model
+        self.prompt_type = prompt_type
         if model == "groq":
             self.client = groq.Groq(api_key=os.getenv("GROQ_API_KEY"))
         elif model == "gemini":
@@ -118,26 +119,10 @@ class VectorSearch:
         self.vector_store.save_local(index_path)
         print("인덱스가 생성되었습니다.")
 
-    def search(self, query: str, k: int = 50) -> str:
-        """쿼리에 대한 검색 수행"""
-        if not self.vector_store:
-            raise ValueError("먼저 인덱스를 생성하거나 로드해야 합니다.")
-
-        # 벡터 검색 수행
-        results = self.vector_store.similarity_search_with_score(
-            query, k=k, fetch_k=k * 20
-        )
-
-        # 컨텍스트 구성
-        contexts = []
-        for doc, score in results:
-            contexts.append(
-                f"[작품 ID: {doc.metadata['article_id']}]\n{doc.page_content}\n(유사도: {score:.4f})"
-            )
-
-        context_text = "\n\n".join(contexts)
-
-        prompt = f"""아래는 벡터 DB에서 검색된 여러 문서의 내용입니다. 이 문서들은 사용자의 질문에 답변하는 데 필요한 정보를 담고 있으며, 답변은 반드시 이 문서들에 포함된 내용만을 기반으로 작성해야 합니다. 문서에 없는 정보는 추측하거나 추가하지 말고, 오직 제공된 문서 데이터만 사용하여 한국어로 답변해 주세요.
+    def get_prompt(self, query: str, context_text: str) -> str:
+        """프롬프트 타입에 따른 프롬프트 반환"""
+        prompts = {
+            "general": f"""아래는 벡터 DB에서 검색된 여러 문서의 내용입니다. 이 문서들은 사용자의 질문에 답변하는 데 필요한 정보를 담고 있으며, 답변은 반드시 이 문서들에 포함된 내용만을 기반으로 작성해야 합니다. 문서에 없는 정보는 추측하거나 추가하지 말고, 오직 제공된 문서 데이터만 사용하여 한국어로 답변해 주세요.
 
 **질문:** {query}
 
@@ -151,7 +136,53 @@ class VectorSearch:
 4. 문서에 사용된 전문 용어나 표현이 있다면, 이를 그대로 사용하여 답변의 정확성과 전문성을 유지하세요.  
 5. 답변은 반드시 한국어로 작성하며, 다른 언어는 사용하지 마세요.
 
-위 지침을 엄격히 준수하여, 제공된 문서의 내용을 종합하고 질문에 답변해 주세요."""
+위 지침을 엄격히 준수하여, 제공된 문서의 내용을 종합하고 질문에 답변해 주세요.""",
+            "relevance": f"""아래는 벡터 DB에서 검색된 여러 문서의 내용입니다. 이 문서들은 사용자의 질문과 관련된 정보를 담고 있으며, 결과는 반드시 이 문서들에 포함된 article id와 "질문과 가장 알맞는 답변의 정도"만을 기반으로 작성해야 합니다. 문서에 없는 정보는 추가하지 말고, 오직 제공된 문서 데이터만 사용하세요.
+
+질문: {query}
+
+검색된 문서들:
+{context_text}
+
+결과 작성 지침:
+1. 문서에서 article id와 "질문과 가장 알맞는 답변의 정도"를 추출하여 출력하세요. 
+2. "질문과 가장 알맞는 답변의 정도"는 해당 문서가 질문에 답변하는 데 얼마나 적합한지를 0~1 사이 값으로 평가한 것입니다(0은 전혀 관련 없음, 1은 완벽히 적합함).
+3. 여러 문서가 포함된 경우, 각 문서의 article id와 "질문과 가장 알맞는 답변의 정도"를 개별적으로 나열하되, 해당 값 기준으로 내림차순 정렬하세요.
+4. 결과는 간결하고 명확하게 작성하며, 추가 설명이나 해석은 포함시키지 마세요.""",
+            "keyword": f"""아래는 벡터 DB에서 검색된 여러 문서의 내용입니다. 이 문서들은 사용자가 제공한 키워드 조합과 관련된 정보를 담고 있으며, 결과는 반드시 이 문서들에 포함된 article id와 해당 문서가 키워드와 관련된 이유만을 기반으로 작성해야 합니다. 문서에 없는 정보는 추측하거나 추가하지 말고, 오직 제공된 문서 데이터만 사용하여 한국어로 작성하세요.
+
+키워드: {query}
+
+검색된 문서들:
+{context_text}
+
+결과 작성 지침:
+1. 문서에서 제공된 키워드와 직접적으로 관련된 정보를 기반으로 article id와 해당 문서가 키워드와 관련된 이유를 추출하세요.
+2. 여러 문서가 포함된 경우, 각 문서의 article id와 이유를 개별적으로 나열하되, 키워드와의 관련성 높은 순으로 정렬하세요.
+3. 이유는 간결하고 명확하게 작성하며, 문서 내용에서 키워드와 연결되는 구체적인 부분을 간략히 설명하세요.
+4. 문서에 사용된 전문 용어나 표현이 있다면, 이를 그대로 사용하여 결과의 정확성과 전문성을 유지하세요.
+5. 결과는 반드시 한국어로 작성하며, 다른 언어는 사용하지 마세요.""",
+        }
+
+        return prompts.get(self.prompt_type, prompts["general"])
+
+    def search(self, query: str, k: int = 50) -> str:
+        """쿼리에 대한 검색 수행"""
+        if not self.vector_store:
+            raise ValueError("먼저 인덱스를 생성하거나 로드해야 합니다.")
+
+        results = self.vector_store.similarity_search_with_score(
+            query, k=k, fetch_k=k * 20
+        )
+
+        contexts = []
+        for doc, score in results:
+            contexts.append(
+                f"[작품 ID: {doc.metadata['article_id']}]\n{doc.page_content}\n(유사도: {score:.4f})"
+            )
+
+        context_text = "\n\n".join(contexts)
+        prompt = self.get_prompt(query, context_text)
 
         if self.model == "groq":
             completion = self.client.chat.completions.create(
@@ -167,7 +198,6 @@ class VectorSearch:
 
 
 def main():
-    # 명령행 인자 파서 설정
     parser = argparse.ArgumentParser(description="벡터 검색 시스템")
     parser.add_argument(
         "--model",
@@ -176,9 +206,16 @@ def main():
         default="gemini",
         help="사용할 모델을 선택 (groq 또는 gemini)",
     )
+    parser.add_argument(
+        "--prompt",
+        type=str,
+        choices=["general", "relevance", "keyword"],
+        default="general",
+        help="사용할 프롬프트 타입 선택 (general: 일반 답변, relevance: 관련도 평가, keyword: 키워드 관련성)",
+    )
 
     args = parser.parse_args()
-    vector_search = VectorSearch(model=args.model)
+    vector_search = VectorSearch(model=args.model, prompt_type=args.prompt)
 
     # 인덱스 생성 또는 로드
     vector_search.create_or_load_index()
