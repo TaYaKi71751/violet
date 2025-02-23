@@ -21,10 +21,16 @@ class VectorSearch:
     def __init__(self, model: str = "groq"):
         """벡터 검색을 위한 초기화"""
         self.embeddings = HuggingFaceEmbeddings(
-            model_name="jhgan/ko-sroberta-multitask",
+            # model_name="jhgan/ko-sroberta-multitask",
             # model_name="jhgan/ko-sbert-nli",
-            model_kwargs={"device": "cpu"},
-            encode_kwargs={"normalize_embeddings": True},
+            # model_name="jinaai/jina-embeddings-v3",
+            model_name="BAAI/bge-m3",
+            model_kwargs={
+                "device": "cuda",
+            },
+            encode_kwargs={
+                "normalize_embeddings": True,
+            },
         )
         self.vector_store = None
         self.text_splitter = RecursiveCharacterTextSplitter(
