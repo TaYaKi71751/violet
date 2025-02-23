@@ -2,20 +2,26 @@ import os
 from pathlib import Path
 from typing import List, Dict, Any
 import groq
+import google.generativeai as genai
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 from dotenv import load_dotenv
+import argparse
 
 # 환경 변수 로드
 load_dotenv()
 
+# Gemini 설정
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
 
 class VectorSearch:
-    def __init__(self):
+    def __init__(self, model: str = "groq"):
         """벡터 검색을 위한 초기화"""
         self.embeddings = HuggingFaceEmbeddings(
-            model_name="jhgan/ko-sbert-nli",
+            model_name="jhgan/ko-sroberta-multitask",
+            # model_name="jhgan/ko-sbert-nli",
             model_kwargs={"device": "cpu"},
             encode_kwargs={"normalize_embeddings": True},
         )
@@ -26,7 +32,15 @@ class VectorSearch:
             separators=["\n\n", "\n", ".", " ", ""],
             length_function=len,
         )
-        self.client = groq.Groq(api_key=os.getenv("GROQ_API_KEY"))
+        self.model = model
+        if model == "groq":
+            self.client = groq.Groq(api_key=os.getenv("GROQ_API_KEY"))
+        elif model == "gemini":
+            self.client = genai.GenerativeModel("gemini-2.0-flash")
+        else:
+            raise ValueError(
+                "지원하지 않는 모델입니다. 'groq' 또는 'gemini'를 선택하세요."
+            )
 
     def load_documents(self) -> List[Dict[str, Any]]:
         """result 폴더의 문서들을 로드"""
@@ -84,7 +98,7 @@ class VectorSearch:
         self.vector_store.save_local(index_path)
         print("인덱스가 생성되었습니다.")
 
-    def search(self, query: str, k: int = 10) -> str:
+    def search(self, query: str, k: int = 20) -> str:
         """쿼리에 대한 검색 수행"""
         if not self.vector_store:
             raise ValueError("먼저 인덱스를 생성하거나 로드해야 합니다.")
@@ -101,7 +115,6 @@ class VectorSearch:
 
         context_text = "\n\n".join(contexts)
 
-        # LLM을 통한 답변 생성
         prompt = f"""아래는 검색 결과로 나온 여러 문서의 내용들이야. 이 내용들을 기반으로 질문에 한국어로 답변해줘.
         
 질문: {query}
@@ -111,19 +124,32 @@ class VectorSearch:
 
 위 문서들의 내용을 종합해서 질문에 답변해줘. 문서에 없는 내용은 추측하지 말고, 문서에 있는 내용만 사용해서 한국어로 답변해줘."""
 
-        completion = self.client.chat.completions.create(
-            model="deepseek-r1-distill-llama-70b",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.1,
-            max_tokens=1000,
-        )
-
-        return completion.choices[0].message.content
+        if self.model == "groq":
+            completion = self.client.chat.completions.create(
+                model="deepseek-r1-distill-llama-70b",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.1,
+                max_tokens=1000,
+            )
+            return completion.choices[0].message.content
+        else:  # gemini
+            response = self.client.generate_content(prompt)
+            return response.text
 
 
 def main():
-    # 사용 예시
-    vector_search = VectorSearch()
+    # 명령행 인자 파서 설정
+    parser = argparse.ArgumentParser(description="벡터 검색 시스템")
+    parser.add_argument(
+        "--model",
+        type=str,
+        choices=["groq", "gemini"],
+        default="gemini",
+        help="사용할 모델을 선택 (groq 또는 gemini)",
+    )
+
+    args = parser.parse_args()
+    vector_search = VectorSearch(model=args.model)
 
     # 인덱스 생성 또는 로드
     vector_search.create_or_load_index()
