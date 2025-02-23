@@ -22,6 +22,14 @@ class PatchModel {
 
 final patches = [
   PatchModel(
+    dateTime: DateTime(2025, 2, 3),
+    version: '1.32.3 Patch',
+    contents: [
+      'fix bug that thumbnail not shown',
+      'fix stcuk at loading index'
+    ],
+  ),
+  PatchModel(
     dateTime: DateTime(2025, 1, 4),
     version: '1.32.2 Patch',
     contents: [
