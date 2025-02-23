@@ -1,8 +1,10 @@
 use std::cmp::Ordering;
+use std::collections::HashSet;
 use std::fs::File;
 use std::path::PathBuf;
 use std::sync::{Arc, LazyLock, Mutex};
 
+use itertools::Itertools;
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use serde::{Deserialize, Serialize};
 
@@ -150,5 +152,17 @@ pub fn search_article(id: usize) -> Vec<MessageResult> {
         .iter()
         .filter(|msg| msg.article_id == id)
         .map(|msg| msg.as_ref().into())
+        .collect()
+}
+
+pub fn article_lists() -> Vec<usize> {
+    MESSAGES
+        .lock()
+        .unwrap()
+        .iter()
+        .map(|msg| msg.as_ref().article_id)
+        .collect::<HashSet<_>>()
+        .into_iter()
+        .sorted()
         .collect()
 }
