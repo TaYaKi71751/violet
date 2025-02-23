@@ -136,7 +136,7 @@ def get_llm_response(client_type: str, content: str) -> str:
             f"{system_prompt}\n\n다음 대사들로 스토리를 요약해줘.\n\n{content}",
             generation_config=genai.types.GenerationConfig(
                 temperature=0.1,
-                max_output_tokens=1000,
+                max_output_tokens=3000,
             ),
         )
 
@@ -154,7 +154,7 @@ def summarize_text(id: str, llm_type: str = "groq") -> bool:
     except Exception as e:
         raise FileError(f"파일 읽기 실패: {e}")
 
-    max_chunk_size = 4000
+    max_chunk_size = 4000 if llm_type == "groq" else 8000
     chunks = [
         content[i : i + max_chunk_size] for i in range(0, len(content), max_chunk_size)
     ]
@@ -224,7 +224,7 @@ def process_single(id: str, llm_type: str = "groq") -> None:
 
 
 @app.command()
-def process_list(workers: int = 1, llm_type: str = "groq"):
+def process_list(workers: int = 2, llm_type: str = "groq"):
     """lists.json에서 ID들을 읽어와서 병렬로 처리
 
     Args:

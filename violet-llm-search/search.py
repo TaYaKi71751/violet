@@ -29,7 +29,7 @@ class VectorSearch:
         self.text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=500,
             chunk_overlap=50,
-            separators=["\n\n", "\n", ".", " ", ""],
+            separators=["\n\n", "\n", ".", " ", "", "*", ":", '"'],
             length_function=len,
         )
         self.model = model
@@ -98,13 +98,15 @@ class VectorSearch:
         self.vector_store.save_local(index_path)
         print("인덱스가 생성되었습니다.")
 
-    def search(self, query: str, k: int = 20) -> str:
+    def search(self, query: str, k: int = 50) -> str:
         """쿼리에 대한 검색 수행"""
         if not self.vector_store:
             raise ValueError("먼저 인덱스를 생성하거나 로드해야 합니다.")
 
         # 벡터 검색 수행
-        results = self.vector_store.similarity_search_with_score(query, k=k)
+        results = self.vector_store.similarity_search_with_score(
+            query, k=k, fetch_k=k * 20
+        )
 
         # 컨텍스트 구성
         contexts = []
@@ -115,14 +117,21 @@ class VectorSearch:
 
         context_text = "\n\n".join(contexts)
 
-        prompt = f"""아래는 검색 결과로 나온 여러 문서의 내용들이야. 이 내용들을 기반으로 질문에 한국어로 답변해줘.
-        
-질문: {query}
+        prompt = f"""아래는 벡터 DB에서 검색된 여러 문서의 내용입니다. 이 문서들은 사용자의 질문에 답변하는 데 필요한 정보를 담고 있으며, 답변은 반드시 이 문서들에 포함된 내용만을 기반으로 작성해야 합니다. 문서에 없는 정보는 추측하거나 추가하지 말고, 오직 제공된 문서 데이터만 사용하여 한국어로 답변해 주세요.
 
-검색된 문서들:
+**질문:** {query}
+
+**검색된 문서들:**  
 {context_text}
 
-위 문서들의 내용을 종합해서 질문에 답변해줘. 문서에 없는 내용은 추측하지 말고, 문서에 있는 내용만 사용해서 한국어로 답변해줘."""
+**답변 작성 지침:**  
+1. 문서에서 질문과 직접적으로 관련된 정보만을 추출하여 답변에 포함하세요.  
+2. 여러 문서에서 정보를 가져올 경우, 내용이 모순되지 않도록 일관된 흐름으로 통합하여 작성하세요.  
+3. 답변은 간결하고 명확하게 작성하되, 질문에 대한 충분한 설명이 필요할 경우 세부 사항을 추가하세요.  
+4. 문서에 사용된 전문 용어나 표현이 있다면, 이를 그대로 사용하여 답변의 정확성과 전문성을 유지하세요.  
+5. 답변은 반드시 한국어로 작성하며, 다른 언어는 사용하지 마세요.
+
+위 지침을 엄격히 준수하여, 제공된 문서의 내용을 종합하고 질문에 답변해 주세요."""
 
         if self.model == "groq":
             completion = self.client.chat.completions.create(
