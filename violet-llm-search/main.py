@@ -111,8 +111,6 @@ def get_llm_response(client_type: str, content: str) -> str:
 * 등장인물: 각 등장인물의 나이나 옷차림 등도 포함해서 출력 
             """
 
-    print(system_prompt)
-
     if client_type == "groq":
         client = groq.Groq(api_key=os.getenv("GROQ_API_KEY"))
         completion = client.chat.completions.create(
@@ -128,7 +126,7 @@ def get_llm_response(client_type: str, content: str) -> str:
         # 모델 설정
         # gemini-pro
         # gemini-2.0-flash
-        model = genai.GenerativeModel("gemini-1.5-pro")
+        model = genai.GenerativeModel("gemini-2.0-flash")
 
         # 채팅 시작
         chat = model.start_chat(history=[])
