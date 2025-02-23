@@ -8,6 +8,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 from dotenv import load_dotenv
 import argparse
+from tqdm import tqdm
 
 # 환경 변수 로드
 load_dotenv()
@@ -90,11 +91,24 @@ class VectorSearch:
         texts = [doc["content"] for doc in documents]
         metadatas = [doc["metadata"] for doc in documents]
 
-        self.vector_store = FAISS.from_texts(
-            texts=texts, embedding=self.embeddings, metadatas=metadatas
+        # 청크 단위로 임베딩 생성 및 진행률 표시
+        embeddings_list = []
+        batch_size = 32  # 배치 크기 설정
+
+        for i in tqdm(range(0, len(texts), batch_size), desc="임베딩 생성 중"):
+            batch_texts = texts[i : i + batch_size]
+            batch_embeddings = self.embeddings.embed_documents(batch_texts)
+            embeddings_list.extend(batch_embeddings)
+
+        print("FAISS 인덱스 생성 중...")
+        self.vector_store = FAISS.from_embeddings(
+            text_embeddings=list(zip(texts, embeddings_list)),
+            embedding=self.embeddings,
+            metadatas=metadatas,
         )
 
         # 인덱스 저장
+        print("인덱스 저장 중...")
         self.vector_store.save_local(index_path)
         print("인덱스가 생성되었습니다.")
 
