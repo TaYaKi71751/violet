@@ -137,24 +137,319 @@ class TextCluster:
         """클러스터링 결과 시각화"""
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
+
         if method == ClusteringMethod.HIERARCHICAL:
             if self.linkage_matrix is None:
                 raise ValueError("계층적 클러스터링 결과가 없습니다.")
-            plt.figure(figsize=(12, 8))
-            hierarchy.dendrogram(
-                self.linkage_matrix,
-                labels=self.article_ids,
-                leaf_rotation=90,
-                leaf_font_size=8,
-            )
-            plt.title("Hierarchical Clustering Dendrogram")
-            plt.xlabel("Article IDs")
-            plt.ylabel("Distance")
-            plt.tight_layout()
-            output_path = os.path.join(output_dir, "dendrogram.png")
-            plt.savefig(output_path)
-            print(f"덴드로그램이 {output_path}에 저장되었습니다.")
-            plt.close()
+
+            try:
+                # 메모리 정리
+                plt.close("all")
+
+                # 고해상도 이미지 생성
+                fig = plt.figure(figsize=(fig_width, fig_height), dpi=dpi)
+                hierarchy.dendrogram(
+                    self.linkage_matrix,
+                    labels=self.article_ids,
+                    leaf_rotation=90,
+                    leaf_font_size=leaf_font_size,
+                )
+                plt.title("Hierarchical Clustering Dendrogram", fontsize=12)
+                plt.xlabel("Article IDs", fontsize=10)
+                plt.ylabel("Distance", fontsize=10)
+                plt.tight_layout()
+
+                # SVG 파일로 저장
+                svg_path = os.path.join(output_dir, "dendrogram.svg")
+                plt.savefig(svg_path, format="svg", bbox_inches="tight")
+                print(f"덴드로그램이 {svg_path}에 저장되었습니다.")
+
+                # PNG 파일도 함께 저장
+                png_path = os.path.join(output_dir, "dendrogram.png")
+                plt.savefig(png_path, format="png", bbox_inches="tight")
+                print(f"덴드로그램이 {png_path}에도 저장되었습니다.")
+
+            finally:
+                # 메모리 정리
+                plt.close("all")
+
+    # def visualize_clusters_simple(
+    #     self,
+    #     method: ClusteringMethod,
+    #     output_dir: str = "visualizations",
+    #     fig_width: int = 40,
+    #     fig_height: int = 30,
+    #     dpi: int = 100,
+    #     leaf_font_size: int = 6,
+    # ):
+    #     """클러스터링 결과 시각화"""
+    #     if not os.path.exists(output_dir):
+    #         os.makedirs(output_dir)
+
+    #     if method == ClusteringMethod.HIERARCHICAL:
+    #         if self.linkage_matrix is None:
+    #             raise ValueError("계층적 클러스터링 결과가 없습니다.")
+
+    #         try:
+    #             # 메모리 정리
+    #             plt.close("all")
+
+    #             # 고해상도 이미지 생성
+    #             fig = plt.figure(figsize=(fig_width, fig_height), dpi=dpi)
+    #             # 덴드로그램을 간소화하고 색상으로 클러스터 구분
+    #             hierarchy.dendrogram(
+    #                 self.linkage_matrix,
+    #                 truncate_mode="level",  # 상위 레벨만 표시
+    #                 p=5,  # 표시할 계층 수준 (조정 가능)
+    #                 show_leaf_counts=True,  # 잎 노드 수 표시
+    #                 color_threshold=self.distance_threshold
+    #                 if hasattr(self, "distance_threshold")
+    #                 else None,
+    #                 above_threshold_color="grey",
+    #                 leaf_font_size=leaf_font_size,
+    #             )
+    #             plt.title("Hierarchical Clustering Dendrogram (Truncated)", fontsize=12)
+    #             plt.xlabel("Clusters (Number of Articles)", fontsize=10)
+    #             plt.ylabel("Distance", fontsize=10)
+    #             plt.tight_layout()
+
+    #             # SVG 파일로 저장
+    #             svg_path = os.path.join(output_dir, "dendrogram.svg")
+    #             plt.savefig(svg_path, format="svg", bbox_inches="tight")
+    #             print(f"덴드로그램이 {svg_path}에 저장되었습니다.")
+
+    #             # PNG 파일도 함께 저장
+    #             png_path = os.path.join(output_dir, "dendrogram.png")
+    #             plt.savefig(png_path, format="png", bbox_inches="tight")
+    #             print(f"덴드로그램이 {png_path}에도 저장되었습니다.")
+
+    #         finally:
+    #             # 메모리 정리
+    #             plt.close("all")
+
+    # def visualize_clusters_scatter(
+    #     self,
+    #     method: ClusteringMethod,
+    #     output_dir: str = "visualizations",
+    #     fig_width: int = 40,
+    #     fig_height: int = 30,
+    #     dpi: int = 100,
+    #     leaf_font_size: int = 6,
+    # ):
+    #     """클러스터링 결과 시각화"""
+    #     if not os.path.exists(output_dir):
+    #         os.makedirs(output_dir)
+
+    #     if method == ClusteringMethod.HIERARCHICAL:
+    #         if self.linkage_matrix is None:
+    #             raise ValueError("계층적 클러스터링 결과가 없습니다.")
+
+    #         try:
+    #             # 메모리 정리
+    #             plt.close("all")
+
+    #             # t-SNE로 2D 차원 축소 (self.article_embeddings 사용)
+    #             from sklearn.manifold import TSNE
+
+    #             tsne = TSNE(
+    #                 n_components=2, random_state=42, perplexity=30, learning_rate=200
+    #             )
+    #             embeddings_array = np.array(
+    #                 [self.article_embeddings[id] for id in self.article_ids]
+    #             )
+    #             reduced_data = tsne.fit_transform(embeddings_array)
+
+    #             # 클러스터 레이블 생성 (예: linkage_matrix와 cut-off 기준)
+    #             from scipy.cluster.hierarchy import fcluster
+
+    #             clusters = fcluster(self.linkage_matrix, t=1.0, criterion="distance")
+
+    #             # 고해상도 이미지 생성
+    #             fig = plt.figure(figsize=(fig_width, fig_height), dpi=dpi)
+    #             plt.scatter(
+    #                 reduced_data[:, 0],
+    #                 reduced_data[:, 1],
+    #                 c=clusters,
+    #                 cmap="viridis",
+    #                 s=50,
+    #             )
+    #             plt.title("Hierarchical Clustering (t-SNE Visualization)", fontsize=12)
+    #             plt.xlabel("t-SNE Component 1", fontsize=10)
+    #             plt.ylabel("t-SNE Component 2", fontsize=10)
+    #             plt.colorbar(label="Cluster ID")
+    #             plt.tight_layout()
+
+    #             # SVG 파일로 저장
+    #             svg_path = os.path.join(output_dir, "cluster_scatter.svg")
+    #             plt.savefig(svg_path, format="svg", bbox_inches="tight")
+    #             print(f"클러스터 산점도가 {svg_path}에 저장되었습니다.")
+
+    #             # PNG 파일도 함께 저장
+    #             png_path = os.path.join(output_dir, "cluster_scatter.png")
+    #             plt.savefig(png_path, format="png", bbox_inches="tight")
+    #             print(f"클러스터 산점도가 {png_path}에도 저장되었습니다.")
+
+    #         finally:
+    #             # 메모리 정리
+    #             plt.close("all")
+
+    # def visualize_clusters_heatmap(
+    #     self,
+    #     method: ClusteringMethod,
+    #     output_dir: str = "visualizations",
+    #     fig_width: int = 40,
+    #     fig_height: int = 30,
+    #     dpi: int = 100,
+    # ):
+    #     """클러스터링 결과 히트맵 시각화"""
+    #     if not os.path.exists(output_dir):
+    #         os.makedirs(output_dir)
+
+    #     if method == ClusteringMethod.HIERARCHICAL:
+    #         if self.distance_matrix is None:
+    #             raise ValueError("거리 행렬이 없습니다.")
+
+    #         try:
+    #             # 메모리 정리
+    #             plt.close("all")
+
+    #             # 거리 행렬 히트맵 생성
+    #             fig = plt.figure(figsize=(fig_width, fig_height), dpi=dpi)
+    #             plt.imshow(
+    #                 self.distance_matrix, cmap="viridis", interpolation="nearest"
+    #             )
+    #             plt.title(
+    #                 "Hierarchical Clustering Distance Matrix (Heatmap)", fontsize=12
+    #             )
+    #             plt.xlabel("Article IDs", fontsize=10)
+    #             plt.ylabel("Article IDs", fontsize=10)
+    #             plt.colorbar(label="Distance")
+    #             plt.tight_layout()
+
+    #             # SVG 파일로 저장
+    #             svg_path = os.path.join(output_dir, "cluster_heatmap.svg")
+    #             plt.savefig(svg_path, format="svg", bbox_inches="tight")
+    #             print(f"클러스터 히트맵이 {svg_path}에 저장되었습니다.")
+
+    #             # PNG 파일도 함께 저장
+    #             png_path = os.path.join(output_dir, "cluster_heatmap.png")
+    #             plt.savefig(png_path, format="png", bbox_inches="tight")
+    #             print(f"클러스터 히트맵이 {png_path}에도 저장되었습니다.")
+
+    #         finally:
+    #             # 메모리 정리
+    #             plt.close("all")
+
+    # def visualize_clusters_umap(
+    #     self,
+    #     method: ClusteringMethod,
+    #     output_dir: str = "visualizations",
+    #     fig_width: int = 40,
+    #     fig_height: int = 30,
+    #     dpi: int = 100,
+    # ):
+    #     """클러스터링 결과 UMAP 시각화"""
+    #     if not os.path.exists(output_dir):
+    #         os.makedirs(output_dir)
+
+    #     if method == ClusteringMethod.HIERARCHICAL:
+    #         if self.linkage_matrix is None:
+    #             raise ValueError("계층적 클러스터링 결과가 없습니다.")
+
+    #         try:
+    #             # 메모리 정리
+    #             plt.close("all")
+
+    #             # UMAP으로 2D 차원 축소
+    #             embeddings_array = np.array(
+    #                 [self.article_embeddings[id] for id in self.article_ids]
+    #             )
+    #             reducer = umap.UMAP(
+    #                 n_components=2, random_state=42, n_neighbors=15, min_dist=0.1
+    #             )
+    #             reduced_data = reducer.fit_transform(embeddings_array)
+
+    #             # 클러스터 레이블 생성
+    #             from scipy.cluster.hierarchy import fcluster
+
+    #             clusters = fcluster(self.linkage_matrix, t=1.0, criterion="distance")
+
+    #             # 고해상도 이미지 생성
+    #             fig = plt.figure(figsize=(fig_width, fig_height), dpi=dpi)
+    #             plt.scatter(
+    #                 reduced_data[:, 0],
+    #                 reduced_data[:, 1],
+    #                 c=clusters,
+    #                 cmap="viridis",
+    #                 s=50,
+    #             )
+    #             plt.title("Hierarchical Clustering (UMAP Visualization)", fontsize=12)
+    #             plt.xlabel("UMAP Component 1", fontsize=10)
+    #             plt.ylabel("UMAP Component 2", fontsize=10)
+    #             plt.colorbar(label="Cluster ID")
+    #             plt.tight_layout()
+
+    #             # SVG 파일로 저장
+    #             svg_path = os.path.join(output_dir, "cluster_umap.svg")
+    #             plt.savefig(svg_path, format="svg", bbox_inches="tight")
+    #             print(f"클러스터 UMAP이 {svg_path}에 저장되었습니다.")
+
+    #             # PNG 파일도 함께 저장
+    #             png_path = os.path.join(output_dir, "cluster_umap.png")
+    #             plt.savefig(png_path, format="png", bbox_inches="tight")
+    #             print(f"클러스터 UMAP이 {png_path}에도 저장되었습니다.")
+
+    #         finally:
+    #             # 메모리 정리
+    #             plt.close("all")
+
+    # def visualize_clusters_bar(
+    #     self,
+    #     method: ClusteringMethod,
+    #     output_dir: str = "visualizations",
+    #     fig_width: int = 40,
+    #     fig_height: int = 30,
+    #     dpi: int = 100,
+    # ):
+    #     """클러스터 크기 분포 바 차트 시각화"""
+    #     if not os.path.exists(output_dir):
+    #         os.makedirs(output_dir)
+
+    #     if method == ClusteringMethod.HIERARCHICAL:
+    #         if self.linkage_matrix is None:
+    #             raise ValueError("계층적 클러스터링 결과가 없습니다.")
+
+    #         try:
+    #             # 메모리 정리
+    #             plt.close("all")
+
+    #             # 클러스터 크기 계산
+    #             from scipy.cluster.hierarchy import fcluster
+
+    #             clusters = fcluster(self.linkage_matrix, t=1.0, criterion="distance")
+    #             cluster_sizes = np.bincount(clusters)
+
+    #             # 바 차트 생성
+    #             fig = plt.figure(figsize=(fig_width, fig_height), dpi=dpi)
+    #             plt.bar(range(1, len(cluster_sizes) + 1), cluster_sizes)
+    #             plt.title("Cluster Size Distribution", fontsize=12)
+    #             plt.xlabel("Cluster ID", fontsize=10)
+    #             plt.ylabel("Number of Articles", fontsize=10)
+    #             plt.tight_layout()
+
+    #             # SVG 파일로 저장
+    #             svg_path = os.path.join(output_dir, "cluster_bar.svg")
+    #             plt.savefig(svg_path, format="svg", bbox_inches="tight")
+    #             print(f"클러스터 크기 분포가 {svg_path}에 저장되었습니다.")
+
+    #             # PNG 파일도 함께 저장
+    #             png_path = os.path.join(output_dir, "cluster_bar.png")
+    #             plt.savefig(png_path, format="png", bbox_inches="tight")
+    #             print(f"클러스터 크기 분포가 {png_path}에도 저장되었습니다.")
+
+    #         finally:
+    #             # 메모리 정리
+    #             plt.close("all")
 
     def perform_clustering(
         self,

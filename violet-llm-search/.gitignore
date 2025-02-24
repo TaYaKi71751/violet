@@ -6,3 +6,4 @@ vector_index*/*
 *.log
 *.txt
 *.pkl
+visualizations/*
