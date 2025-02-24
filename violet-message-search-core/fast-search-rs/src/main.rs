@@ -3,7 +3,8 @@ use std::path::PathBuf;
 use chrono::Local;
 use lazy_static::lazy_static;
 use message::{
-    load_messages, search_article, search_partial_contains, search_similar, MessageResult,
+    article_lists, load_messages, search_article, search_partial_contains, search_similar,
+    MessageResult,
 };
 use rocket::serde::json::Json;
 use structopt::StructOpt;
@@ -64,6 +65,12 @@ fn article(id: usize) -> Json<Vec<MessageResult>> {
     Json(search_article(id))
 }
 
+#[get("/")]
+fn lists() -> Json<Vec<usize>> {
+    println!("({}) lists", current_date_time());
+    Json(article_lists())
+}
+
 #[launch]
 fn rocket() -> _ {
     OPT.data_paths
@@ -85,4 +92,5 @@ fn rocket() -> _ {
         .mount("/wsimilar", routes![wsimilar])
         .mount("/wcontains", routes![wcontains])
         .mount("/article", routes![article])
+        .mount("/lists", routes![lists])
 }

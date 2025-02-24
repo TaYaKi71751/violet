@@ -1,0 +1,8 @@
+*.json
+raw/*
+result/*
+vector_index*/*
+.env
+*.log
+*.txt
+*.pkl
