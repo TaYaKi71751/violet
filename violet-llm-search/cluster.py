@@ -205,14 +205,15 @@ def main():
     )
 
     args = parser.parse_args()
-    method = ClusteringMethod(args.method)
-    filename = f"clusters_{args.method}"
-    if args.method == "kmeans":
-        filename += f"_{args.n_clusters}.pkl"
-    else:
-        filename += f"_{str(args.distance_threshold).replace('.', '_')}.pkl"
-
     cluster = TextCluster()
+
+    # 클러스터링 파라미터 설정
+    method = ClusteringMethod(args.method)
+    cluster.n_clusters = args.n_clusters
+    cluster.distance_threshold = args.distance_threshold
+
+    # 파일명 생성
+    filename = cluster.get_cluster_filename(method)
 
     if not os.path.exists(filename):
         print("새로운 클러스터링을 수행합니다...")
