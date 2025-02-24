@@ -7,13 +7,21 @@ import numpy as np
 from sklearn.cluster import KMeans
 import pickle
 from collections import defaultdict
+from enum import Enum
+from scipy.spatial.distance import cdist
+
+
+class ClusteringMethod(Enum):
+    KMEANS = "kmeans"
+    ALL_DISTANCES = "all_distances"
 
 
 class TextCluster:
     def __init__(self):
         """텍스트 클러스터링을 위한 초기화"""
         self.embeddings = HuggingFaceEmbeddings(
-            model_name="BAAI/bge-m3",
+            # model_name="BAAI/bge-m3",
+            model_name="dragonkue/BGE-m3-ko",
             model_kwargs={
                 "device": "cuda",
             },
@@ -25,6 +33,8 @@ class TextCluster:
         self.article_embeddings = {}
         self.id_to_cluster = {}
         self.cluster_to_ids = defaultdict(list)
+        self.distance_matrix = None
+        self.article_ids = None
 
     def load_documents(self) -> Dict[str, str]:
         """result 폴더의 문서들을 로드"""
@@ -43,7 +53,7 @@ class TextCluster:
 
         return documents
 
-    def create_embeddings(self, documents: Dict[str, str], batch_size: int = 8):
+    def create_embeddings(self, documents: Dict[str, str], batch_size: int = 4):
         """문서들의 임베딩 생성"""
         print("임베딩 생성 중...")
 
@@ -62,21 +72,48 @@ class TextCluster:
         for doc_id, embedding in zip(doc_ids, embeddings_list):
             self.article_embeddings[doc_id] = embedding
 
-    def perform_clustering(self, n_clusters: int = 10):
-        """K-means 클러스터링 수행"""
-        print("클러스터링 수행 중...")
+    def perform_clustering(
+        self,
+        method: ClusteringMethod = ClusteringMethod.KMEANS,
+        n_clusters: int = 10,
+        distance_threshold: float = 0.5,
+    ):
+        """클러스터링 수행"""
+        print(f"클러스터링 수행 중... (방식: {method.value})")
 
         # 임베딩 배열 생성
-        embeddings_array = np.array(list(self.article_embeddings.values()))
+        self.article_ids = list(self.article_embeddings.keys())
+        embeddings_array = np.array(
+            [self.article_embeddings[id] for id in self.article_ids]
+        )
 
-        # K-means 클러스터링
-        kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-        self.clusters = kmeans.fit_predict(embeddings_array)
+        if method == ClusteringMethod.KMEANS:
+            # K-means 클러스터링
+            kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+            self.clusters = kmeans.fit_predict(embeddings_array)
 
-        # 클러스터 결과 매핑
-        for doc_id, cluster_id in zip(self.article_embeddings.keys(), self.clusters):
-            self.id_to_cluster[doc_id] = cluster_id
-            self.cluster_to_ids[cluster_id].append(doc_id)
+            # 클러스터 결과 매핑
+            for doc_id, cluster_id in zip(self.article_ids, self.clusters):
+                self.id_to_cluster[doc_id] = cluster_id
+                self.cluster_to_ids[cluster_id].append(doc_id)
+
+        else:  # ALL_DISTANCES
+            # 모든 문서 쌍 간의 거리 계산
+            print("문서 간 거리 계산 중...")
+            self.distance_matrix = cdist(
+                embeddings_array, embeddings_array, metric="cosine"
+            )
+
+            # 거리 행렬을 기반으로 유사도 그룹 생성
+            for i, doc_id in enumerate(self.article_ids):
+                # 현재 문서와 다른 모든 문서 간의 거리
+                distances = self.distance_matrix[i]
+                # 임계값보다 가까운 문서들을 같은 클러스터로 그룹화
+                similar_indices = np.where(distances <= distance_threshold)[0]
+                similar_ids = [
+                    self.article_ids[idx] for idx in similar_indices if idx != i
+                ]
+                self.cluster_to_ids[doc_id] = similar_ids
 
     def save_clusters(self, filename: str = "clusters.pkl"):
         """클러스터링 결과 저장"""
@@ -96,27 +133,62 @@ class TextCluster:
         self.cluster_to_ids = defaultdict(list, data["cluster_to_ids"])
         print("클러스터링 결과를 로드했습니다.")
 
-    def get_similar_articles(self, article_id: str, top_k: int = 5) -> List[str]:
-        """특정 작품과 같은 클러스터에 있는 작품들 반환"""
-        if article_id not in self.id_to_cluster:
+    def get_similar_articles(self, article_id: str, top_k: int = 20) -> List[str]:
+        """특정 작품과 비슷한 작품들 반환"""
+        if article_id not in self.article_embeddings:
             raise ValueError(f"작품 ID {article_id}를 찾을 수 없습니다.")
 
-        cluster_id = self.id_to_cluster[article_id]
-        similar_ids = self.cluster_to_ids[cluster_id]
-
-        # 자기 자신을 제외하고 상위 k개 반환
-        return [id for id in similar_ids if id != article_id][:top_k]
+        if self.distance_matrix is not None:
+            # ALL_DISTANCES 방식을 사용한 경우
+            idx = self.article_ids.index(article_id)
+            distances = self.distance_matrix[idx]
+            # 거리가 가까운 순서대로 정렬 (자기 자신 제외)
+            similar_indices = np.argsort(distances)[1 : top_k + 1]
+            return [self.article_ids[i] for i in similar_indices]
+        else:
+            # KMEANS 방식을 사용한 경우
+            cluster_id = self.id_to_cluster[article_id]
+            similar_ids = self.cluster_to_ids[cluster_id]
+            return [id for id in similar_ids if id != article_id][:top_k]
 
 
 def main():
-    # 클러스터링 수행 또는 로드
+    import argparse
+
+    parser = argparse.ArgumentParser(description="텍스트 클러스터링 시스템")
+    parser.add_argument(
+        "--method",
+        type=str,
+        choices=["kmeans", "all_distances"],
+        default="kmeans",
+        help="클러스터링 방식 선택",
+    )
+    parser.add_argument(
+        "--n_clusters",
+        type=int,
+        default=10,
+        help="K-means 클러스터 수 (method가 kmeans일 때만 사용)",
+    )
+    parser.add_argument(
+        "--distance_threshold",
+        type=float,
+        default=0.5,
+        help="유사도 임계값 (method가 all_distances일 때만 사용)",
+    )
+
+    args = parser.parse_args()
+
     cluster = TextCluster()
 
     if not os.path.exists("clusters.pkl"):
         print("새로운 클러스터링을 수행합니다...")
         documents = cluster.load_documents()
         cluster.create_embeddings(documents)
-        cluster.perform_clustering()
+        cluster.perform_clustering(
+            method=ClusteringMethod(args.method),
+            n_clusters=args.n_clusters,
+            distance_threshold=args.distance_threshold,
+        )
         cluster.save_clusters()
     else:
         print("저장된 클러스터링 결과를 로드합니다...")
