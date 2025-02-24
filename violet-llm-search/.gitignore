@@ -1,7 +1,7 @@
 *.json
 raw/*
 result/*
-vector_index/*
+vector_index*/*
 .env
 *.log
 *.txt

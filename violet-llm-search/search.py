@@ -13,6 +13,13 @@ from tqdm import tqdm
 # 환경 변수 로드
 load_dotenv()
 
+# 청크 설정
+CHUNK_SIZE = 1000
+CHUNK_OVERLAP = 200
+
+# 인덱스 경로 설정
+INDEX_PATH = f"vector_index_{CHUNK_SIZE}_{CHUNK_OVERLAP}"
+
 # Gemini 설정
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
@@ -34,8 +41,8 @@ class VectorSearch:
         )
         self.vector_store = None
         self.text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=500,
-            chunk_overlap=50,
+            chunk_size=CHUNK_SIZE,
+            chunk_overlap=CHUNK_OVERLAP,
             separators=["\n\n", "\n", ".", " ", "", "*", ":", '"'],
             length_function=len,
         )
@@ -80,16 +87,18 @@ class VectorSearch:
 
     def create_or_load_index(self, force_recreate: bool = False):
         """벡터 인덱스 생성 또는 로드"""
-        index_path = "vector_index"
-
-        if not force_recreate and os.path.exists(index_path):
-            print("기존 인덱스를 로드합니다...")
+        if not force_recreate and os.path.exists(INDEX_PATH):
+            print(
+                f"기존 인덱스를 로드합니다... (chunk_size: {CHUNK_SIZE}, chunk_overlap: {CHUNK_OVERLAP})"
+            )
             self.vector_store = FAISS.load_local(
-                index_path, self.embeddings, allow_dangerous_deserialization=True
+                INDEX_PATH, self.embeddings, allow_dangerous_deserialization=True
             )
             return
 
-        print("새로운 인덱스를 생성합니다...")
+        print(
+            f"새로운 인덱스를 생성합니다... (chunk_size: {CHUNK_SIZE}, chunk_overlap: {CHUNK_OVERLAP})"
+        )
         documents = self.load_documents()
 
         if not documents:
@@ -116,7 +125,7 @@ class VectorSearch:
 
         # 인덱스 저장
         print("인덱스 저장 중...")
-        self.vector_store.save_local(index_path)
+        self.vector_store.save_local(INDEX_PATH)
         print("인덱스가 생성되었습니다.")
 
     def get_prompt(self, query: str, context_text: str) -> str:
