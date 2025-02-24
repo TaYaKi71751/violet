@@ -72,6 +72,66 @@ class TextCluster:
         for doc_id, embedding in zip(doc_ids, embeddings_list):
             self.article_embeddings[doc_id] = embedding
 
+    def get_cluster_filename(self, method: ClusteringMethod) -> str:
+        """클러스터링 방식에 따른 파일 이름 반환"""
+        if method == ClusteringMethod.KMEANS:
+            return f"clusters_kmeans_{self.n_clusters}.pkl"
+        else:
+            return f"clusters_distances_{str(self.distance_threshold).replace('.', '_')}.pkl"
+
+    def save_clusters(self):
+        """클러스터링 결과 저장"""
+        method = (
+            ClusteringMethod.ALL_DISTANCES
+            if self.distance_matrix is not None
+            else ClusteringMethod.KMEANS
+        )
+        filename = self.get_cluster_filename(method)
+
+        data = {
+            "id_to_cluster": self.id_to_cluster,
+            "cluster_to_ids": dict(self.cluster_to_ids),
+            "distance_matrix": self.distance_matrix,
+            "article_ids": self.article_ids,
+            "article_embeddings": self.article_embeddings,
+            "clustering_method": method.value,
+            "n_clusters": getattr(self, "n_clusters", None),
+            "distance_threshold": getattr(self, "distance_threshold", None),
+        }
+        with open(filename, "wb") as f:
+            pickle.dump(data, f)
+        print(f"클러스터링 결과가 {filename}에 저장되었습니다.")
+
+    def load_clusters(self, filename: str = "clusters.pkl"):
+        """저장된 클러스터링 결과 로드"""
+        with open(filename, "rb") as f:
+            data = pickle.load(f)
+        self.id_to_cluster = data["id_to_cluster"]
+        self.cluster_to_ids = defaultdict(list, data["cluster_to_ids"])
+        self.distance_matrix = data["distance_matrix"]
+        self.article_ids = data["article_ids"]
+        self.article_embeddings = data["article_embeddings"]
+        method = data["clustering_method"]
+        print(f"클러스터링 결과를 로드했습니다. (방식: {method})")
+
+    def get_similar_articles(self, article_id: str, top_k: int = 20) -> List[str]:
+        """특정 작품과 비슷한 작품들 반환"""
+        if article_id not in self.article_embeddings:
+            raise ValueError(f"작품 ID {article_id}를 찾을 수 없습니다.")
+
+        if self.distance_matrix is not None:
+            # ALL_DISTANCES 방식을 사용한 경우
+            idx = self.article_ids.index(article_id)
+            distances = self.distance_matrix[idx]
+            # 거리가 가까운 순서대로 정렬 (자기 자신 제외)
+            similar_indices = np.argsort(distances)[1 : top_k + 1]
+            return [self.article_ids[i] for i in similar_indices]
+        else:
+            # KMEANS 방식을 사용한 경우
+            cluster_id = self.id_to_cluster[article_id]
+            similar_ids = self.cluster_to_ids[cluster_id]
+            return [id for id in similar_ids if id != article_id][:top_k]
+
     def perform_clustering(
         self,
         method: ClusteringMethod = ClusteringMethod.KMEANS,
@@ -80,6 +140,10 @@ class TextCluster:
     ):
         """클러스터링 수행"""
         print(f"클러스터링 수행 중... (방식: {method.value})")
+
+        # 파라미터 저장
+        self.n_clusters = n_clusters
+        self.distance_threshold = distance_threshold
 
         # 임베딩 배열 생성
         self.article_ids = list(self.article_embeddings.keys())
@@ -115,42 +179,6 @@ class TextCluster:
                 ]
                 self.cluster_to_ids[doc_id] = similar_ids
 
-    def save_clusters(self, filename: str = "clusters.pkl"):
-        """클러스터링 결과 저장"""
-        data = {
-            "id_to_cluster": self.id_to_cluster,
-            "cluster_to_ids": dict(self.cluster_to_ids),
-        }
-        with open(filename, "wb") as f:
-            pickle.dump(data, f)
-        print(f"클러스터링 결과가 {filename}에 저장되었습니다.")
-
-    def load_clusters(self, filename: str = "clusters.pkl"):
-        """저장된 클러스터링 결과 로드"""
-        with open(filename, "rb") as f:
-            data = pickle.load(f)
-        self.id_to_cluster = data["id_to_cluster"]
-        self.cluster_to_ids = defaultdict(list, data["cluster_to_ids"])
-        print("클러스터링 결과를 로드했습니다.")
-
-    def get_similar_articles(self, article_id: str, top_k: int = 20) -> List[str]:
-        """특정 작품과 비슷한 작품들 반환"""
-        if article_id not in self.article_embeddings:
-            raise ValueError(f"작품 ID {article_id}를 찾을 수 없습니다.")
-
-        if self.distance_matrix is not None:
-            # ALL_DISTANCES 방식을 사용한 경우
-            idx = self.article_ids.index(article_id)
-            distances = self.distance_matrix[idx]
-            # 거리가 가까운 순서대로 정렬 (자기 자신 제외)
-            similar_indices = np.argsort(distances)[1 : top_k + 1]
-            return [self.article_ids[i] for i in similar_indices]
-        else:
-            # KMEANS 방식을 사용한 경우
-            cluster_id = self.id_to_cluster[article_id]
-            similar_ids = self.cluster_to_ids[cluster_id]
-            return [id for id in similar_ids if id != article_id][:top_k]
-
 
 def main():
     import argparse
@@ -177,22 +205,28 @@ def main():
     )
 
     args = parser.parse_args()
+    method = ClusteringMethod(args.method)
+    filename = f"clusters_{args.method}"
+    if args.method == "kmeans":
+        filename += f"_{args.n_clusters}.pkl"
+    else:
+        filename += f"_{str(args.distance_threshold).replace('.', '_')}.pkl"
 
     cluster = TextCluster()
 
-    if not os.path.exists("clusters.pkl"):
+    if not os.path.exists(filename):
         print("새로운 클러스터링을 수행합니다...")
         documents = cluster.load_documents()
         cluster.create_embeddings(documents)
         cluster.perform_clustering(
-            method=ClusteringMethod(args.method),
+            method=method,
             n_clusters=args.n_clusters,
             distance_threshold=args.distance_threshold,
         )
         cluster.save_clusters()
     else:
         print("저장된 클러스터링 결과를 로드합니다...")
-        cluster.load_clusters()
+        cluster.load_clusters(filename)
 
     # 대화형 검색
     while True:
