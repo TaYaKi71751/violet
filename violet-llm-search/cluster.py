@@ -126,7 +126,13 @@ class TextCluster:
             return [id for id in similar_ids if id != article_id][:top_k]
 
     def visualize_clusters(
-        self, method: ClusteringMethod, output_dir: str = "visualizations"
+        self,
+        method: ClusteringMethod,
+        output_dir: str = "visualizations",
+        fig_width: int = 40,  # 크기를 더 작게 조정
+        fig_height: int = 30,  # 크기를 더 작게 조정
+        dpi: int = 100,  # DPI를 낮춤
+        leaf_font_size: int = 6,  # 글꼴 크기도 작게 조정
     ):
         """클러스터링 결과 시각화"""
         if not os.path.exists(output_dir):
@@ -199,6 +205,37 @@ class TextCluster:
                 self.id_to_cluster[doc_id] = cluster_id
                 self.cluster_to_ids[cluster_id].append(doc_id)
 
+    def save_embeddings(self, filename: str = "article_embeddings.pkl"):
+        """문서 임베딩 저장"""
+        data = {
+            "article_embeddings": self.article_embeddings,
+            # "model_name": self.embeddings.model_name,
+        }
+        with open(filename, "wb") as f:
+            pickle.dump(data, f)
+        print(f"임베딩이 {filename}에 저장되었습니다.")
+
+    def load_embeddings(self, filename: str = "article_embeddings.pkl") -> bool:
+        """저장된 임베딩 로드. 성공하면 True, 실패하면 False 반환"""
+        try:
+            if not os.path.exists(filename):
+                return False
+
+            with open(filename, "rb") as f:
+                data = pickle.load(f)
+
+            # 모델이 다른 경우 임베딩을 재생성
+            # if data["model_name"] != self.embeddings.model_name:
+            #     print("다른 임베딩 모델이 감지되어 임베딩을 재생성합니다.")
+            #     return False
+
+            self.article_embeddings = data["article_embeddings"]
+            print(f"임베딩을 {filename}에서 로드했습니다.")
+            return True
+        except Exception as e:
+            print(f"임베딩 로드 중 오류 발생: {e}")
+            return False
+
 
 def main():
     import argparse
@@ -223,6 +260,11 @@ def main():
         default=0.5,
         help="유사도 임계값 (all_distances에서 사용)",
     )
+    parser.add_argument(
+        "--force-embedding",
+        action="store_true",
+        help="임베딩을 강제로 재생성",
+    )
 
     args = parser.parse_args()
     method = ClusteringMethod(args.method)
@@ -235,7 +277,15 @@ def main():
     if not os.path.exists(filename):
         print("새로운 클러스터링을 수행합니다...")
         documents = cluster.load_documents()
-        cluster.create_embeddings(documents)
+
+        # 임베딩 로드 시도
+        if not args.force_embedding and cluster.load_embeddings():
+            print("기존 임베딩을 사용합니다.")
+        else:
+            print("임베딩을 생성합니다...")
+            cluster.create_embeddings(documents)
+            cluster.save_embeddings()
+
         cluster.perform_clustering(
             method=method,
             n_clusters=args.n_clusters,
