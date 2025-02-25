@@ -175,13 +175,21 @@ class VectorSearch:
 
         return prompts.get(self.prompt_type, prompts["general"])
 
-    def search(self, query: str, k: int = 50) -> str:
-        """쿼리에 대한 검색 수행"""
+    def search(self, query: str, search_query: str = None, k: int = 50) -> str:
+        """쿼리에 대한 검색 수행
+        Args:
+            query: 프롬프트에 사용될 쿼리
+            search_query: 벡터 검색에 사용될 쿼리 (None인 경우 query 사용)
+            k: 검색할 문서 수
+        """
         if not self.vector_store:
             raise ValueError("먼저 인덱스를 생성하거나 로드해야 합니다.")
 
+        # 벡터 검색에 사용할 쿼리 결정
+        vector_query = search_query if search_query is not None else query
+
         results = self.vector_store.similarity_search_with_score(
-            query, k=k, fetch_k=k * 20
+            vector_query, k=k, fetch_k=k * 20
         )
 
         contexts = []
@@ -222,6 +230,11 @@ def main():
         default="general",
         help="사용할 프롬프트 타입 선택 (general: 일반 답변, relevance: 관련도 평가, keyword: 키워드 관련성)",
     )
+    parser.add_argument(
+        "--separate-query",
+        action="store_true",
+        help="벡터 검색 쿼리와 프롬프트 쿼리를 분리하여 입력",
+    )
 
     args = parser.parse_args()
     vector_search = VectorSearch(model=args.model, prompt_type=args.prompt)
@@ -231,12 +244,21 @@ def main():
 
     # 검색 예시
     while True:
-        query = input("\n검색할 내용을 입력하세요 (종료하려면 'q' 입력): ")
-        if query.lower() == "q":
-            break
+        if args.separate_query:
+            search_query = input(
+                "\n벡터 검색에 사용할 키워드를 입력하세요 (종료하려면 'q' 입력): "
+            )
+            if search_query.lower() == "q":
+                break
+            prompt_query = input("프롬프트에 사용할 질문을 입력하세요: ")
+        else:
+            prompt_query = input("\n검색할 내용을 입력하세요 (종료하려면 'q' 입력): ")
+            if prompt_query.lower() == "q":
+                break
+            search_query = None
 
         try:
-            result = vector_search.search(query)
+            result = vector_search.search(prompt_query, search_query)
             print("\n=== 검색 결과 ===")
             print(result)
             print("================")
