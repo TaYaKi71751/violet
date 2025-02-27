@@ -9,6 +9,108 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from dotenv import load_dotenv
 import argparse
 from tqdm import tqdm
+import requests
+import json
+
+
+# https://github.com/mem0ai/grok3-api
+class GrokClient:
+    def __init__(self, cookies):
+        """
+        Initialize the Grok client with cookie values
+
+        Args:
+            cookies (dict): Dictionary containing cookie values
+                - x-anonuserid
+                - x-challenge
+                - x-signature
+                - sso
+                - sso-rw
+        """
+        self.base_url = "https://grok.com/rest/app-chat/conversations/new"
+        self.cookies = cookies
+        self.headers = {
+            "accept": "*/*",
+            "accept-language": "en-GB,en;q=0.9",
+            "content-type": "application/json",
+            "origin": "https://grok.com",
+            "priority": "u=1, i",
+            "referer": "https://grok.com/",
+            "sec-ch-ua": '"Not/A)Brand";v="8", "Chromium";v="126", "Brave";v="126"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"macOS"',
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-origin",
+            "sec-gpc": "1",
+            "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+        }
+
+    def _prepare_payload(self, message):
+        """Prepare the default payload with the user's message"""
+        return {
+            "temporary": False,
+            "modelName": "grok-3",
+            "message": message,
+            "fileAttachments": [],
+            "imageAttachments": [],
+            "disableSearch": False,
+            "enableImageGeneration": True,
+            "returnImageBytes": False,
+            "returnRawGrokInXaiRequest": False,
+            "enableImageStreaming": True,
+            "imageGenerationCount": 2,
+            "forceConcise": False,
+            "toolOverrides": {},
+            "enableSideBySide": True,
+            "isPreset": False,
+            "sendFinalMetadata": True,
+            "customInstructions": "",
+            "deepsearchPreset": "",
+            "isReasoning": False,
+        }
+
+    def send_message(self, message):
+        """
+        Send a message to Grok and collect the streaming response
+
+        Args:
+            message (str): The user's input message
+
+        Returns:
+            str: The complete response from Grok
+        """
+        payload = self._prepare_payload(message)
+        response = requests.post(
+            self.base_url,
+            headers=self.headers,
+            cookies=self.cookies,
+            json=payload,
+            stream=True,
+        )
+
+        full_response = ""
+
+        for line in response.iter_lines():
+            if line:
+                decoded_line = line.decode("utf-8")
+                try:
+                    json_data = json.loads(decoded_line)
+                    result = json_data.get("result", {})
+                    response_data = result.get("response", {})
+
+                    if "modelResponse" in response_data:
+                        return response_data["modelResponse"]["message"]
+
+                    token = response_data.get("token", "")
+                    if token:
+                        full_response += token
+
+                except json.JSONDecodeError:
+                    continue
+
+        return full_response.strip()
+
 
 # 환경 변수 로드
 load_dotenv()
@@ -48,13 +150,37 @@ class VectorSearch:
         )
         self.model = model
         self.prompt_type = prompt_type
+
         if model == "groq":
             self.client = groq.Groq(api_key=os.getenv("GROQ_API_KEY"))
         elif model == "gemini":
             self.client = genai.GenerativeModel("gemini-2.0-flash")
+        elif model == "grok":
+            # Grok API는 클라이언트 라이브러리가 아닌 직접 API 호출 방식 사용
+            self.grok_api_key = os.getenv("GROK_API_KEY")
+            if not self.grok_api_key:
+                raise ValueError("GROK_API_KEY 환경 변수가 설정되지 않았습니다.")
+        elif model == "grok-unofficial":
+            # 쿠키 값 로드
+            cookies = {
+                "x-anonuserid": os.getenv("GROK_ANONUSERID"),
+                "x-challenge": os.getenv("GROK_CHALLENGE"),
+                "x-signature": os.getenv("GROK_SIGNATURE"),
+                "sso": os.getenv("GROK_SSO"),
+                "sso-rw": os.getenv("GROK_SSO_RW"),
+            }
+
+            # 필수 쿠키 값 확인
+            missing_cookies = [k for k, v in cookies.items() if not v]
+            if missing_cookies:
+                raise ValueError(
+                    f"다음 Grok 쿠키 환경 변수가 설정되지 않았습니다: {', '.join(missing_cookies)}"
+                )
+
+            self.client = GrokClient(cookies)
         else:
             raise ValueError(
-                "지원하지 않는 모델입니다. 'groq' 또는 'gemini'를 선택하세요."
+                "지원하지 않는 모델입니다. 'groq', 'gemini', 'grok', 또는 'grok-unofficial'을 선택하세요."
             )
 
     def load_documents(self) -> List[Dict[str, Any]]:
@@ -209,9 +335,41 @@ class VectorSearch:
                 max_tokens=1000,
             )
             return completion.choices[0].message.content
-        else:  # gemini
+        elif self.model == "gemini":
             response = self.client.generate_content(prompt)
             return response.text
+        elif self.model == "grok":
+            # Grok API 호출
+            headers = {
+                "Authorization": f"Bearer {self.grok_api_key}",
+                "Content-Type": "application/json",
+            }
+
+            payload = {
+                "messages": [{"role": "user", "content": prompt}],
+                "model": "grok-2-1212",  # TODO: grok-3
+                "temperature": 0.1,
+                "max_tokens": 1000,
+            }
+
+            response = requests.post(
+                "https://api.x.ai/v1/chat/completions", headers=headers, json=payload
+            )
+
+            if response.status_code != 200:
+                raise Exception(
+                    f"Grok API 오류: {response.status_code} - {response.text}"
+                )
+
+            result = response.json()
+            return result["choices"][0]["message"]["content"]
+        elif self.model == "grok-unofficial":
+            # 비공식 Grok API 클라이언트 사용
+            try:
+                response = self.client.send_message(prompt)
+                return response
+            except Exception as e:
+                raise Exception(f"비공식 Grok API 오류: {str(e)}")
 
 
 def main():
@@ -219,9 +377,14 @@ def main():
     parser.add_argument(
         "--model",
         type=str,
-        choices=["groq", "gemini"],
+        choices=[
+            "groq",
+            "gemini",
+            "grok",
+            "grok-unofficial",
+        ],  # grok-unofficial 옵션 추가
         default="gemini",
-        help="사용할 모델을 선택 (groq 또는 gemini)",
+        help="사용할 모델을 선택 (groq, gemini, grok, 또는 grok-unofficial)",
     )
     parser.add_argument(
         "--prompt",
@@ -237,7 +400,15 @@ def main():
     )
 
     args = parser.parse_args()
-    vector_search = VectorSearch(model=args.model, prompt_type=args.prompt)
+
+    try:
+        vector_search = VectorSearch(model=args.model, prompt_type=args.prompt)
+    except ImportError as e:
+        print(f"오류: {e}")
+        return
+    except ValueError as e:
+        print(f"오류: {e}")
+        return
 
     # 인덱스 생성 또는 로드
     vector_search.create_or_load_index()
