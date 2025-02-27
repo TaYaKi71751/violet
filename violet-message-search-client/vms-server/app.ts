@@ -58,8 +58,8 @@ app.get(
     const article = req.params["article"];
 
     db.all(
-      `SELECT * FROM HitomiColumnModel WHERE Id=${article}`,
-      [],
+      `SELECT * FROM HitomiColumnModel WHERE Id=?`,
+      [article],
       (err: any, rows: any) => {
         res.send(rows[0]);
       }
@@ -74,8 +74,8 @@ app.get(
     const article = req.params["article"];
 
     db.all(
-      `SELECT EHash FROM HitomiColumnModel WHERE Id=${article}`,
-      [],
+      `SELECT EHash FROM HitomiColumnModel WHERE Id=?`,
+      [article],
       (err: any, rows: any) => {
         res.send(rows[0]["EHash"]);
       }
