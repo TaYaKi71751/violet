@@ -531,6 +531,38 @@ class TextCluster:
             print(f"임베딩 로드 중 오류 발생: {e}")
             return False
 
+    def save_similar_articles_with_scores(
+        self, filename: str = "similar_articles_with_scores.json", top_k: int = 30
+    ):
+        """각 작품에 대해 유사한 작품 30개와 상대적 유사도 점수를 JSON 형식으로 저장"""
+        import json
+
+        if self.distance_matrix is None:
+            raise ValueError(
+                "거리 행렬이 없습니다. all_distances 방식으로 클러스터링을 수행하세요."
+            )
+
+        similar_data = {}
+        for i, article_id in enumerate(self.article_ids):
+            # 거리 행렬에서 현재 작품의 거리 가져오기 (코사인 거리이므로 1 - 거리 = 유사도)
+            distances = self.distance_matrix[i]
+            # 거리가 0인 자신 제거
+            distances[i] = float("inf")
+            # 유사도 점수 계산 (코사인 거리는 0~2 범위, 유사도는 0~1로 정규화: 1 - 거리/2)
+            similarities = 1 - (distances / 2)  # 코사인 거리를 유사도로 변환 (0~1 범위)
+            # 유사도가 높은 순으로 상위 30개 인덱스 추출
+            similar_indices = np.argsort(similarities)[-top_k:][::-1]  # 내림차순 정렬
+            # {"other_id": relative_score} 형식으로 딕셔너리 생성
+            similar_entries = {
+                self.article_ids[j]: float(similarities[j]) for j in similar_indices
+            }
+            similar_data[article_id] = similar_entries
+
+        # JSON 파일로 저장
+        with open(filename, "w", encoding="utf-8") as f:
+            json.dump(similar_data, f, ensure_ascii=False, indent=4)
+        print(f"유사한 작품 데이터가 {filename}에 저장되었습니다.")
+
 
 def main():
     import argparse
@@ -589,11 +621,15 @@ def main():
         cluster.save_clusters()
         if method == ClusteringMethod.HIERARCHICAL:
             cluster.visualize_clusters(method)
+        if method == ClusteringMethod.ALL_DISTANCES:
+            cluster.save_similar_articles_with_scores(top_k=50)
     else:
         print("저장된 클러스터링 결과를 로드합니다...")
         cluster.load_clusters(filename)
         if method == ClusteringMethod.HIERARCHICAL:
             cluster.visualize_clusters(method)
+        if method == ClusteringMethod.ALL_DISTANCES:
+            cluster.save_similar_articles_with_scores(top_k=50)
 
     while True:
         article_id = input("\n작품 ID를 입력하세요 (종료하려면 'q' 입력): ")
