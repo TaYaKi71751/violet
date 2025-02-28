@@ -116,8 +116,8 @@ class GrokClient:
 load_dotenv()
 
 # 청크 설정
-CHUNK_SIZE = 1000
-CHUNK_OVERLAP = 200
+CHUNK_SIZE = 2000
+CHUNK_OVERLAP = 400
 
 # 인덱스 경로 설정
 INDEX_PATH = f"vector_index_{CHUNK_SIZE}_{CHUNK_OVERLAP}"
