@@ -235,7 +235,7 @@ class VectorSearch:
 
         # 청크 단위로 임베딩 생성 및 진행률 표시
         embeddings_list = []
-        batch_size = 32  # 배치 크기 설정
+        batch_size = 128  # 배치 크기 설정
 
         for i in tqdm(range(0, len(texts), batch_size), desc="임베딩 생성 중"):
             batch_texts = texts[i : i + batch_size]
@@ -314,8 +314,16 @@ class VectorSearch:
         # 벡터 검색에 사용할 쿼리 결정
         vector_query = search_query if search_query is not None else query
 
+        # 전체 인덱스에 저장된 문서 수를 가져와 fetch_k로 사용합니다.
+        # (self.vector_store.index.ntotal이 FAISS 인덱스의 총 벡터 수입니다.)
+        total_docs = (
+            self.vector_store.index.ntotal
+            if hasattr(self.vector_store, "index")
+            else k * 20
+        )
+
         results = self.vector_store.similarity_search_with_score(
-            vector_query, k=k, fetch_k=k * 20
+            vector_query, k=k, fetch_k=total_docs
         )
 
         contexts = []
