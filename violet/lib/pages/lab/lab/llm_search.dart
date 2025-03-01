@@ -39,19 +39,10 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
   List<GlobalKey>? _keys;
   List<String>? _urls;
 
-  // 검색 폼의 높이를 측정하기 위한 GlobalKey 추가
-  final GlobalKey _searchFormKey = GlobalKey();
-  double _searchFormHeight = 0.0;
-
   @override
   void initState() {
     super.initState();
     _loadSavedServerUrl();
-
-    // 위젯이 렌더링된 후 검색 폼의 높이를 측정
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _measureSearchFormHeight();
-    });
   }
 
   @override
@@ -199,23 +190,11 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
     );
   }
 
-  // 검색 폼의 실제 높이를 측정하는 메서드
-  void _measureSearchFormHeight() {
-    if (_searchFormKey.currentContext != null) {
-      final RenderBox renderBox =
-          _searchFormKey.currentContext!.findRenderObject() as RenderBox;
-      setState(() {
-        _searchFormHeight = renderBox.size.height;
-      });
-    }
-  }
-
   // 검색 폼 위젯 (기존 레이아웃)
   Widget _buildSearchForm() {
     return Column(
       children: [
         Padding(
-          key: _searchFormKey, // GlobalKey 추가
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -240,8 +219,8 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
 
   // 검색 결과 화면 (두 가지 페이즈를 가진 레이아웃)
   Widget _buildSearchResultsView() {
-    // 동적으로 측정된 높이 사용 (기본값 설정)
-    final double formHeight = _searchFormHeight > 0 ? _searchFormHeight : 350;
+    // 동적으로 SliverAppBar 높이 계산
+    final double formHeight = _calculateFormHeight();
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -258,7 +237,7 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
               pinned: false,
               floating: true,
               snap: true,
-              expandedHeight: formHeight, // 동적으로 측정된 높이 사용
+              expandedHeight: formHeight, // 동적으로 계산된 높이 사용
               backgroundColor:
                   Settings.themeWhat ? Colors.grey.shade900 : Colors.white,
               flexibleSpace: FlexibleSpaceBar(
@@ -340,6 +319,25 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
         ),
       ),
     );
+  }
+
+  // 검색 폼 높이를 동적으로 계산하는 메서드
+  double _calculateFormHeight() {
+    // 기본 패딩 및 위젯 간격
+    double height = 16.0 * 2; // 상하 패딩
+
+    // 제목 높이
+    height += 40.0; // 제목 + 간격
+
+    // 입력 필드 높이 (각 필드 + 간격)
+    height += 60.0 + 12.0; // 서버 URL 필드 + 간격
+    height += 60.0 + 12.0; // 검색어 필드 + 간격
+    height += 60.0 + 16.0; // k 필드 + 간격
+
+    // 검색 버튼 높이
+    height += 48.0;
+
+    return height;
   }
 
   Widget _buildTitle() {

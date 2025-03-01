@@ -175,7 +175,8 @@ class LLMSearchService {
       String resultText = result['result'] as String;
 
       // JSON 블록이 있는 경우 처리
-      if (resultText.trim().startsWith('```')) {
+      if (resultText.trim().startsWith('```') &&
+          resultText.trim().endsWith('```')) {
         final parsedResult = parseJsonFromMarkdown(resultText);
 
         // 파싱된 결과가 Map이면 그대로 반환
