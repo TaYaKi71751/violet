@@ -46,6 +46,7 @@ dependencies:
   cached_network_image: ^3.2.1
   carousel_slider: ^5.0.0
   chopper: ^8.0.0
+  charset: ^2.0.1
   # charts_flutter: ^0.11.0
   # charts_flutter: # https://github.com/google/charts/issues/678
   #   git:
@@ -123,7 +124,7 @@ dependencies:
   material_design_icons_flutter: ^5.0.6595
   mdi: ^5.0.0-nullsafety.0
   modal_bottom_sheet: ^3.0.0-pre
-  open_file: ^3.3.1
+  open_file: ^3.5.10
   path:
   path_provider: ^2.1.4
   permission_handler: ^11.0.1
