@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:violet/component/image_provider.dart';
 import 'package:violet/log/log.dart';
@@ -206,7 +207,7 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
           ),
           if (_searchResults.isNotEmpty)
             Expanded(
-              child: _buildResultsList(),
+              child: _buildResultsGrid(),
             ),
         ],
       ),
@@ -316,131 +317,166 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
     );
   }
 
-  Widget _buildResultsList() {
-    final height = MediaQuery.of(context).size.height;
+  Widget _buildResultsGrid() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // 화면 너비에 따라 컬럼 수 결정
+        int crossAxisCount = _calculateColumnCount(constraints.maxWidth);
+        final height = MediaQuery.of(context).size.height;
 
-    return ListView.builder(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.all(8),
-      cacheExtent: height * 3.0,
-      itemCount: _searchResults.length,
-      itemBuilder: (BuildContext ctxt, int index) {
-        final result = _searchResults[index];
-        return FutureBuilder(
-          future: Future.delayed(const Duration(milliseconds: 100))
-              .then((value) async {
-            final provider = await getImageProviderFromId(result.id);
-            final image = await provider.getThumbnailUrl();
-            final header = await provider.getHeader(0);
-            _urls![index] = image;
-
-            return (image, header);
-          }),
-          builder:
-              (context, AsyncSnapshot<(String, Map<String, String>)> snapshot) {
-            if (!snapshot.hasData) {
-              return Column(
-                children: [
-                  SizedBox(
-                    height: _height![index] != 0 ? _height![index] : 200,
-                    child: const Align(
-                      alignment: Alignment.center,
-                      child: SizedBox(
-                        width: 50,
-                        height: 50,
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                  ),
-                  ListTile(
-                    title: Text('ID: ${result.id}'),
-                    subtitle: Text(result.reason),
-                  ),
-                ],
-              );
-            }
-
-            return Card(
-              margin: const EdgeInsets.symmetric(vertical: 8),
-              elevation: 2,
-              child: InkWell(
-                onTap: () async {
-                  FocusScope.of(context).unfocus();
-                  showArticleInfoById(context, result.id);
-                },
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(4)),
-                      child: VCachedNetworkImage(
-                        key: _keys![index],
-                        fit: BoxFit.cover,
-                        fadeInDuration: const Duration(microseconds: 500),
-                        fadeInCurve: Curves.easeIn,
-                        imageUrl: snapshot.data!.$1,
-                        httpHeaders: snapshot.data!.$2,
-                        progressIndicatorBuilder: (context, string, progress) {
-                          return SizedBox(
-                            height: 200,
-                            child: Center(
-                              child: SizedBox(
-                                width: 30,
-                                height: 30,
-                                child: CircularProgressIndicator(
-                                  value: progress.progress,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                        imageBuilder: (context, imageProvider, child) {
-                          if (_height![index] == 0 || _height![index] == 200) {
-                            Future.delayed(const Duration(milliseconds: 50))
-                                .then((value) {
-                              try {
-                                final RenderBox renderBox = _keys![index]
-                                    .currentContext!
-                                    .findRenderObject()! as RenderBox;
-                                final sizeRender = renderBox.size;
-                                if (sizeRender.height != 200) {
-                                  setState(() {
-                                    _height![index] = sizeRender.height;
-                                  });
-                                }
-                              } catch (_) {}
-                            });
-                          }
-                          return child;
-                        },
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'ID: ${result.id}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            result.reason,
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
+        return MasonryGridView.count(
+          physics: const BouncingScrollPhysics(),
+          crossAxisCount: crossAxisCount,
+          mainAxisSpacing: 8.0,
+          crossAxisSpacing: 8.0,
+          itemCount: _searchResults.length,
+          padding: const EdgeInsets.all(8),
+          cacheExtent: height * 3.0,
+          itemBuilder: (context, index) {
+            return _buildResultCard(index);
           },
+        );
+      },
+    );
+  }
+
+  // 화면 너비에 따라 컬럼 수 계산
+  int _calculateColumnCount(double width) {
+    if (width < 600) return 1;
+    if (width < 900) return 2;
+    if (width < 1200) return 3;
+    if (width < 1500) return 4;
+    return 5;
+  }
+
+  Widget _buildResultCard(int index) {
+    final result = _searchResults[index];
+
+    return FutureBuilder(
+      future:
+          Future.delayed(const Duration(milliseconds: 100)).then((value) async {
+        final provider = await getImageProviderFromId(result.id);
+        final image = await provider.getThumbnailUrl();
+        final header = await provider.getHeader(0);
+        _urls![index] = image;
+
+        return (image, header);
+      }),
+      builder:
+          (context, AsyncSnapshot<(String, Map<String, String>)> snapshot) {
+        if (!snapshot.hasData) {
+          return Card(
+            elevation: 3,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: CircularProgressIndicator(),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'ID: ${result.id}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    result.reason,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return Card(
+          elevation: 3,
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () async {
+              FocusScope.of(context).unfocus();
+              showArticleInfoById(context, result.id);
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 이미지 영역
+                FutureBuilder<Size>(
+                  future: _calculateImageDimension(
+                      snapshot.data!.$1, snapshot.data!.$2),
+                  builder: (context, sizeSnapshot) {
+                    // 이미지 크기 정보가 있으면 실제 비율 사용, 없으면 기본값 사용
+                    double aspectRatio = 1.0; // 기본값
+                    if (sizeSnapshot.hasData) {
+                      aspectRatio =
+                          sizeSnapshot.data!.width / sizeSnapshot.data!.height;
+                      // 너무 극단적인 비율 방지
+                      if (aspectRatio > 2.5) aspectRatio = 2.5;
+                      if (aspectRatio < 0.4) aspectRatio = 0.4;
+                    }
+
+                    return AspectRatio(
+                      aspectRatio: aspectRatio,
+                      child: Container(
+                        color: Settings.themeWhat
+                            ? Colors.black12
+                            : Colors.grey.shade100,
+                        child: Hero(
+                          tag: 'result_image_${result.id}',
+                          child: VCachedNetworkImage(
+                            key: _keys![index],
+                            fit: BoxFit.contain, // 이미지가 짤리지 않고 전체가 보이도록 함
+                            fadeInDuration: const Duration(microseconds: 500),
+                            fadeInCurve: Curves.easeIn,
+                            imageUrl: snapshot.data!.$1,
+                            httpHeaders: snapshot.data!.$2,
+                            progressIndicatorBuilder:
+                                (context, string, progress) {
+                              return Center(
+                                child: SizedBox(
+                                  width: 30,
+                                  height: 30,
+                                  child: CircularProgressIndicator(
+                                    value: progress.progress,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                // ID 표시 영역
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
+                  child: Text(
+                    'ID: ${result.id}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                // 설명 텍스트 영역
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                  child: Text(
+                    result.reason,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
