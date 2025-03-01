@@ -184,160 +184,34 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
     return CardPanel.build(
       context,
       enableBackgroundColor: true,
-      child: _searchResults.isEmpty
-          ? _buildSearchForm() // 검색 결과가 없을 때는 기존 레이아웃 사용
-          : _buildSearchResultsView(), // 검색 결과가 있을 때는 새로운 레이아웃 사용
-    );
-  }
-
-  // 검색 폼 위젯 (기존 레이아웃)
-  Widget _buildSearchForm() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildTitle(),
-              const SizedBox(height: 16),
-              _buildServerUrlField(),
-              const SizedBox(height: 12),
-              _buildSearchQueryField(),
-              const SizedBox(height: 12),
-              _buildKField(),
-              const SizedBox(height: 16),
-              _buildSearchButton(),
-              const SizedBox(height: 16),
-              if (_evaluate.isNotEmpty) _buildEvaluateArea(),
-            ],
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildTitle(),
+                const SizedBox(height: 16),
+                _buildServerUrlField(),
+                const SizedBox(height: 12),
+                _buildSearchQueryField(),
+                const SizedBox(height: 12),
+                _buildKField(),
+                const SizedBox(height: 16),
+                _buildSearchButton(),
+                const SizedBox(height: 16),
+                if (_evaluate.isNotEmpty) _buildEvaluateArea(),
+              ],
+            ),
           ),
-        ),
-      ],
-    );
-  }
-
-  // 검색 결과 화면 (두 가지 페이즈를 가진 레이아웃)
-  Widget _buildSearchResultsView() {
-    // 동적으로 SliverAppBar 높이 계산
-    final double formHeight = _calculateFormHeight();
-
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: NotificationListener<ScrollNotification>(
-        onNotification: (scrollNotification) {
-          // 스크롤 이벤트 처리 (필요한 경우)
-          return false;
-        },
-        child: CustomScrollView(
-          physics: const BouncingScrollPhysics(),
-          slivers: [
-            // 첫 번째 페이즈: 스크롤을 올렸을 때 보이는 영역 (초기 검색 화면과 동일)
-            SliverAppBar(
-              pinned: false,
-              floating: true,
-              snap: true,
-              expandedHeight: formHeight, // 동적으로 계산된 높이 사용
-              backgroundColor:
-                  Settings.themeWhat ? Colors.grey.shade900 : Colors.white,
-              flexibleSpace: FlexibleSpaceBar(
-                background: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _buildTitle(),
-                      const SizedBox(height: 16),
-                      _buildServerUrlField(),
-                      const SizedBox(height: 12),
-                      _buildSearchQueryField(),
-                      const SizedBox(height: 12),
-                      _buildKField(),
-                      const SizedBox(height: 16),
-                      _buildSearchButton(),
-                    ],
-                  ),
-                ),
-              ),
+          if (_searchResults.isNotEmpty)
+            Expanded(
+              child: _buildResultsGrid(),
             ),
-
-            // 두 번째 페이즈: 스크롤을 내렸을 때 보이는 영역 (검색 결과 요약만)
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: _SearchResultsHeaderDelegate(
-                child: Container(
-                  color:
-                      Settings.themeWhat ? Colors.grey.shade900 : Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 8.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _buildEvaluateArea(), // 검색 결과 요약만 표시
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            // 검색 결과가 있을 때만 그리드 표시
-            if (_searchResults.isNotEmpty)
-              SliverPadding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      if (index == 0) {
-                        return _buildResultsGrid();
-                      }
-                      return null;
-                    },
-                    childCount: 1,
-                  ),
-                ),
-              )
-            else
-              // 검색 결과가 없을 때 메시지 표시
-              SliverToBoxAdapter(
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(32.0),
-                    child: Text(
-                      '검색 결과가 없습니다.',
-                      style: TextStyle(
-                        color: Settings.themeWhat
-                            ? Colors.white70
-                            : Colors.black54,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
+        ],
       ),
     );
-  }
-
-  // 검색 폼 높이를 동적으로 계산하는 메서드
-  double _calculateFormHeight() {
-    // 기본 패딩 및 위젯 간격
-    double height = 16.0 * 2; // 상하 패딩
-
-    // 제목 높이
-    height += 40.0; // 제목 + 간격
-
-    // 입력 필드 높이 (각 필드 + 간격)
-    height += 60.0 + 12.0; // 서버 URL 필드 + 간격
-    height += 60.0 + 12.0; // 검색어 필드 + 간격
-    height += 60.0 + 16.0; // k 필드 + 간격
-
-    // 검색 버튼 높이
-    height += 48.0;
-
-    return height;
   }
 
   Widget _buildTitle() {
@@ -368,7 +242,7 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
       controller: _searchQueryController,
       decoration: const InputDecoration(
         labelText: '검색어 (search_query)',
-        hintText: '검색 내용을 입력하세요',
+        hintText: '검색할 키워드를 입력하세요',
         border: OutlineInputBorder(),
       ),
     );
@@ -412,7 +286,7 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
 
   Widget _buildEvaluateArea() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Settings.themeWhat ? Colors.black26 : Colors.grey.shade100,
         borderRadius: BorderRadius.circular(8),
@@ -423,30 +297,15 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              const Text(
-                '검색 결과 요약',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              const Spacer(),
-              // 검색어 표시 (간결하게)
-              Text(
-                '검색어: ${_searchQueryController.text}',
-                style: TextStyle(
-                  color: Settings.themeWhat ? Colors.white70 : Colors.black54,
-                  fontSize: 12,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ],
+          const Text(
+            '검색 결과 요약',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
           Text(
             _evaluate,
             style: TextStyle(
@@ -463,34 +322,19 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
       builder: (context, constraints) {
         // 화면 너비에 따라 컬럼 수 결정
         int crossAxisCount = _calculateColumnCount(constraints.maxWidth);
+        final height = MediaQuery.of(context).size.height;
 
-        // 결과가 없으면 빈 컨테이너 반환
-        if (_searchResults.isEmpty) {
-          return const SizedBox.shrink();
-        }
-
-        // 결과 개수에 따라 높이 계산 (최소 높이 설정)
-        final double itemHeight = 300.0; // 각 아이템의 평균 높이
-        final double totalHeight =
-            _searchResults.length * itemHeight / crossAxisCount;
-        final double minHeight =
-            MediaQuery.of(context).size.height * 0.5; // 최소 높이
-        final double gridHeight =
-            totalHeight > minHeight ? totalHeight : minHeight;
-
-        return SizedBox(
-          height: gridHeight,
-          child: MasonryGridView.count(
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: crossAxisCount,
-            mainAxisSpacing: 8.0,
-            crossAxisSpacing: 8.0,
-            itemCount: _searchResults.length,
-            padding: const EdgeInsets.all(8),
-            itemBuilder: (context, index) {
-              return _buildResultCard(index);
-            },
-          ),
+        return MasonryGridView.count(
+          physics: const BouncingScrollPhysics(),
+          crossAxisCount: crossAxisCount,
+          mainAxisSpacing: 8.0,
+          crossAxisSpacing: 8.0,
+          itemCount: _searchResults.length,
+          padding: const EdgeInsets.all(8),
+          cacheExtent: height * 3.0,
+          itemBuilder: (context, index) {
+            return _buildResultCard(index);
+          },
         );
       },
     );
@@ -661,30 +505,4 @@ class SearchResult {
   final String reason;
 
   SearchResult({required this.id, required this.reason});
-}
-
-// 검색 결과 헤더 델리게이트 클래스 (스크롤 시 고정되는 헤더)
-class _SearchResultsHeaderDelegate extends SliverPersistentHeaderDelegate {
-  final Widget child;
-
-  _SearchResultsHeaderDelegate({
-    required this.child,
-  });
-
-  @override
-  double get minExtent => 120; // 검색 결과 요약만 표시하므로 높이 축소
-
-  @override
-  double get maxExtent => 120; // 검색 결과 요약만 표시하므로 높이 축소
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return child;
-  }
-
-  @override
-  bool shouldRebuild(_SearchResultsHeaderDelegate oldDelegate) {
-    return child != oldDelegate.child;
-  }
 }
