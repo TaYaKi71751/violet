@@ -6,8 +6,6 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:violet/component/image_provider.dart';
 import 'package:violet/log/log.dart';
 import 'package:violet/pages/common/toast.dart';
 import 'package:violet/pages/common/utils.dart';
@@ -24,7 +22,6 @@ class LLMSearchPage extends StatefulWidget {
 }
 
 class _LLMSearchPageState extends State<LLMSearchPage> {
-  final TextEditingController _serverUrlController = TextEditingController();
   final TextEditingController _queryController = TextEditingController();
   final TextEditingController _searchQueryController = TextEditingController();
   final TextEditingController _kController = TextEditingController(text: '50');
@@ -35,14 +32,12 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
   LLMSearchService? _searchService;
   List<SearchResult> _searchResults = [];
 
-  List<double>? _height;
   List<GlobalKey>? _keys;
   List<String>? _urls;
 
   @override
   void initState() {
     super.initState();
-    _loadSavedServerUrl();
   }
 
   @override
@@ -64,31 +59,7 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
     }
   }
 
-  Future<void> _loadSavedServerUrl() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedUrl = prefs.getString('llm_search_server_url');
-    if (savedUrl != null && savedUrl.isNotEmpty) {
-      _serverUrlController.text = savedUrl;
-    } else {
-      _serverUrlController.text = 'http://localhost:8080';
-    }
-  }
-
-  Future<void> _saveServerUrl(String url) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('llm_search_server_url', url);
-    Logger.info('[LLMSearchPage] 서버 URL 저장: $url');
-  }
-
   void _search() async {
-    if (_serverUrlController.text.isEmpty) {
-      showToast(
-        level: ToastLevel.error,
-        message: '서버 URL을 입력해주세요.',
-      );
-      return;
-    }
-
     if (_searchQueryController.text.isEmpty) {
       showToast(
         level: ToastLevel.error,
@@ -104,13 +75,7 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
     });
 
     try {
-      _searchService ??= LLMSearchService(baseUrl: _serverUrlController.text);
-
-      // 서버 URL이 변경된 경우 서비스 재생성
-      if (_searchService!.baseUrl != _serverUrlController.text) {
-        _searchService = LLMSearchService(baseUrl: _serverUrlController.text);
-        await _saveServerUrl(_serverUrlController.text);
-      }
+      _searchService ??= LLMSearchService();
 
       final int k = int.tryParse(_kController.text) ?? 50;
 
@@ -148,7 +113,6 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
         }
 
         // 이미지 표시를 위한 초기화
-        _height = List<double>.filled(searchResults.length, 0);
         _keys = List<GlobalKey>.generate(
             searchResults.length, (index) => GlobalKey());
         _urls = List<String>.filled(searchResults.length, '');
@@ -193,13 +157,7 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
               children: [
                 _buildTitle(),
                 const SizedBox(height: 16),
-                _buildServerUrlField(),
-                const SizedBox(height: 12),
-                _buildSearchQueryField(),
-                const SizedBox(height: 12),
-                _buildKField(),
-                const SizedBox(height: 16),
-                _buildSearchButton(),
+                _buildSearchRow(),
                 const SizedBox(height: 16),
                 if (_evaluate.isNotEmpty) _buildEvaluateArea(),
               ],
@@ -217,7 +175,7 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
   Widget _buildTitle() {
     return const Center(
       child: Text(
-        'LLM 검색',
+        'Violet LLM Search',
         style: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.bold,
@@ -226,61 +184,65 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
     );
   }
 
-  Widget _buildServerUrlField() {
-    return TextField(
-      controller: _serverUrlController,
-      decoration: const InputDecoration(
-        labelText: '서버 URL',
-        hintText: 'http://localhost:8080',
-        border: OutlineInputBorder(),
-      ),
-    );
-  }
-
-  Widget _buildSearchQueryField() {
-    return TextField(
-      controller: _searchQueryController,
-      decoration: const InputDecoration(
-        labelText: '검색어 (search_query)',
-        hintText: '검색할 키워드를 입력하세요',
-        border: OutlineInputBorder(),
-      ),
-    );
-  }
-
-  Widget _buildKField() {
-    return TextField(
-      controller: _kController,
-      decoration: const InputDecoration(
-        labelText: '검색 문서 수 (k)',
-        hintText: '50',
-        border: OutlineInputBorder(),
-      ),
-      keyboardType: TextInputType.number,
-    );
-  }
-
-  Widget _buildSearchButton() {
-    return ElevatedButton(
-      onPressed: _isLoading ? null : _search,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Settings.majorColor,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-      ),
-      child: _isLoading
-          ? const SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(
-                color: Colors.white,
-                strokeWidth: 2,
-              ),
-            )
-          : const Text(
-              '검색',
-              style: TextStyle(fontSize: 16),
+  Widget _buildSearchRow() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 3,
+          child: TextField(
+            controller: _searchQueryController,
+            decoration: const InputDecoration(
+              labelText: '검색어',
+              hintText: '검색할 키워드를 입력하세요',
+              border: OutlineInputBorder(),
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          flex: 1,
+          child: TextField(
+            controller: _kController,
+            decoration: const InputDecoration(
+              labelText: '문서 수',
+              hintText: '50',
+              border: OutlineInputBorder(),
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            ),
+            keyboardType: TextInputType.number,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: ElevatedButton(
+            onPressed: _isLoading ? null : _search,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Settings.majorColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              minimumSize: const Size(80, 48),
+            ),
+            child: _isLoading
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : const Text(
+                    '검색',
+                    style: TextStyle(fontSize: 16),
+                  ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -298,14 +260,14 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '검색 결과 요약',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-          const SizedBox(height: 8),
+          //   const Text(
+          //     '검색 결과 요약',
+          //     style: TextStyle(
+          //       fontWeight: FontWeight.bold,
+          //       fontSize: 16,
+          //     ),
+          //   ),
+          //   const SizedBox(height: 8),
           Text(
             _evaluate,
             style: TextStyle(
@@ -320,15 +282,14 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
   Widget _buildResultsGrid() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // 화면 너비에 따라 컬럼 수 결정
         int crossAxisCount = _calculateColumnCount(constraints.maxWidth);
         final height = MediaQuery.of(context).size.height;
 
         return MasonryGridView.count(
           physics: const BouncingScrollPhysics(),
           crossAxisCount: crossAxisCount,
-          mainAxisSpacing: 8.0,
-          crossAxisSpacing: 8.0,
+          mainAxisSpacing: 4.0,
+          crossAxisSpacing: 4.0,
           itemCount: _searchResults.length,
           padding: const EdgeInsets.all(8),
           cacheExtent: height * 3.0,
@@ -340,7 +301,6 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
     );
   }
 
-  // 화면 너비에 따라 컬럼 수 계산
   int _calculateColumnCount(double width) {
     if (width < 600) return 1;
     if (width < 900) return 2;
@@ -407,17 +367,14 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 이미지 영역
                 FutureBuilder<Size>(
                   future: _calculateImageDimension(
                       snapshot.data!.$1, snapshot.data!.$2),
                   builder: (context, sizeSnapshot) {
-                    // 이미지 크기 정보가 있으면 실제 비율 사용, 없으면 기본값 사용
-                    double aspectRatio = 1.0; // 기본값
+                    double aspectRatio = 1.0;
                     if (sizeSnapshot.hasData) {
                       aspectRatio =
                           sizeSnapshot.data!.width / sizeSnapshot.data!.height;
-                      // 너무 극단적인 비율 방지
                       if (aspectRatio > 2.5) aspectRatio = 2.5;
                       if (aspectRatio < 0.4) aspectRatio = 0.4;
                     }
@@ -432,7 +389,7 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
                           tag: 'result_image_${result.id}',
                           child: VCachedNetworkImage(
                             key: _keys![index],
-                            fit: BoxFit.contain, // 이미지가 짤리지 않고 전체가 보이도록 함
+                            fit: BoxFit.contain,
                             fadeInDuration: const Duration(microseconds: 500),
                             fadeInCurve: Curves.easeIn,
                             imageUrl: snapshot.data!.$1,
@@ -455,7 +412,6 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
                     );
                   },
                 ),
-                // ID 표시 영역
                 Padding(
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
                   child: Text(
@@ -466,7 +422,6 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
                     ),
                   ),
                 ),
-                // 설명 텍스트 영역
                 Padding(
                   padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
                   child: Text(

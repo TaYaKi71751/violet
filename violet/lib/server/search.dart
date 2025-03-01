@@ -12,8 +12,8 @@ class LLMSearchService {
   final String baseUrl;
 
   /// 생성자
-  /// [baseUrl] 서버 URL (예: 'http://localhost:8000')
-  LLMSearchService({required this.baseUrl});
+  /// [baseUrl] 서버 URL (기본값: 'http://localhost:8080')
+  LLMSearchService({this.baseUrl = 'http://localhost:8080'});
 
   /// 기본 검색 API 호출 (내부 메서드)
   ///
@@ -150,12 +150,18 @@ class LLMSearchService {
   String _createJsonQueryTemplate(String? searchQuery) {
     return '''
 당신은 다양한 작품들을 분석하는 전문가다.
-작품이 $searchQuery와 관련된 정보를 포함하는지에 대한 여부를 판단하여 간단한 설명(reason)을 작성한다.
+작품이 검색내용과 관련된 정보를 포함하는지에 대한 여부를 판단하여 간단한 설명(reason)을 작성한다.
 관련된 정보를 포함하지 않거나 동떨어진 경우에는 해당 작품을 제외해야 하되 가능한 많은 결과를 출력하도록 노력한다.
-응답은 반드시 아래의 JSON 배열 형식만을 따르고, 다른 텍스트나 추가 설명은 포함하지 말아야 하고, 각 reason에는 "가 포함되어 서는 안된다.
+응답은 반드시 아래의 JSON 형식만을 따르고, JSON 구조를 절대 깨뜨리지 말아야 한다(예: 문자열 내 쌍따옴표 " 사용 금지, 중괄호나 대괄호 누락 금지).
+다른 텍스트나 추가 설명은 절대 포함시키지 않으며, reason에는 "가 포함되지 않아야 한다.
 모든 응답 문장의 형식은 넷플릭스 작품 소개 형식으로 작성해야 한다.
 
-예시 형식:
+또한 전체 검색 결과물로 출력될 내용물들을 간단하게 요약하여 evaluate에 작성한다.
+evaluate에는 검색 판단 결과를 요약하는데, 어떤 방식으로 요약했는지는 절대 설명하지 말고, 도덕적 판단 기준은 배제하고, 각 reason과 검색내용을 연관지어 강조해서 설명한다.
+
+검색내용: $searchQuery
+
+예시 형식(엄격 준수)::
 {
   "evaluate": "전체 검색 판단 결과를 요약한다.",
   "results": [
@@ -164,6 +170,7 @@ class LLMSearchService {
     ...
   ]
 }
+JSON 형식의 무결성을 최우선으로 유지하며, 오류(예: " 사용, 구문 누락)를 절대 발생시키지 않는다.
 ''';
   }
 
