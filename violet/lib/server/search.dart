@@ -15,6 +15,38 @@ class LLMSearchService {
   /// [baseUrl] 서버 URL (예: 'http://localhost:8000')
   LLMSearchService({required this.baseUrl});
 
+  /// 기본 검색 API 호출 (내부 메서드)
+  ///
+  /// [payload] 검색 요청 페이로드
+  /// [timeout] 요청 타임아웃 시간
+  ///
+  /// 성공 시 응답 본문을 반환, 실패 시 예외 발생
+  Future<String> _searchRequest({
+    required Map<String, dynamic> payload,
+    Duration timeout = const Duration(seconds: 30),
+  }) async {
+    final url = Uri.parse('$baseUrl/search');
+
+    Logger.info('[LLMSearchService] 검색 요청: $payload');
+
+    final response = await http
+        .post(
+          url,
+          headers: {'Content-Type': 'application/json; charset=utf-8'},
+          body: jsonEncode(payload),
+        )
+        .timeout(timeout);
+
+    if (response.statusCode == 200) {
+      return decodeResponseBody(response.bodyBytes);
+    } else {
+      final errorMsg =
+          '서버 오류: ${response.statusCode} - ${decodeResponseBody(response.bodyBytes)}';
+      Logger.error('[LLMSearchService] $errorMsg');
+      throw Exception(errorMsg);
+    }
+  }
+
   /// 검색 API 호출
   ///
   /// [query] 검색할 질문
@@ -28,55 +60,35 @@ class LLMSearchService {
     int k = 50,
   }) async {
     try {
-      final url = Uri.parse('$baseUrl/search');
-
       final payload = {
         'query': query,
         if (searchQuery != null) 'search_query': searchQuery,
         'k': k,
       };
 
-      Logger.info('[LLMSearchService] 검색 요청: $payload');
+      final decodedBody = await _searchRequest(payload: payload);
 
-      final response = await http
-          .post(
-            url,
-            headers: {'Content-Type': 'application/json; charset=utf-8'},
-            body: jsonEncode(payload),
-          )
-          .timeout(const Duration(seconds: 30));
+      try {
+        // 결과 추출
+        final result = jsonDecode(decodedBody);
+        String resultText = result['result'] as String;
 
-      if (response.statusCode == 200) {
-        // 인코딩 문제 처리
-        String decodedBody = decodeResponseBody(response.bodyBytes);
-
-        try {
-          // 결과 추출
-          final result = jsonDecode(decodedBody);
-          String resultText = result['result'] as String;
-
-          // JSON 블록이 있는 경우 처리
-          if (resultText.trim().startsWith('```') &&
-              resultText.trim().endsWith('```')) {
-            final parsedResult = parseJsonFromMarkdown(resultText);
-            // 파싱 결과가 문자열이 아닌 경우 JSON 문자열로 변환
-            if (parsedResult is! String) {
-              return jsonEncode(parsedResult);
-            }
-            return parsedResult.toString();
+        // JSON 블록이 있는 경우 처리
+        if (resultText.trim().startsWith('```') &&
+            resultText.trim().endsWith('```')) {
+          final parsedResult = parseJsonFromMarkdown(resultText);
+          // 파싱 결과가 문자열이 아닌 경우 JSON 문자열로 변환
+          if (parsedResult is! String) {
+            return jsonEncode(parsedResult);
           }
-
-          return resultText;
-        } catch (e) {
-          Logger.error('[LLMSearchService] 응답 파싱 실패: $e\n원본: $decodedBody');
-          // 원본 응답 반환
-          return decodedBody;
+          return parsedResult.toString();
         }
-      } else {
-        final errorMsg =
-            '서버 오류: ${response.statusCode} - ${decodeResponseBody(response.bodyBytes)}';
-        Logger.error('[LLMSearchService] $errorMsg');
-        return '검색 실패: $errorMsg';
+
+        return resultText;
+      } catch (e) {
+        Logger.error('[LLMSearchService] 응답 파싱 실패: $e\n원본: $decodedBody');
+        // 원본 응답 반환
+        return decodedBody;
       }
     } catch (e, stackTrace) {
       Logger.error('[LLMSearchService] 검색 중 오류 발생: $e\n$stackTrace');
@@ -89,6 +101,113 @@ class LLMSearchService {
       }
 
       return '검색 실패: $e';
+    }
+  }
+
+  /// JSON 형식의 검색 API 호출
+  ///
+  /// [query] 검색할 질문
+  /// [searchQuery] 벡터 검색에 사용할 키워드 (선택사항)
+  /// [k] 검색할 문서 수 (기본값: 50)
+  ///
+  /// 성공 시 JSON 객체를 반환, 실패 시 에러 정보가 포함된 JSON 객체 반환
+  Future<Map<String, dynamic>> searchJson({
+    required String query,
+    String? searchQuery,
+    int k = 50,
+  }) async {
+    try {
+      // 검색 쿼리 템플릿 생성
+      String formattedQuery = _createJsonQueryTemplate(searchQuery);
+
+      final payload = {
+        'query': formattedQuery,
+        if (searchQuery != null) 'search_query': searchQuery,
+        'k': k,
+      };
+
+      final decodedBody = await _searchRequest(
+        payload: payload,
+        timeout: const Duration(seconds: 60), // JSON 응답은 더 오래 걸릴 수 있음
+      );
+
+      return _processJsonResponse(decodedBody);
+    } catch (e, stackTrace) {
+      Logger.error('[LLMSearchService] 검색 중 오류 발생: $e\n$stackTrace');
+
+      // 네트워크 오류 발생 시 자동 재시도
+      if (e.toString().contains('Failed to load')) {
+        Logger.warning('[LLMSearchService] 네트워크 오류로 인한 재시도...');
+        await Future.delayed(const Duration(milliseconds: 500));
+        return searchJson(query: query, searchQuery: searchQuery, k: k);
+      }
+
+      return {'error': '검색 실패', 'message': e.toString()};
+    }
+  }
+
+  /// JSON 검색을 위한 쿼리 템플릿 생성
+  String _createJsonQueryTemplate(String? searchQuery) {
+    return '''
+당신은 다양한 작품들을 분석하는 전문가다.
+작품이 $searchQuery와 관련된 정보를 포함하는지에 대한 여부를 판단하여 간단한 설명(reason)을 작성한다.
+관련된 정보를 포함하지 않거나 동떨어진 경우에는 해당 작품을 제외해야 하되 가능한 많은 결과를 출력하도록 노력한다.
+응답은 반드시 아래의 JSON 배열 형식만을 따르고, 다른 텍스트나 추가 설명은 포함하지 말아야 하고, 각 reason에는 "가 포함되어 서는 안된다.
+모든 응답 문장의 형식은 넷플릭스 작품 소개 형식으로 작성해야 한다.
+
+예시 형식:
+{
+  "evaluate": "전체 검색 판단 결과를 요약한다.",
+  "results": [
+    {"id": 12345, "reason": "각 작품이 입력 정보와 어떤 관련이 있는지, 작품 자체의 특징은 어떠한지 설명한다."},
+    {"id": 12345, "reason": "각 작품이 입력 정보와 어떤 관련이 있는지, 작품 자체의 특징은 어떠한지 설명한다."},
+    ...
+  ]
+}
+''';
+  }
+
+  /// JSON 응답 처리
+  Map<String, dynamic> _processJsonResponse(String decodedBody) {
+    try {
+      // 결과 추출
+      final result = jsonDecode(decodedBody);
+      String resultText = result['result'] as String;
+
+      // JSON 블록이 있는 경우 처리
+      if (resultText.trim().startsWith('```') &&
+          resultText.trim().endsWith('```')) {
+        final parsedResult = parseJsonFromMarkdown(resultText);
+
+        // 파싱된 결과가 Map이면 그대로 반환
+        if (parsedResult is Map<String, dynamic>) {
+          return parsedResult;
+        }
+
+        // 파싱된 결과가 문자열이면 다시 JSON으로 파싱 시도
+        if (parsedResult is String) {
+          try {
+            return jsonDecode(parsedResult);
+          } catch (e) {
+            Logger.error('[LLMSearchService] JSON 파싱 실패: $e');
+            return {'error': '응답을 JSON으로 파싱할 수 없습니다.', 'raw': parsedResult};
+          }
+        }
+
+        // 다른 타입의 결과는 문자열로 변환하여 반환
+        return {'result': parsedResult.toString()};
+      }
+
+      // JSON 블록이 없는 경우 직접 파싱 시도
+      try {
+        return jsonDecode(resultText);
+      } catch (e) {
+        Logger.error('[LLMSearchService] JSON 파싱 실패: $e');
+        return {'error': '응답을 JSON으로 파싱할 수 없습니다.', 'raw': resultText};
+      }
+    } catch (e) {
+      Logger.error('[LLMSearchService] 응답 파싱 실패: $e\n원본: $decodedBody');
+      return {'error': '응답 파싱 실패', 'message': e.toString(), 'raw': decodedBody};
     }
   }
 
@@ -109,6 +228,25 @@ class LLMSearchService {
     search(query: query, searchQuery: searchQuery, k: k)
         .then(onResult)
         .catchError((e) => onError(e.toString()));
+  }
+
+  /// 비동기 JSON 검색 API 호출 (백그라운드에서 실행)
+  ///
+  /// [query] 검색할 질문
+  /// [searchQuery] 벡터 검색에 사용할 키워드 (선택사항)
+  /// [k] 검색할 문서 수 (기본값: 50)
+  /// [onResult] 검색 결과 콜백
+  /// [onError] 에러 발생 시 콜백
+  void searchJsonAsync({
+    required String query,
+    String? searchQuery,
+    int k = 50,
+    required Function(Map<String, dynamic>) onResult,
+    required Function(Map<String, dynamic>) onError,
+  }) {
+    searchJson(query: query, searchQuery: searchQuery, k: k)
+        .then(onResult)
+        .catchError((e) => onError({'error': e.toString()}));
   }
 }
 

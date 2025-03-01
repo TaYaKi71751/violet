@@ -34,6 +34,7 @@ import 'package:violet/server/violet.dart';
 import 'package:violet/server/wsalt.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/style/palette.dart';
+import 'package:violet/pages/lab/lab/llm_search.dart';
 
 class LaboratoryPage extends StatefulWidget {
   const LaboratoryPage({super.key});
@@ -370,6 +371,15 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                 null,
                 () async {
                   _navigate(const CropBookmarkPage());
+                },
+              ),
+              _buildItem(
+                const Icon(MdiIcons.chatQuestion, size: 40, color: Colors.blue),
+                '#021 LLM Search',
+                'Search using LLM API',
+                null,
+                () async {
+                  _navigate(const LLMSearchPage());
                 },
               ),
               SizedBox.fromSize(size: const Size.fromHeight(8.0))
