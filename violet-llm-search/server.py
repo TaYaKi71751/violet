@@ -7,14 +7,15 @@ from search import VectorSearch
 import typer
 from contextlib import asynccontextmanager
 import requests
+import os
 
 app = typer.Typer()
 
 # 전역 변수로 벡터 검색 인스턴스 저장
 vector_search = None
 # 서버에서 사용할 모델과 프롬프트 타입 설정을 위한 전역 변수
-server_model = "gemini"
-server_prompt_type = "general"
+server_model = os.environ.get("SERVER_MODEL", "gemini")
+server_prompt_type = os.environ.get("SERVER_PROMPT_TYPE", "general")
 
 
 @asynccontextmanager
@@ -22,12 +23,24 @@ async def lifespan(app: FastAPI):
     """FastAPI 애플리케이션의 수명 주기 이벤트 핸들러"""
     global vector_search, server_model, server_prompt_type
 
+    # 환경 변수에서 설정 가져오기
+    if "SERVER_MODEL" in os.environ:
+        server_model = os.environ["SERVER_MODEL"]
+    if "SERVER_PROMPT_TYPE" in os.environ:
+        server_prompt_type = os.environ["SERVER_PROMPT_TYPE"]
+
+    print(
+        f"lifespan 시작 - 서버 모델: {server_model}, 프롬프트 타입: {server_prompt_type}"
+    )
+
     try:
         print("벡터 검색 인스턴스 초기화 중...")
         # 서버 설정된 모델과 프롬프트 타입으로 초기화
         vector_search = VectorSearch(model=server_model, prompt_type=server_prompt_type)
         vector_search.create_or_load_index()
-        print("벡터 검색 인스턴스 초기화 완료")
+        print(
+            f"벡터 검색 인스턴스 초기화 완료 - 모델: {vector_search.model}, 프롬프트 타입: {vector_search.prompt_type}"
+        )
     except Exception as e:
         print(f"벡터 검색 인스턴스 초기화 실패: {e}")
 
@@ -85,6 +98,15 @@ async def search(
 
     if vector_search is None:
         try:
+            # 환경 변수에서 설정 가져오기
+            if "SERVER_MODEL" in os.environ:
+                server_model = os.environ["SERVER_MODEL"]
+            if "SERVER_PROMPT_TYPE" in os.environ:
+                server_prompt_type = os.environ["SERVER_PROMPT_TYPE"]
+
+            print(
+                f"검색 함수에서 벡터 검색 초기화 - 모델: {server_model}, 프롬프트 타입: {server_prompt_type}"
+            )
             # 서버 설정 사용
             vector_search = VectorSearch(
                 model=server_model, prompt_type=server_prompt_type
@@ -96,6 +118,10 @@ async def search(
             )
 
     try:
+        print(
+            f"검색 수행 - 모델: {vector_search.model}, 프롬프트 타입: {vector_search.prompt_type}"
+        )
+
         # 서버 설정 사용
         vector_search.model = server_model
         vector_search.prompt_type = server_prompt_type
@@ -129,8 +155,17 @@ def server(
     server_model = model
     server_prompt_type = prompt_type
 
+    print(
+        f"서버 시작 전 설정 - 모델: {server_model}, 프롬프트 타입: {server_prompt_type}"
+    )
+
     print(f"서버를 시작합니다: http://{host}:{port}")
     print(f"기본 모델: {server_model}, 기본 프롬프트 타입: {server_prompt_type}")
+
+    # reload 모드에서는 전역 변수가 초기화될 수 있으므로 환경 변수로 전달
+    os.environ["SERVER_MODEL"] = server_model
+    os.environ["SERVER_PROMPT_TYPE"] = server_prompt_type
+
     uvicorn.run("server:api_app", host=host, port=port, reload=reload)
 
 

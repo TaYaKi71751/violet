@@ -163,9 +163,9 @@ class VectorSearch:
         elif model == "grok-unofficial":
             # 쿠키 값 로드
             cookies = {
-                "x-anonuserid": os.getenv("GROK_ANONUSERID"),
-                "x-challenge": os.getenv("GROK_CHALLENGE"),
-                "x-signature": os.getenv("GROK_SIGNATURE"),
+                # "x-anonuserid": os.getenv("GROK_ANONUSERID"),
+                # "x-challenge": os.getenv("GROK_CHALLENGE"),
+                # "x-signature": os.getenv("GROK_SIGNATURE"),
                 "sso": os.getenv("GROK_SSO"),
                 "sso-rw": os.getenv("GROK_SSO_RW"),
             }
