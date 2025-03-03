@@ -29,8 +29,6 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
   final TextEditingController _kController = TextEditingController(text: '50');
   bool _strictRelevance = false;
   bool _showEvaluate = false;
-  bool _showSuggestions = false;
-  List<String> _recentQueries = [];
 
   String _evaluate = '';
   bool _isLoading = false;
@@ -44,15 +42,6 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
   @override
   void initState() {
     super.initState();
-    _loadRecentQueries();
-  }
-
-  Future<void> _loadRecentQueries() async {
-    final db = await LLMSearchLogDatabase.getInstance();
-    final queries = await db.getQueries();
-    setState(() {
-      _recentQueries = queries;
-    });
   }
 
   @override
@@ -83,7 +72,6 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
       timestamp: DateTime.now(),
     );
     await db.insert(log);
-    await _loadRecentQueries();
   }
 
   void _search() async {
@@ -101,7 +89,6 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
       _isLoading = true;
       _evaluate = '검색 중...';
       _searchResults = [];
-      _showSuggestions = false;
     });
 
     try {
