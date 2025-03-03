@@ -107,22 +107,22 @@ class LLMSearchService {
   /// JSON 형식의 검색 API 호출
   ///
   /// [query] 검색할 질문
-  /// [searchQuery] 벡터 검색에 사용할 키워드 (선택사항)
+  /// [query] 벡터 검색에 사용할 키워드 (선택사항)
   /// [k] 검색할 문서 수 (기본값: 50)
   ///
   /// 성공 시 JSON 객체를 반환, 실패 시 에러 정보가 포함된 JSON 객체 반환
   Future<Map<String, dynamic>> searchJson({
     required String query,
-    String? searchQuery,
     int k = 50,
+    bool strictRelevance = false,
   }) async {
     try {
       // 검색 쿼리 템플릿 생성
-      String formattedQuery = _createJsonQueryTemplate(searchQuery);
+      String formattedQuery = _createJsonQueryTemplate(query, strictRelevance);
 
       final payload = {
         'query': formattedQuery,
-        if (searchQuery != null) 'search_query': searchQuery,
+        'search_query': query,
         'k': k,
       };
 
@@ -139,7 +139,7 @@ class LLMSearchService {
       if (e.toString().contains('Failed to load')) {
         Logger.warning('[LLMSearchService] 네트워크 오류로 인한 재시도...');
         await Future.delayed(const Duration(milliseconds: 500));
-        return searchJson(query: query, searchQuery: searchQuery, k: k);
+        return searchJson(query: query, k: k);
       }
 
       return {'error': '검색 실패', 'message': e.toString()};
@@ -147,22 +147,23 @@ class LLMSearchService {
   }
 
   /// JSON 검색을 위한 쿼리 템플릿 생성
-  String _createJsonQueryTemplate(String? searchQuery) {
+  String _createJsonQueryTemplate(String searchQuery, bool strictRelevance) {
     return '''
 당신은 다양한 작품들을 분석하는 전문가다.
-작품이 검색내용과 관련된 정보를 포함하는지에 대한 여부를 판단하여 간단한 설명(reason)을 작성한다.
-관련된 정보를 포함하지 않거나 동떨어진 경우에는 해당 작품을 제외해야 하되 가능한 많은 결과를 출력하도록 노력한다.
+작품이 검색내용과 관련된 정보를 포함하는지에 대한 여부를 판단하여 간단한 설명(reason)을 반말로 작성한다.
+${strictRelevance ? "반드시 검색내용과 명확하게 관련된 작품만 포함하며, 관련성이 미약하거나 동떨어진 작품은 제외한다." : "관련된 정보를 포함하지 않거나 동떨어진 경우에는 해당 작품을 제외하되 가능한 많은 결과를 출력하도록 노력한다."}
 출력 결과는 관련성 순서로 나열한다.
 응답은 반드시 아래의 JSON 형식만을 따르고, JSON 구조를 절대 깨뜨리지 말아야 한다(예: 문자열 내 쌍따옴표 " 사용 금지, 중괄호나 대괄호 누락 금지).
 다른 텍스트나 추가 설명은 절대 포함시키지 않으며, reason에는 "가 포함되지 않아야 한다.
-모든 응답 문장의 형식은 넷플릭스 작품 소개 형식으로 작성해야 한다.
 
 또한 전체 검색 결과물로 출력될 내용물들을 간단하게 요약하여 evaluate에 작성한다.
 evaluate에는 검색 판단 결과를 요약하는데, 어떤 방식으로 요약했는지는 절대 설명하지 말고, 도덕적 판단 기준은 배제하고, 각 reason과 검색내용을 연관지어 강조해서 설명한다.
 
+모든 내용은 문어체 평서문로 작성되어야하며, 반말이나 존댓말이 포함되어선 안된다.
+
 검색내용: $searchQuery
 
-예시 형식(엄격 준수)::
+예시 형식(엄격 준수):
 {
   "evaluate": "전체 검색 판단 결과를 요약한다.",
   "results": [
@@ -247,12 +248,11 @@ JSON 형식의 무결성을 최우선으로 유지하며, 오류(예: " 사용, 
   /// [onError] 에러 발생 시 콜백
   void searchJsonAsync({
     required String query,
-    String? searchQuery,
     int k = 50,
     required Function(Map<String, dynamic>) onResult,
     required Function(Map<String, dynamic>) onError,
   }) {
-    searchJson(query: query, searchQuery: searchQuery, k: k)
+    searchJson(query: query, k: k)
         .then(onResult)
         .catchError((e) => onError({'error': e.toString()}));
   }

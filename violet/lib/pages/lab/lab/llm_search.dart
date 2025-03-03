@@ -23,9 +23,10 @@ class LLMSearchPage extends StatefulWidget {
 }
 
 class _LLMSearchPageState extends State<LLMSearchPage> {
-  final TextEditingController _queryController = TextEditingController();
   final TextEditingController _searchQueryController = TextEditingController();
   final TextEditingController _kController = TextEditingController(text: '50');
+  bool _strictRelevance = false;
+  bool _showEvaluate = false;
 
   String _evaluate = '';
   bool _isLoading = false;
@@ -81,9 +82,9 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
       final int k = int.tryParse(_kController.text) ?? 50;
 
       final result = await _searchService!.searchJson(
-        query: _queryController.text,
-        searchQuery: _searchQueryController.text,
+        query: _searchQueryController.text,
         k: k,
+        strictRelevance: _strictRelevance,
       );
 
       if (result.containsKey('error')) {
@@ -159,8 +160,8 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
                 _buildTitle(),
                 const SizedBox(height: 16),
                 _buildSearchRow(),
-                const SizedBox(height: 16),
-                if (_evaluate.isNotEmpty) _buildEvaluateArea(),
+                _buildSearchOptions(),
+                _buildEvaluateArea(),
               ],
             ),
           ),
@@ -262,35 +263,100 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
     );
   }
 
-  Widget _buildEvaluateArea() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Settings.themeWhat ? Colors.black26 : Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color:
-              Settings.themeWhat ? Colors.grey.shade800 : Colors.grey.shade300,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildSearchOptions() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Row(
         children: [
-          //   const Text(
-          //     '검색 결과 요약',
-          //     style: TextStyle(
-          //       fontWeight: FontWeight.bold,
-          //       fontSize: 16,
-          //     ),
-          //   ),
-          //   const SizedBox(height: 8),
+          Checkbox(
+            value: _strictRelevance,
+            onChanged: (value) {
+              setState(() {
+                _strictRelevance = value ?? false;
+              });
+            },
+            activeColor: Settings.majorColor,
+          ),
+          const Text(
+            '정확한 검색',
+            style: TextStyle(fontSize: 14),
+          ),
+          const SizedBox(width: 8),
           Text(
-            _evaluate,
+            '(관련성이 높은 결과만 표시)',
             style: TextStyle(
-              color: Settings.themeWhat ? Colors.white : Colors.black87,
+              fontSize: 12,
+              color: Settings.themeWhat ? Colors.grey : Colors.grey.shade600,
             ),
           ),
+          const Spacer(),
+          if (_evaluate.isNotEmpty)
+            TextButton.icon(
+              onPressed: () {
+                setState(() {
+                  _showEvaluate = !_showEvaluate;
+                });
+              },
+              icon: Icon(
+                _showEvaluate ? Icons.expand_less : Icons.expand_more,
+                color: Settings.themeWhat ? Colors.white : Colors.black87,
+              ),
+              label: Text(
+                '검색 결과 요약',
+                style: TextStyle(
+                  color: Settings.themeWhat ? Colors.white : Colors.black87,
+                  fontSize: 14,
+                ),
+              ),
+            ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildEvaluateArea() {
+    return AnimatedSlide(
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOutCubic,
+      offset: Offset(0, _showEvaluate ? 0 : -0.1),
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeOutCubic,
+        scale: _showEvaluate ? 1.0 : 0.95,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeOutCubic,
+          margin: EdgeInsets.only(top: _showEvaluate ? 8 : 0),
+          height: _showEvaluate ? null : 0,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutCubic,
+              opacity: _showEvaluate ? 1.0 : 0.0,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Settings.themeWhat
+                      ? Colors.black26
+                      : Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Settings.themeWhat
+                        ? Colors.grey.shade800
+                        : Colors.grey.shade300,
+                  ),
+                ),
+                child: Text(
+                  _evaluate,
+                  style: TextStyle(
+                    color: Settings.themeWhat ? Colors.white : Colors.black87,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -343,31 +409,37 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
         if (!snapshot.hasData) {
           return Card(
             elevation: 3,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(
-                  width: 50,
-                  height: 50,
-                  child: CircularProgressIndicator(),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'ID: ${result.id}',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
+            child: InkWell(
+              onTap: () async {
+                FocusScope.of(context).unfocus();
+                showArticleInfoById(context, result.id);
+              },
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: CircularProgressIndicator(),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(
-                    result.reason,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
+                  const SizedBox(height: 16),
+                  Text(
+                    'ID: ${result.id}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      result.reason,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         }
