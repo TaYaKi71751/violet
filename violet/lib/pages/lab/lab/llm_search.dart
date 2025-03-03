@@ -7,6 +7,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:violet/database/user/llm_search.dart';
 import 'package:violet/log/log.dart';
 import 'package:violet/pages/common/toast.dart';
 import 'package:violet/pages/common/utils.dart';
@@ -14,6 +15,7 @@ import 'package:violet/pages/segment/card_panel.dart';
 import 'package:violet/server/search.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/widgets/v_cached_network_image.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class LLMSearchPage extends StatefulWidget {
   const LLMSearchPage({super.key});
@@ -27,6 +29,8 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
   final TextEditingController _kController = TextEditingController(text: '50');
   bool _strictRelevance = false;
   bool _showEvaluate = false;
+  bool _showSuggestions = false;
+  List<String> _recentQueries = [];
 
   String _evaluate = '';
   bool _isLoading = false;
@@ -40,6 +44,15 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
   @override
   void initState() {
     super.initState();
+    _loadRecentQueries();
+  }
+
+  Future<void> _loadRecentQueries() async {
+    final db = await LLMSearchLogDatabase.getInstance();
+    final queries = await db.getQueries();
+    setState(() {
+      _recentQueries = queries;
+    });
   }
 
   @override
@@ -61,6 +74,18 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
     }
   }
 
+  Future<void> _saveSearchLog() async {
+    final db = await LLMSearchLogDatabase.getInstance();
+    final log = LLMSearchLog(
+      query: _searchQueryController.text,
+      k: int.tryParse(_kController.text) ?? 50,
+      strictRelevance: _strictRelevance,
+      timestamp: DateTime.now(),
+    );
+    await db.insert(log);
+    await _loadRecentQueries();
+  }
+
   void _search() async {
     if (_searchQueryController.text.isEmpty) {
       showToast(
@@ -70,10 +95,13 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
       return;
     }
 
+    await _saveSearchLog();
+
     setState(() {
       _isLoading = true;
       _evaluate = '검색 중...';
       _searchResults = [];
+      _showSuggestions = false;
     });
 
     try {
@@ -207,15 +235,42 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
       children: [
         Expanded(
           flex: 3,
-          child: TextField(
-            controller: _searchQueryController,
-            decoration: const InputDecoration(
-              labelText: '검색어',
-              hintText: '검색할 키워드를 입력하세요',
-              border: OutlineInputBorder(),
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          child: TypeAheadField<String>(
+            textFieldConfiguration: TextFieldConfiguration(
+              controller: _searchQueryController,
+              decoration: const InputDecoration(
+                labelText: '검색어',
+                hintText: '검색할 키워드를 입력하세요',
+                border: OutlineInputBorder(),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              ),
             ),
+            suggestionsCallback: (pattern) async {
+              final db = await LLMSearchLogDatabase.getInstance();
+              final queries = await db.getQueries();
+              return queries
+                  .where((query) =>
+                      query.toLowerCase().contains(pattern.toLowerCase()))
+                  .toSet()
+                  .toList();
+            },
+            itemBuilder: (context, String suggestion) {
+              return ListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 0.0,
+                  horizontal: 16.0,
+                ),
+                title: Text(suggestion),
+                dense: true,
+              );
+            },
+            onSuggestionSelected: (String suggestion) {
+              _searchQueryController.text = suggestion;
+            },
+            hideOnEmpty: true,
+            hideOnLoading: true,
+            direction: AxisDirection.down,
           ),
         ),
         const SizedBox(width: 8),
