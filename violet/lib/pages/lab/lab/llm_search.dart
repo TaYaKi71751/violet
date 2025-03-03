@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:violet/log/log.dart';
 import 'package:violet/pages/common/toast.dart';
 import 'package:violet/pages/common/utils.dart';
@@ -173,14 +174,29 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
   }
 
   Widget _buildTitle() {
-    return const Center(
-      child: Text(
-        'Violet LLM Search',
-        style: TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ClipOval(
+          child: SvgPicture.asset(
+            'assets/icons/llm-search.svg',
+            width: 42,
+            height: 42,
+            colorFilter: ColorFilter.mode(
+              Settings.themeWhat ? Colors.white : Colors.black87,
+              BlendMode.srcIn,
+            ),
+          ),
         ),
-      ),
+        const SizedBox(width: 8),
+        const Text(
+          'Violet LLM Search',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
     );
   }
 

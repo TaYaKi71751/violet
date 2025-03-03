@@ -35,6 +35,7 @@ import 'package:violet/server/wsalt.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/style/palette.dart';
 import 'package:violet/pages/lab/lab/llm_search.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class LaboratoryPage extends StatefulWidget {
   const LaboratoryPage({super.key});
@@ -374,7 +375,17 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                 },
               ),
               _buildItem(
-                const Icon(MdiIcons.chatQuestion, size: 40, color: Colors.blue),
+                ClipOval(
+                  child: SvgPicture.asset(
+                    'assets/icons/llm-search.svg',
+                    width: 40,
+                    height: 40,
+                    colorFilter: ColorFilter.mode(
+                      Colors.blue,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ),
                 '#021 LLM Search',
                 'Search using LLM API',
                 null,
