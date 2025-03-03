@@ -46,6 +46,7 @@ dependencies:
   cached_network_image: ^3.2.1
   carousel_slider: ^5.0.0
   chopper: ^8.0.0
+  charset: ^2.0.1
   # charts_flutter: ^0.11.0
   # charts_flutter: # https://github.com/google/charts/issues/678
   #   git:
@@ -100,8 +101,8 @@ dependencies:
   flutter_staggered_animations:
     git: https://github.com/mfrischbutter/flutter_staggered_animations
   flutter_staggered_grid_view: ^0.7.0
-  flutter_svg: ^2.0.7
-  flutter_typeahead: ^4.0.0
+  flutter_svg: ^2.0.10
+  flutter_typeahead: ^4.8.0
   flutter_js: ^0.8.1
   flutter_windowmanager: ^0.2.0
   fluttertoast: ^8.2.4
@@ -123,7 +124,7 @@ dependencies:
   material_design_icons_flutter: ^5.0.6595
   mdi: ^5.0.0-nullsafety.0
   modal_bottom_sheet: ^3.0.0-pre
-  open_file: ^3.3.1
+  open_file: ^3.5.10
   path:
   path_provider: ^2.1.4
   permission_handler: ^11.0.1
@@ -207,6 +208,7 @@ flutter:
     - assets/lottie/28446-floward-gift-box.json
 
     - assets/icons/pixiv.ico
+    - assets/icons/llm-search.svg
 
     - shorebird.yaml
 
