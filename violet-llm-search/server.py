@@ -80,7 +80,7 @@ class SearchResponse(BaseModel):
 @api_app.get("/models", response_model=List[str])
 async def get_models():
     """사용 가능한 모델 목록 반환"""
-    return ["groq", "gemini", "grok", "grok-unofficial"]
+    return ["groq", "gemini", "grok"]
 
 
 @api_app.get("/prompt-types", response_model=List[str])
@@ -141,9 +141,7 @@ def server(
     host: str = "127.0.0.1",
     port: int = 8000,
     reload: bool = False,
-    model: str = typer.Option(
-        "gemini", help="사용할 모델 (groq, gemini, grok, grok-unofficial)"
-    ),
+    model: str = typer.Option("gemini", help="사용할 모델 (groq, gemini, grok)"),
     prompt_type: str = typer.Option(
         "general", help="사용할 프롬프트 타입 (general, relevance, keyword)"
     ),
@@ -171,9 +169,7 @@ def server(
 
 @app.command()
 def search_cli(
-    model: str = typer.Option(
-        "gemini", help="사용할 모델 (groq, gemini, grok, grok-unofficial)"
-    ),
+    model: str = typer.Option("gemini", help="사용할 모델 (groq, gemini, grok)"),
     prompt_type: str = typer.Option(
         "general", help="사용할 프롬프트 타입 (general, relevance, keyword)"
     ),
