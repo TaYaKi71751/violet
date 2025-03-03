@@ -190,29 +190,40 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
   }
 
   Widget _buildTitle() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ClipOval(
-          child: SvgPicture.asset(
-            'assets/icons/llm-search.svg',
-            width: 42,
-            height: 42,
-            colorFilter: ColorFilter.mode(
-              Settings.themeWhat ? Colors.white : Colors.black87,
-              BlendMode.srcIn,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return const LLMSearchInfoDialog();
+          },
+        );
+      },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ClipOval(
+            child: SvgPicture.asset(
+              'assets/icons/llm-search.svg',
+              width: 42,
+              height: 42,
+              colorFilter: ColorFilter.mode(
+                Settings.themeWhat ? Colors.white : Colors.black87,
+                BlendMode.srcIn,
+              ),
             ),
           ),
-        ),
-        const SizedBox(width: 8),
-        const Text(
-          'Violet LLM Search',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
+          const SizedBox(width: 8),
+          const Text(
+            'Violet LLM Search',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -310,25 +321,38 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
       padding: const EdgeInsets.only(top: 8),
       child: Row(
         children: [
-          Checkbox(
-            value: _strictRelevance,
-            onChanged: (value) {
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
               setState(() {
-                _strictRelevance = value ?? false;
+                _strictRelevance = !_strictRelevance;
               });
             },
-            activeColor: Settings.majorColor,
-          ),
-          const Text(
-            '정확한 검색',
-            style: TextStyle(fontSize: 14),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            '(관련성이 높은 결과만 표시)',
-            style: TextStyle(
-              fontSize: 12,
-              color: Settings.themeWhat ? Colors.grey : Colors.grey.shade600,
+            child: Row(
+              children: [
+                Checkbox(
+                  value: _strictRelevance,
+                  onChanged: (value) {
+                    setState(() {
+                      _strictRelevance = value ?? false;
+                    });
+                  },
+                  activeColor: Settings.majorColor,
+                ),
+                const Text(
+                  '정확한 검색',
+                  style: TextStyle(fontSize: 14),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '(관련성이 높은 결과만 표시)',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color:
+                        Settings.themeWhat ? Colors.grey : Colors.grey.shade600,
+                  ),
+                ),
+              ],
             ),
           ),
           const Spacer(),
@@ -590,4 +614,51 @@ class SearchResult {
   final String reason;
 
   SearchResult({required this.id, required this.reason});
+}
+
+class LLMSearchInfoDialog extends StatelessWidget {
+  const LLMSearchInfoDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        width: 500,
+        height: 250,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipOval(
+              child: SvgPicture.asset(
+                'assets/icons/llm-search.svg',
+                width: 96,
+                height: 96,
+                colorFilter: ColorFilter.mode(
+                  Settings.themeWhat ? Colors.white : Colors.black87,
+                  BlendMode.srcIn,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Violet LLM Search',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Text(
+              'A manga search engine powered by retrieval-augmented generation.\nDeveloped using various open-source tools and APIs, including Cursor, Claude, EasyOCR, DeepSeek, and Gemini.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
