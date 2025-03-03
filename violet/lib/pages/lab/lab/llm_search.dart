@@ -308,7 +308,7 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
           crossAxisSpacing: 4.0,
           itemCount: _searchResults.length,
           padding: const EdgeInsets.all(8),
-          cacheExtent: height * 3.0,
+          cacheExtent: height * 30.0,
           itemBuilder: (context, index) {
             return _buildResultCard(index);
           },
