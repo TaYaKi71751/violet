@@ -56,7 +56,9 @@ class _ScriptWebViewState extends State<ScriptWebView>
   Future<void> v4FailCheckProbe() async {
     if (ScriptManager.enableV4) return;
     if (Settings.routingRule.first != 'Hitomi' &&
-        Settings.routingRule.first != 'Hiyobi') return;
+        Settings.routingRule.first != 'Hiyobi') {
+      return;
+    }
 
     // showOkDialog(
     //     context,
@@ -83,7 +85,7 @@ class _ScriptWebViewState extends State<ScriptWebView>
         height: 1,
         child: InAppWebView(
           initialUrlRequest: URLRequest(
-            url: Uri.parse('https://hitomi.la/'),
+            url: WebUri('https://hitomi.la/'),
           ),
           initialOptions: InAppWebViewGroupOptions(
               crossPlatform: InAppWebViewOptions(
@@ -127,7 +129,9 @@ class _ScriptWebViewState extends State<ScriptWebView>
           }),
           onLoadHttpError: (controller, url, statusCode, description) {
             if (!(url.toString() == 'https://hitomi.la' ||
-                url.toString() == 'https://hitomi.la/')) return;
+                url.toString() == 'https://hitomi.la/')) {
+              return;
+            }
 
             if (statusCode >= 500) {
               isCurrentReload = true;

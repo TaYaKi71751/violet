@@ -139,9 +139,13 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
       if (item.files() == null) continue;
 
       if (item.files() != null &&
-          item.files()!.toLowerCase().contains(newPath.toLowerCase())) continue;
+          item.files()!.toLowerCase().contains(newPath.toLowerCase())) {
+        continue;
+      }
       if (item.path() != null &&
-          item.path()!.toLowerCase().contains(newPath.toLowerCase())) continue;
+          item.path()!.toLowerCase().contains(newPath.toLowerCase())) {
+        continue;
+      }
 
       final oldPath =
           ((jsonDecode(item.files()!) as List<dynamic>)[0] as String)
