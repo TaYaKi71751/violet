@@ -62,8 +62,8 @@ class SearchLogDatabase {
   Future<void> insertSearchLog(String? searchWhat, [DateTime? datetime]) async {
     datetime ??= DateTime.now();
     final db = await CommonUserDatabase.getInstance();
-    final body = {
-      'SearchWhat': searchWhat,
+    Map<String, Object> body = {
+      'SearchWhat': searchWhat.toString(),
       'DateTime': datetime.toString(),
     };
     await db.insert('SearchLog', body);

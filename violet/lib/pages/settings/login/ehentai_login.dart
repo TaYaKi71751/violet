@@ -6,7 +6,6 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:developer' as developer;
-
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -26,9 +25,6 @@ Map<String, String> parseCookies(String cookies) {
   return result;
 }
 
-// Input id-pwd login?
-// Or cookie?
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -39,7 +35,20 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   static const _loginUrl = 'https://e-hentai.org/bounce_login.php';
 
-  final _webViewController = Completer<WebViewController>();
+  late final WebViewController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageFinished: (url) => _checkCookie(),
+        ),
+      )
+      ..loadRequest(Uri.parse(_loginUrl));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,38 +56,27 @@ class _LoginScreenState extends State<LoginScreen> {
       appBar: AppBar(
         title: const Text('Login'),
       ),
-      body: WebView(
-        initialUrl: _loginUrl,
-        javascriptMode: JavascriptMode.unrestricted,
-        onWebViewCreated: (controller) {
-          _webViewController.complete(controller);
-        },
-        onPageFinished: (url) {
-          _checkCookie();
-        },
-      ),
+      body: WebViewWidget(controller: _controller),
     );
   }
 
   Future<void> _checkCookie() async {
-    final controller = await _webViewController.future;
     var cookieString =
-        await controller.runJavascriptReturningResult('document.cookie');
+        await _controller.runJavaScriptReturningResult('document.cookie');
     try {
-      cookieString = jsonDecode(cookieString) as String;
+      cookieString = jsonDecode(cookieString as String) as String;
     } catch (e) {}
-    final cookies = parseCookies(cookieString);
+
+    final cookies = parseCookies(cookieString as String);
     developer.log('Get cookies: $cookies');
 
     if (cookies.containsKey('ipb_member_id') &&
         cookies.containsKey('ipb_pass_hash') &&
         (cookies.containsKey('sk') || cookies.containsKey('igneous'))) {
-      // await sessionStore.setSession(cookieString);
-      // await _cookieManager.clearCookies();
       if (!mounted) return;
       Navigator.pop(context, cookieString);
     } else if (cookies.containsKey('ipb_member_id')) {
-      controller.loadUrl('https://exhentai.org');
+      _controller.loadRequest(Uri.parse('https://exhentai.org'));
     }
   }
 }

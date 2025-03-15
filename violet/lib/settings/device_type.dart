@@ -48,7 +48,9 @@ class Device {
         (screenHeight == 812 ||
             screenWidth == 812 ||
             screenHeight == 896 ||
-            screenWidth == 896)) isIphoneX = true;
+            screenWidth == 896)) {
+      isIphoneX = true;
+    }
 
     return _device = Device(
         isTablet: isTablet,
