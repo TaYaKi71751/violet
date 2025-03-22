@@ -137,326 +137,351 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
     });
   }
 
+  // 아티클 드래그 시작 핸들러
+  void _handleDragStart(DragStartDetails details, ArticleNode node) {
+    final invertedMatrix = Matrix4.inverted(_transformationController.value);
+    final localPosition =
+        MatrixUtils.transformPoint(invertedMatrix, details.globalPosition);
+
+    setState(() {
+      _draggedNode = node;
+      _dragPosition = localPosition;
+      print('드래그 시작: ${node.x}, ${node.y}');
+    });
+  }
+
+  // 아티클 드래그 업데이트 핸들러
+  void _handleDragUpdate(DragUpdateDetails details, ArticleNode node) {
+    if (_draggedNode == node) {
+      final invertedMatrix = Matrix4.inverted(_transformationController.value);
+      final localPosition =
+          MatrixUtils.transformPoint(invertedMatrix, details.globalPosition);
+
+      if (_dragPosition == null) {
+        _dragPosition = localPosition;
+        return;
+      }
+
+      final dx = localPosition.dx - _dragPosition!.dx;
+      final dy = localPosition.dy - _dragPosition!.dy;
+
+      setState(() {
+        node.x += dx;
+        node.y += dy;
+        _dragPosition = localPosition;
+      });
+    }
+  }
+
+  // 아티클 드래그 종료 핸들러
+  void _handleDragEnd(DragEndDetails details, ArticleNode node) {
+    if (_draggedNode == node) {
+      setState(() {
+        _draggedNode = null;
+        _dragPosition = null;
+      });
+    }
+  }
+
+  // 크기 및 위치 변경 핸들러
+  void _handleTransformation(ScaleEndDetails details) {
+    setState(() {
+      _scale = getScaleFromTransform();
+      _offset = getOffsetFromTransform();
+    });
+  }
+
+  // 앱바 위젯 생성
+  AppBar _buildAppBar() {
+    return AppBar(
+      title: const Text('떠다니는 아티클'),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.refresh),
+          onPressed: _resetToCenter,
+          tooltip: '초기 위치로 돌아가기',
+        ),
+      ],
+    );
+  }
+
+  // 격자 위젯 생성
+  Widget _buildGrid() {
+    return CustomPaint(
+      size: _virtualSize,
+      painter: InfiniteGridPainter(_gridSize, _gridColor,
+          getOffsetFromTransform(), getScaleFromTransform()),
+    );
+  }
+
+  // 엣지(노드 간 연결선) 위젯 생성
+  Widget _buildEdges() {
+    return CustomPaint(
+      size: _virtualSize,
+      painter: ArticleEdgePainter(_nodes, maxDistance),
+    );
+  }
+
+  // 드래그 가능한 아티클 노드 위젯 생성
+  Widget _buildArticleNode(ArticleNode node) {
+    return Positioned(
+      left: node.x - 150, // 아티클 위젯의 절반 너비
+      top: node.y - 100, // 아티클 위젯의 절반 높이
+      child: Transform.scale(
+        scale: 0.75, // 크기 조정
+        child: _buildArticleCard(node),
+      ),
+    );
+  }
+
+  // 아티클 카드 위젯 생성
+  Widget _buildArticleCard(ArticleNode node) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          // 아티클 탭 시 동작 (예: 상세 페이지로 이동)
+        },
+        child: Stack(
+          children: [
+            // 아티클 위젯
+            _buildArticleWidget(node),
+
+            // 드래그 핸들 - 아티클 전체 영역을 드래그 가능하게 만듦
+            _buildDragHandle(node),
+
+            // 드래그 손잡이 표시
+            _buildDragIndicator(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // 아티클 위젯 생성 (Provider 적용)
+  Widget _buildArticleWidget(ArticleNode node) {
+    return Provider<ArticleListItem>.value(
+      value: ArticleListItem.fromArticleListItem(
+        queryResult: node.queryResult,
+        showDetail: false,
+        width: 300, // 적당한 너비
+        thumbnailTag: const Uuid().v4(),
+        usableTabList: _queryResults,
+        addBottomPadding: false,
+      ),
+      child: const ArticleListItemWidget(),
+    );
+  }
+
+  // 드래그 핸들 위젯 생성
+  Widget _buildDragHandle(ArticleNode node) {
+    return Positioned.fill(
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onPanStart: (details) => _handleDragStart(details, node),
+        onPanUpdate: (details) => _handleDragUpdate(details, node),
+        onPanEnd: (details) => _handleDragEnd(details, node),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: _draggedNode == node
+                  ? Colors.blue.withOpacity(0.8)
+                  : Colors.transparent,
+              width: 3,
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 드래그 표시자 위젯 생성
+  Widget _buildDragIndicator() {
+    return Positioned(
+      top: 5,
+      right: 5,
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: Colors.black54,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Icon(
+          Icons.drag_indicator,
+          color: Colors.white70,
+          size: 16,
+        ),
+      ),
+    );
+  }
+
+  // 사용 설명 패널 위젯 생성
+  Widget _buildInstructionPanel() {
+    return Positioned(
+      bottom: 20,
+      left: 20,
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.7),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '• 아티클을 드래그해서 움직이기',
+              style: TextStyle(color: Colors.white, fontSize: 14),
+            ),
+            SizedBox(height: 4),
+            Text(
+              '• 핀치로 줌인/줌아웃',
+              style: TextStyle(color: Colors.white, fontSize: 14),
+            ),
+            SizedBox(height: 4),
+            Text(
+              '• 배경을 드래그해서 이동',
+              style: TextStyle(color: Colors.white, fontSize: 14),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // 정보 패널 위젯 생성
+  Widget _buildInfoPanel() {
+    return Positioned(
+      top: 20,
+      right: 20,
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.7),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.white24, width: 1),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            // 확대 배율 표시
+            Text(
+              '확대 배율: ${_scale.toStringAsFixed(2)}x',
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+            ),
+            const SizedBox(height: 4),
+            // 현재 위치 표시
+            Text(
+              '위치: (${(-_offset.dx / _scale).toStringAsFixed(0)}, ${(-_offset.dy / _scale).toStringAsFixed(0)})',
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+            ),
+            const SizedBox(height: 8),
+            // 정중앙 버튼
+            _buildCenterButton(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // 중앙으로 이동 버튼 위젯 생성
+  Widget _buildCenterButton() {
+    return ElevatedButton.icon(
+      onPressed: _resetToCenter,
+      icon: const Icon(Icons.center_focus_strong, size: 16),
+      label: const Text('원점으로'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue.withOpacity(0.8),
+        foregroundColor: Colors.white,
+        visualDensity: VisualDensity.compact,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        textStyle: const TextStyle(fontSize: 12),
+      ),
+    );
+  }
+
+  // 원점 이동 플로팅 버튼 위젯 생성
+  Widget _buildFloatingCenterButton() {
+    return Positioned(
+      bottom: 20,
+      right: 20,
+      child: FloatingActionButton(
+        onPressed: _resetToCenter,
+        backgroundColor: Colors.blue.withOpacity(0.8),
+        mini: true,
+        child: const Icon(Icons.my_location, size: 20),
+      ),
+    );
+  }
+
+  // 인터랙티브 캔버스 위젯 생성
+  Widget _buildInteractiveCanvas() {
+    return Container(
+      color: Colors.black87,
+      width: double.infinity,
+      height: double.infinity,
+      child: InteractiveViewer(
+        transformationController: _transformationController,
+        minScale: _minScale,
+        maxScale: _maxScale,
+        boundaryMargin: const EdgeInsets.all(double.infinity),
+        constrained: true,
+        onInteractionUpdate: (details) {
+          setState(() {
+            _scale = getScaleFromTransform();
+            _offset = getOffsetFromTransform();
+          });
+        },
+        onInteractionEnd: _handleTransformation,
+        child: SizedBox.fromSize(
+          size: _virtualSize,
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: _buildAnimatedContent,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 애니메이션 콘텐츠 빌더
+  Widget _buildAnimatedContent(BuildContext context, Widget? child) {
+    // 노드 움직임 업데이트
+    for (var node in _nodes) {
+      if (_draggedNode != node) {
+        node.update(_controller.value);
+      }
+    }
+
+    return Stack(
+      alignment: Alignment.center,
+      clipBehavior: Clip.none,
+      children: [
+        // 격자 그리기
+        _buildGrid(),
+
+        // 노드와 엣지 그리기
+        _buildEdges(),
+
+        // 각 아티클 노드 배치
+        ..._nodes.map(_buildArticleNode).toList(),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('떠다니는 아티클'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _resetToCenter,
-            tooltip: '초기 위치로 돌아가기',
-          ),
-        ],
-      ),
+      appBar: _buildAppBar(),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Stack(
               children: [
-                // 무한 줌인/아웃 가능한 배경
-                Container(
-                  color: Colors.black87,
-                  width: double.infinity,
-                  height: double.infinity,
-                  child: InteractiveViewer(
-                    transformationController: _transformationController,
-                    minScale: _minScale,
-                    maxScale: _maxScale,
-                    boundaryMargin:
-                        const EdgeInsets.all(double.infinity), // 무한 경계
-                    constrained: true, // 화면에 맞게 제약
-                    onInteractionUpdate: (details) {
-                      setState(() {
-                        _scale = getScaleFromTransform();
-                        _offset = getOffsetFromTransform();
-                      });
-                    },
-                    onInteractionEnd: (details) {
-                      setState(() {
-                        _scale = getScaleFromTransform();
-                        _offset = getOffsetFromTransform();
-                      });
-                    },
-                    child: SizedBox.fromSize(
-                      size: _virtualSize,
-                      child: AnimatedBuilder(
-                        animation: _controller,
-                        builder: (context, child) {
-                          // 노드 움직임 업데이트
-                          for (var node in _nodes) {
-                            if (_draggedNode != node) {
-                              node.update(_controller.value);
-                            }
-                          }
-
-                          return Stack(
-                            // 중요! 스택의 위치를 중앙으로 지정
-                            alignment: Alignment.center,
-                            clipBehavior: Clip.none, // 클리핑 없애기
-                            children: [
-                              // 격자 그리기
-                              CustomPaint(
-                                size: _virtualSize,
-                                painter: InfiniteGridPainter(
-                                    _gridSize,
-                                    _gridColor,
-                                    getOffsetFromTransform(),
-                                    getScaleFromTransform()),
-                              ),
-
-                              // 노드와 엣지 그리기
-                              CustomPaint(
-                                size: _virtualSize,
-                                painter:
-                                    ArticleEdgePainter(_nodes, maxDistance),
-                              ),
-
-                              // 각 아티클 노드 배치
-                              ..._nodes.map((node) {
-                                final nodeWidget =
-                                    Provider<ArticleListItem>.value(
-                                  value: ArticleListItem.fromArticleListItem(
-                                    queryResult: node.queryResult,
-                                    showDetail: false,
-                                    width: 300, // 적당한 너비
-                                    thumbnailTag: const Uuid().v4(),
-                                    usableTabList: _queryResults,
-                                    addBottomPadding: false,
-                                  ),
-                                  child: const ArticleListItemWidget(),
-                                );
-
-                                return Positioned(
-                                  left: node.x - 150, // 아티클 위젯의 절반 너비
-                                  top: node.y - 100, // 아티클 위젯의 절반 높이
-                                  child: Transform.scale(
-                                    scale: 0.75, // 크기 조정
-                                    child: Material(
-                                      color: Colors.transparent,
-                                      child: InkWell(
-                                        onTap: () {
-                                          // 아티클 탭 시 동작 (예: 상세 페이지로 이동)
-                                        },
-                                        child: Stack(
-                                          children: [
-                                            // 아티클 위젯
-                                            nodeWidget,
-
-                                            // 드래그 핸들 - 아티클 전체 영역을 드래그 가능하게 만듦
-                                            Positioned.fill(
-                                              child: GestureDetector(
-                                                behavior:
-                                                    HitTestBehavior.translucent,
-                                                onPanStart: (details) {
-                                                  final invertedMatrix =
-                                                      Matrix4.inverted(
-                                                          _transformationController
-                                                              .value);
-                                                  final localPosition =
-                                                      MatrixUtils.transformPoint(
-                                                          invertedMatrix,
-                                                          details
-                                                              .globalPosition);
-
-                                                  setState(() {
-                                                    _draggedNode = node;
-                                                    _dragPosition =
-                                                        localPosition;
-
-                                                    // 디버깅용 로그 추가 (필요시)
-                                                    print(
-                                                        '드래그 시작: ${node.x}, ${node.y}');
-                                                  });
-                                                },
-                                                onPanUpdate: (details) {
-                                                  if (_draggedNode == node) {
-                                                    final invertedMatrix =
-                                                        Matrix4.inverted(
-                                                            _transformationController
-                                                                .value);
-                                                    final localPosition =
-                                                        MatrixUtils.transformPoint(
-                                                            invertedMatrix,
-                                                            details
-                                                                .globalPosition);
-
-                                                    // _dragPosition이 null이면 현재 위치로 초기화
-                                                    if (_dragPosition == null) {
-                                                      _dragPosition =
-                                                          localPosition;
-                                                      return;
-                                                    }
-
-                                                    final dx =
-                                                        localPosition.dx -
-                                                            _dragPosition!.dx;
-                                                    final dy =
-                                                        localPosition.dy -
-                                                            _dragPosition!.dy;
-
-                                                    setState(() {
-                                                      node.x += dx;
-                                                      node.y += dy;
-                                                      _dragPosition =
-                                                          localPosition;
-
-                                                      // 드래그 위치 업데이트 디버깅 (필요시)
-                                                      // print('드래그 중: ${node.x}, ${node.y}, dx: $dx, dy: $dy');
-                                                    });
-                                                  }
-                                                },
-                                                onPanEnd: (details) {
-                                                  if (_draggedNode == node) {
-                                                    setState(() {
-                                                      _draggedNode = null;
-                                                      _dragPosition = null;
-                                                    });
-                                                  }
-                                                },
-                                                // 드래그 중일 때 시각적 피드백
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                      color: _draggedNode ==
-                                                              node
-                                                          ? Colors.blue
-                                                              .withOpacity(0.8)
-                                                          : Colors.transparent,
-                                                      width: 3,
-                                                    ),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-
-                                            // 드래그 손잡이 표시 (선택 사항)
-                                            Positioned(
-                                              top: 5,
-                                              right: 5,
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(4),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.black54,
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                ),
-                                                child: const Icon(
-                                                  Icons.drag_indicator,
-                                                  color: Colors.white70,
-                                                  size: 16,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-
-                // 사용 설명
-                Positioned(
-                  bottom: 20,
-                  left: 20,
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '• 아티클을 드래그해서 움직이기',
-                          style: TextStyle(color: Colors.white, fontSize: 14),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          '• 핀치로 줌인/줌아웃',
-                          style: TextStyle(color: Colors.white, fontSize: 14),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          '• 배경을 드래그해서 이동',
-                          style: TextStyle(color: Colors.white, fontSize: 14),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // 실시간 정보 표시 패널
-                Positioned(
-                  top: 20,
-                  right: 20,
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.white24, width: 1),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        // 확대 배율 표시
-                        Text(
-                          '확대 배율: ${_scale.toStringAsFixed(2)}x',
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 14),
-                        ),
-                        const SizedBox(height: 4),
-                        // 현재 위치 표시
-                        Text(
-                          '위치: (${(-_offset.dx / _scale).toStringAsFixed(0)}, ${(-_offset.dy / _scale).toStringAsFixed(0)})',
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 14),
-                        ),
-                        const SizedBox(height: 8),
-                        // 정중앙 버튼
-                        ElevatedButton.icon(
-                          onPressed: _resetToCenter,
-                          icon: const Icon(Icons.center_focus_strong, size: 16),
-                          label: const Text('원점으로'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue.withOpacity(0.8),
-                            foregroundColor: Colors.white,
-                            visualDensity: VisualDensity.compact,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            textStyle: const TextStyle(fontSize: 12),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // 원점 버튼 (쉽게 접근 가능하도록 우측 하단에 추가)
-                Positioned(
-                  bottom: 20,
-                  right: 20,
-                  child: FloatingActionButton(
-                    onPressed: _resetToCenter,
-                    backgroundColor: Colors.blue.withOpacity(0.8),
-                    mini: true,
-                    child: const Icon(Icons.my_location, size: 20),
-                  ),
-                ),
+                _buildInteractiveCanvas(),
+                _buildInstructionPanel(),
+                _buildInfoPanel(),
+                _buildFloatingCenterButton(),
               ],
             ),
     );
