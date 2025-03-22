@@ -223,6 +223,8 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
       // 초기 노드에 특별한 스타일 적용
       initialNode.highlightColor = Colors.purple.withOpacity(0.3);
       initialNode.isSpecial = true; // 특별 속성 추가 (표시용)
+      initialNode.canPierceOtherGroups = true; // 다른 그룹 관통 가능
+      initialNode.collisionRadius = 350.0; // 충돌 반경 설정
 
       _nodes.add(initialNode);
 
@@ -291,7 +293,7 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
         node.maxVelocity = 1.0;
         node.velocityX = (random.nextDouble() - 0.5) * 0.8;
         node.velocityY = (random.nextDouble() - 0.5) * 0.8;
-        node.canPierceOtherGroups = false; // 다른 그룹 관통 불가
+        node.canPierceOtherGroups = true; // 다른 그룹 관통 가능
         node.isHighSimilarity = true; // 상위 유사도 표시
         node.collisionRadius = 300.0; // 충돌 반경 설정
 
@@ -363,7 +365,7 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
         node.velocityY = (random.nextDouble() - 0.5) * node.maxVelocity;
         node.canPierceOtherGroups = true; // 다른 그룹 관통 가능
         node.isHighSimilarity = false; // 낮은 유사도 표시
-        node.collisionRadius = 250.0; // 충돌 반경 설정
+        node.collisionRadius = 300.0; // 충돌 반경 설정
 
         _nodes.add(node);
 
@@ -418,8 +420,7 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
     _scale = getScaleFromTransform();
     _offset = getOffsetFromTransform();
 
-    debugPrint(
-        '초기 화면 설정: 스케일=$initialScale, 위치=$centerX, $centerY, 화면 크기=${screenWidth}x${screenHeight}');
+    debugPrint('초기 화면 설정: 스케일=$initialScale, 위치=$centerX, $centerY');
   }
 
   // 초기 충돌 해결을 위한 시뮬레이션
@@ -2112,13 +2113,15 @@ class ArticleNode {
         double otherFactor = 0.5;
 
         // 초기 노드, 높은 유사도 노드 등에 따라 계수 조정
-        if (isSpecial) {
-          myFactor = 0.0;
-          otherFactor = 1.0;
-        } else if (other.isSpecial) {
-          myFactor = 1.0;
-          otherFactor = 0.0;
-        } else if (isHighSimilarity && !other.isHighSimilarity) {
+        // if (isSpecial) {
+        //   myFactor = 0.0;
+        //   otherFactor = 1.0;
+        // } else if (other.isSpecial) {
+        //   myFactor = 1.0;
+        //   otherFactor = 0.0;
+        // } else
+
+        if (isHighSimilarity && !other.isHighSimilarity) {
           myFactor = 0.3;
           otherFactor = 0.7;
         } else if (!isHighSimilarity && other.isHighSimilarity) {
