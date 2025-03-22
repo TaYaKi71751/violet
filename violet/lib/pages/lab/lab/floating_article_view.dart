@@ -94,47 +94,103 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
     final articlesToUse =
         _queryResults.length < nodeCount ? _queryResults.length : nodeCount;
 
-    // 노드 생성
+    // ID % 10 기준으로 그룹화
+    Map<int, List<QueryResult>> groups = {};
     for (int i = 0; i < articlesToUse; i++) {
-      bool validPosition = false;
-      double randomX = 0;
-      double randomY = 0;
+      final groupId = _queryResults[i].id() % 10;
+      if (!groups.containsKey(groupId)) {
+        groups[groupId] = [];
+      }
+      groups[groupId]!.add(_queryResults[i]);
+    }
 
-      // 다른 노드와 너무 겹치지 않는 위치 찾기 (최대 10번 시도)
-      for (int attempt = 0; attempt < 10; attempt++) {
-        randomX = centerX + (math.Random().nextDouble() * 2 - 1) * spreadRadius;
-        randomY = centerY + (math.Random().nextDouble() * 2 - 1) * spreadRadius;
+    // 각 그룹별로 위치 지정하여 노드 생성
+    int groupIndex = 0;
+    final random = math.Random();
 
-        // 이전에 생성된 노드들과의 충돌 확인
-        bool overlapping = false;
-        final tempNode = ArticleNode(
-          queryResult: _queryResults[i],
-          x: randomX,
-          y: randomY,
+    for (var entry in groups.entries) {
+      final int groupId = entry.key;
+      final List<QueryResult> groupItems = entry.value;
+
+      // 각 그룹의 중심 위치 계산 (원형으로 배치)
+      final double groupAngle = (groupIndex * (2 * math.pi / groups.length));
+      final double groupRadius = spreadRadius * 0.6; // 그룹간 거리
+      final double groupCenterX = centerX + math.cos(groupAngle) * groupRadius;
+      final double groupCenterY = centerY + math.sin(groupAngle) * groupRadius;
+
+      // 그룹별 랜덤 색상 지정 (시각적 구분을 위해)
+      final groupColor = Color.fromRGBO(150 + random.nextInt(100),
+          150 + random.nextInt(100), 150 + random.nextInt(100), 1.0);
+
+      // 각 그룹에 대해 더 조밀한 초기 배치 영역 설정
+      final double groupSpreadRadius = 350.0; // 그룹 내 노드들이 퍼지는 범위 (더 작게 설정)
+
+      // 그룹 내 아이템들을 더 가깝게 배치
+      for (int i = 0; i < groupItems.length; i++) {
+        double itemX;
+        double itemY;
+
+        // 첫 번째 노드는 그룹 중심에 배치
+        if (i == 0) {
+          itemX = groupCenterX;
+          itemY = groupCenterY;
+        } else {
+          // 나머지 노드들은 그룹 중심 주변에 클러스터링
+
+          // 태양계 배치 스타일 - 중심에서부터 일정 거리와 각도로 배치
+          final double angle =
+              i * (2 * math.pi / groupItems.length) + random.nextDouble() * 0.5;
+
+          // 노드 번호에 따라 중심에서 거리가 점점 증가 (나선형)
+          // 아이템 수에 따라 적절히 조정
+          final double distanceFromCenter =
+              (i / groupItems.length) * groupSpreadRadius;
+
+          itemX = groupCenterX + math.cos(angle) * distanceFromCenter;
+          itemY = groupCenterY + math.sin(angle) * distanceFromCenter;
+
+          // 약간의 랜덤성 추가 (매우 적은 범위로 제한)
+          itemX += (random.nextDouble() * 30.0 - 15.0);
+          itemY += (random.nextDouble() * 30.0 - 15.0);
+        }
+
+        // 노드 생성하고 그룹 ID 설정
+        final node = ArticleNode(
+          queryResult: groupItems[i],
+          x: itemX,
+          y: itemY,
           maxWidth: _virtualSize.width,
           maxHeight: _virtualSize.height,
+          groupId: groupId,
         );
 
-        for (var node in _nodes) {
-          if (tempNode.intersects(node)) {
-            overlapping = true;
-            break;
-          }
+        // 그룹에 따라 관통 속성 설정
+        // 같은 그룹 내에서는 일관된 관통 속성 부여 (그룹별 특성 부여)
+        node.canPierceOtherGroups =
+            groupId % 2 == 0; // 짝수 그룹은 관통 가능, 홀수 그룹은 불가능
+
+        // 그룹별로 속도 특성 부여 (다양한 움직임 패턴)
+        if (groupId % 3 == 0) {
+          // 빠르게 움직이는 그룹
+          node.maxVelocity = 4.5;
+          node.velocityX = (random.nextDouble() - 0.5) * 4.0;
+          node.velocityY = (random.nextDouble() - 0.5) * 4.0;
+        } else if (groupId % 3 == 1) {
+          // 중간 속도로 움직이는 그룹
+          node.maxVelocity = 3.0;
+          node.velocityX = (random.nextDouble() - 0.5) * 2.5;
+          node.velocityY = (random.nextDouble() - 0.5) * 2.5;
+        } else {
+          // 천천히 움직이는 그룹
+          node.maxVelocity = 2.0;
+          node.velocityX = (random.nextDouble() - 0.5) * 1.5;
+          node.velocityY = (random.nextDouble() - 0.5) * 1.5;
         }
 
-        if (!overlapping) {
-          validPosition = true;
-          break;
-        }
+        _nodes.add(node);
       }
 
-      _nodes.add(ArticleNode(
-        queryResult: _queryResults[i],
-        x: randomX,
-        y: randomY,
-        maxWidth: _virtualSize.width,
-        maxHeight: _virtualSize.height,
-      ));
+      groupIndex++;
     }
 
     // 변환 컨트롤러 초기화 - 중앙에서 시작
@@ -257,12 +313,55 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
 
   // 드래그 가능한 아티클 노드 위젯 생성
   Widget _buildArticleNode(ArticleNode node) {
+    // 그룹 ID에 따른 색상 반환
+    Color getGroupColor(int groupId) {
+      final colors = [
+        Colors.red,
+        Colors.blue,
+        Colors.green,
+        Colors.yellow,
+        Colors.purple,
+        Colors.orange,
+        Colors.teal,
+        Colors.pink,
+        Colors.cyan,
+        Colors.amber,
+      ];
+
+      return colors[groupId % colors.length];
+    }
+
     return Positioned(
       left: node.x - 150, // 아티클 위젯의 절반 너비
       top: node.y - 200, // 아티클 위젯의 절반 높이
       child: Transform.scale(
         scale: 0.75, // 크기 조정
-        child: _buildArticleCard(node),
+        child: Stack(
+          children: [
+            _buildArticleCard(node),
+            // 그룹 표시 마커 추가
+            Positioned(
+              top: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: getGroupColor(node.groupId).withOpacity(0.8),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                ),
+                child: Text(
+                  '${node.groupId}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -492,16 +591,179 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
 
   // 애니메이션 콘텐츠 빌더
   Widget _buildAnimatedContent(BuildContext context, Widget? child) {
-    // 노드 움직임 업데이트
+    // 그룹별 중심점 계산
+    Map<int, Offset> groupCenters = {};
+    Map<int, int> groupCounts = {};
+    List<int> sortedGroupIds = [];
+
+    // 각 그룹의 평균 위치 계산 및 그룹 ID 수집
     for (var node in _nodes) {
-      if (_draggedNode != node) {
-        node.update(_controller.value);
+      if (!groupCenters.containsKey(node.groupId)) {
+        groupCenters[node.groupId] = Offset(node.x, node.y);
+        groupCounts[node.groupId] = 1;
+        sortedGroupIds.add(node.groupId);
+      } else {
+        final currentCenter = groupCenters[node.groupId]!;
+        final currentCount = groupCounts[node.groupId]!;
+
+        // 누적 합계 갱신
+        groupCenters[node.groupId] =
+            Offset(currentCenter.dx + node.x, currentCenter.dy + node.y);
+        groupCounts[node.groupId] = currentCount + 1;
       }
     }
 
-    // 노드 간 충돌 처리
+    // 그룹 ID 정렬
+    sortedGroupIds.sort();
+
+    // 평균 계산
+    groupCenters.forEach((groupId, totalOffset) {
+      final count = groupCounts[groupId]!;
+      groupCenters[groupId] =
+          Offset(totalOffset.dx / count, totalOffset.dy / count);
+    });
+
+    // 속도 감쇠 계수 설정 (진동 방지)
+    final dampingFactor = 0.95;
+
+    // 노드 움직임 업데이트 및 노드 간 간격 유지
+    for (var node in _nodes) {
+      if (_draggedNode != node) {
+        // 속도 감쇠 추가 - 진동 방지
+        node.velocityX *= dampingFactor;
+        node.velocityY *= dampingFactor;
+
+        // 아주 작은 속도는 0으로 설정
+        if (node.velocityX.abs() < 0.05) node.velocityX = 0;
+        if (node.velocityY.abs() < 0.05) node.velocityY = 0;
+
+        node.update(_controller.value);
+
+        // 1. 자신의 그룹 중심으로 이동하는 힘 적용
+        if (groupCenters.containsKey(node.groupId)) {
+          final groupCenter = groupCenters[node.groupId]!;
+          final dirX = groupCenter.dx - node.x;
+          final dirY = groupCenter.dy - node.y;
+          final distance = math.sqrt(dirX * dirX + dirY * dirY);
+
+          if (distance > 0) {
+            // 그룹 결집력 설정
+            final factor = math.min(distance / 800, 0.02);
+            node.velocityX += dirX * factor;
+            node.velocityY += dirY * factor;
+          }
+        }
+
+        // 2. 인접 그룹 중심으로의 약한 인력 적용
+        int groupIndex = sortedGroupIds.indexOf(node.groupId);
+        if (groupIndex >= 0) {
+          // 인접 그룹 계산 (앞뒤로 하나씩)
+          List<int> adjacentGroups = [];
+
+          // 이전 그룹 (순환 구조 고려)
+          int prevGroupIdx =
+              (groupIndex - 1 < 0) ? sortedGroupIds.length - 1 : groupIndex - 1;
+          adjacentGroups.add(sortedGroupIds[prevGroupIdx]);
+
+          // 다음 그룹 (순환 구조 고려)
+          int nextGroupIdx = (groupIndex + 1) % sortedGroupIds.length;
+          adjacentGroups.add(sortedGroupIds[nextGroupIdx]);
+
+          // 인접 그룹으로의 약한 인력 적용
+          for (int adjacentGroupId in adjacentGroups) {
+            if (groupCenters.containsKey(adjacentGroupId)) {
+              final adjacentCenter = groupCenters[adjacentGroupId]!;
+              final dirX = adjacentCenter.dx - node.x;
+              final dirY = adjacentCenter.dy - node.y;
+              final distance = math.sqrt(dirX * dirX + dirY * dirY);
+
+              if (distance > 0 && distance < 1500) {
+                // 일정 거리 내에서만 영향
+                // 인접 그룹으로의 약한 인력 (자신의 그룹의 20% 정도)
+                final factor = math.min(distance / 2000, 0.005);
+                node.velocityX += dirX * factor;
+                node.velocityY += dirY * factor;
+              }
+            }
+          }
+        }
+
+        // 3. 같은 그룹 내 다른 노드와의 거리 유지
+        for (var otherNode in _nodes) {
+          if (node != otherNode && node.groupId == otherNode.groupId) {
+            final dirX = node.x - otherNode.x;
+            final dirY = node.y - otherNode.y;
+            final distanceSq = dirX * dirX + dirY * dirY;
+
+            // 최소 거리 설정 (이 거리보다 가까우면 서로 밀어냄)
+            final minDistance = 300.0; // 적정 거리 설정
+            final minDistanceSq = minDistance * minDistance;
+
+            if (distanceSq > 0 && distanceSq < minDistanceSq) {
+              final distance = math.sqrt(distanceSq);
+              // 밀어내는 힘 설정
+              final repulsionFactor = 0.05 * (1.0 - distance / minDistance);
+
+              // 거리가 가까울수록 더 강하게 밀어냄
+              node.velocityX += dirX / distance * repulsionFactor;
+              node.velocityY += dirY / distance * repulsionFactor;
+            }
+          }
+        }
+
+        // 4. 다른 그룹 노드와의 반발력 적용 (인접 그룹은 약한 반발력)
+        for (var otherNode in _nodes) {
+          if (node != otherNode && node.groupId != otherNode.groupId) {
+            final dirX = node.x - otherNode.x;
+            final dirY = node.y - otherNode.y;
+            final distanceSq = dirX * dirX + dirY * dirY;
+            final distance = math.sqrt(distanceSq);
+
+            // 최소 거리 설정
+            final minDistance = 400.0;
+            final minDistanceSq = minDistance * minDistance;
+
+            if (distance > 0 && distanceSq < minDistanceSq) {
+              // 인접 그룹인지 확인
+              bool isAdjacent = false;
+              int groupIndex = sortedGroupIds.indexOf(node.groupId);
+              if (groupIndex >= 0) {
+                int prevGroupIdx = (groupIndex - 1 < 0)
+                    ? sortedGroupIds.length - 1
+                    : groupIndex - 1;
+                int nextGroupIdx = (groupIndex + 1) % sortedGroupIds.length;
+
+                isAdjacent =
+                    otherNode.groupId == sortedGroupIds[prevGroupIdx] ||
+                        otherNode.groupId == sortedGroupIds[nextGroupIdx];
+              }
+
+              // 인접 그룹은 약한 반발력, 비인접 그룹은 강한 반발력
+              double repulsionFactor;
+              if (isAdjacent) {
+                // 인접 그룹 - 약한 반발력
+                repulsionFactor = 0.08 * (1.0 - distance / minDistance);
+              } else {
+                // 비인접 그룹 - 강한 반발력
+                repulsionFactor = 0.15 * (1.0 - distance / minDistance);
+              }
+
+              node.velocityX += dirX / distance * repulsionFactor;
+              node.velocityY += dirY / distance * repulsionFactor;
+            }
+          }
+        }
+
+        // 속도 제한
+        node.maxVelocity = 3.0;
+        node.limitVelocity();
+      }
+    }
+
+    // 충돌 처리 개선 - 진동 방지
     for (int i = 0; i < _nodes.length; i++) {
       for (int j = i + 1; j < _nodes.length; j++) {
+        // 그룹에 따라 다른 충돌 처리 적용
         _nodes[i].resolveCollision(_nodes[j]);
       }
     }
@@ -510,13 +772,8 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
       alignment: Alignment.center,
       clipBehavior: Clip.none,
       children: [
-        // 격자 그리기
         _buildGrid(),
-
-        // 노드와 엣지 그리기
         _buildEdges(),
-
-        // 각 아티클 노드 배치
         ..._nodes.map(_buildArticleNode).toList(),
       ],
     );
@@ -538,7 +795,7 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
 
       // 탭 위치가 노드 내부에 있는지 확인
       if (nodeBounds.contains(virtualPosition)) {
-        print('노드 선택됨: ${node.queryResult.id}');
+        print('노드 선택됨: ${node.queryResult.id()}');
         setState(() {
           // 이전에 선택된 노드와 다른 경우에만 패널 위치 초기화
           if (_selectedNode != node) {
@@ -828,32 +1085,169 @@ class ArticleEdgePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // 노드 사이에 엣지 그리기
-    for (int i = 0; i < nodes.length; i++) {
-      for (int j = i + 1; j < nodes.length; j++) {
-        final distance = math.sqrt(math.pow(nodes[i].x - nodes[j].x, 2) +
-            math.pow(nodes[i].y - nodes[j].y, 2));
+    // 각 그룹별 노드 저장
+    Map<int, List<ArticleNode>> groupedNodes = {};
 
-        if (distance < maxDistance) {
-          final opacity = 1.0 - (distance / maxDistance);
+    // 노드들을 그룹별로 정리
+    for (var node in nodes) {
+      if (!groupedNodes.containsKey(node.groupId)) {
+        groupedNodes[node.groupId] = [];
+      }
+      groupedNodes[node.groupId]!.add(node);
+    }
 
-          // 아티클의 유사도나 관계성에 따라 색상을 결정할 수 있음
-          // 예시로 기본 색상 사용
-          final color = Colors.lightBlueAccent.withOpacity(opacity * 0.7);
+    // 모든 그룹 ID 정렬
+    final List<int> sortedGroupIds = groupedNodes.keys.toList()..sort();
+    final int totalGroups = sortedGroupIds.length;
 
-          final paint = Paint()
-            ..color = color
-            ..strokeWidth = 2.0 * opacity
-            ..style = PaintingStyle.stroke;
+    // 1. 같은 그룹 내 노드 간 연결 - 강한 연결
+    groupedNodes.forEach((groupId, groupNodes) {
+      if (groupNodes.length > 1) {
+        // 같은 그룹 내 모든 노드끼리 연결
+        for (int i = 0; i < groupNodes.length; i++) {
+          for (int j = i + 1; j < groupNodes.length; j++) {
+            final node1 = groupNodes[i];
+            final node2 = groupNodes[j];
 
-          canvas.drawLine(
-            Offset(nodes[i].x, nodes[i].y),
-            Offset(nodes[j].x, nodes[j].y),
-            paint,
-          );
+            final distance = math.sqrt(math.pow(node1.x - node2.x, 2) +
+                math.pow(node1.y - node2.y, 2));
+
+            // 거리에 따른 선 그리기
+            final maxGroupDistance = maxDistance * 8.0;
+
+            if (distance < maxGroupDistance) {
+              // 같은 그룹 내 연결 - 강한 연결
+              _drawConnection(
+                canvas,
+                node1,
+                node2,
+                distance,
+                maxGroupDistance,
+                groupId,
+                1.0, // 강도 계수 (1.0 = 100% 강도)
+              );
+            }
+          }
+        }
+      }
+    });
+
+    // 2. 인접 그룹 간 노드 연결 - 약한 연결
+    for (int i = 0; i < sortedGroupIds.length; i++) {
+      int currentGroupId = sortedGroupIds[i];
+
+      // 인접 그룹 계산 (앞뒤로 하나씩)
+      List<int> adjacentGroups = [];
+
+      // 이전 그룹 (순환 구조 고려)
+      int prevGroupIdx = (i - 1 < 0) ? sortedGroupIds.length - 1 : i - 1;
+      adjacentGroups.add(sortedGroupIds[prevGroupIdx]);
+
+      // 다음 그룹 (순환 구조 고려)
+      int nextGroupIdx = (i + 1) % sortedGroupIds.length;
+      adjacentGroups.add(sortedGroupIds[nextGroupIdx]);
+
+      // 현재 그룹 노드들
+      List<ArticleNode> currentGroupNodes = groupedNodes[currentGroupId]!;
+
+      // 각 인접 그룹과의 연결
+      for (int adjacentGroupId in adjacentGroups) {
+        List<ArticleNode> adjacentGroupNodes = groupedNodes[adjacentGroupId]!;
+
+        // 인접 그룹 노드와 연결
+        for (var node1 in currentGroupNodes) {
+          for (var node2 in adjacentGroupNodes) {
+            final distance = math.sqrt(math.pow(node1.x - node2.x, 2) +
+                math.pow(node1.y - node2.y, 2));
+
+            // 인접 그룹 간 최대 거리는 더 짧게 설정 (더 가까운 노드만 연결)
+            final maxAdjacentDistance = maxDistance * 4.0;
+
+            if (distance < maxAdjacentDistance) {
+              // 인접 그룹 간 연결 - 약한 연결 (강도 0.4 = 40%)
+              _drawConnection(
+                canvas,
+                node1,
+                node2,
+                distance,
+                maxAdjacentDistance,
+                adjacentGroupId, // 인접 그룹의 색상 사용
+                0.4, // 약한 연결 강도
+              );
+            }
+          }
         }
       }
     }
+  }
+
+  // 노드 간 연결선 그리기 헬퍼 함수
+  void _drawConnection(
+    Canvas canvas,
+    ArticleNode node1,
+    ArticleNode node2,
+    double distance,
+    double maxDistance,
+    int colorGroupId,
+    double strengthFactor, // 연결 강도 (0.0 ~ 1.0)
+  ) {
+    // 투명도 계산 (거리가 가까울수록 더 선명하게)
+    final baseOpacity = math.max(0.4, 1.0 - (distance / maxDistance));
+    final opacity = baseOpacity * strengthFactor;
+
+    // 그룹 ID에 따라 색상 다르게 설정
+    final Color baseColor = _getGroupColor(colorGroupId);
+    final color = baseColor.withOpacity(opacity);
+
+    // 선 두께 계산 (거리가 가까울수록 더 두껍게, 강도에 따라 조정)
+    final baseStrokeWidth = math.max(1.5, 4.0 * (1.0 - distance / maxDistance));
+    final strokeWidth = baseStrokeWidth * strengthFactor;
+
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke;
+
+    // 엣지 그리기
+    canvas.drawLine(
+      Offset(node1.x, node1.y),
+      Offset(node2.x, node2.y),
+      paint,
+    );
+
+    // 가까운 노드들 사이에는 연결 표시 (강도에 따라 크기와 투명도 조정)
+    if (distance < maxDistance * 0.5) {
+      final midX = (node1.x + node2.x) / 2;
+      final midY = (node1.y + node2.y) / 2;
+
+      final glowOpacity = math.min(0.9, opacity * 1.5);
+      final glowRadius = 3.0 * strengthFactor;
+
+      final glowPaint = Paint()
+        ..color = baseColor.withOpacity(glowOpacity)
+        ..style = PaintingStyle.fill
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, 4 * strengthFactor);
+
+      canvas.drawCircle(Offset(midX, midY), glowRadius, glowPaint);
+    }
+  }
+
+  // 그룹 ID에 따른 더 선명한 색상 반환
+  Color _getGroupColor(int groupId) {
+    final colors = [
+      Colors.red.shade600,
+      Colors.blue.shade600,
+      Colors.green.shade600,
+      Colors.amber.shade600,
+      Colors.purple.shade600,
+      Colors.orange.shade600,
+      Colors.teal.shade600,
+      Colors.pink.shade600,
+      Colors.cyan.shade600,
+      Colors.deepOrange.shade600,
+    ];
+
+    return colors[groupId % colors.length];
   }
 
   @override
@@ -930,8 +1324,10 @@ class ArticleNode {
   late double velocityY;
   final double maxWidth;
   final double maxHeight;
-  final double maxVelocity = 2.0; // 속도 제한 (느리게)
+  double maxVelocity = 3.5; // 최대 속도 증가 (2.0 -> 3.5)
   bool isDraggable = true; // 드래그 가능 여부 플래그
+  final int groupId; // 그룹 ID
+  bool canPierceOtherGroups = true; // 다른 그룹 관통 가능 여부 추가
 
   // 사각형 충돌 감지를 위한 크기 설정
   final double width = 300.0 * 3 / 4; // 아티클 카드의 너비
@@ -944,12 +1340,13 @@ class ArticleNode {
     required this.y,
     required this.maxWidth,
     required this.maxHeight,
+    required this.groupId, // 생성자에 그룹 ID 파라미터 추가
   }) {
     final random = math.Random();
 
-    // 랜덤한 속도와 방향 (느리게)
-    velocityX = (random.nextDouble() - 0.5) * maxVelocity;
-    velocityY = (random.nextDouble() - 0.5) * maxVelocity;
+    // 랜덤한 속도와 방향 (더 빠르게)
+    velocityX = (random.nextDouble() - 0.5) * maxVelocity * 0.9;
+    velocityY = (random.nextDouble() - 0.5) * maxVelocity * 0.9;
   }
 
   // 사각형의 충돌 영역 정의 - UI 표시와 일치하도록 수정
@@ -960,7 +1357,7 @@ class ArticleNode {
     return bounds.overlaps(other.bounds);
   }
 
-  // 노드 업데이트 (움직임, 경계 확인)
+  // 노드 업데이트 (움직임, 경계 확인) - 그룹 기반 움직임 조정
   void update(double delta) {
     if (!isDraggable) return; // 드래그 중이면 자동 이동 안함
 
@@ -987,9 +1384,21 @@ class ArticleNode {
           ? centerY - virtualBoundary
           : centerY + virtualBoundary;
     }
+
+    // 추가: 같은 그룹 노드들이 평균 위치를 향해 약하게 이동하는 힘 추가
+    _moveTowardsGroupCenter();
   }
 
-  // 사각형 기반 충돌 처리
+  // 같은 그룹의 평균 위치를 향해 이동하는 힘 추가
+  void _moveTowardsGroupCenter() {
+    // 외부에서 전달받은 _nodes 접근 방식이 없으므로
+    // 이 메서드는 실제 구현에서 수정 필요합니다.
+
+    // FloatingArticleView 클래스에서 다음과 같이 구현이 필요함:
+    // 모든 노드에 대해 같은 그룹 노드들의 중심점 계산 및 이동 로직 적용
+  }
+
+  // 사각형 기반 충돌 처리 - 다른 그룹 관통 기능 추가
   void resolveCollision(ArticleNode other) {
     // 충돌 감지
     if (intersects(other)) {
@@ -1024,48 +1433,120 @@ class ArticleNode {
         }
       }
 
+      // 같은 그룹인지 다른 그룹인지에 따라 처리 방법 차별화
+      bool sameGroup = groupId == other.groupId;
+
+      // 충돌 반응 계수 - 같은 그룹일 때와 다른 그룹일 때 다르게 설정
+      double positionFactor = sameGroup ? 0.5 : 0.3; // 위치 조정 계수
+      double velocityRestitution =
+          sameGroup ? restitution : restitution * 1.2; // 속도 반발 계수
+
       // 드래그 상태에 따라 위치 조정
       if (!isDragging() && !other.isDragging()) {
-        // 두 노드 모두 자유롭게 움직이는 경우, 서로를 밀어냄
-        x += adjustX * 0.5;
-        y += adjustY * 0.5;
-        other.x -= adjustX * 0.5;
-        other.y -= adjustY * 0.5;
+        // 두 노드 모두 자유롭게 움직이는 경우
 
-        // 속도 교환 (탄성 충돌)
-        double tempVelocityX = velocityX;
-        double tempVelocityY = velocityY;
+        // 서로 다른 그룹인 경우, canPierceOtherGroups 속성에 따라 처리
+        if (!sameGroup && canPierceOtherGroups && other.canPierceOtherGroups) {
+          // 다른 그룹이면서 둘 다 관통 설정이 켜져있을 때
 
-        // X 방향 충돌인 경우 X 방향 속도만 교환
-        if (overlapWidth < overlapHeight) {
-          velocityX = other.velocityX * restitution;
-          other.velocityX = tempVelocityX * restitution;
+          // 약한 충돌 효과 (위치 조정은 적게, 속도는 약간만 영향)
+          x += adjustX * positionFactor * 0.3;
+          y += adjustY * positionFactor * 0.3;
+          other.x -= adjustX * positionFactor * 0.3;
+          other.y -= adjustY * positionFactor * 0.3;
+
+          // 속도에 약간의 영향만 (완전히 관통하지 않고 약간의 상호작용)
+          double tempVelocityX = velocityX;
+          double tempVelocityY = velocityY;
+
+          if (overlapWidth < overlapHeight) {
+            velocityX = velocityX * 0.95 + other.velocityX * 0.05;
+            other.velocityX = other.velocityX * 0.95 + tempVelocityX * 0.05;
+          } else {
+            velocityY = velocityY * 0.95 + other.velocityY * 0.05;
+            other.velocityY = other.velocityY * 0.95 + tempVelocityY * 0.05;
+          }
         } else {
-          // Y 방향 충돌인 경우 Y 방향 속도만 교환
-          velocityY = other.velocityY * restitution;
-          other.velocityY = tempVelocityY * restitution;
+          // 같은 그룹이거나 관통 설정이 꺼진 경우 - 일반 충돌 처리
+
+          // 위치 조정
+          x += adjustX * positionFactor;
+          y += adjustY * positionFactor;
+          other.x -= adjustX * positionFactor;
+          other.y -= adjustY * positionFactor;
+
+          // 속도 교환 (탄성 충돌)
+          double tempVelocityX = velocityX;
+          double tempVelocityY = velocityY;
+
+          // X 방향 충돌인 경우 X 방향 속도 교환
+          if (overlapWidth < overlapHeight) {
+            velocityX = other.velocityX * velocityRestitution;
+            other.velocityX = tempVelocityX * velocityRestitution;
+          } else {
+            // Y 방향 충돌인 경우 Y 방향 속도 교환
+            velocityY = other.velocityY * velocityRestitution;
+            other.velocityY = tempVelocityY * velocityRestitution;
+          }
+
+          // 다른 그룹일 경우 추가 속도 부스트 (더 역동적인 움직임)
+          if (!sameGroup) {
+            final random = math.Random();
+            final boostFactor =
+                0.5 + random.nextDouble() * 0.5; // 0.5-1.0 랜덤 부스트
+
+            velocityX *= boostFactor;
+            velocityY *= boostFactor;
+            other.velocityX *= boostFactor;
+            other.velocityY *= boostFactor;
+          }
         }
       } else if (!isDragging()) {
         // 내 노드만 자유롭게 움직이는 경우
-        x += adjustX;
-        y += adjustY;
-
-        // 속도 반전
-        if (overlapWidth < overlapHeight) {
-          velocityX *= -restitution;
+        // 다른 그룹이면서 관통 설정이 켜져있으면 약한 충돌
+        if (!sameGroup && canPierceOtherGroups && other.canPierceOtherGroups) {
+          x += adjustX * 0.3;
+          // 속도는 적게 영향받음
+          if (overlapWidth < overlapHeight) {
+            velocityX *= -0.3;
+          } else {
+            velocityY *= -0.3;
+          }
         } else {
-          velocityY *= -restitution;
+          // 일반 충돌
+          x += adjustX;
+          y += adjustY;
+
+          // 속도 반전
+          if (overlapWidth < overlapHeight) {
+            velocityX *= -velocityRestitution;
+          } else {
+            velocityY *= -velocityRestitution;
+          }
         }
       } else if (!other.isDragging()) {
         // 상대 노드만 자유롭게 움직이는 경우
-        other.x -= adjustX;
-        other.y -= adjustY;
-
-        // 상대 속도 반전
-        if (overlapWidth < overlapHeight) {
-          other.velocityX *= -restitution;
+        // 다른 그룹이면서 관통 설정이 켜져있으면 약한 충돌
+        if (!sameGroup && canPierceOtherGroups && other.canPierceOtherGroups) {
+          other.x -= adjustX * 0.3;
+          other.y -= adjustY * 0.3;
+          // 속도는 적게 영향받음
+          if (overlapWidth < overlapHeight) {
+            other.velocityX *= -0.3;
+          } else {
+            other.velocityY *= -0.3;
+          }
         } else {
-          other.velocityY *= -restitution;
+          // 일반 충돌
+          other.x -= adjustX;
+          other.y -= adjustY;
+
+          // 상대 속도 반전
+          if (overlapWidth < overlapHeight) {
+            other.velocityX *= -velocityRestitution;
+          } else {
+            other.velocityY *= -velocityRestitution;
+          }
         }
       }
 
@@ -1080,8 +1561,13 @@ class ArticleNode {
     return !isDraggable;
   }
 
-  // 속도 제한 (너무 빠르게 움직이지 않도록)
+  // 속도 제한 및 감쇠 메서드 (진동 방지)
   void limitVelocity() {
+    // 매우 느린 속도는 0으로 설정 (미세 진동 방지)
+    if (velocityX.abs() < 0.05) velocityX = 0;
+    if (velocityY.abs() < 0.05) velocityY = 0;
+
+    // 속도 제한
     final speed = math.sqrt(velocityX * velocityX + velocityY * velocityY);
     if (speed > maxVelocity) {
       velocityX = (velocityX / speed) * maxVelocity;
