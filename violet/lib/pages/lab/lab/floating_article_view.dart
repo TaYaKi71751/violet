@@ -42,6 +42,12 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
   List<QueryResult> _queryResults = [];
   bool _isLoading = true;
 
+  // 선택된 노드 정보 저장
+  ArticleNode? _selectedNode;
+
+  // 선택된 노드 정보 패널 위치 변수 추가
+  Offset _nodeInfoPanelPosition = const Offset(20, 80); // 초기 위치
+
   @override
   void initState() {
     super.initState();
@@ -253,7 +259,7 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
   Widget _buildArticleNode(ArticleNode node) {
     return Positioned(
       left: node.x - 150, // 아티클 위젯의 절반 너비
-      top: node.y - 100, // 아티클 위젯의 절반 높이
+      top: node.y - 200, // 아티클 위젯의 절반 높이
       child: Transform.scale(
         scale: 0.75, // 크기 조정
         child: _buildArticleCard(node),
@@ -516,7 +522,7 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
     );
   }
 
-  // 탭으로 노드 찾기
+  // 탭으로 노드 찾기 - 선택 정보 업데이트
   void _findNodeUnderTap(TapDownDetails details) {
     // 화면 좌표를 가상 공간 좌표로 변환
     final invertedMatrix = Matrix4.inverted(_transformationController.value);
@@ -527,13 +533,18 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
 
     // 모든 노드 검사
     for (var node in _nodes) {
-      // 노드의 충돌 영역 계산
+      // 노드의 충돌 영역 계산 (이미 UI 위치에 맞게 수정됨)
       final nodeBounds = node.bounds;
 
       // 탭 위치가 노드 내부에 있는지 확인
       if (nodeBounds.contains(virtualPosition)) {
         print('노드 선택됨: ${node.queryResult.id}');
         setState(() {
+          // 이전에 선택된 노드와 다른 경우에만 패널 위치 초기화
+          if (_selectedNode != node) {
+            _nodeInfoPanelPosition = const Offset(20, 80); // 패널 위치 초기화
+          }
+          _selectedNode = node; // 선택된 노드 저장
           _draggedNode = node;
           node.isDraggable = false;
           _dragPosition = virtualPosition;
@@ -541,6 +552,11 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
         return;
       }
     }
+
+    // 빈 공간 탭 시 선택 해제
+    setState(() {
+      _selectedNode = null;
+    });
 
     print('선택된 노드 없음');
   }
@@ -609,6 +625,181 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
     }
   }
 
+  // 선택된 노드 정보 패널 위젯 생성 (드래그 가능하도록 수정)
+  Widget _buildSelectedNodeInfo() {
+    if (_selectedNode == null) return const SizedBox.shrink();
+
+    final node = _selectedNode!;
+    final queryResult = node.queryResult;
+
+    return Positioned(
+      top: _nodeInfoPanelPosition.dy,
+      right: _nodeInfoPanelPosition.dx,
+      child: GestureDetector(
+        // 드래그 시작 처리
+        onPanStart: (details) {
+          // 드래그 시작 시점에 별도 처리가 필요하면 여기에 추가
+        },
+        // 드래그 이동 처리
+        onPanUpdate: (details) {
+          setState(() {
+            // 패널 위치 업데이트 (dx는 오른쪽에서부터의 거리이므로 음수로 계산)
+            _nodeInfoPanelPosition = Offset(
+                _nodeInfoPanelPosition.dx - details.delta.dx,
+                _nodeInfoPanelPosition.dy + details.delta.dy);
+          });
+        },
+        // 드래그 종료 처리
+        onPanEnd: (details) {
+          // 드래그 종료 시점에 별도 처리가 필요하면 여기에 추가
+        },
+        child: Container(
+          width: 300,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.8),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.blue.withOpacity(0.7), width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.blue.withOpacity(0.3),
+                spreadRadius: 2,
+                blurRadius: 5,
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 드래그 핸들 추가
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      // 드래그 핸들 아이콘 추가
+                      Icon(Icons.drag_handle, color: Colors.white70, size: 18),
+                      const SizedBox(width: 8),
+                      const Text(
+                        '선택된 아티클 정보',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close,
+                        color: Colors.white70, size: 18),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    onPressed: () {
+                      setState(() {
+                        _selectedNode = null;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              const Divider(color: Colors.white30),
+              const SizedBox(height: 8),
+              _buildInfoItem('ID', queryResult.id.toString()),
+              _buildInfoItem('제목', queryResult.title()),
+              _buildInfoItem('페이지 수', queryResult.files().toString()),
+              const SizedBox(height: 8),
+              _buildActionButtons(queryResult),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 정보 아이템 생성 헬퍼 함수
+  Widget _buildInfoItem(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.blue,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: const TextStyle(color: Colors.white, fontSize: 14),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 아티클 액션 버튼 생성
+  Widget _buildActionButtons(QueryResult queryResult) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildActionButton(
+          icon: Icons.open_in_new,
+          label: '열기',
+          onPressed: () {
+            // 아티클 페이지로 이동
+            // Navigator.push...
+          },
+        ),
+        _buildActionButton(
+          icon: Icons.download,
+          label: '다운로드',
+          onPressed: () {
+            // 다운로드 기능
+          },
+        ),
+        _buildActionButton(
+          icon: Icons.bookmark,
+          label: '북마크',
+          onPressed: () {
+            // 북마크 기능
+          },
+        ),
+      ],
+    );
+  }
+
+  // 액션 버튼 생성 헬퍼 함수
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+  }) {
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(4),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        child: Column(
+          children: [
+            Icon(icon, color: Colors.white, size: 20),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -621,6 +812,7 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
                 _buildInstructionPanel(),
                 _buildInfoPanel(),
                 _buildFloatingCenterButton(),
+                _buildSelectedNodeInfo(), // 선택된 노드 정보 패널 추가
               ],
             ),
     );
@@ -760,9 +952,8 @@ class ArticleNode {
     velocityY = (random.nextDouble() - 0.5) * maxVelocity;
   }
 
-  // 사각형의 충돌 영역 정의
-  Rect get bounds =>
-      Rect.fromLTWH(x - width / 2, y - height / 2, width, height);
+  // 사각형의 충돌 영역 정의 - UI 표시와 일치하도록 수정
+  Rect get bounds => Rect.fromLTWH(x - width / 2, y - 100, width, height);
 
   // 사각형 충돌 감지
   bool intersects(ArticleNode other) {
