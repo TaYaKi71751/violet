@@ -18,6 +18,7 @@ import 'package:violet/pages/artist_info/article_list_page.dart';
 import 'package:violet/pages/bookmark/crop_bookmark.dart';
 import 'package:violet/pages/lab/lab/artist_search/artist_search.dart';
 import 'package:violet/pages/lab/lab/bookmark_spy.dart';
+import 'package:violet/pages/lab/lab/floating_article_view.dart';
 import 'package:violet/pages/lab/lab/recent_comments.dart';
 import 'package:violet/pages/lab/lab/recent_record.dart';
 import 'package:violet/pages/lab/lab/recent_record_u.dart';
@@ -36,6 +37,7 @@ import 'package:violet/settings/settings.dart';
 import 'package:violet/style/palette.dart';
 import 'package:violet/pages/lab/lab/llm_search.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:violet/pages/lab/lab/floating_text_view.dart';
 
 class LaboratoryPage extends StatefulWidget {
   const LaboratoryPage({super.key});
@@ -392,6 +394,23 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                 () async {
                   _navigate(const LLMSearchPage());
                 },
+              ),
+              _buildItem(
+                const Icon(MdiIcons.textBox, size: 40, color: Colors.blue),
+                '#022 Floating Text View',
+                'Floating text view',
+                null,
+                () async {
+                  _navigate(const FloatingTextView());
+                },
+              ),
+              _buildItem(
+                const Icon(Icons.article_outlined,
+                    size: 40, color: Colors.purple),
+                '#023 떠다니는 아티클',
+                '아티클 목록이 클라우드처럼 떠다니는 뷰',
+                const FloatingArticleView(),
+                null,
               ),
               SizedBox.fromSize(size: const Size.fromHeight(8.0))
             ],

@@ -20,7 +20,7 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
   late final AnimationController _controller;
   ArticleNode? _draggedNode;
   Offset? _dragPosition;
-  final int nodeCount = 15; // 적정한 수의 아이템
+  final int nodeCount = 100; // 적정한 수의 아이템
   final double maxDistance = 200.0; // 엣지가 그려질 최대 거리
 
   // 무한 배경을 위한 변수들
@@ -232,54 +232,128 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
                                   top: node.y - 100, // 아티클 위젯의 절반 높이
                                   child: Transform.scale(
                                     scale: 0.75, // 크기 조정
-                                    child: GestureDetector(
-                                      onPanStart: (details) {
-                                        setState(() {
-                                          _draggedNode = node;
-                                          final invertedMatrix =
-                                              Matrix4.inverted(
-                                                  _transformationController
-                                                      .value);
-                                          _dragPosition =
-                                              MatrixUtils.transformPoint(
-                                                  invertedMatrix,
-                                                  details.globalPosition);
-                                        });
-                                      },
-                                      onPanUpdate: (details) {
-                                        if (_draggedNode == node) {
-                                          final invertedMatrix =
-                                              Matrix4.inverted(
-                                                  _transformationController
-                                                      .value);
-                                          final localPosition =
-                                              MatrixUtils.transformPoint(
-                                                  invertedMatrix,
-                                                  details.globalPosition);
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: () {
+                                          // 아티클 탭 시 동작 (예: 상세 페이지로 이동)
+                                        },
+                                        child: Stack(
+                                          children: [
+                                            // 아티클 위젯
+                                            nodeWidget,
 
-                                          final dx = localPosition.dx -
-                                              _dragPosition!.dx;
-                                          final dy = localPosition.dy -
-                                              _dragPosition!.dy;
+                                            // 드래그 핸들 - 아티클 전체 영역을 드래그 가능하게 만듦
+                                            Positioned.fill(
+                                              child: GestureDetector(
+                                                behavior:
+                                                    HitTestBehavior.translucent,
+                                                onPanStart: (details) {
+                                                  final invertedMatrix =
+                                                      Matrix4.inverted(
+                                                          _transformationController
+                                                              .value);
+                                                  final localPosition =
+                                                      MatrixUtils.transformPoint(
+                                                          invertedMatrix,
+                                                          details
+                                                              .globalPosition);
 
-                                          setState(() {
-                                            node.x += dx;
-                                            node.y += dy;
-                                            _dragPosition = localPosition;
-                                          });
-                                        }
-                                      },
-                                      onPanEnd: (details) {
-                                        if (_draggedNode == node) {
-                                          setState(() {
-                                            _draggedNode = null;
-                                            _dragPosition = null;
-                                          });
-                                        }
-                                      },
-                                      child: MouseRegion(
-                                        cursor: SystemMouseCursors.grab,
-                                        child: nodeWidget,
+                                                  setState(() {
+                                                    _draggedNode = node;
+                                                    _dragPosition =
+                                                        localPosition;
+
+                                                    // 디버깅용 로그 추가 (필요시)
+                                                    print(
+                                                        '드래그 시작: ${node.x}, ${node.y}');
+                                                  });
+                                                },
+                                                onPanUpdate: (details) {
+                                                  if (_draggedNode == node) {
+                                                    final invertedMatrix =
+                                                        Matrix4.inverted(
+                                                            _transformationController
+                                                                .value);
+                                                    final localPosition =
+                                                        MatrixUtils.transformPoint(
+                                                            invertedMatrix,
+                                                            details
+                                                                .globalPosition);
+
+                                                    // _dragPosition이 null이면 현재 위치로 초기화
+                                                    if (_dragPosition == null) {
+                                                      _dragPosition =
+                                                          localPosition;
+                                                      return;
+                                                    }
+
+                                                    final dx =
+                                                        localPosition.dx -
+                                                            _dragPosition!.dx;
+                                                    final dy =
+                                                        localPosition.dy -
+                                                            _dragPosition!.dy;
+
+                                                    setState(() {
+                                                      node.x += dx;
+                                                      node.y += dy;
+                                                      _dragPosition =
+                                                          localPosition;
+
+                                                      // 드래그 위치 업데이트 디버깅 (필요시)
+                                                      // print('드래그 중: ${node.x}, ${node.y}, dx: $dx, dy: $dy');
+                                                    });
+                                                  }
+                                                },
+                                                onPanEnd: (details) {
+                                                  if (_draggedNode == node) {
+                                                    setState(() {
+                                                      _draggedNode = null;
+                                                      _dragPosition = null;
+                                                    });
+                                                  }
+                                                },
+                                                // 드래그 중일 때 시각적 피드백
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                      color: _draggedNode ==
+                                                              node
+                                                          ? Colors.blue
+                                                              .withOpacity(0.8)
+                                                          : Colors.transparent,
+                                                      width: 3,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+
+                                            // 드래그 손잡이 표시 (선택 사항)
+                                            Positioned(
+                                              top: 5,
+                                              right: 5,
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(4),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black54,
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                ),
+                                                child: const Icon(
+                                                  Icons.drag_indicator,
+                                                  color: Colors.white70,
+                                                  size: 16,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -501,6 +575,7 @@ class ArticleNode {
   final double maxWidth;
   final double maxHeight;
   final double maxVelocity = 0.5; // 속도 제한 (느리게)
+  bool isDraggable = true; // 드래그 가능 여부 플래그 추가
 
   ArticleNode({
     required this.queryResult,
