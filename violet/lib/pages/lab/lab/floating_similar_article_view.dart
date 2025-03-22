@@ -10,11 +10,13 @@ import 'package:violet/model/article_list_item.dart';
 import 'package:violet/widgets/article_item/article_list_item_widget.dart';
 
 class FloatingSimilarArticleView extends StatefulWidget {
-  final int initialArticleId; // 초기 아티클 ID 추가
+  final int initialArticleId; // 초기 아티클 ID
+  final bool useRecursiveLoading; // 재귀적 로딩 사용 여부 옵션 추가
 
   const FloatingSimilarArticleView({
     super.key,
-    required this.initialArticleId, // 초기 아티클 ID 필수 파라미터로 받음
+    required this.initialArticleId,
+    this.useRecursiveLoading = false, // 기본값은 비재귀 모드
   });
 
   @override
@@ -93,8 +95,14 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
       await _similarArticles.loadSimilarityData();
 
       if (_similarArticles.isLoaded) {
-        // 유사도 데이터 로드 성공 후 아티클 불러오기
-        await _loadSimilarArticlesNonRecursive(widget.initialArticleId);
+        // 재귀 모드에 따라 다른 로딩 방식 사용
+        if (widget.useRecursiveLoading) {
+          // 재귀적 방식으로 아티클 로드
+          await _loadArticlesByIdRecursively(widget.initialArticleId);
+        } else {
+          // 비재귀적 방식으로 아티클 로드
+          await _loadSimilarArticlesNonRecursive(widget.initialArticleId);
+        }
       } else {
         // 유사도 데이터 로드 실패 시 에러 처리
         debugPrint('유사도 데이터 로드 실패');
@@ -105,6 +113,59 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
     } catch (e) {
       debugPrint('유사도 데이터 또는 아티클 로드 실패: $e');
       setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+// 재귀적으로 아티클을 불러오는 함수 구현
+  // 재귀적으로 유사 아티클을 불러오는 함수
+  Future<void> _loadArticlesByIdRecursively(int articleId,
+      {double minSimilarity = 0.2, int depth = 0, int maxDepth = 3}) async {
+    // 이미 처리한 아티클이거나 최대 깊이에 도달한 경우 중단
+    if (_processedArticleIds.contains(articleId) ||
+        depth > maxDepth ||
+        _processedArticleIds.length >= nodeCount) {
+      return;
+    }
+
+    // 현재 아티클 ID 처리 목록에 추가
+    _processedArticleIds.add(articleId);
+
+    try {
+      // 현재 아티클 정보 가져오기
+      final searchResult = await HentaiManager.idSearch(articleId.toString());
+      if (searchResult != null) {
+        _queryResults.add(searchResult.results.first);
+
+        // 유사한 아티클 목록 가져오기
+        final similarArticles = _similarArticles.getSimilarArticles(articleId);
+
+        // 유사도별 재귀 호출 (유사도가 높은 것부터 처리)
+        for (var similarArticle in similarArticles) {
+          // 최소 유사도 이상인 경우만 처리
+          if (similarArticle.similarity >= minSimilarity) {
+            // 재귀적으로 유사 아티클 불러오기
+            await _loadArticlesByIdRecursively(similarArticle.id,
+                minSimilarity: minSimilarity,
+                depth: depth + 1,
+                maxDepth: maxDepth);
+          }
+
+          // 최대 노드 수 도달 시 중단
+          if (_processedArticleIds.length >= nodeCount) {
+            break;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('아티클 $articleId 불러오기 실패: $e');
+    }
+
+    // 모든 작업이 완료되면 노드 생성 (최상위 함수에서만 호출)
+    if (depth == 0) {
+      setState(() {
+        _createNodesWithSimilarity();
         _isLoading = false;
       });
     }
@@ -365,7 +426,7 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
         node.velocityY = (random.nextDouble() - 0.5) * node.maxVelocity;
         node.canPierceOtherGroups = true; // 다른 그룹 관통 가능
         node.isHighSimilarity = false; // 낮은 유사도 표시
-        node.collisionRadius = 300.0; // 충돌 반경 설정
+        node.collisionRadius = 250.0; // 충돌 반경 설정
 
         _nodes.add(node);
 
@@ -624,8 +685,42 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
   // 앱바 위젯 생성
   AppBar _buildAppBar() {
     return AppBar(
-      title: const Text('떠다니는 아티클'),
+      title: Row(
+        children: [
+          const Text('떠다니는 아티클'),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: widget.useRecursiveLoading ? Colors.purple : Colors.blue,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              widget.useRecursiveLoading ? '재귀 모드' : '일반 모드',
+              style: const TextStyle(fontSize: 12, color: Colors.white),
+            ),
+          )
+        ],
+      ),
       actions: [
+        // 로딩 모드 전환 버튼 추가
+        IconButton(
+          icon: Icon(
+            widget.useRecursiveLoading ? Icons.account_tree : Icons.grid_view,
+          ),
+          tooltip: widget.useRecursiveLoading ? '일반 모드로 전환' : '재귀 모드로 전환',
+          onPressed: () {
+            // 반대 모드로 페이지 다시 로드
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => FloatingSimilarArticleView(
+                  initialArticleId: widget.initialArticleId,
+                  useRecursiveLoading: !widget.useRecursiveLoading,
+                ),
+              ),
+            );
+          },
+        ),
         IconButton(
           icon: const Icon(Icons.refresh),
           onPressed: _resetToCenter,
@@ -967,7 +1062,12 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
     try {
       // 유사도 데이터가 이미 로드되어 있으므로 바로 아티클 로드
       if (_similarArticles.isLoaded) {
-        await _loadSimilarArticlesNonRecursive(newInitialArticleId);
+        // 재귀 모드에 따라 다른 로딩 방식 사용
+        if (widget.useRecursiveLoading) {
+          await _loadArticlesByIdRecursively(newInitialArticleId);
+        } else {
+          await _loadSimilarArticlesNonRecursive(newInitialArticleId);
+        }
 
         // 여기서는 _createNodesWithSimilarity()가 호출되므로 추가 설정 불필요
 
@@ -978,7 +1078,12 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
         await _similarArticles.loadSimilarityData();
 
         if (_similarArticles.isLoaded) {
-          await _loadSimilarArticlesNonRecursive(newInitialArticleId);
+          // 재귀 모드에 따라 다른 로딩 방식 사용
+          if (widget.useRecursiveLoading) {
+            await _loadArticlesByIdRecursively(newInitialArticleId);
+          } else {
+            await _loadSimilarArticlesNonRecursive(newInitialArticleId);
+          }
           _navigateToNewPage(newInitialArticleId);
         } else {
           // 유사도 데이터 로드 실패 시 에러 처리
@@ -1007,7 +1112,7 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
     }
   }
 
-  // 새로운 페이지로 이동하는 메서드
+  // 새로운 페이지로 이동하는 메서드 수정 - 재귀 옵션 유지
   void _navigateToNewPage(int newInitialArticleId) {
     try {
       print('새 페이지로 이동 시작: $newInitialArticleId');
@@ -1016,6 +1121,7 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
         MaterialPageRoute(
           builder: (context) => FloatingSimilarArticleView(
             initialArticleId: newInitialArticleId,
+            useRecursiveLoading: widget.useRecursiveLoading, // 재귀 모드 옵션 유지
           ),
         ),
       );
@@ -1099,32 +1205,63 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
         decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.7),
           borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: widget.useRecursiveLoading
+                ? Colors.purple.withOpacity(0.5)
+                : Colors.blue.withOpacity(0.5),
+            width: 1,
+          ),
         ),
-        child: const Column(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            // 모드 표시 추가
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              margin: const EdgeInsets.only(bottom: 8),
+              decoration: BoxDecoration(
+                color: widget.useRecursiveLoading
+                    ? Colors.purple.withOpacity(0.7)
+                    : Colors.blue.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                widget.useRecursiveLoading
+                    ? '재귀 모드: 깊이 우선 탐색'
+                    : '일반 모드: 유사도 기반 로딩',
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            const Text(
               '• 아티클을 탭하면 유사작품 모으기',
               style: TextStyle(color: Colors.white, fontSize: 14),
             ),
-            SizedBox(height: 4),
-            Text(
+            const SizedBox(height: 4),
+            const Text(
               '• 아티클을 더블 탭하면 초기 작품으로 설정',
               style: TextStyle(color: Colors.white, fontSize: 14),
             ),
-            SizedBox(height: 4),
-            Text(
+            const SizedBox(height: 4),
+            const Text(
               '• 아티클을 드래그해서 움직이기',
               style: TextStyle(color: Colors.white, fontSize: 14),
             ),
-            SizedBox(height: 4),
-            Text(
+            const SizedBox(height: 4),
+            const Text(
               '• 핀치로 줌인/줌아웃',
               style: TextStyle(color: Colors.white, fontSize: 14),
             ),
-            SizedBox(height: 4),
-            Text(
+            const SizedBox(height: 4),
+            const Text(
               '• 배경을 드래그해서 이동',
+              style: TextStyle(color: Colors.white, fontSize: 14),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              '• 앱바에서 모드 전환 가능',
               style: TextStyle(color: Colors.white, fontSize: 14),
             ),
           ],
@@ -1603,7 +1740,7 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
               ),
               const Divider(color: Colors.white30),
               const SizedBox(height: 8),
-              _buildInfoItem('ID', queryResult.id.toString()),
+              _buildInfoItem('ID', queryResult.id().toString()),
               _buildInfoItem('제목', queryResult.title()),
               _buildInfoItem('페이지 수', queryResult.files().toString()),
               const SizedBox(height: 8),
@@ -2046,7 +2183,7 @@ class ArticleNode {
     y += velocityY;
 
     // 가상 경계 영역 설정 (넓게)
-    final virtualBoundary = 2000.0;
+    final virtualBoundary = 5000.0;
     final centerX = maxWidth / 2;
     final centerY = maxHeight / 2;
 
