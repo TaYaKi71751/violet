@@ -7,8 +7,7 @@ import 'package:flutter/services.dart' show rootBundle;
 /// JSON 파일에서 유사도 데이터를 로드하고 활용하는 기능 제공
 class SimilarArticles {
   // 싱글톤 인스턴스
-  static final SimilarArticles _instance =
-      SimilarArticles._internal();
+  static final SimilarArticles _instance = SimilarArticles._internal();
 
   // 유사도 데이터 저장 맵 - { 아티클ID: { 관련아티클ID: 유사도점수 } }
   final Map<String, Map<String, double>> _similarityData = {};
@@ -88,8 +87,8 @@ class SimilarArticles {
   /// 특정 아티클의 유사한 아티클 목록 반환
   ///
   /// [articleId]와 유사한 아티클 목록을 반환
-  /// [limit]으로 결과 개수 제한 가능 (기본값: 10)
-  List<SimilarArticle> getSimilarArticles(int articleId, {int limit = 10}) {
+  /// [limit]으로 결과 개수 제한 가능 (기본값: 50)
+  List<SimilarArticle> getSimilarArticles(int articleId, {int limit = 50}) {
     if (!_isLoaded) return [];
 
     final strId = articleId.toString();
