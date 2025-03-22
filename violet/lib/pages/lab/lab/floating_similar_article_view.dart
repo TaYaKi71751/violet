@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:violet/component/hentai.dart';
+import 'package:vector_math/vector_math_64.dart' as vector_math;
 import 'package:violet/component/hitomi/similar_articles.dart';
 import 'package:violet/database/query.dart';
 import 'package:violet/model/article_list_item.dart';
@@ -380,9 +381,45 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
       // ...
     }
 
-    // 변환 컨트롤러 초기화 - 중앙에서 시작
+    // 변환 컨트롤러 초기화 - 초기 아티클이 있는 위치로 이동
+
+    // 가상 캔버스 중심점 (이미 정의됨)
+    // final centerX = _virtualSize.width / 2;
+    // final centerY = _virtualSize.height / 2;
+
+    // 스케일을 0.8로 설정하여 더 넓은 범위를 볼 수 있게 함
+    final initialScale = 0.8;
+
+    // 초기 위치 계산
+    // 중요: vector_math.Vector3에서 setTranslation 값을 설정할 때
+    // 화면 중앙에 초기 작품이 오도록 계산해야 함
     final matrix = Matrix4.identity();
+    matrix.setEntry(0, 0, initialScale);
+    matrix.setEntry(1, 1, initialScale);
+    matrix.setEntry(2, 2, initialScale);
+    matrix.setEntry(3, 3, 1.0);
+
+    // 변환 계산 수정: 화면 중앙에 초기 노드가 오도록 계산
+    // 핵심 포인트: centerX, centerY는 이미 초기 노드의 위치이기 때문에
+    // 이 좌표가 화면 중앙에 위치하도록 계산
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // 화면 중앙에 노드가 오도록 변환
+    matrix.setTranslation(vector_math.Vector3(
+      screenWidth / 2 - centerX * initialScale,
+      screenHeight / 2 - centerY * initialScale,
+      0.0,
+    ));
+
     _transformationController.value = matrix;
+
+    // 현재 스케일과 오프셋 값 갱신
+    _scale = getScaleFromTransform();
+    _offset = getOffsetFromTransform();
+
+    debugPrint(
+        '초기 화면 설정: 스케일=$initialScale, 위치=$centerX, $centerY, 화면 크기=${screenWidth}x${screenHeight}');
   }
 
   // 초기 충돌 해결을 위한 시뮬레이션
@@ -489,9 +526,42 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
 
   void _resetToCenter() {
     setState(() {
-      // 원점으로 이동
+      // 가상 캔버스 중심점 (초기 노드의 위치)
+      final centerX = _virtualSize.width / 2;
+      final centerY = _virtualSize.height / 2;
+
+      // 중심으로 이동하되 적절한 스케일 설정
+      final initialScale = 0.8;
+
       final matrix = Matrix4.identity();
+      matrix.setEntry(0, 0, initialScale);
+      matrix.setEntry(1, 1, initialScale);
+      matrix.setEntry(2, 2, initialScale);
+      matrix.setEntry(3, 3, 1.0);
+
+      // 화면 중앙에 초기 작품이 오도록 계산
+      final screenWidth = MediaQuery.of(context).size.width;
+      final screenHeight = MediaQuery.of(context).size.height;
+
+      matrix.setTranslation(vector_math.Vector3(
+        screenWidth / 2 - centerX * initialScale,
+        screenHeight / 2 - centerY * initialScale,
+        0.0,
+      ));
+
       _transformationController.value = matrix;
+
+      // 현재 스케일과 오프셋 값 갱신
+      _scale = getScaleFromTransform();
+      _offset = getOffsetFromTransform();
+
+      // 스낵바로 알림
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('초기 작품으로 화면을 이동했습니다.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
     });
   }
 
@@ -897,6 +967,8 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
       // 유사도 데이터가 이미 로드되어 있으므로 바로 아티클 로드
       if (_similarArticles.isLoaded) {
         await _loadSimilarArticlesNonRecursive(newInitialArticleId);
+
+        // 여기서는 _createNodesWithSimilarity()가 호출되므로 추가 설정 불필요
 
         // 새로운 페이지로 이동
         _navigateToNewPage(newInitialArticleId);
