@@ -303,21 +303,15 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
   // 드래그 핸들 위젯 생성
   Widget _buildDragHandle(ArticleNode node) {
     return Positioned.fill(
-      child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onPanStart: (details) => _handleDragStart(details, node),
-        onPanUpdate: (details) => _handleDragUpdate(details, node),
-        onPanEnd: (details) => _handleDragEnd(details, node),
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: _draggedNode == node
-                  ? Colors.blue.withOpacity(0.8)
-                  : Colors.transparent,
-              width: 3,
-            ),
-            borderRadius: BorderRadius.circular(8),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: _draggedNode == node
+                ? Colors.blue.withOpacity(0.8)
+                : Colors.transparent,
+            width: 3,
           ),
+          borderRadius: BorderRadius.circular(8),
         ),
       ),
     );
@@ -453,7 +447,8 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
         minScale: _minScale,
         maxScale: _maxScale,
         boundaryMargin: const EdgeInsets.all(double.infinity),
-        constrained: true,
+        constrained: false,
+        clipBehavior: Clip.none,
         onInteractionUpdate: (details) {
           setState(() {
             _scale = getScaleFromTransform();
@@ -461,12 +456,29 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
           });
         },
         onInteractionEnd: _handleTransformation,
-        child: SizedBox.fromSize(
-          size: _virtualSize,
-          child: AnimatedBuilder(
-            animation: _controller,
-            builder: _buildAnimatedContent,
-          ),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            SizedBox.fromSize(
+              size: _virtualSize,
+              child: AnimatedBuilder(
+                animation: _controller,
+                builder: _buildAnimatedContent,
+              ),
+            ),
+            Positioned.fill(
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTapDown: _findNodeUnderTap,
+                onPanStart: _handleGlobalPanStart,
+                onPanUpdate: _handleGlobalPanUpdate,
+                onPanEnd: _handleGlobalPanEnd,
+                child: Container(
+                  color: Colors.transparent,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -502,6 +514,99 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
         ..._nodes.map(_buildArticleNode).toList(),
       ],
     );
+  }
+
+  // 탭으로 노드 찾기
+  void _findNodeUnderTap(TapDownDetails details) {
+    // 화면 좌표를 가상 공간 좌표로 변환
+    final invertedMatrix = Matrix4.inverted(_transformationController.value);
+    final virtualPosition =
+        MatrixUtils.transformPoint(invertedMatrix, details.globalPosition);
+
+    print('Tap detected at: ${virtualPosition.dx}, ${virtualPosition.dy}');
+
+    // 모든 노드 검사
+    for (var node in _nodes) {
+      // 노드의 충돌 영역 계산
+      final nodeBounds = node.bounds;
+
+      // 탭 위치가 노드 내부에 있는지 확인
+      if (nodeBounds.contains(virtualPosition)) {
+        print('노드 선택됨: ${node.queryResult.id}');
+        setState(() {
+          _draggedNode = node;
+          node.isDraggable = false;
+          _dragPosition = virtualPosition;
+        });
+        return;
+      }
+    }
+
+    print('선택된 노드 없음');
+  }
+
+  // 글로벌 팬 시작 핸들러
+  void _handleGlobalPanStart(DragStartDetails details) {
+    // 화면 좌표를 가상 공간 좌표로 변환
+    final invertedMatrix = Matrix4.inverted(_transformationController.value);
+    final virtualPosition =
+        MatrixUtils.transformPoint(invertedMatrix, details.globalPosition);
+
+    print('Pan start at: ${virtualPosition.dx}, ${virtualPosition.dy}');
+
+    // 모든 노드 검사하여 드래그할 노드 찾기
+    for (var node in _nodes) {
+      // 노드의 충돌 영역 계산
+      final nodeBounds = node.bounds;
+
+      // 확장된 히트 테스트 영역 (약간 더 큰 영역으로 체크)
+      final expandedBounds = Rect.fromLTWH(nodeBounds.left - 20,
+          nodeBounds.top - 20, nodeBounds.width + 40, nodeBounds.height + 40);
+
+      // 터치 위치가 확장된 노드 영역 내부에 있는지 확인
+      if (expandedBounds.contains(virtualPosition)) {
+        print('드래그 시작: ${node.queryResult.id}');
+        setState(() {
+          _draggedNode = node;
+          node.isDraggable = false;
+          _dragPosition = virtualPosition;
+        });
+        return;
+      }
+    }
+  }
+
+  // 글로벌 팬 업데이트 핸들러
+  void _handleGlobalPanUpdate(DragUpdateDetails details) {
+    if (_draggedNode != null && _dragPosition != null) {
+      // 화면 좌표를 가상 공간 좌표로 변환
+      final invertedMatrix = Matrix4.inverted(_transformationController.value);
+      final virtualPosition =
+          MatrixUtils.transformPoint(invertedMatrix, details.globalPosition);
+
+      final dx = virtualPosition.dx - _dragPosition!.dx;
+      final dy = virtualPosition.dy - _dragPosition!.dy;
+
+      print('드래그 업데이트: dx=$dx, dy=$dy');
+
+      setState(() {
+        _draggedNode!.x += dx;
+        _draggedNode!.y += dy;
+        _dragPosition = virtualPosition;
+      });
+    }
+  }
+
+  // 글로벌 팬 종료 핸들러
+  void _handleGlobalPanEnd(DragEndDetails details) {
+    if (_draggedNode != null) {
+      print('드래그 종료');
+      setState(() {
+        _draggedNode!.isDraggable = true;
+        _draggedNode = null;
+        _dragPosition = null;
+      });
+    }
   }
 
   @override
