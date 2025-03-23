@@ -49,7 +49,7 @@ class _RouteDialogState extends State<RouteDialog> {
               leading: Image.network(
                 {
                   'Hitomi':
-                      'https://ltn.hitomi.la/apple-touch-icon-180x180.png',
+                      'https://ltn.gold-usergeneratedcontent.net/apple-touch-icon-180x180.png',
                   'EHentai': 'https://e-hentai.org/favicon.ico',
                   'ExHentai': 'https://exhentai.org/favicon.ico',
                   'Hiyobi': 'https://hiyobi.me/favicon.ico',
@@ -114,7 +114,7 @@ class _ImageRouteDialogState extends State<ImageRouteDialog> {
               leading: Image.network(
                 {
                   'Hitomi':
-                      'https://ltn.hitomi.la/apple-touch-icon-180x180.png',
+                      'https://ltn.gold-usergeneratedcontent.net/apple-touch-icon-180x180.png',
                   'EHentai': 'https://e-hentai.org/favicon.ico',
                   'ExHentai': 'https://exhentai.org/favicon.ico',
                   'NHentai': 'https://nhentai.net/favicon.ico',

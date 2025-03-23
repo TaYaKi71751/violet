@@ -99,7 +99,7 @@ class _GroupArticleListPageState extends State<LabGroupArticleListPage> {
             var headers = await ScriptManager.runHitomiGetHeaderContent(
                 element.article());
             var hh = await http.get(
-              'https://ltn.hitomi.la/galleryblock/${element.article()}.html',
+              'https://ltn.gold-usergeneratedcontent.net/galleryblock/${element.article()}.html',
               headers: headers,
             );
             var article = await HitomiParser.parseGalleryBlock(hh.body);

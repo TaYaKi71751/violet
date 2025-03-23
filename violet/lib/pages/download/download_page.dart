@@ -192,7 +192,7 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
             final headers =
                 await ScriptManager.runHitomiGetHeaderContent('$element');
             final res = await http.get(
-              'https://ltn.hitomi.la/galleryblock/$element.html',
+              'https://ltn.gold-usergeneratedcontent.net/galleryblock/$element.html',
               headers: headers,
             );
             final article = await HitomiParser.parseGalleryBlock(res.body);
