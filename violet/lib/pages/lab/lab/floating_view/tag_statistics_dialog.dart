@@ -15,34 +15,21 @@ class TagStatisticsDialog extends StatefulWidget {
   State<TagStatisticsDialog> createState() => _TagStatisticsDialogState();
 }
 
-class _TagStatisticsDialogState extends State<TagStatisticsDialog>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _TagStatisticsDialogState extends State<TagStatisticsDialog> {
   String _searchQuery = '';
   int _minAppearance = 1;
   String _sortBy = 'count'; // 'count' 또는 'name'
   bool _sortAscending = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(
-      length: widget.tagStatistics.keys.length,
-      vsync: this,
-    );
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+  // 태그 타입 필터 옵션
+  final Map<String, bool> _tagTypeFilters = {
+    'female': true,
+    'male': true,
+    'tags': true,
+  };
 
   @override
   Widget build(BuildContext context) {
-    // 태그 유형 목록
-    final tagTypes = widget.tagStatistics.keys.toList();
-
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
@@ -72,54 +59,12 @@ class _TagStatisticsDialogState extends State<TagStatisticsDialog>
             // 검색 및 필터 섹션
             _buildSearchFilterSection(),
 
-            // 탭 바
-            TabBar(
-              controller: _tabController,
-              tabs: tagTypes.map((type) {
-                final tagCount = widget.tagStatistics[type]!.length;
-                return Tab(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // 태그 유형에 따른 아이콘
-                      Icon(
-                        type == 'female'
-                            ? Icons.female
-                            : type == 'male'
-                                ? Icons.male
-                                : Icons.tag,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(type),
-                      const SizedBox(width: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          tagCount.toString(),
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-              indicatorColor: Colors.purple,
-            ),
+            // 태그 타입 필터 토글 섹션 추가
+            _buildTagTypeFilterSection(),
 
-            // 탭 내용
+            // 통합된 태그 목록
             Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: tagTypes
-                    .map((type) => _buildTagStatisticsList(type))
-                    .toList(),
-              ),
+              child: _buildAllTagsList(),
             ),
           ],
         ),
@@ -307,6 +252,94 @@ class _TagStatisticsDialogState extends State<TagStatisticsDialog>
     );
   }
 
+  // 태그 타입 필터 섹션 추가
+  Widget _buildTagTypeFilterSection() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.02),
+        border: Border(
+          bottom: BorderSide(color: Colors.white.withOpacity(0.1)),
+        ),
+      ),
+      child: Row(
+        children: [
+          const Text(
+            '태그 타입:',
+            style: TextStyle(color: Colors.white70, fontSize: 14),
+          ),
+          const SizedBox(width: 12),
+          // Female 태그 토글
+          _buildTagTypeToggle(
+            'female',
+            Colors.pink,
+            Icons.female,
+          ),
+          const SizedBox(width: 8),
+          // Male 태그 토글
+          _buildTagTypeToggle(
+            'male',
+            Colors.blue,
+            Icons.male,
+          ),
+          const SizedBox(width: 8),
+          // 일반 태그 토글
+          _buildTagTypeToggle(
+            'tags',
+            Colors.grey,
+            Icons.tag,
+          ),
+          const Spacer(),
+          // 현재 표시 중인 태그 수
+          Text(
+            '표시 중인 태그: ${_getVisibleTagCount()}',
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 태그 타입 토글 버튼
+  Widget _buildTagTypeToggle(String tagType, Color color, IconData icon) {
+    return FilterChip(
+      label: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon,
+              size: 16,
+              color: _tagTypeFilters[tagType]! ? color : Colors.white54),
+          const SizedBox(width: 4),
+          Text(
+            tagType,
+            style: TextStyle(
+              color: _tagTypeFilters[tagType]! ? Colors.white : Colors.white54,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+      selected: _tagTypeFilters[tagType]!,
+      onSelected: (bool selected) {
+        setState(() {
+          _tagTypeFilters[tagType] = selected;
+        });
+      },
+      selectedColor: color.withOpacity(0.3),
+      backgroundColor: Colors.white.withOpacity(0.05),
+      checkmarkColor: color,
+      showCheckmark: false,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: _tagTypeFilters[tagType]!
+              ? color.withOpacity(0.7)
+              : Colors.white12,
+        ),
+      ),
+    );
+  }
+
   // 전체 고유 태그 수 계산
   int _getTotalUniqueTagCount() {
     int total = 0;
@@ -316,41 +349,58 @@ class _TagStatisticsDialogState extends State<TagStatisticsDialog>
     return total;
   }
 
-  // 태그 통계 목록
-  Widget _buildTagStatisticsList(String tagType) {
-    // 태그 맵 가져오기
-    final tagsMap = widget.tagStatistics[tagType] ?? {};
-
-    // 검색 및 최소 등장 횟수 필터 적용
-    List<MapEntry<String, int>> filteredTags = tagsMap.entries
-        .where((entry) =>
+  // 현재 표시 중인 태그 수 계산
+  int _getVisibleTagCount() {
+    int count = 0;
+    widget.tagStatistics.forEach((type, tags) {
+      if (_tagTypeFilters[type] ?? false) {
+        // 검색어와 최소 등장 횟수 필터 적용
+        final filtered = tags.entries.where((entry) =>
             entry.key.toLowerCase().contains(_searchQuery.toLowerCase()) &&
-            entry.value >= _minAppearance)
-        .toList();
+            entry.value >= _minAppearance);
+        count += filtered.length;
+      }
+    });
+    return count;
+  }
+
+  // 모든 태그 통합 목록
+  Widget _buildAllTagsList() {
+    // 모든 태그를 하나의 리스트로 통합
+    List<MapEntry<String, Map<String, dynamic>>> allTags = [];
+
+    // 각 태그 유형의 필터가 활성화된 경우에만 추가
+    widget.tagStatistics.forEach((tagType, tagsMap) {
+      if (_tagTypeFilters[tagType] ?? false) {
+        tagsMap.forEach((tagName, count) {
+          if (tagName.toLowerCase().contains(_searchQuery.toLowerCase()) &&
+              count >= _minAppearance) {
+            allTags.add(
+              MapEntry(
+                tagName,
+                {
+                  'count': count,
+                  'type': tagType,
+                },
+              ),
+            );
+          }
+        });
+      }
+    });
 
     // 정렬 적용
     if (_sortBy == 'count') {
-      filteredTags.sort((a, b) => _sortAscending
-          ? a.value.compareTo(b.value)
-          : b.value.compareTo(a.value));
+      allTags.sort((a, b) => _sortAscending
+          ? a.value['count'].compareTo(b.value['count'])
+          : b.value['count'].compareTo(a.value['count']));
     } else {
       // name
-      filteredTags.sort((a, b) =>
+      allTags.sort((a, b) =>
           _sortAscending ? a.key.compareTo(b.key) : b.key.compareTo(a.key));
     }
 
-    // 색상 설정
-    Color tagColor;
-    if (tagType == 'female') {
-      tagColor = Colors.pink;
-    } else if (tagType == 'male') {
-      tagColor = Colors.blue;
-    } else {
-      // tags
-      tagColor = Colors.grey;
-    }
-
-    return filteredTags.isEmpty
+    return allTags.isEmpty
         ? Center(
             child: Text(
               '검색 결과가 없습니다.',
@@ -358,13 +408,33 @@ class _TagStatisticsDialogState extends State<TagStatisticsDialog>
             ),
           )
         : ListView.builder(
-            itemCount: filteredTags.length,
+            itemCount: allTags.length,
             itemBuilder: (context, index) {
-              final entry = filteredTags[index];
+              final entry = allTags[index];
               final tagName = entry.key;
-              final tagCount = entry.value;
+              final tagData = entry.value;
+              final tagCount = tagData['count'] as int;
+              final tagType = tagData['type'] as String;
               final percentage = (tagCount / widget.totalArticleCount * 100)
                   .toStringAsFixed(1);
+
+              // 태그 타입에 따른 색상 설정
+              Color tagColor;
+              IconData tagIcon;
+
+              switch (tagType) {
+                case 'female':
+                  tagColor = Colors.pink;
+                  tagIcon = Icons.female;
+                  break;
+                case 'male':
+                  tagColor = Colors.blue;
+                  tagIcon = Icons.male;
+                  break;
+                default:
+                  tagColor = Colors.grey;
+                  tagIcon = Icons.tag;
+              }
 
               return ListTile(
                 leading: Container(
@@ -373,17 +443,22 @@ class _TagStatisticsDialogState extends State<TagStatisticsDialog>
                     color: tagColor.withOpacity(0.2),
                     shape: BoxShape.circle,
                   ),
-                  child: Text(
-                    '${index + 1}',
-                    style: TextStyle(
-                      color: tagColor,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  child: Icon(
+                    tagIcon,
+                    color: tagColor,
+                    size: 16,
                   ),
                 ),
                 title: Text(
                   tagName,
                   style: const TextStyle(color: Colors.white),
+                ),
+                subtitle: Text(
+                  '타입: $tagType',
+                  style: TextStyle(
+                    color: tagColor.withOpacity(0.7),
+                    fontSize: 12,
+                  ),
                 ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -426,7 +501,7 @@ class _TagStatisticsDialogState extends State<TagStatisticsDialog>
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 onTap: () {
-                  // 태그를 탭하면 관련 작품을 하이라이트하는 기능 등을 추가할 수 있음
+                  // 태그를 탭하면 관련 작품을 하이라이트하는 기능
                   _highlightNodesWithTag(tagType, tagName);
                 },
               );
@@ -436,8 +511,7 @@ class _TagStatisticsDialogState extends State<TagStatisticsDialog>
 
   // 특정 태그를 가진 노드를 하이라이트하는 함수
   void _highlightNodesWithTag(String tagType, String tagValue) {
-    // 이 함수는 FloatingSimilarArticleViewState 클래스의 메서드이므로
-    // 여기서는 Navigator.pop() 후 콜백으로 처리해야 함
+    // 다이얼로그 닫고 콜백으로 처리
     Navigator.of(context).pop({
       'action': 'highlight',
       'tagType': tagType,
