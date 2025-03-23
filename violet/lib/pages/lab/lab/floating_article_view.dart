@@ -283,7 +283,7 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
   // 앱바 위젯 생성
   AppBar _buildAppBar() {
     return AppBar(
-      title: const Text('떠다니는 아티클'),
+      title: const Text('Floating Article View'),
       actions: [
         IconButton(
           icon: const Icon(Icons.refresh),

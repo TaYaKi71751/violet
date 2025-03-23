@@ -19,7 +19,6 @@ import 'package:violet/pages/bookmark/crop_bookmark.dart';
 import 'package:violet/pages/lab/lab/artist_search/artist_search.dart';
 import 'package:violet/pages/lab/lab/bookmark_spy.dart';
 import 'package:violet/pages/lab/lab/floating_article_view.dart';
-import 'package:violet/pages/lab/lab/floating_similar_article_view.dart';
 import 'package:violet/pages/lab/lab/recent_comments.dart';
 import 'package:violet/pages/lab/lab/recent_record.dart';
 import 'package:violet/pages/lab/lab/recent_record_u.dart';
@@ -408,19 +407,10 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
               _buildItem(
                 const Icon(Icons.article_outlined,
                     size: 40, color: Colors.purple),
-                '#023 떠다니는 아티클',
-                '아티클 목록이 클라우드처럼 떠다니는 뷰',
+                '#023 Floating Article View',
+                'Floating article view',
                 const FloatingArticleView(),
                 null,
-              ),
-              _buildItem(
-                const Icon(Icons.article_outlined,
-                    size: 40, color: Colors.purple),
-                '#024 떠다니는 유사 아티클',
-                '유사한 아티클 목록이 클라우드처럼 떠다니는 뷰',
-                const FloatingSimilarArticleView(
-                  initialArticleId: 2555874,
-                ),
               ),
               SizedBox.fromSize(size: const Size.fromHeight(8.0))
             ],

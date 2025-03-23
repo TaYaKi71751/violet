@@ -736,7 +736,7 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
             )
           : Row(
               children: [
-                const Text('떠다니는 아티클'),
+                const Text('Floating Article View'),
                 const SizedBox(width: 8),
                 GestureDetector(
                   onTap: () {
