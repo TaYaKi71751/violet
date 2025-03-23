@@ -22,6 +22,15 @@ class PatchModel {
 
 final patches = [
   PatchModel(
+    dateTime: DateTime(2025, 3, 23),
+    version: '1.33.0 Minor',
+    isMinor: true,
+    contents: [
+      'fix hitomi url not found',
+      'add float view (experimental)',
+    ],
+  ),
+  PatchModel(
     dateTime: DateTime(2025, 2, 3),
     version: '1.32.3 Patch',
     contents: [
