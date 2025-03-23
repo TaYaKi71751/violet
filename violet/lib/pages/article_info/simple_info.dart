@@ -13,6 +13,8 @@ import 'package:violet/model/article_info.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/widgets/article_item/image_provider_manager.dart';
 import 'package:violet/widgets/article_item/thumbnail_view_page.dart';
+import 'package:violet/pages/lab/lab/floating_similar_article_view.dart';
+import 'package:violet/component/hitomi/similar_articles.dart';
 
 class SimpleInfoWidget extends StatelessWidget {
   final FlareControls _flareController = FlareControls();
@@ -24,25 +26,37 @@ class SimpleInfoWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = thumbnailSize();
     final data = Provider.of<ArticleInfo>(context);
-    return Row(
-      children: [
-        Stack(
-          children: <Widget>[
-            thumbnail(context, data),
-            bookmark(data),
-          ],
-        ),
-        Expanded(
-          child: SizedBox(
-            height: size.height,
-            width: size.width,
-            child: Padding(
-              padding: const EdgeInsets.all(4),
-              child: simpleInfo(data),
-            ),
+    return Container(
+      color: Colors.white,
+      child: Stack(
+        children: <Widget>[
+          Row(
+            children: [
+              Stack(
+                children: <Widget>[
+                  thumbnail(context, data),
+                  bookmark(data),
+                ],
+              ),
+              Expanded(
+                child: SizedBox(
+                  height: size.height,
+                  width: size.width,
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: simpleInfo(data),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
+          Positioned(
+            right: 16,
+            bottom: MediaQuery.of(context).padding.bottom + 16,
+            child: floatingSimilarView(context, data),
+          ),
+        ],
+      ),
     );
   }
 
@@ -215,5 +229,104 @@ class SimpleInfoWidget extends StatelessWidget {
             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
       ],
     );
+  }
+
+  Widget floatingSimilarView(BuildContext context, ArticleInfo data) {
+    final articleId = data.queryResult.id();
+
+    return FutureBuilder<bool>(
+      future: _checkSimilarArticlesExist(articleId),
+      builder: (context, snapshot) {
+        // 로딩 중일 때 로딩 인디케이터 표시
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.purple),
+              ),
+            ),
+          );
+        }
+
+        // 유사 아티클 데이터가 없으면 빈 위젯 반환
+        if (!snapshot.hasData || snapshot.data != true) {
+          return const SizedBox.shrink();
+        }
+
+        // 유사 아티클 데이터가 있으면 버튼 표시
+        return Material(
+          elevation: 8,
+          shadowColor: Colors.purple.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(24),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Colors.purple, Colors.deepPurple],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.purple.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: InkWell(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => FloatingSimilarArticleView(
+                      initialArticleId: articleId,
+                      useRecursiveLoading: false,
+                    ),
+                  ),
+                );
+              },
+              borderRadius: BorderRadius.circular(24),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(Icons.bubble_chart, color: Colors.white),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<bool> _checkSimilarArticlesExist(int articleId) async {
+    try {
+      final similarArticles = SimilarArticles();
+
+      await similarArticles.loadSimilarityData();
+
+      if (!similarArticles.isLoaded) {
+        return false;
+      }
+
+      final similarList = similarArticles.getSimilarArticles(articleId);
+
+      return similarList.isNotEmpty;
+    } catch (e) {
+      print('유사 작품 확인 중 오류 발생: $e');
+      return false;
+    }
   }
 }
