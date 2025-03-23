@@ -10,8 +10,8 @@ import 'package:violet/model/article_list_item.dart';
 import 'package:violet/pages/common/utils.dart';
 import 'package:violet/pages/lab/lab/floating_view/article_node.dart';
 import 'package:violet/pages/lab/lab/floating_view/painter.dart';
-import 'package:violet/pages/lab/lab/floating_view/tag_statistics_dialog.dart';
 import 'package:violet/widgets/article_item/article_list_item_widget.dart';
+import 'package:violet/pages/lab/lab/floating_view/tag_statistics_panel.dart';
 
 class FloatingSimilarArticleView extends StatefulWidget {
   final int initialArticleId;
@@ -80,6 +80,10 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
   late TextEditingController _articleIdController;
   final FocusNode _articleIdFocusNode = FocusNode();
   bool _isSearching = false; // 검색 중인지 상태 추가
+
+  // 태그 통계 패널 상태 변수 추가
+  bool _showTagStatisticsPanel = true;
+  Offset _tagStatisticsPanelPosition = const Offset(20, 120);
 
   @override
   void initState() {
@@ -794,14 +798,12 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
             onPressed: _resetToCenter,
             tooltip: '초기 위치로 돌아가기',
           ),
-        // 태그 통계 버튼 추가
+        // "태그 통계 보기" 버튼 처리 수정
         if (!_isSearching)
           IconButton(
             icon: const Icon(Icons.analytics),
             tooltip: '태그 통계 보기',
-            onPressed: () {
-              _showTagStatistics();
-            },
+            onPressed: _toggleTagStatisticsPanel,
           ),
       ],
     );
@@ -2565,26 +2567,8 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
 
   // 태그 통계 다이얼로그 표시 함수 수정
   void _showTagStatistics() {
-    // 태그 통계 수집
-    final tagStats = _collectTagStatistics();
-
-    // 다이얼로그 표시 및 결과 처리
-    showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (context) => TagStatisticsDialog(
-        tagStatistics: tagStats,
-        totalArticleCount: _nodes.length,
-      ),
-    ).then((result) {
-      // 다이얼로그 결과 처리
-      if (result != null && result['action'] == 'highlight') {
-        final tagType = result['tagType'] as String;
-        final tagValue = result['tagValue'] as String;
-
-        // 태그를 가진 노드 하이라이트
-        _highlightNodesWithSpecificTag(tagType, tagValue);
-      }
-    });
+    // 패널 토글로 대체
+    _toggleTagStatisticsPanel();
   }
 
   // 태그 통계 수집 함수
@@ -2695,6 +2679,18 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
     );
   }
 
+  // 태그 통계 버튼 핸들러 수정
+  void _toggleTagStatisticsPanel() {
+    setState(() {
+      _showTagStatisticsPanel = !_showTagStatisticsPanel;
+    });
+  }
+
+  // 태그 선택 핸들러
+  void _handleTagSelected(String tagType, String tagValue) {
+    _highlightNodesWithSpecificTag(tagType, tagValue);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -2707,7 +2703,21 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
                 _buildInstructionPanel(),
                 _buildInfoPanel(),
                 _buildFloatingCenterButton(),
-                _buildSelectedNodeInfo(), // 선택된 노드 정보 패널 추가
+                _buildSelectedNodeInfo(), // 선택된 노드 정보 패널
+
+                // 태그 통계 패널 조건부 표시
+                if (_showTagStatisticsPanel)
+                  TagStatisticsPanel(
+                    tagStatistics: _collectTagStatistics(),
+                    totalArticleCount: _nodes.length,
+                    onTagSelected: _handleTagSelected,
+                    initialPosition: _tagStatisticsPanelPosition,
+                    onClose: () {
+                      setState(() {
+                        _showTagStatisticsPanel = false;
+                      });
+                    },
+                  ),
               ],
             ),
     );
