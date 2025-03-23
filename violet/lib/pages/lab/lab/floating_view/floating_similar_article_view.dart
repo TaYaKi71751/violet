@@ -2806,9 +2806,106 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
     });
   }
 
-  // 태그 선택 핸들러
-  void _handleTagSelected(String tagType, String tagValue) {
-    _highlightNodesWithSpecificTag(tagType, tagValue);
+  // 태그 선택 핸들러 수정 - 여러 태그 처리
+  void _handleTagsSelected(List<Map<String, String>> selectedTags) {
+    if (selectedTags.isEmpty) {
+      // 선택된 태그가 없으면 모든 노드 원래 상태로 복원
+      for (var node in _nodes) {
+        node.highlightColor = null;
+        node.opacity = 1.0;
+        node.glowRadius = 0.0;
+      }
+      return;
+    }
+
+    // 모든 노드 리셋 (흐리게 처리)
+    for (var node in _nodes) {
+      node.isAttracted = false;
+      node.attractionFactor = 0;
+      node.highlightColor = null;
+      node.attractionTarget = null;
+      node.opacity = 0.25;
+      node.glowRadius = 0.0;
+    }
+
+    // 모든 선택된 태그를 포함하는 노드 찾기
+    List<ArticleNode> matchingNodes = [];
+
+    for (var node in _nodes) {
+      final queryResult = node.queryResult;
+
+      if (queryResult.tags() != null) {
+        final tagsString = queryResult.tags() as String;
+        bool matchesAllTags = true;
+
+        // 모든 선택된 태그가 이 아티클에 포함되어 있는지 확인
+        for (var tagInfo in selectedTags) {
+          final tagType = tagInfo['type']!;
+          final tagValue = tagInfo['value']!;
+
+          final tagToFind = tagType == 'tags' ? tagValue : '$tagType:$tagValue';
+
+          if (!tagsString.contains(tagToFind)) {
+            matchesAllTags = false;
+            break;
+          }
+        }
+
+        if (matchesAllTags) {
+          matchingNodes.add(node);
+        }
+      }
+    }
+
+    // 매칭된 노드가 없으면 스낵바 표시
+    if (matchingNodes.isEmpty) {
+      // 모든 노드 원래 상태로 복원
+      for (var node in _nodes) {
+        node.opacity = 1.0;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('선택한 모든 태그를 포함하는 작품이 없습니다.'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    // 매칭된 노드 강조 효과
+    for (var node in matchingNodes) {
+      // 강력한 하이라이트 효과 적용 (보라색 계열로 통일)
+      node.highlightColor = Colors.deepPurple.withOpacity(0.6);
+      // 완전 불투명하게
+      node.opacity = 1.0;
+      // 글로우 효과 추가 (더 강하게)
+      node.glowRadius = 30.0;
+    }
+
+    // 스낵바로 알림
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          '선택한 모든 태그를 포함하는 ${matchingNodes.length}개 작품을 강조 표시했습니다.',
+          style: const TextStyle(fontSize: 14),
+        ),
+        backgroundColor: Colors.deepPurple.withOpacity(0.8),
+        duration: const Duration(seconds: 3),
+        action: SnackBarAction(
+          label: '취소',
+          textColor: Colors.white,
+          onPressed: () {
+            // 하이라이트 취소 - 모든 노드 원래 상태로 복원
+            for (var node in _nodes) {
+              node.highlightColor = null;
+              node.opacity = 1.0;
+              node.glowRadius = 0.0;
+            }
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -2823,14 +2920,14 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
                 _buildInstructionPanel(),
                 _buildInfoPanel(),
                 _buildFloatingCenterButton(),
-                _buildSelectedNodeInfo(), // 선택된 노드 정보 패널
+                _buildSelectedNodeInfo(),
 
-                // 태그 통계 패널 조건부 표시
+                // 태그 통계 패널 조건부 표시 - 콜백 함수 변경
                 if (_showTagStatisticsPanel)
                   TagStatisticsPanel(
                     tagStatistics: _collectTagStatistics(),
                     totalArticleCount: _nodes.length,
-                    onTagSelected: _handleTagSelected,
+                    onTagsSelected: _handleTagsSelected, // 변경된 콜백 함수
                     initialPosition: _tagStatisticsPanelPosition,
                     onClose: () {
                       setState(() {

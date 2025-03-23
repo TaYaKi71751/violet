@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class TagStatisticsPanel extends StatefulWidget {
   final Map<String, Map<String, int>> tagStatistics;
   final int totalArticleCount;
-  final Function(String, String) onTagSelected;
+  final Function(List<Map<String, String>>) onTagsSelected; // 콜백 함수 변경
   final Offset initialPosition;
   final VoidCallback onClose;
 
@@ -11,7 +11,7 @@ class TagStatisticsPanel extends StatefulWidget {
     Key? key,
     required this.tagStatistics,
     required this.totalArticleCount,
-    required this.onTagSelected,
+    required this.onTagsSelected,
     required this.initialPosition,
     required this.onClose,
   }) : super(key: key);
@@ -20,13 +20,21 @@ class TagStatisticsPanel extends StatefulWidget {
   State<TagStatisticsPanel> createState() => _TagStatisticsPanelState();
 }
 
-class _TagStatisticsPanelState extends State<TagStatisticsPanel> {
+class _TagStatisticsPanelState extends State<TagStatisticsPanel>
+    with TickerProviderStateMixin {
   String _searchQuery = '';
   int _minAppearance = 1;
   String _sortBy = 'count'; // 'count' 또는 'name'
   bool _sortAscending = false;
   bool _isCollapsed = false; // 패널 축소 상태
   late Offset _position;
+
+  // 선택된 태그 목록 (Map<태그 유형, Set<태그 값>>)
+  final Map<String, Set<String>> _selectedTags = {
+    'female': {},
+    'male': {},
+    'tags': {},
+  };
 
   // 태그 타입 필터 옵션
   final Map<String, bool> _tagTypeFilters = {
@@ -35,6 +43,9 @@ class _TagStatisticsPanelState extends State<TagStatisticsPanel> {
     'tags': true,
   };
 
+  // 애니메이션 컨트롤러를 담을 맵 추가
+  final Map<String, AnimationController> _animationControllers = {};
+
   @override
   void initState() {
     super.initState();
@@ -42,10 +53,25 @@ class _TagStatisticsPanelState extends State<TagStatisticsPanel> {
   }
 
   @override
+  void dispose() {
+    // 모든 애니메이션 컨트롤러 해제
+    _animationControllers.forEach((key, controller) {
+      controller.dispose();
+    });
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // 패널의 크기 계산
-    final panelWidth = 350.0;
-    final panelHeight = _isCollapsed ? 50.0 : 500.0;
+    final panelWidth = 400.0;
+    final panelHeight = _isCollapsed ? 50.0 : 600.0;
+
+    // 선택된 태그 개수 계산
+    int totalSelectedTags = 0;
+    _selectedTags.forEach((key, value) {
+      totalSelectedTags += value.length;
+    });
 
     return Positioned(
       left: _position.dx,
@@ -77,7 +103,7 @@ class _TagStatisticsPanelState extends State<TagStatisticsPanel> {
           child: Column(
             children: [
               // 헤더 - 드래그 핸들 포함
-              _buildPanelHeader(),
+              _buildPanelHeader(totalSelectedTags),
 
               // 축소된 상태가 아닐 때만 본문 표시
               if (!_isCollapsed) ...[
@@ -100,9 +126,9 @@ class _TagStatisticsPanelState extends State<TagStatisticsPanel> {
   }
 
   // 패널 헤더 - 드래그 핸들 포함
-  Widget _buildPanelHeader() {
+  Widget _buildPanelHeader(int selectedCount) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -120,25 +146,37 @@ class _TagStatisticsPanelState extends State<TagStatisticsPanel> {
       child: Row(
         children: [
           // 드래그 핸들 아이콘 추가
-          const Icon(Icons.drag_handle, color: Colors.white70, size: 20),
-          const SizedBox(width: 8),
-          const Icon(Icons.analytics, color: Colors.white, size: 16),
-          const SizedBox(width: 8),
-          const Text(
-            '태그 통계',
-            style: TextStyle(
+          const Icon(Icons.drag_handle, color: Colors.white70, size: 22),
+          const SizedBox(width: 10),
+          const Icon(Icons.analytics, color: Colors.white, size: 18),
+          const SizedBox(width: 10),
+          Text(
+            selectedCount > 0 ? '태그 통계 (${selectedCount}개 선택됨)' : '태그 통계',
+            style: const TextStyle(
               color: Colors.white,
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
           const Spacer(),
+
+          // 선택 초기화 버튼 (선택된 태그가 있을 때만)
+          if (selectedCount > 0)
+            IconButton(
+              icon: const Icon(Icons.refresh, color: Colors.white, size: 20),
+              onPressed: _clearAllSelections,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              tooltip: '선택 초기화',
+            ),
+          const SizedBox(width: 10),
+
           // 숨기기/보이기 전환 버튼
           IconButton(
             icon: Icon(
               _isCollapsed ? Icons.expand_more : Icons.expand_less,
               color: Colors.white,
-              size: 20,
+              size: 22,
             ),
             onPressed: () {
               setState(() {
@@ -149,10 +187,11 @@ class _TagStatisticsPanelState extends State<TagStatisticsPanel> {
             constraints: const BoxConstraints(),
             tooltip: _isCollapsed ? '패널 확장' : '패널 축소',
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
+
           // 닫기 버튼
           IconButton(
-            icon: const Icon(Icons.close, color: Colors.white, size: 20),
+            icon: const Icon(Icons.close, color: Colors.white, size: 22),
             onPressed: widget.onClose,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
@@ -195,7 +234,7 @@ class _TagStatisticsPanelState extends State<TagStatisticsPanel> {
               contentPadding: const EdgeInsets.symmetric(vertical: 8),
               isDense: true,
             ),
-            style: const TextStyle(color: Colors.white, fontSize: 12),
+            style: const TextStyle(color: Colors.white, fontSize: 14),
           ),
           const SizedBox(height: 8),
 
@@ -206,7 +245,7 @@ class _TagStatisticsPanelState extends State<TagStatisticsPanel> {
               DropdownButton<String>(
                 value: _sortBy,
                 dropdownColor: Colors.black87,
-                style: const TextStyle(color: Colors.white, fontSize: 12),
+                style: const TextStyle(color: Colors.white, fontSize: 14),
                 underline: Container(
                   height: 1,
                   color: Colors.white30,
@@ -224,7 +263,7 @@ class _TagStatisticsPanelState extends State<TagStatisticsPanel> {
                     value: value,
                     child: Text(
                       value == 'count' ? '등장 횟수' : '이름',
-                      style: const TextStyle(fontSize: 12),
+                      style: const TextStyle(fontSize: 14),
                     ),
                   );
                 }).toList(),
@@ -254,12 +293,12 @@ class _TagStatisticsPanelState extends State<TagStatisticsPanel> {
               // 최소 등장 횟수 필터
               const Text(
                 '최소:',
-                style: TextStyle(color: Colors.white70, fontSize: 12),
+                style: TextStyle(color: Colors.white70, fontSize: 14),
               ),
               const SizedBox(width: 4),
               SizedBox(
-                width: 40,
-                height: 24,
+                width: 50,
+                height: 30,
                 child: TextField(
                   keyboardType: TextInputType.number,
                   onChanged: (value) {
@@ -269,8 +308,8 @@ class _TagStatisticsPanelState extends State<TagStatisticsPanel> {
                   },
                   decoration: InputDecoration(
                     contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 4,
-                      vertical: 4,
+                      horizontal: 8,
+                      vertical: 8,
                     ),
                     filled: true,
                     fillColor: Colors.white.withOpacity(0.08),
@@ -279,7 +318,7 @@ class _TagStatisticsPanelState extends State<TagStatisticsPanel> {
                       borderSide: BorderSide.none,
                     ),
                   ),
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
                   textAlign: TextAlign.center,
                   controller:
                       TextEditingController(text: _minAppearance.toString()),
@@ -292,7 +331,7 @@ class _TagStatisticsPanelState extends State<TagStatisticsPanel> {
     );
   }
 
-  // 태그 타입 필터 섹션 개선 - 한 줄로 컴팩트하게 변경
+  // 태그 타입 필터 섹션 추가
   Widget _buildTagTypeFilterSection() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -314,7 +353,7 @@ class _TagStatisticsPanelState extends State<TagStatisticsPanel> {
             '필터:',
             style: TextStyle(
               color: Colors.white70,
-              fontSize: 13,
+              fontSize: 14,
             ),
           ),
           const SizedBox(width: 8),
@@ -340,7 +379,7 @@ class _TagStatisticsPanelState extends State<TagStatisticsPanel> {
               '${_getVisibleTagCount()}개',
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 11,
+                fontSize: 12,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -436,6 +475,8 @@ class _TagStatisticsPanelState extends State<TagStatisticsPanel> {
                 {
                   'count': count,
                   'type': tagType,
+                  'isSelected':
+                      _selectedTags[tagType]?.contains(tagName) ?? false,
                 },
               ),
             );
@@ -469,8 +510,49 @@ class _TagStatisticsPanelState extends State<TagStatisticsPanel> {
               final tagData = entry.value;
               final tagCount = tagData['count'] as int;
               final tagType = tagData['type'] as String;
+              final isSelected = tagData['isSelected'] as bool;
               final percentage = (tagCount / widget.totalArticleCount * 100)
                   .toStringAsFixed(1);
+
+              // 각 아이템에 대한 고유 키 생성
+              final String animationKey = '$tagType:$tagName';
+
+              // 아직 없는 경우 애니메이션 컨트롤러 생성
+              if (!_animationControllers.containsKey(animationKey)) {
+                _animationControllers[animationKey] = AnimationController(
+                  vsync: this,
+                  duration: const Duration(milliseconds: 300),
+                );
+
+                // 초기 상태 설정
+                if (isSelected) {
+                  _animationControllers[animationKey]!.value = 1.0;
+                } else {
+                  _animationControllers[animationKey]!.value = 0.0;
+                }
+              }
+
+              // 선택 상태에 따라 애니메이션 실행
+              if (isSelected &&
+                  _animationControllers[animationKey]!.status !=
+                      AnimationStatus.completed) {
+                _animationControllers[animationKey]!.forward();
+              } else if (!isSelected &&
+                  _animationControllers[animationKey]!.status !=
+                      AnimationStatus.dismissed) {
+                _animationControllers[animationKey]!.reverse();
+              }
+
+              // 애니메이션 구성
+              final Animation<double> scaleAnimation = CurvedAnimation(
+                parent: _animationControllers[animationKey]!,
+                curve: Curves.elasticOut,
+              );
+
+              final Animation<double> fadeAnimation = CurvedAnimation(
+                parent: _animationControllers[animationKey]!,
+                curve: Curves.easeInOut,
+              );
 
               // 태그 타입에 따른 색상 설정
               Color tagColor;
@@ -490,76 +572,197 @@ class _TagStatisticsPanelState extends State<TagStatisticsPanel> {
                   tagIcon = Icons.tag;
               }
 
-              // 작은 크기의 리스트 아이템으로 변경 - 글자와 아이콘 크기 키움
-              return ListTile(
-                dense: true,
-                visualDensity: VisualDensity.compact,
-                leading: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: tagColor.withOpacity(0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    tagIcon,
-                    color: tagColor,
-                    size: 16, // 아이콘 크기 증가
-                  ),
-                ),
-                title: Text(
-                  tagName,
-                  style: const TextStyle(
-                      color: Colors.white, fontSize: 14), // 글자 크기 증가
-                  overflow: TextOverflow.ellipsis,
-                ),
-                // subtitle 제거 (타입 정보는 아이콘으로 충분히 표현됨)
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 3), // 패딩 조금 증가
-                      decoration: BoxDecoration(
-                        color: tagColor.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: tagColor.withOpacity(0.3),
-                        ),
-                      ),
-                      child: Text(
-                        '$tagCount',
-                        style: TextStyle(
-                          color: tagColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12, // 글자 크기 증가
-                        ),
-                      ),
+              // 선택 상태에 따른 색상 및 스타일 조정
+              final itemColor =
+                  isSelected ? tagColor : Colors.white.withOpacity(0.9);
+              final itemBgColor =
+                  isSelected ? tagColor.withOpacity(0.2) : Colors.transparent;
+
+              // 작은 크기의 리스트 아이템으로 변경 - 애니메이션 추가
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                color: itemBgColor,
+                child: ListTile(
+                  dense: true,
+                  visualDensity: VisualDensity.compact,
+                  leading: InkWell(
+                    onTap: () {
+                      _toggleTagSelection(tagType, tagName);
+                    },
+                    borderRadius: BorderRadius.circular(24),
+                    child: AnimatedBuilder(
+                      animation: _animationControllers[animationKey]!,
+                      builder: (context, child) {
+                        return Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Color.lerp(
+                              tagColor.withOpacity(0.1),
+                              tagColor.withOpacity(0.3),
+                              fadeAnimation.value,
+                            ),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Color.lerp(
+                                tagColor.withOpacity(0.3),
+                                tagColor,
+                                fadeAnimation.value,
+                              )!,
+                              width: 1.0 + fadeAnimation.value,
+                            ),
+                            boxShadow: [
+                              if (fadeAnimation.value > 0)
+                                BoxShadow(
+                                  color: tagColor
+                                      .withOpacity(0.3 * fadeAnimation.value),
+                                  blurRadius: 8 * fadeAnimation.value,
+                                  spreadRadius: 2 * fadeAnimation.value,
+                                ),
+                            ],
+                          ),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              // 원래 아이콘 (페이드 아웃)
+                              Opacity(
+                                opacity: 1.0 - fadeAnimation.value,
+                                child: Icon(
+                                  tagIcon,
+                                  color: tagColor.withOpacity(0.7),
+                                  size: 16,
+                                ),
+                              ),
+                              // 체크 아이콘 (페이드 인 + 스케일)
+                              ScaleTransition(
+                                scale: scaleAnimation,
+                                child: Opacity(
+                                  opacity: fadeAnimation.value,
+                                  child: Icon(
+                                    Icons.check,
+                                    color: tagColor,
+                                    size: 16,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
-                    const SizedBox(width: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 3), // 패딩 조금 증가
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        '$percentage%',
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12, // 글자 크기 증가
+                  ),
+                  title: AnimatedDefaultTextStyle(
+                    duration: const Duration(milliseconds: 200),
+                    style: TextStyle(
+                      color: itemColor,
+                      fontSize: 14,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
+                    ),
+                    child: Text(
+                      tagName,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: tagColor.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: tagColor.withOpacity(0.3),
+                          ),
+                        ),
+                        child: Text(
+                          '$tagCount',
+                          style: TextStyle(
+                            color: tagColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          '$percentage%',
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  onTap: () {
+                    // 태그 탭 시 선택/해제 토글
+                    _toggleTagSelection(tagType, tagName);
+                  },
                 ),
-                contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 6), // 패딩 조금 증가
-                onTap: () {
-                  widget.onTagSelected(tagType, tagName);
-                },
               );
             },
           );
+  }
+
+  // 태그 선택 토글 함수
+  void _toggleTagSelection(String tagType, String tagValue) {
+    setState(() {
+      if (_selectedTags.containsKey(tagType)) {
+        if (_selectedTags[tagType]!.contains(tagValue)) {
+          // 이미 선택된 경우 제거
+          _selectedTags[tagType]!.remove(tagValue);
+        } else {
+          // 선택되지 않은 경우 추가
+          _selectedTags[tagType]!.add(tagValue);
+        }
+      } else {
+        // 해당 타입이 없는 경우 새로 생성
+        _selectedTags[tagType] = {tagValue};
+      }
+    });
+
+    // 선택된 태그 즉시 적용
+    _applyTagSelectionImmediately();
+  }
+
+  // 선택된 태그 즉시 적용 함수
+  void _applyTagSelectionImmediately() {
+    // 선택된 태그를 리스트 형태로 변환
+    List<Map<String, String>> selectedTagsList = [];
+
+    _selectedTags.forEach((tagType, tagValues) {
+      for (var tagValue in tagValues) {
+        selectedTagsList.add({
+          'type': tagType,
+          'value': tagValue,
+        });
+      }
+    });
+
+    // 콜백 호출하여 부모 위젯에 선택된 태그 전달
+    widget.onTagsSelected(selectedTagsList);
+  }
+
+  // 모든 선택 초기화 함수 수정 - 초기화 후 즉시 적용
+  void _clearAllSelections() {
+    setState(() {
+      _selectedTags.forEach((key, value) {
+        value.clear();
+      });
+    });
+
+    // 선택 초기화 후 즉시 적용 (빈 목록 전달)
+    _applyTagSelectionImmediately();
   }
 }
