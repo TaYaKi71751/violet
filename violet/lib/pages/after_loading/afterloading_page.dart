@@ -370,7 +370,7 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
                 : SystemUiOverlayStyle.light,
             child: Stack(
               children: [
-                if (kReleaseMode) const ScriptWebView(),
+                if (kReleaseMode && !Platform.isWindows) const ScriptWebView(),
                 PageView(
                   controller: _pageController,
                   physics:

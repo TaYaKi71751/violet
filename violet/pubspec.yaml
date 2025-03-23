@@ -156,6 +156,7 @@ dependencies:
   pointer_interceptor_ios: ^0.10.1
   pointer_interceptor_platform_interface: ^0.10.0+1
   pointer_interceptor_web: ^0.10.2+1
+  vector_math: ^2.1.4
 
 dev_dependencies:
   flutter_test:
@@ -216,6 +217,8 @@ flutter:
     - assets/icons/llm-search.svg
 
     - shorebird.yaml
+
+    - assets/rank/similar_articles_with_scores.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

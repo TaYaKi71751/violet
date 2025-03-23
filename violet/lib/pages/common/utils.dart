@@ -4,13 +4,19 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:violet/component/hentai.dart';
 import 'package:violet/component/image_provider.dart';
 import 'package:violet/database/query.dart';
 import 'package:violet/database/user/bookmark.dart';
+import 'package:violet/database/user/record.dart';
 import 'package:violet/model/article_info.dart';
 import 'package:violet/pages/article_info/article_info_page.dart';
+import 'package:violet/pages/viewer/viewer_page.dart';
+import 'package:violet/pages/viewer/viewer_page_provider.dart';
+import 'package:violet/server/violet.dart';
+import 'package:violet/settings/settings.dart';
 import 'package:violet/widgets/article_item/image_provider_manager.dart';
 
 const String heroKey = 'articleInfoHero';
@@ -113,4 +119,44 @@ Future<VioletImageProvider> getImageProvider(QueryResult queryResult) async {
   ProviderManager.insert(id, provider);
 
   return provider;
+}
+
+Future<void> showViewer(BuildContext context, int articleId, int page) async {
+  if (Settings.useVioletServer) {
+    Future.delayed(const Duration(milliseconds: 100)).then((value) async {
+      await VioletServer.view(articleId);
+    });
+  }
+
+  await (await User.getInstance()).insertUserLog(articleId, 0);
+
+  var prov = await ProviderManager.get(articleId);
+
+  await prov.init();
+
+  var headers = await prov.getHeader(0);
+
+  if (!context.mounted) return;
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      fullscreenDialog: true,
+      builder: (context) {
+        return Provider<ViewerPageProvider>.value(
+            value: ViewerPageProvider(
+              uris: List<String>.filled(prov.length(), ''),
+              useProvider: true,
+              provider: prov,
+              headers: headers,
+              id: articleId,
+              title: '<No Query>',
+              jumpPage: page,
+            ),
+            child: const ViewerPage());
+      },
+    ),
+  ).then((value) async {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: SystemUiOverlay.values);
+  });
 }

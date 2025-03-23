@@ -16,21 +16,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:violet/database/user/bookmark.dart';
-import 'package:violet/database/user/record.dart';
 import 'package:violet/log/log.dart';
 import 'package:violet/other/dialogs.dart';
 import 'package:violet/pages/common/toast.dart';
 import 'package:violet/pages/common/utils.dart';
 import 'package:violet/pages/segment/platform_navigator.dart';
-import 'package:violet/pages/viewer/viewer_page.dart';
-import 'package:violet/pages/viewer/viewer_page_provider.dart';
-import 'package:violet/server/violet.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/util/evict_image_urls.dart';
-import 'package:violet/widgets/article_item/image_provider_manager.dart';
 import 'package:violet/widgets/cupertino_switch_list_tile.dart';
 
 class CropBookmarkPage extends StatefulWidget {
@@ -199,7 +193,7 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
                         showArticleInfoById(context, articleId);
                       },
                       onDoubleTap: () async {
-                        _showViewer(articleId, page);
+                        showViewer(context, articleId, page);
                       },
                       onLongPress: () async {
                         if (await showYesNoDialog(context, '북마크를 삭제할까요?')) {
@@ -219,46 +213,6 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
         );
       },
     );
-  }
-
-  Future<void> _showViewer(int articleId, int page) async {
-    if (Settings.useVioletServer) {
-      Future.delayed(const Duration(milliseconds: 100)).then((value) async {
-        await VioletServer.view(articleId);
-      });
-    }
-
-    await (await User.getInstance()).insertUserLog(articleId, 0);
-
-    var prov = await ProviderManager.get(articleId);
-
-    await prov.init();
-
-    var headers = await prov.getHeader(0);
-
-    if (!mounted) return;
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (context) {
-          return Provider<ViewerPageProvider>.value(
-              value: ViewerPageProvider(
-                uris: List<String>.filled(prov.length(), ''),
-                useProvider: true,
-                provider: prov,
-                headers: headers,
-                id: articleId,
-                title: '<No Query>',
-                jumpPage: page,
-              ),
-              child: const ViewerPage());
-        },
-      ),
-    ).then((value) async {
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-          overlays: SystemUiOverlay.values);
-    });
   }
 
   Widget settingMenu() {
