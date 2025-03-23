@@ -99,7 +99,9 @@ class ScriptManager {
   static Future<bool> refreshV4NoWebView() async {
     var success = false;
     await catchUnwind(() async {
-      final ggBody = (await http.get('https://ltn.hitomi.la/gg.js')).body;
+      final ggBody =
+          (await http.get('https://ltn.gold-usergeneratedcontent.net/gg.js'))
+              .body;
       final ggRuntime = getJavascriptRuntime();
       // TODO: 이유는 잘 모르겠으나 use strict를 삭제하지 않으면 gg instance를 찾을 수 없어서 실패함
       ggRuntime.evaluate(ggBody.split("'use strict';")[1]);

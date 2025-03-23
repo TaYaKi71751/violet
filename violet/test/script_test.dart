@@ -28,19 +28,19 @@ void main() {
   });
 
   test('Get Gallery Info Raw', () async {
-    // https://ltn.hitomi.la/galleries/1234567.js
+    // https://ltn.gold-usergeneratedcontent.net/galleries/1234567.js
     final raw = await ScriptManager.getGalleryInfoRaw('1234567');
     expect(raw != null, true);
   });
 
   test('Get Image List', () async {
-    // https://ltn.hitomi.la/galleries/1234567.js
+    // https://ltn.gold-usergeneratedcontent.net/galleries/1234567.js
     final list = await ScriptManager.runHitomiGetImageList(1234567);
     expect(list != null, true);
   });
 
   test('Get Header Contents', () async {
-    // https://ltn.hitomi.la/galleries/1234567.js
+    // https://ltn.gold-usergeneratedcontent.net/galleries/1234567.js
     final headers = await ScriptManager.runHitomiGetHeaderContent('1234567');
     expect(headers.isNotEmpty, true);
   });

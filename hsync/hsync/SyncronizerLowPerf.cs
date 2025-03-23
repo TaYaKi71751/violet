@@ -79,7 +79,7 @@ namespace hsync
         public void SyncHitomi()
         {
             var gburls = Enumerable.Range(useManualRange ? starts : latestId - hitomiSyncRange, useManualRange ? ends - starts + 1 : hitomiSyncRange * 2)
-                .Select(x => $"https://ltn.hitomi.la/galleryblock/{x}.html").ToList();
+                .Select(x => $"https://ltn.gold-usergeneratedcontent.net/galleryblock/{x}.html").ToList();
             var dcnt = 0;
             var ecnt = 0;
             Console.Write("Running galleryblock tester... ");
@@ -108,12 +108,12 @@ namespace hsync
                 if (aa.Magic.Contains("-"))
                 {
                     gurls.Add("https://hitomi.la/" + aa.Magic);
-                    gpurls.Add("https://ltn.hitomi.la/galleries/" + aa.Magic.Split("-").Last().Split(".").First() + ".js");
+                    gpurls.Add("https://ltn.gold-usergeneratedcontent.net/galleries/" + aa.Magic.Split("-").Last().Split(".").First() + ".js");
                 }
                 else
                 {
                     gurls.Add("https://hitomi.la/galleries/" + i + ".html");
-                    gpurls.Add("https://ltn.hitomi.la/galleries/" + i + ".js");
+                    gpurls.Add("https://ltn.gold-usergeneratedcontent.net/galleries/" + i + ".js");
                 }
             }
 

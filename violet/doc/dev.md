@@ -70,7 +70,7 @@ But, `hitomi.la` has a very optimistic ratelimit rule, so, you always load image
 
 We just need to handle the annoying 503 error and script-related issues.
 
-Check https://ltn.hitomi.la/gg.js
+Check https://ltn.gold-usergeneratedcontent.net/gg.js
 
 For handling this problem, we made https://github.com/project-violet/scripts and https://github.com/project-violet/violet/blob/40b5fee47b5b619f7fcfabfea3cfe044a2af8830/lib/script/script_manager.dart
 

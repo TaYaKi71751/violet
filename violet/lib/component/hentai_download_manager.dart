@@ -28,7 +28,7 @@ class HentaiDonwloadManager {
   }
 
   String fav() {
-    return 'https://ltn.hitomi.la/favicon-192x192.png';
+    return 'https://ltn.gold-usergeneratedcontent.net/favicon-192x192.png';
   }
 
   bool loginRequire() {

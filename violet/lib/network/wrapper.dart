@@ -24,7 +24,7 @@ class HttpWrapper {
 
 bool _isScriptUrl(String url) {
   const hosts = [
-    'ltn.hitomi.la',
+    'ltn.gold-usergeneratedcontent.net',
     'raw.githubusercontent.com/project-violet/violet-message-search'
   ];
 
