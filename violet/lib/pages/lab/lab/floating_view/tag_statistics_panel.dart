@@ -436,15 +436,6 @@ class _TagStatisticsPanelState extends State<TagStatisticsPanel>
     );
   }
 
-  // 전체 고유 태그 수 계산
-  int _getTotalUniqueTagCount() {
-    int total = 0;
-    widget.tagStatistics.forEach((type, tags) {
-      total += tags.length;
-    });
-    return total;
-  }
-
   // 현재 표시 중인 태그 수 계산
   int _getVisibleTagCount() {
     int count = 0;

@@ -118,10 +118,6 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
       final double groupCenterX = centerX + math.cos(groupAngle) * groupRadius;
       final double groupCenterY = centerY + math.sin(groupAngle) * groupRadius;
 
-      // 그룹별 랜덤 색상 지정 (시각적 구분을 위해)
-      final groupColor = Color.fromRGBO(150 + random.nextInt(100),
-          150 + random.nextInt(100), 150 + random.nextInt(100), 1.0);
-
       // 각 그룹에 대해 더 조밀한 초기 배치 영역 설정
       final double groupSpreadRadius = 350.0; // 그룹 내 노드들이 퍼지는 범위 (더 작게 설정)
 
@@ -223,53 +219,6 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
       final matrix = Matrix4.identity();
       _transformationController.value = matrix;
     });
-  }
-
-  // 아티클 드래그 시작 핸들러
-  void _handleDragStart(DragStartDetails details, ArticleNode node) {
-    final invertedMatrix = Matrix4.inverted(_transformationController.value);
-    final localPosition =
-        MatrixUtils.transformPoint(invertedMatrix, details.globalPosition);
-
-    setState(() {
-      _draggedNode = node;
-      node.isDraggable = false; // 드래그 중 자동 이동 비활성화
-      _dragPosition = localPosition;
-    });
-  }
-
-  // 아티클 드래그 업데이트 핸들러
-  void _handleDragUpdate(DragUpdateDetails details, ArticleNode node) {
-    if (_draggedNode == node) {
-      final invertedMatrix = Matrix4.inverted(_transformationController.value);
-      final localPosition =
-          MatrixUtils.transformPoint(invertedMatrix, details.globalPosition);
-
-      if (_dragPosition == null) {
-        _dragPosition = localPosition;
-        return;
-      }
-
-      final dx = localPosition.dx - _dragPosition!.dx;
-      final dy = localPosition.dy - _dragPosition!.dy;
-
-      setState(() {
-        node.x += dx;
-        node.y += dy;
-        _dragPosition = localPosition;
-      });
-    }
-  }
-
-  // 아티클 드래그 종료 핸들러
-  void _handleDragEnd(DragEndDetails details, ArticleNode node) {
-    if (_draggedNode == node) {
-      setState(() {
-        _draggedNode = null;
-        node.isDraggable = true; // 드래그 종료 후 자동 이동 다시 활성화
-        _dragPosition = null;
-      });
-    }
   }
 
   // 크기 및 위치 변경 핸들러
@@ -1098,7 +1047,6 @@ class ArticleEdgePainter extends CustomPainter {
 
     // 모든 그룹 ID 정렬
     final List<int> sortedGroupIds = groupedNodes.keys.toList()..sort();
-    final int totalGroups = sortedGroupIds.length;
 
     // 1. 같은 그룹 내 노드 간 연결 - 강한 연결
     groupedNodes.forEach((groupId, groupNodes) {

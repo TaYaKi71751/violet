@@ -82,40 +82,6 @@ class _FloatingTextViewState extends State<FloatingTextView>
     return Offset(matrix.getTranslation().x, matrix.getTranslation().y);
   }
 
-  // 드래그할 노드 찾기
-  bool _findNodeUnderTouch(Offset position) {
-    // 현재 변환을 고려한 위치 계산
-    final invertedMatrix = Matrix4.inverted(_transformationController.value);
-    final localPosition = MatrixUtils.transformPoint(invertedMatrix, position);
-
-    double minDistance = double.infinity;
-    NodeText? closestNode;
-
-    // 현재 스케일 가져오기
-    _scale = getScaleFromTransform();
-
-    for (var node in _nodes) {
-      final distance = math.sqrt(math.pow(node.x - localPosition.dx, 2) +
-          math.pow(node.y - localPosition.dy, 2));
-
-      // 터치 영역을 스케일에 따라 조정
-      final touchRadius = 40.0 / _scale;
-      if (distance < minDistance && distance < touchRadius) {
-        minDistance = distance;
-        closestNode = node;
-      }
-    }
-
-    if (closestNode != null) {
-      setState(() {
-        _draggedNode = closestNode;
-        _dragPosition = localPosition;
-      });
-      return true;
-    }
-    return false;
-  }
-
   void _resetToCenter() {
     setState(() {
       // 원점으로 이동
