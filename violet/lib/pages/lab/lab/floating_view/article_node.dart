@@ -29,6 +29,11 @@ class ArticleNode {
   final double height = 300.0; // 아티클 카드의 높이
   final double restitution = 0.8; // 반발 계수 (0~1, 값이 클수록 더 많이 튕김)
 
+  // 하이라이트 효과 강화를 위한 속성 추가
+  double opacity = 1.0; // 투명도 조절
+  double scale = 1.0; // 크기 조절
+  double glowRadius = 0.0; // 글로우 효과 반경
+
   ArticleNode({
     required this.queryResult,
     required this.x,

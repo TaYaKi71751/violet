@@ -947,167 +947,196 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
       return colors[groupId % colors.length];
     }
 
-    // 초기 아티클인 경우 약간 크게 표시
-    final scale = node.isSpecial ? 0.85 : (node.isHighSimilarity ? 0.8 : 0.75);
+    // 노드 스케일 계산 (기본 스케일에 다이나믹 스케일 적용)
+    final baseScale =
+        node.isSpecial ? 0.85 : (node.isHighSimilarity ? 0.8 : 0.75);
+    final dynamicScale = baseScale * node.scale; // 동적 스케일 적용
+
+    // 맥동 효과
+    final pulsateEffect = 1.0;
+
+    final effectiveScale = dynamicScale * pulsateEffect;
 
     return Positioned(
       left: node.x - 150, // 아티클 위젯의 절반 너비
       top: node.y - 200, // 아티클 위젯의 절반 높이
-      child: Transform.scale(
-        scale: scale, // 특별 노드는 좀 더 크게
-        child: Stack(
-          children: [
-            // 하이라이트 효과 추가
-            if (node.highlightColor != null)
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: node.highlightColor,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: node.highlightColor!.withOpacity(0.8),
-                        blurRadius: node.isSpecial
-                            ? 15
-                            : (node.isHighSimilarity ? 12 : 10),
-                        spreadRadius: node.isSpecial
-                            ? 4
-                            : (node.isHighSimilarity ? 3 : 2),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-            _buildArticleCard(node),
-
-            // 초기 아티클인 경우 특별 표시 추가
-            if (node.isSpecial)
-              Positioned(
-                top: 0,
-                left: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.purple.withOpacity(0.9),
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      bottomRight: Radius.circular(12),
+      child: Opacity(
+        opacity: node.opacity, // 투명도 적용
+        child: Transform.scale(
+          scale: effectiveScale, // 동적 스케일 적용
+          child: Stack(
+            children: [
+              // 글로우 효과 추가 (하이라이트 색상이 있고 글로우 반경이 설정된 경우)
+              if (node.highlightColor != null && node.glowRadius > 0)
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: node.highlightColor!.withOpacity(0.8),
+                          blurRadius: node.glowRadius,
+                          spreadRadius: node.glowRadius / 3,
+                        ),
+                      ],
                     ),
                   ),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.star, color: Colors.yellow, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        '초기 작품',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
+                ),
+
+              // 하이라이트 효과 추가
+              if (node.highlightColor != null)
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: node.highlightColor,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: node.highlightColor!.withOpacity(0.8),
+                          blurRadius: node.isSpecial
+                              ? 15
+                              : (node.isHighSimilarity ? 12 : 10),
+                          spreadRadius: node.isSpecial
+                              ? 4
+                              : (node.isHighSimilarity ? 3 : 2),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
 
-            // 상위 유사도 작품인 경우 표시 추가
-            if (node.isHighSimilarity && !node.isSpecial)
+              _buildArticleCard(node),
+
+              // 초기 아티클인 경우 특별 표시 추가
+              if (node.isSpecial)
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.purple.withOpacity(0.9),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(8),
+                        bottomRight: Radius.circular(12),
+                      ),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.star, color: Colors.yellow, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          '초기 작품',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+              // 상위 유사도 작품인 경우 표시 추가
+              if (node.isHighSimilarity && !node.isSpecial)
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.8),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(8),
+                        bottomRight: Radius.circular(10),
+                      ),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.trending_up, color: Colors.white, size: 14),
+                        SizedBox(width: 2),
+                        Text(
+                          '높은 유사도',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+              // 더블 탭 힌트 추가 (초기 작품이 아닌 경우만) - 더 눈에 띄게 수정
+              if (!node.isSpecial)
+                Positioned(
+                  bottom: 5,
+                  right: 5,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.85),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.touch_app, color: Colors.white, size: 14),
+                        SizedBox(width: 4),
+                        Text(
+                          '더블탭하여 기준 작품으로',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+              // 그룹 표시 마커 추가
               Positioned(
                 top: 0,
-                left: 0,
+                right: 0,
                 child: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.8),
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      bottomRight: Radius.circular(10),
+                    color: getGroupColor(node.groupId).withOpacity(0.8),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: node.isSpecial
+                          ? Colors.yellow
+                          : (node.isHighSimilarity ? Colors.red : Colors.white),
+                      width: node.isSpecial
+                          ? 3
+                          : (node.isHighSimilarity ? 2.5 : 2),
                     ),
                   ),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.trending_up, color: Colors.white, size: 14),
-                      SizedBox(width: 2),
-                      Text(
-                        '높은 유사도',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 10,
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    '${node.groupId}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
               ),
-
-            // 더블 탭 힌트 추가 (초기 작품이 아닌 경우만) - 더 눈에 띄게 수정
-            if (!node.isSpecial)
-              Positioned(
-                bottom: 5,
-                right: 5,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.85),
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.touch_app, color: Colors.white, size: 14),
-                      SizedBox(width: 4),
-                      Text(
-                        '더블탭하여 기준 작품으로',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-            // 그룹 표시 마커 추가
-            Positioned(
-              top: 0,
-              right: 0,
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: getGroupColor(node.groupId).withOpacity(0.8),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: node.isSpecial
-                        ? Colors.yellow
-                        : (node.isHighSimilarity ? Colors.red : Colors.white),
-                    width:
-                        node.isSpecial ? 3 : (node.isHighSimilarity ? 2.5 : 2),
-                  ),
-                ),
-                child: Text(
-                  '${node.groupId}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -2618,7 +2647,7 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
     return statistics;
   }
 
-  // 특정 태그를 가진 노드를 하이라이트하는 함수
+  // 특정 태그를 가진 노드를 하이라이트하는 함수 개선
   void _highlightNodesWithSpecificTag(String tagType, String tagValue) {
     // 모든 노드 리셋
     for (var node in _nodes) {
@@ -2626,6 +2655,10 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
       node.attractionFactor = 0;
       node.highlightColor = null;
       node.attractionTarget = null;
+      // 모든 노드 흐리게 처리
+      node.opacity = 0.25;
+      // 글로우 효과 제거
+      node.glowRadius = 0.0;
     }
 
     // 특정 태그를 가진 노드 찾기
@@ -2646,6 +2679,11 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
 
     // 매칭된 노드가 없으면 스낵바 표시
     if (matchingNodes.isEmpty) {
+      // 모든 노드 원래 상태로 복원
+      for (var node in _nodes) {
+        node.opacity = 1.0;
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('태그 "$tagValue"를 가진 작품이 현재 뷰에 없습니다.'),
@@ -2655,28 +2693,110 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
       return;
     }
 
-    // 매칭된 노드 하이라이트
+    // 매칭된 노드 강조 효과
     for (var node in matchingNodes) {
-      node.highlightColor = Colors.green.withOpacity(0.3);
+      // 태그 타입에 따른 색상 설정
+      Color highlightColor;
+      switch (tagType) {
+        case 'female':
+          highlightColor = Colors.pink;
+          break;
+        case 'male':
+          highlightColor = Colors.blue;
+          break;
+        default:
+          highlightColor = Colors.green;
+      }
+
+      // 강력한 하이라이트 효과 적용
+      node.highlightColor = highlightColor.withOpacity(0.6);
+      // 완전 불투명하게
+      node.opacity = 1.0;
+      // 글로우 효과 추가
+      node.glowRadius = 25.0;
     }
 
     // 스낵바로 알림
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content:
-            Text('태그 "$tagValue"를 가진 ${matchingNodes.length}개 작품을 하이라이트했습니다.'),
-        duration: const Duration(seconds: 2),
+        content: Text(
+          '태그 "$tagValue"를 가진 ${matchingNodes.length}개 작품을 강조 표시했습니다.',
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: matchingNodes[0].highlightColor?.withOpacity(0.8),
+        duration: const Duration(seconds: 4),
         action: SnackBarAction(
           label: '취소',
+          textColor: Colors.white,
           onPressed: () {
-            // 하이라이트 취소
+            // 하이라이트 취소 - 모든 노드 원래 상태로 복원
             for (var node in _nodes) {
               node.highlightColor = null;
+              node.opacity = 1.0;
+              node.glowRadius = 0.0;
             }
           },
         ),
       ),
     );
+  }
+
+  // 매칭된 노드들이 모두 보이도록 뷰를 조정하는 함수
+  void _adjustViewToShowMatchingNodes(List<ArticleNode> matchingNodes) {
+    if (matchingNodes.isEmpty) return;
+
+    // 모든 매칭 노드의 경계 계산
+    double minX = double.infinity;
+    double minY = double.infinity;
+    double maxX = double.negativeInfinity;
+    double maxY = double.negativeInfinity;
+
+    for (var node in matchingNodes) {
+      minX = math.min(minX, node.x - 150); // 노드 크기 고려
+      minY = math.min(minY, node.y - 200);
+      maxX = math.max(maxX, node.x + 150);
+      maxY = math.max(maxY, node.y + 200);
+    }
+
+    // 경계의 중심점 계산
+    final centerX = (minX + maxX) / 2;
+    final centerY = (minY + maxY) / 2;
+
+    // 경계의 크기 계산
+    final width = maxX - minX;
+    final height = maxY - minY;
+
+    // 화면 크기
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // 적절한 스케일 계산 (모든 노드가 보이도록)
+    final scaleX = screenWidth / (width * 1.2); // 20% 여백 추가
+    final scaleY = screenHeight / (height * 1.2);
+
+    // 더 작은 스케일 선택 (두 방향 모두 화면에 맞도록)
+    final scale = math.min(scaleX, scaleY).clamp(_minScale, _maxScale);
+
+    // 변환 매트릭스 생성
+    final matrix = Matrix4.identity();
+    matrix.setEntry(0, 0, scale);
+    matrix.setEntry(1, 1, scale);
+    matrix.setEntry(2, 2, scale);
+    matrix.setEntry(3, 3, 1.0);
+
+    // 화면 중앙에 선택된 노드들이 오도록 변환
+    matrix.setTranslation(vector_math.Vector3(
+      screenWidth / 2 - centerX * scale,
+      screenHeight / 2 - centerY * scale,
+      0.0,
+    ));
+
+    // 애니메이션과 함께 뷰 변환 적용
+    _transformationController.value = matrix;
+
+    // 현재 스케일과 오프셋 값 갱신
+    _scale = getScaleFromTransform();
+    _offset = getOffsetFromTransform();
   }
 
   // 태그 통계 버튼 핸들러 수정
