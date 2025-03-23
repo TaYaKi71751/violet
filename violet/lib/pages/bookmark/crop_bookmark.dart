@@ -16,21 +16,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:violet/database/user/bookmark.dart';
-import 'package:violet/database/user/record.dart';
 import 'package:violet/log/log.dart';
 import 'package:violet/other/dialogs.dart';
 import 'package:violet/pages/common/toast.dart';
 import 'package:violet/pages/common/utils.dart';
 import 'package:violet/pages/segment/platform_navigator.dart';
-import 'package:violet/pages/viewer/viewer_page.dart';
-import 'package:violet/pages/viewer/viewer_page_provider.dart';
-import 'package:violet/server/violet.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/util/evict_image_urls.dart';
-import 'package:violet/widgets/article_item/image_provider_manager.dart';
 import 'package:violet/widgets/cupertino_switch_list_tile.dart';
 
 class CropBookmarkPage extends StatefulWidget {

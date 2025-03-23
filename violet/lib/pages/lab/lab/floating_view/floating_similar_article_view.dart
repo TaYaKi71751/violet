@@ -7,18 +7,12 @@ import 'package:violet/component/hentai.dart';
 import 'package:vector_math/vector_math_64.dart' as vector_math;
 import 'package:violet/component/hitomi/similar_articles.dart';
 import 'package:violet/database/query.dart';
-import 'package:violet/database/user/record.dart';
 import 'package:violet/model/article_list_item.dart';
 import 'package:violet/pages/common/utils.dart';
 import 'package:violet/pages/lab/lab/floating_view/article_node.dart';
 import 'package:violet/pages/lab/lab/floating_view/painter.dart';
-import 'package:violet/pages/viewer/viewer_page.dart';
-import 'package:violet/pages/viewer/viewer_page_provider.dart';
-import 'package:violet/server/violet.dart';
-import 'package:violet/settings/settings.dart';
 import 'package:violet/widgets/article_item/article_list_item_widget.dart';
 import 'package:violet/pages/lab/lab/floating_view/tag_statistics_panel.dart';
-import 'package:violet/widgets/article_item/image_provider_manager.dart';
 
 class FloatingSimilarArticleView extends StatefulWidget {
   final int initialArticleId;
