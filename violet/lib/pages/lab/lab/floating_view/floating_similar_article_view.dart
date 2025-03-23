@@ -11,22 +11,22 @@ import 'package:violet/pages/common/utils.dart';
 import 'package:violet/widgets/article_item/article_list_item_widget.dart';
 
 class FloatingSimilarArticleView extends StatefulWidget {
-  final int initialArticleId; // 초기 아티클 ID
-  final bool useRecursiveLoading; // 재귀적 로딩 사용 여부 옵션 추가
+  final int initialArticleId;
+  final bool useRecursiveLoading;
 
   const FloatingSimilarArticleView({
-    super.key,
+    Key? key,
     required this.initialArticleId,
-    this.useRecursiveLoading = false, // 기본값은 비재귀 모드
-  });
+    this.useRecursiveLoading = false,
+  }) : super(key: key);
 
   @override
-  State<FloatingSimilarArticleView> createState() =>
+  _FloatingSimilarArticleViewState createState() =>
       _FloatingSimilarArticleViewState();
 }
 
 class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   final List<ArticleNode> _nodes = [];
   late final AnimationController _controller;
   ArticleNode? _draggedNode;
@@ -154,27 +154,25 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
     try {
       // 현재 아티클 정보 가져오기
       final searchResult = await HentaiManager.idSearch(articleId.toString());
-      if (searchResult != null) {
-        _queryResults.add(searchResult.results.first);
+      _queryResults.add(searchResult.results.first);
 
-        // 유사한 아티클 목록 가져오기
-        final similarArticles = _similarArticles.getSimilarArticles(articleId);
+      // 유사한 아티클 목록 가져오기
+      final similarArticles = _similarArticles.getSimilarArticles(articleId);
 
-        // 유사도별 재귀 호출 (유사도가 높은 것부터 처리)
-        for (var similarArticle in similarArticles) {
-          // 최소 유사도 이상인 경우만 처리
-          if (similarArticle.similarity >= minSimilarity) {
-            // 재귀적으로 유사 아티클 불러오기
-            await _loadArticlesByIdRecursively(similarArticle.id,
-                minSimilarity: minSimilarity,
-                depth: depth + 1,
-                maxDepth: maxDepth);
-          }
+      // 유사도별 재귀 호출 (유사도가 높은 것부터 처리)
+      for (var similarArticle in similarArticles) {
+        // 최소 유사도 이상인 경우만 처리
+        if (similarArticle.similarity >= minSimilarity) {
+          // 재귀적으로 유사 아티클 불러오기
+          await _loadArticlesByIdRecursively(similarArticle.id,
+              minSimilarity: minSimilarity,
+              depth: depth + 1,
+              maxDepth: maxDepth);
+        }
 
-          // 최대 노드 수 도달 시 중단
-          if (_processedArticleIds.length >= nodeCount) {
-            break;
-          }
+        // 최대 노드 수 도달 시 중단
+        if (_processedArticleIds.length >= nodeCount) {
+          break;
         }
       }
     } catch (e) {
@@ -197,8 +195,7 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
       final initialSearchResult =
           await HentaiManager.idSearch(initialArticleId.toString());
 
-      if (initialSearchResult != null &&
-          initialSearchResult.results.isNotEmpty) {
+      if (initialSearchResult.results.isNotEmpty) {
         final initialArticle = initialSearchResult.results.first;
 
         debugPrint(
@@ -233,7 +230,7 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
             final searchResult =
                 await HentaiManager.idSearch(articleId.toString());
 
-            if (searchResult != null && searchResult.results.isNotEmpty) {
+            if (searchResult.results.isNotEmpty) {
               final article = searchResult.results.first;
 
               // 결과 목록에 추가
@@ -342,8 +339,6 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
       // 상위 5개 아티클 배치 (가깝게, 강하게 연결) - 겹침 방지
       for (int i = 0; i < highSimilarityArticles.length; i++) {
         final article = highSimilarityArticles[i];
-        final articleId = article.id();
-        final similarity = similarities[articleId] ?? 0.0;
 
         // 가까운 거리에 배치 (350-600 사이)
         // 더 넓게 분포시켜 겹침 방지
@@ -639,53 +634,6 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
     });
   }
 
-  // 아티클 드래그 시작 핸들러
-  void _handleDragStart(DragStartDetails details, ArticleNode node) {
-    final invertedMatrix = Matrix4.inverted(_transformationController.value);
-    final localPosition =
-        MatrixUtils.transformPoint(invertedMatrix, details.globalPosition);
-
-    setState(() {
-      _draggedNode = node;
-      node.isDraggable = false; // 드래그 중 자동 이동 비활성화
-      _dragPosition = localPosition;
-    });
-  }
-
-  // 아티클 드래그 업데이트 핸들러
-  void _handleDragUpdate(DragUpdateDetails details, ArticleNode node) {
-    if (_draggedNode == node) {
-      final invertedMatrix = Matrix4.inverted(_transformationController.value);
-      final localPosition =
-          MatrixUtils.transformPoint(invertedMatrix, details.globalPosition);
-
-      if (_dragPosition == null) {
-        _dragPosition = localPosition;
-        return;
-      }
-
-      final dx = localPosition.dx - _dragPosition!.dx;
-      final dy = localPosition.dy - _dragPosition!.dy;
-
-      setState(() {
-        node.x += dx;
-        node.y += dy;
-        _dragPosition = localPosition;
-      });
-    }
-  }
-
-  // 아티클 드래그 종료 핸들러
-  void _handleDragEnd(DragEndDetails details, ArticleNode node) {
-    if (_draggedNode == node) {
-      setState(() {
-        _draggedNode = null;
-        node.isDraggable = true; // 드래그 종료 후 자동 이동 다시 활성화
-        _dragPosition = null;
-      });
-    }
-  }
-
   // 크기 및 위치 변경 핸들러
   void _handleTransformation(ScaleEndDetails details) {
     setState(() {
@@ -920,7 +868,7 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
       // 다이얼로그 닫기
       Navigator.of(context).pop();
 
-      if (searchResult == null || searchResult.results.isEmpty) {
+      if (searchResult.results.isEmpty) {
         _showErrorSnackBar('해당 ID의 아티클을 찾을 수 없습니다: $articleId');
         return;
       }

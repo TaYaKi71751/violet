@@ -13,7 +13,7 @@ import 'package:violet/model/article_info.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/widgets/article_item/image_provider_manager.dart';
 import 'package:violet/widgets/article_item/thumbnail_view_page.dart';
-import 'package:violet/pages/lab/lab/floating_similar_article_view.dart';
+import 'package:violet/pages/lab/lab/floating_view/floating_similar_article_view.dart';
 import 'package:violet/component/hitomi/similar_articles.dart';
 
 class SimpleInfoWidget extends StatelessWidget {
