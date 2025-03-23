@@ -72,6 +72,11 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
   DateTime? _lastTapTime;
   final _doubleTapDuration = const Duration(milliseconds: 300); // 더블 탭 인식 시간
 
+  // 아티클 ID 입력을 위한 컨트롤러 추가
+  late TextEditingController _articleIdController;
+  final FocusNode _articleIdFocusNode = FocusNode();
+  bool _isSearching = false; // 검색 중인지 상태 추가
+
   @override
   void initState() {
     super.initState();
@@ -80,8 +85,21 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
       vsync: this,
     )..repeat();
 
+    // 아티클 ID 컨트롤러 초기화
+    _articleIdController =
+        TextEditingController(text: widget.initialArticleId.toString());
+
     // 유사도 데이터 로드 후 아티클 불러오기
     _loadSimilarityDataAndArticles();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _transformationController.dispose();
+    _articleIdController.dispose(); // 컨트롤러 해제
+    _articleIdFocusNode.dispose(); // 포커스 노드 해제
+    super.dispose();
   }
 
   // 유사도 데이터를 먼저 로드한 후 아티클을 불러오는 메소드 수정
@@ -567,13 +585,6 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
     }
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    _transformationController.dispose();
-    super.dispose();
-  }
-
   // TransformationController에서 현재 스케일 가져오기
   double getScaleFromTransform() {
     final matrix = _transformationController.value;
@@ -682,52 +693,258 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
     });
   }
 
-  // 앱바 위젯 생성
+  // 앱바 위젯 생성 수정 - 텍스트필드 추가
   AppBar _buildAppBar() {
     return AppBar(
-      title: Row(
-        children: [
-          const Text('떠다니는 아티클'),
-          const SizedBox(width: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: widget.useRecursiveLoading ? Colors.purple : Colors.blue,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              widget.useRecursiveLoading ? '재귀 모드' : '일반 모드',
-              style: const TextStyle(fontSize: 12, color: Colors.white),
-            ),
-          )
-        ],
-      ),
-      actions: [
-        // 로딩 모드 전환 버튼 추가
-        IconButton(
-          icon: Icon(
-            widget.useRecursiveLoading ? Icons.account_tree : Icons.grid_view,
-          ),
-          tooltip: widget.useRecursiveLoading ? '일반 모드로 전환' : '재귀 모드로 전환',
-          onPressed: () {
-            // 반대 모드로 페이지 다시 로드
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => FloatingSimilarArticleView(
-                  initialArticleId: widget.initialArticleId,
-                  useRecursiveLoading: !widget.useRecursiveLoading,
-                ),
+      leading: _isSearching
+          ? IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                setState(() {
+                  _isSearching = false;
+                  // 초기 아티클 ID로 컨트롤러 값 복원
+                  _articleIdController.text =
+                      widget.initialArticleId.toString();
+                });
+                // 포커스 해제
+                FocusScope.of(context).unfocus();
+              },
+            )
+          : null,
+      title: _isSearching
+          ? TextField(
+              controller: _articleIdController,
+              focusNode: _articleIdFocusNode,
+              decoration: const InputDecoration(
+                hintText: '아티클 ID 입력...',
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(vertical: 15),
               ),
-            );
-          },
-        ),
-        IconButton(
-          icon: const Icon(Icons.refresh),
-          onPressed: _resetToCenter,
-          tooltip: '초기 위치로 돌아가기',
-        ),
+              style: const TextStyle(fontSize: 16),
+              keyboardType: TextInputType.number,
+              textInputAction: TextInputAction.search,
+              onSubmitted: (value) {
+                if (value.isNotEmpty) {
+                  _processArticleIdInput(value);
+                  // 포커스 해제
+                  FocusScope.of(context).unfocus();
+                  setState(() {
+                    _isSearching = false;
+                  });
+                }
+              },
+            )
+          : Row(
+              children: [
+                const Text('떠다니는 아티클'),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isSearching = true;
+                    });
+                    // 약간의 지연 후 포커스 (애니메이션 완료 후)
+                    Future.delayed(const Duration(milliseconds: 100), () {
+                      _articleIdFocusNode.requestFocus();
+                    });
+                  },
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.tag, size: 14),
+                        const SizedBox(width: 4),
+                        Text(
+                          'ID: ${widget.initialArticleId}',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: widget.useRecursiveLoading
+                        ? Colors.purple
+                        : Colors.blue,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    widget.useRecursiveLoading ? '재귀 모드' : '일반 모드',
+                    style: const TextStyle(fontSize: 12, color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+      actions: [
+        // 검색 아이콘으로 변경
+        if (!_isSearching)
+          IconButton(
+            icon: const Icon(Icons.search),
+            tooltip: '아티클 ID로 검색',
+            onPressed: () {
+              setState(() {
+                _isSearching = true;
+              });
+              // 약간의 지연 후 포커스 (애니메이션 완료 후)
+              Future.delayed(const Duration(milliseconds: 100), () {
+                _articleIdFocusNode.requestFocus();
+              });
+            },
+          ),
+        // 검색 상태일 때는 확인 버튼
+        if (_isSearching)
+          IconButton(
+            icon: const Icon(Icons.search),
+            tooltip: '검색',
+            onPressed: () {
+              if (_articleIdController.text.isNotEmpty) {
+                _processArticleIdInput(_articleIdController.text);
+                // 포커스 해제
+                FocusScope.of(context).unfocus();
+                setState(() {
+                  _isSearching = false;
+                });
+              }
+            },
+          ),
+        // 로딩 모드 전환 버튼 (검색 상태가 아닐 때만)
+        if (!_isSearching)
+          IconButton(
+            icon: Icon(
+              widget.useRecursiveLoading ? Icons.account_tree : Icons.grid_view,
+            ),
+            tooltip: widget.useRecursiveLoading ? '일반 모드로 전환' : '재귀 모드로 전환',
+            onPressed: () {
+              // 반대 모드로 페이지 다시 로드
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => FloatingSimilarArticleView(
+                    initialArticleId: widget.initialArticleId,
+                    useRecursiveLoading: !widget.useRecursiveLoading,
+                  ),
+                ),
+              );
+            },
+          ),
+        // 초기 위치 버튼 (검색 상태가 아닐 때만)
+        if (!_isSearching)
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _resetToCenter,
+            tooltip: '초기 위치로 돌아가기',
+          ),
       ],
     );
+  }
+
+  // 입력된 아티클 ID 처리 함수
+  void _processArticleIdInput(String input) {
+    try {
+      // 입력값을 정수로 변환
+      final int articleId = int.parse(input.trim());
+
+      // 0보다 작거나 같은 ID는 무효
+      if (articleId <= 0) {
+        _showErrorSnackBar('유효하지 않은 아티클 ID입니다. 양수를 입력해주세요.');
+        return;
+      }
+
+      // 현재 초기 아티클과 같은 ID인 경우
+      if (articleId == widget.initialArticleId) {
+        _showErrorSnackBar('현재 표시 중인 아티클과 동일한 ID입니다.');
+        return;
+      }
+
+      // 아티클 ID 유효성 검사 후 초기 작품으로 설정 시작
+      _loadAndSetNewInitialArticle(articleId);
+    } catch (e) {
+      _showErrorSnackBar('유효하지 않은 입력입니다. 숫자만 입력해주세요.');
+    }
+  }
+
+  // 에러 스낵바 표시 함수
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  // 새 아티클 로드 및 초기 작품으로 설정 함수
+  Future<void> _loadAndSetNewInitialArticle(int articleId) async {
+    // 로딩 표시 다이얼로그 표시
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => WillPopScope(
+        onWillPop: () async => false,
+        child: const AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('아티클을 검색하는 중입니다...'),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    try {
+      // 해당 ID의 아티클이 존재하는지 먼저 확인
+      final searchResult = await HentaiManager.idSearch(articleId.toString());
+
+      // 다이얼로그 닫기
+      Navigator.of(context).pop();
+
+      if (searchResult == null || searchResult.results.isEmpty) {
+        _showErrorSnackBar('해당 ID의 아티클을 찾을 수 없습니다: $articleId');
+        return;
+      }
+
+      final article = searchResult.results.first;
+
+      // 아티클 정보를 표시하는 스낵바
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('아티클을 찾았습니다: ${article.title()}'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+      // 가상의 ArticleNode 생성 (임시적으로 사용, UI에는 나타나지 않음)
+      final tempNode = ArticleNode(
+        queryResult: article,
+        x: 0, // 위치는 중요하지 않음
+        y: 0, // 위치는 중요하지 않음
+        maxWidth: _virtualSize.width,
+        maxHeight: _virtualSize.height,
+        groupId: 0,
+      );
+
+      // _setAsInitialArticle 함수 호출하여 새 초기 작품으로 설정
+      _setAsInitialArticle(tempNode);
+    } catch (e) {
+      // 다이얼로그가 아직 열려있다면 닫기
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+
+      _showErrorSnackBar('아티클 검색 중 오류가 발생했습니다: $e');
+    }
   }
 
   // 격자 위젯 생성
@@ -1195,7 +1412,7 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
     );
   }
 
-  // 사용 설명 패널 위젯 생성 수정
+  // 사용 설명 패널 위젯 수정 - 아티클 ID 입력 기능 설명 추가
   Widget _buildInstructionPanel() {
     return Positioned(
       bottom: 20,
@@ -1262,6 +1479,16 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
             const SizedBox(height: 4),
             const Text(
               '• 앱바에서 모드 전환 가능',
+              style: TextStyle(color: Colors.white, fontSize: 14),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              '• 앱바의 검색 아이콘으로 아티클 ID 직접 입력 가능',
+              style: TextStyle(color: Colors.white, fontSize: 14),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              '• 상단의 ID를 탭하여 새 아티클로 변경 가능',
               style: TextStyle(color: Colors.white, fontSize: 14),
             ),
           ],
