@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:math' as math;
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -6,12 +7,18 @@ import 'package:violet/component/hentai.dart';
 import 'package:vector_math/vector_math_64.dart' as vector_math;
 import 'package:violet/component/hitomi/similar_articles.dart';
 import 'package:violet/database/query.dart';
+import 'package:violet/database/user/record.dart';
 import 'package:violet/model/article_list_item.dart';
 import 'package:violet/pages/common/utils.dart';
 import 'package:violet/pages/lab/lab/floating_view/article_node.dart';
 import 'package:violet/pages/lab/lab/floating_view/painter.dart';
+import 'package:violet/pages/viewer/viewer_page.dart';
+import 'package:violet/pages/viewer/viewer_page_provider.dart';
+import 'package:violet/server/violet.dart';
+import 'package:violet/settings/settings.dart';
 import 'package:violet/widgets/article_item/article_list_item_widget.dart';
 import 'package:violet/pages/lab/lab/floating_view/tag_statistics_panel.dart';
+import 'package:violet/widgets/article_item/image_provider_manager.dart';
 
 class FloatingSimilarArticleView extends StatefulWidget {
   final int initialArticleId;
@@ -2146,13 +2153,32 @@ class _FloatingSimilarArticleViewState extends State<FloatingSimilarArticleView>
         children: [
           const Divider(color: Colors.white24),
           const SizedBox(height: 8),
-          _buildActionButton(
-            icon: Icons.open_in_new,
-            label: '아티클 열기',
-            onPressed: () {
-              // 아티클 페이지로 이동
-              showArticleInfoById(context, queryResult.id());
-            },
+          Row(
+            children: [
+              // 아티클 열기 버튼
+              Expanded(
+                child: _buildActionButton(
+                  icon: Icons.article_outlined,
+                  label: '아티클 열기',
+                  onPressed: () {
+                    // 아티클 페이지로 이동
+                    showArticleInfoById(context, queryResult.id());
+                  },
+                ),
+              ),
+              const SizedBox(width: 10),
+              // 뷰어 열기 버튼
+              Expanded(
+                child: _buildActionButton(
+                  icon: Icons.visibility,
+                  label: '뷰어 열기',
+                  onPressed: () {
+                    // 뷰어 페이지로 이동
+                    showViewer(context, queryResult.id(), 0);
+                  },
+                ),
+              ),
+            ],
           ),
         ],
       ),

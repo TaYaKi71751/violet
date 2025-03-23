@@ -199,7 +199,7 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
                         showArticleInfoById(context, articleId);
                       },
                       onDoubleTap: () async {
-                        _showViewer(articleId, page);
+                        showViewer(context, articleId, page);
                       },
                       onLongPress: () async {
                         if (await showYesNoDialog(context, '북마크를 삭제할까요?')) {
@@ -219,46 +219,6 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
         );
       },
     );
-  }
-
-  Future<void> _showViewer(int articleId, int page) async {
-    if (Settings.useVioletServer) {
-      Future.delayed(const Duration(milliseconds: 100)).then((value) async {
-        await VioletServer.view(articleId);
-      });
-    }
-
-    await (await User.getInstance()).insertUserLog(articleId, 0);
-
-    var prov = await ProviderManager.get(articleId);
-
-    await prov.init();
-
-    var headers = await prov.getHeader(0);
-
-    if (!mounted) return;
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (context) {
-          return Provider<ViewerPageProvider>.value(
-              value: ViewerPageProvider(
-                uris: List<String>.filled(prov.length(), ''),
-                useProvider: true,
-                provider: prov,
-                headers: headers,
-                id: articleId,
-                title: '<No Query>',
-                jumpPage: page,
-              ),
-              child: const ViewerPage());
-        },
-      ),
-    ).then((value) async {
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-          overlays: SystemUiOverlay.values);
-    });
   }
 
   Widget settingMenu() {
