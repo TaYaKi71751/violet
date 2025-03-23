@@ -106,7 +106,9 @@ class _ScriptWebViewState extends State<ScriptWebView>
           },
           onLoadResource: (controller, resource) async {
             if (resource.url == null) return;
-            if (resource.url!.toString().contains('ltn.gold-usergeneratedcontent.net/gg.js')) {
+            if (resource.url!
+                .toString()
+                .contains('ltn.gold-usergeneratedcontent.net/gg.js')) {
               controller.stopLoading();
               doUpdateSync(controller);
             }

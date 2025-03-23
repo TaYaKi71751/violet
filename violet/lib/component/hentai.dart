@@ -105,7 +105,8 @@ class HentaiManager {
     final id = int.parse(what);
     final headers =
         await ScriptManager.runHitomiGetHeaderContent(id.toString());
-    final hh = await http.get('https://ltn.gold-usergeneratedcontent.net/galleryblock/$id.html',
+    final hh = await http.get(
+        'https://ltn.gold-usergeneratedcontent.net/galleryblock/$id.html',
         headers: headers);
     final article = await HitomiParser.parseGalleryBlock(hh.body);
     final meta = {

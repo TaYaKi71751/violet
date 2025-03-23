@@ -12,11 +12,13 @@ void main() {
   });
 
   test('Test Bookmark', () async {
-    final _ = await http
-        .get(Uri.parse('https://ltn.gold-usergeneratedcontent.net/galleries/2102839.js'), headers: {
-      'referer': 'https://hitomi.la',
-      'accept': HttpWrapper.accept,
-      'user-agent': HttpWrapper.userAgent,
-    });
+    final _ = await http.get(
+        Uri.parse(
+            'https://ltn.gold-usergeneratedcontent.net/galleries/2102839.js'),
+        headers: {
+          'referer': 'https://hitomi.la',
+          'accept': HttpWrapper.accept,
+          'user-agent': HttpWrapper.userAgent,
+        });
   });
 }
