@@ -306,6 +306,8 @@ impl RankedState {
 mod tests {
     use std::{sync::Arc, thread, time::Duration};
 
+    use rand::Rng;
+
     use super::*;
 
     #[test]
@@ -744,18 +746,22 @@ mod tests {
             num_entries as f64 / insert_duration.as_secs_f64()
         );
 
-        // zrevrange 성능 테스트
-        let range_request = ZRangeRequest {
-            offset: 0,
-            count: 100,
-            withscores: true,
-        };
+        // 쿼리 테스트 - 랜덤 액세스
+        let mut rng = rand::thread_rng();
+        let mut total_query_duration = Duration::new(0, 0);
 
         // 100번 반복 테스트
-        let mut total_query_duration = Duration::new(0, 0);
-        for _ in 0..100 {
-            let query_start = Instant::now();
-            let _result = state.zrevrange("test".to_string(), range_request.clone());
+        for _ in 0..10 {
+            // 0부터 5000만까지 랜덤 오프셋 생성
+            let random_offset = rng.gen_range(0..50_000_000);
+            let range_request = ZRangeRequest {
+                offset: random_offset,
+                count: 100,
+                withscores: true,
+            };
+
+            let query_start = std::time::Instant::now();
+            let _result = state.zrevrange("test".to_string(), range_request);
             total_query_duration += query_start.elapsed();
         }
 
