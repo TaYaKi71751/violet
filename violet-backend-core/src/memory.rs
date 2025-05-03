@@ -523,63 +523,92 @@ impl RankedState {
         let mut remaining = request.count;
         let mut offset = request.offset;
 
-        // 현재 메모리에 있는 데이터 처리
+        // 1. 메모리에 있는 데이터 처리
         {
             let tables = self.tables.read().unwrap();
             if let Some(sorted_entries) = tables.get(&table) {
-                let start = offset.min(sorted_entries.len());
-                let end = (start + remaining).min(sorted_entries.len());
+                // 메모리에 있는 데이터의 범위 확인
+                let memory_min = sorted_entries.first().map(|e| e.value).unwrap_or(i64::MAX);
+                let memory_max = sorted_entries.last().map(|e| e.value).unwrap_or(i64::MIN);
 
-                result = sorted_entries
-                    .iter()
-                    .rev()
-                    .skip(start)
-                    .take(end - start)
-                    .map(|entry| {
-                        if request.withscores {
-                            format!("{}:{}", entry.member, entry.value)
-                        } else {
-                            entry.member.to_string()
-                        }
-                    })
-                    .collect();
+                // 현재 페이지 번호 확인
+                let current_page = self.current_page.read().unwrap();
+                let page_num = *current_page.get(&table).unwrap_or(&0);
 
-                remaining -= end - start;
-                offset = offset.saturating_sub(sorted_entries.len());
+                // 디스크의 페이지들을 확인하여 정렬 순서 결정
+                let mut disk_pages = Vec::new();
+                for i in 0..page_num {
+                    if let Ok(page) =
+                        Page::load_from_file(Path::new(&self.get_page_path(&table, i)))
+                    {
+                        disk_pages.push((i, page.min_value, page.max_value));
+                    }
+                }
+
+                // 메모리 데이터가 처리될 위치 계산 (역순)
+                let mut memory_start = 0;
+                let mut memory_end = sorted_entries.len();
+
+                // 디스크 페이지 중 메모리 데이터보다 큰 값이 있는지 확인
+                for (_, min, max) in disk_pages.iter().rev() {
+                    if *min > memory_max {
+                        memory_start += PAGE_SIZE;
+                        memory_end += PAGE_SIZE;
+                    } else if *max < memory_min {
+                        break;
+                    }
+                }
+
+                // 메모리 데이터 처리 (역순)
+                let start = offset.saturating_sub(memory_start);
+                let end = (start + remaining).min(memory_end - memory_start);
+
+                if start < sorted_entries.len() {
+                    result = sorted_entries
+                        .iter()
+                        .rev()
+                        .skip(start)
+                        .take(end - start)
+                        .map(|entry| {
+                            if request.withscores {
+                                format!("{}:{}", entry.member, entry.value)
+                            } else {
+                                entry.member.to_string()
+                            }
+                        })
+                        .collect();
+
+                    remaining -= end - start;
+                    offset = offset.saturating_sub(memory_end);
+                }
             }
         }
 
-        // 디스크의 페이지 처리
+        // 2. 디스크의 페이지 처리 (역순)
         if remaining > 0 {
             let current_page = self.current_page.read().unwrap();
             let mut page_num = *current_page.get(&table).unwrap_or(&0);
 
             while remaining > 0 && page_num > 0 {
                 page_num -= 1;
-                if let Ok(_) = self.load_page(&table, page_num) {
-                    let tables = self.tables.read().unwrap();
-                    if let Some(sorted_entries) = tables.get(&table) {
-                        let start = offset.min(sorted_entries.len());
-                        let end = (start + remaining).min(sorted_entries.len());
+                if let Ok(page) =
+                    Page::load_from_file(Path::new(&self.get_page_path(&table, page_num)))
+                {
+                    let start = offset.min(page.entries.len());
+                    let end = (start + remaining).min(page.entries.len());
 
-                        result.extend(
-                            sorted_entries
-                                .iter()
-                                .rev()
-                                .skip(start)
-                                .take(end - start)
-                                .map(|entry| {
-                                    if request.withscores {
-                                        format!("{}:{}", entry.member, entry.value)
-                                    } else {
-                                        entry.member.to_string()
-                                    }
-                                }),
-                        );
+                    result.extend(page.entries.iter().rev().skip(start).take(end - start).map(
+                        |entry| {
+                            if request.withscores {
+                                format!("{}:{}", entry.member, entry.value)
+                            } else {
+                                entry.member.to_string()
+                            }
+                        },
+                    ));
 
-                        remaining -= end - start;
-                        offset = offset.saturating_sub(sorted_entries.len());
-                    }
+                    remaining -= end - start;
+                    offset = offset.saturating_sub(page.entries.len());
                 }
             }
         }
