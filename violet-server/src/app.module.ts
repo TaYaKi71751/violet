@@ -11,6 +11,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ViewModule } from './view/view.module';
 import { RedisModule } from './redis/redis.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 import * as Joi from 'joi';
 import { AWSModule } from './aws/aws.module';
 
@@ -37,6 +38,11 @@ export const envValidationSchema = Joi.object({
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([{
+      ttl: 1000, // 1초
+      limit: 1, // 1초에 1번만 요청 가능
+    }]),
+
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath:
@@ -66,4 +72,5 @@ export const envValidationSchema = Joi.object({
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+
+export class AppModule { }

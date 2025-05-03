@@ -10,7 +10,6 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api/v2');
   app.useGlobalPipes(new ValidationPipe());
-
   app.use(cookies());
 
   setupSwagger(app);

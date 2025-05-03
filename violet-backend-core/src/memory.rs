@@ -1,0 +1,764 @@
+use serde::{Deserialize, Serialize};
+use std::cmp::Ordering;
+use std::collections::{BTreeSet, BinaryHeap, HashMap};
+use std::sync::Mutex;
+use std::time::{SystemTime, UNIX_EPOCH};
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RankedEntry {
+    pub value: i64,
+    pub member: String,
+    pub expire: Option<u64>,
+}
+
+impl PartialEq for RankedEntry {
+    fn eq(&self, other: &Self) -> bool {
+        self.value == other.value && self.member == other.member
+    }
+}
+
+impl Eq for RankedEntry {}
+
+impl PartialOrd for RankedEntry {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for RankedEntry {
+    fn cmp(&self, other: &Self) -> Ordering {
+        // 값이 같으면 member로 정렬
+        match self.value.cmp(&other.value) {
+            Ordering::Equal => self.member.cmp(&other.member),
+            ordering => ordering,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq)]
+struct ExpireEntry {
+    expire_time: u64,
+    table: String,
+    member: String,
+    value: i64,
+}
+
+impl Ord for ExpireEntry {
+    fn cmp(&self, other: &Self) -> Ordering {
+        // BinaryHeap은 최대 힙이므로, 시간이 빠른 순서대로 정렬하기 위해 역순으로 비교
+        other.expire_time.cmp(&self.expire_time)
+    }
+}
+
+impl PartialOrd for ExpireEntry {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ZAddRequest {
+    pub value: i64,
+    pub member: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ZIncrByRequest {
+    pub increment: i64,
+    pub member: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ZIncrByPeriodRequest {
+    pub increment: i64,
+    pub member: String,
+    pub expire: u64,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct ZRangeRequest {
+    pub offset: usize,
+    pub count: usize,
+    pub withscores: bool,
+}
+
+#[allow(clippy::type_complexity)]
+pub struct RankedState {
+    tables: Mutex<HashMap<String, (HashMap<String, RankedEntry>, BTreeSet<RankedEntry>)>>,
+    expire_queue: Mutex<BinaryHeap<ExpireEntry>>,
+}
+
+impl RankedState {
+    pub fn new() -> Self {
+        RankedState {
+            tables: Mutex::new(HashMap::new()),
+            expire_queue: Mutex::new(BinaryHeap::new()),
+        }
+    }
+
+    fn process_expired_entries(&self) {
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
+        let mut tables = self.tables.lock().unwrap();
+        let mut expire_queue = self.expire_queue.lock().unwrap();
+
+        while let Some(entry) = expire_queue.peek() {
+            if entry.expire_time > now {
+                break;
+            }
+
+            let entry = expire_queue.pop().unwrap();
+
+            if let Some((entries, sorted_entries)) = tables.get_mut(&entry.table) {
+                if let Some(ranked_entry) = entries.get_mut(&entry.member) {
+                    // 정렬된 집합에서 기존 항목 제거
+                    let old_entry = ranked_entry.clone();
+                    sorted_entries.remove(&old_entry);
+
+                    // 값 업데이트
+                    ranked_entry.value -= entry.value;
+
+                    // 값이 0보다 크면 정렬된 집합에 다시 추가
+                    if ranked_entry.value > 0 {
+                        sorted_entries.insert(ranked_entry.clone());
+                    } else {
+                        entries.remove(&entry.member);
+                    }
+                }
+            }
+        }
+    }
+
+    pub fn zadd(&self, table: String, request: ZAddRequest) -> String {
+        self.process_expired_entries();
+
+        let mut tables = self.tables.lock().unwrap();
+        let (entries, sorted_entries) = tables
+            .entry(table)
+            .or_insert_with(|| (HashMap::new(), BTreeSet::new()));
+
+        // 기존 항목 수정 또는 새로운 항목 생성
+        let entry = entries
+            .entry(request.member.clone())
+            .or_insert_with(|| RankedEntry {
+                value: 0,
+                member: request.member.clone(),
+                expire: None,
+            });
+
+        // 정렬된 집합에서 항목을 제거하고 다시 삽입해야 올바른 순서가 유지됨
+        // BTreeSet은 값이 변경되면 자동으로 순서를 조정하지 않기 때문에 필수적인 과정임
+        sorted_entries.remove(entry);
+        entry.value = request.value;
+        sorted_entries.insert(entry.clone());
+
+        "OK".to_string()
+    }
+
+    pub fn zincrby(&self, table: String, request: ZIncrByRequest) -> String {
+        self.process_expired_entries();
+
+        let mut tables = self.tables.lock().unwrap();
+        let (entries, sorted_entries) = tables
+            .entry(table)
+            .or_insert_with(|| (HashMap::new(), BTreeSet::new()));
+
+        // 기존 항목 수정 또는 새로운 항목 생성
+        let entry = entries
+            .entry(request.member.clone())
+            .or_insert_with(|| RankedEntry {
+                value: 0,
+                member: request.member.clone(),
+                expire: None,
+            });
+
+        sorted_entries.remove(entry);
+        entry.value += request.increment;
+        sorted_entries.insert(entry.clone());
+
+        "OK".to_string()
+    }
+
+    pub fn zincrbyp(&self, table: String, request: ZIncrByPeriodRequest) -> String {
+        self.process_expired_entries();
+
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
+        let mut tables = self.tables.lock().unwrap();
+        let mut expire_queue = self.expire_queue.lock().unwrap();
+        let (entries, sorted_entries) = tables
+            .entry(table.clone())
+            .or_insert_with(|| (HashMap::new(), BTreeSet::new()));
+
+        // 기존 항목 제거 (있는 경우)
+        // 기존 항목 수정 또는 새로운 항목 생성
+        let entry = entries
+            .entry(request.member.clone())
+            .or_insert_with(|| RankedEntry {
+                value: 0,
+                member: request.member.clone(),
+                expire: None,
+            });
+
+        // 정렬된 집합에서 항목을 제거하고 다시 삽입해야 올바른 순서가 유지됨
+        sorted_entries.remove(entry);
+        entry.value += request.increment;
+        entry.expire = Some(now + request.expire);
+        sorted_entries.insert(entry.clone());
+
+        // 만료 큐에 추가
+        expire_queue.push(ExpireEntry {
+            expire_time: now + request.expire,
+            table: table.clone(),
+            member: request.member.clone(),
+            value: request.increment,
+        });
+
+        "OK".to_string()
+    }
+
+    pub fn zrange(&self, table: String, request: ZRangeRequest) -> String {
+        self.process_expired_entries();
+
+        let tables = self.tables.lock().unwrap();
+        if let Some((_, sorted_entries)) = tables.get(&table) {
+            let result: Vec<_> = sorted_entries
+                .iter()
+                .skip(request.offset)
+                .take(request.count)
+                .map(|entry| {
+                    if request.withscores {
+                        format!("{}:{}", entry.member, entry.value)
+                    } else {
+                        entry.member.clone()
+                    }
+                })
+                .collect();
+
+            serde_json::to_string(&result).unwrap()
+        } else {
+            "[]".to_string()
+        }
+    }
+
+    pub fn zrevrange(&self, table: String, request: ZRangeRequest) -> String {
+        self.process_expired_entries();
+
+        let tables = self.tables.lock().unwrap();
+        if let Some((_, sorted_entries)) = tables.get(&table) {
+            let result: Vec<_> = sorted_entries
+                .iter()
+                .rev()
+                .skip(request.offset)
+                .take(request.count)
+                .map(|entry| {
+                    if request.withscores {
+                        format!("{}:{}", entry.member, entry.value)
+                    } else {
+                        entry.member.clone()
+                    }
+                })
+                .collect();
+
+            serde_json::to_string(&result).unwrap()
+        } else {
+            "[]".to_string()
+        }
+    }
+
+    pub fn flushall(&self) -> String {
+        let mut tables = self.tables.lock().unwrap();
+        let mut expire_queue = self.expire_queue.lock().unwrap();
+        tables.clear();
+        expire_queue.clear();
+        "OK".to_string()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::{sync::Arc, thread, time::Duration};
+
+    use super::*;
+
+    #[test]
+    fn test_zadd() {
+        let state = RankedState::new();
+        let request = ZAddRequest {
+            value: 100,
+            member: "user1".to_string(),
+        };
+
+        assert_eq!(state.zadd("test".to_string(), request), "OK");
+
+        // 같은 멤버에 대해 다른 값으로 업데이트
+        let request = ZAddRequest {
+            value: 200,
+            member: "user1".to_string(),
+        };
+        assert_eq!(state.zadd("test".to_string(), request), "OK");
+    }
+
+    #[test]
+    fn test_zincrby() {
+        let state = RankedState::new();
+        let request = ZIncrByRequest {
+            increment: 10,
+            member: "user1".to_string(),
+        };
+
+        assert_eq!(state.zincrby("test".to_string(), request), "OK");
+
+        // 같은 멤버에 대해 다시 증가
+        let request = ZIncrByRequest {
+            increment: 20,
+            member: "user1".to_string(),
+        };
+        assert_eq!(state.zincrby("test".to_string(), request), "OK");
+    }
+
+    #[test]
+    fn test_zincrbyp() {
+        let state = RankedState::new();
+        let request = ZIncrByPeriodRequest {
+            increment: 10,
+            member: "user1".to_string(),
+            expire: 3600,
+        };
+
+        assert_eq!(state.zincrbyp("test".to_string(), request), "OK");
+
+        // 같은 멤버에 대해 다시 증가
+        let request = ZIncrByPeriodRequest {
+            increment: 20,
+            member: "user1".to_string(),
+            expire: 3600,
+        };
+        assert_eq!(state.zincrbyp("test".to_string(), request), "OK");
+    }
+
+    #[test]
+    fn test_zrange() {
+        let state = RankedState::new();
+
+        // 테스트 데이터 추가
+        let requests = vec![
+            ZAddRequest {
+                value: 100,
+                member: "user1".to_string(),
+            },
+            ZAddRequest {
+                value: 200,
+                member: "user2".to_string(),
+            },
+            ZAddRequest {
+                value: 300,
+                member: "user3".to_string(),
+            },
+        ];
+
+        for request in requests {
+            state.zadd("test".to_string(), request);
+        }
+
+        let range_request = ZRangeRequest {
+            offset: 0,
+            count: 2,
+            withscores: true,
+        };
+
+        let result = state.zrange("test".to_string(), range_request);
+        let expected = r#"["user1:100","user2:200"]"#;
+        assert_eq!(result, expected);
+
+        // withscores가 false인 경우
+        let range_request = ZRangeRequest {
+            offset: 0,
+            count: 2,
+            withscores: false,
+        };
+
+        let result = state.zrange("test".to_string(), range_request);
+        let expected = r#"["user1","user2"]"#;
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_zrevrange() {
+        let state = RankedState::new();
+
+        // 테스트 데이터 추가
+        let requests = vec![
+            ZAddRequest {
+                value: 100,
+                member: "user1".to_string(),
+            },
+            ZAddRequest {
+                value: 200,
+                member: "user2".to_string(),
+            },
+            ZAddRequest {
+                value: 300,
+                member: "user3".to_string(),
+            },
+        ];
+
+        for request in requests {
+            state.zadd("test".to_string(), request);
+        }
+
+        let range_request = ZRangeRequest {
+            offset: 0,
+            count: 2,
+            withscores: true,
+        };
+
+        let result = state.zrevrange("test".to_string(), range_request);
+        let expected = r#"["user3:300","user2:200"]"#;
+        assert_eq!(result, expected);
+
+        // withscores가 false인 경우
+        let range_request = ZRangeRequest {
+            offset: 0,
+            count: 2,
+            withscores: false,
+        };
+
+        let result = state.zrevrange("test".to_string(), range_request);
+        let expected = r#"["user3","user2"]"#;
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_flushall() {
+        let state = RankedState::new();
+
+        // 테스트 데이터 추가
+        let request = ZAddRequest {
+            value: 100,
+            member: "user1".to_string(),
+        };
+        state.zadd("test".to_string(), request);
+
+        assert_eq!(state.flushall(), "OK");
+
+        // flushall 후 데이터가 비어있는지 확인
+        let range_request = ZRangeRequest {
+            offset: 0,
+            count: 10,
+            withscores: true,
+        };
+        let result = state.zrange("test".to_string(), range_request);
+        assert_eq!(result, "[]");
+    }
+
+    #[test]
+    fn test_concurrent_operations() {
+        let state = Arc::new(RankedState::new());
+        let handles: Vec<_> = (0..10)
+            .map(|_| {
+                let state = Arc::clone(&state);
+                thread::spawn(move || {
+                    let request = ZIncrByRequest {
+                        increment: 1,
+                        member: "user1".to_string(),
+                    };
+                    state.zincrby("test".to_string(), request)
+                })
+            })
+            .collect();
+
+        for handle in handles {
+            assert_eq!(handle.join().unwrap(), "OK");
+        }
+
+        // 최종 값 확인
+        let range_request = ZRangeRequest {
+            offset: 0,
+            count: 1,
+            withscores: true,
+        };
+        let result = state.zrange("test".to_string(), range_request);
+        assert_eq!(result, r#"["user1:10"]"#);
+    }
+
+    #[test]
+    fn test_expire() {
+        use std::thread;
+        use std::time::Duration;
+
+        let state = RankedState::new();
+
+        // 만료 시간이 1초인 항목 추가
+        let request = ZIncrByPeriodRequest {
+            increment: 100,
+            member: "user1".to_string(),
+            expire: 1, // 1초 후 만료
+        };
+        assert_eq!(state.zincrbyp("test".to_string(), request), "OK");
+
+        // 즉시 조회하면 값이 있어야 함
+        let range_request = ZRangeRequest {
+            offset: 0,
+            count: 1,
+            withscores: true,
+        };
+        let result = state.zrange("test".to_string(), range_request.clone());
+        assert_eq!(result, r#"["user1:100"]"#);
+
+        // 1.5초 대기
+        thread::sleep(Duration::from_millis(1500));
+
+        // 만료 후 조회하면 값이 감소해야 함
+        let result = state.zrange("test".to_string(), range_request);
+        assert_eq!(result, "[]");
+    }
+
+    #[test]
+    fn test_multiple_expires() {
+        use std::thread;
+        use std::time::Duration;
+
+        let state = RankedState::new();
+
+        // 여러 항목 추가
+        let requests = vec![
+            ZIncrByPeriodRequest {
+                increment: 100,
+                member: "user1".to_string(),
+                expire: 1, // 1초 후 만료
+            },
+            ZIncrByPeriodRequest {
+                increment: 200,
+                member: "user2".to_string(),
+                expire: 2, // 2초 후 만료
+            },
+            ZIncrByPeriodRequest {
+                increment: 300,
+                member: "user3".to_string(),
+                expire: 3, // 3초 후 만료
+            },
+        ];
+
+        for request in requests {
+            assert_eq!(state.zincrbyp("test".to_string(), request), "OK");
+        }
+
+        // 초기 상태 확인
+        let range_request = || ZRangeRequest {
+            offset: 0,
+            count: 10,
+            withscores: true,
+        };
+        let result = state.zrange("test".to_string(), range_request());
+        assert_eq!(result, r#"["user1:100","user2:200","user3:300"]"#);
+
+        // 1.5초 후 확인 (user1 만료)
+        thread::sleep(Duration::from_millis(1500));
+        let result = state.zrange("test".to_string(), range_request());
+        assert_eq!(result, r#"["user2:200","user3:300"]"#);
+
+        // 2.5초 후 확인 (user2 만료)
+        thread::sleep(Duration::from_millis(1000));
+        let result = state.zrange("test".to_string(), range_request());
+        assert_eq!(result, r#"["user3:300"]"#);
+
+        // 3.5초 후 확인 (user3 만료)
+        thread::sleep(Duration::from_millis(1000));
+        let result = state.zrange("test".to_string(), range_request());
+        assert_eq!(result, "[]");
+    }
+
+    #[test]
+    fn test_expire_with_multiple_increments() {
+        use std::thread;
+        use std::time::Duration;
+
+        let state = RankedState::new();
+
+        // 같은 멤버에 대해 여러 번 증가
+        let requests = vec![
+            ZIncrByPeriodRequest {
+                increment: 100,
+                member: "user1".to_string(),
+                expire: 1,
+            },
+            ZIncrByPeriodRequest {
+                increment: 200,
+                member: "user1".to_string(),
+                expire: 1,
+            },
+            ZIncrByPeriodRequest {
+                increment: 300,
+                member: "user1".to_string(),
+                expire: 1,
+            },
+        ];
+
+        for request in requests {
+            assert_eq!(state.zincrbyp("test".to_string(), request), "OK");
+        }
+
+        // 초기 상태 확인
+        let range_request = || ZRangeRequest {
+            offset: 0,
+            count: 1,
+            withscores: true,
+        };
+        let result = state.zrange("test".to_string(), range_request());
+        assert_eq!(result, r#"["user1:600"]"#);
+
+        // 1.5초 후 확인 (모든 증가분 만료)
+        thread::sleep(Duration::from_millis(1500));
+        let result = state.zrange("test".to_string(), range_request());
+        assert_eq!(result, "[]");
+    }
+
+    #[test]
+    fn test_expire_with_different_tables() {
+        use std::thread;
+        use std::time::Duration;
+
+        let state = RankedState::new();
+
+        // 다른 테이블에 항목 추가
+        let requests = vec![
+            (
+                "table1",
+                ZIncrByPeriodRequest {
+                    increment: 100,
+                    member: "user1".to_string(),
+                    expire: 1,
+                },
+            ),
+            (
+                "table2",
+                ZIncrByPeriodRequest {
+                    increment: 200,
+                    member: "user1".to_string(),
+                    expire: 2,
+                },
+            ),
+        ];
+
+        for (table, request) in requests {
+            assert_eq!(state.zincrbyp(table.to_string(), request), "OK");
+        }
+
+        // 초기 상태 확인
+        let range_request = || ZRangeRequest {
+            offset: 0,
+            count: 1,
+            withscores: true,
+        };
+        let result1 = state.zrange("table1".to_string(), range_request());
+        let result2 = state.zrange("table2".to_string(), range_request());
+        assert_eq!(result1, r#"["user1:100"]"#);
+        assert_eq!(result2, r#"["user1:200"]"#);
+
+        // 1.5초 후 확인 (table1의 항목 만료)
+        thread::sleep(Duration::from_millis(1500));
+        let result1 = state.zrange("table1".to_string(), range_request());
+        let result2 = state.zrange("table2".to_string(), range_request());
+        assert_eq!(result1, "[]");
+        assert_eq!(result2, r#"["user1:200"]"#);
+
+        // 2.5초 후 확인 (table2의 항목 만료)
+        thread::sleep(Duration::from_millis(1000));
+        let result1 = state.zrange("table1".to_string(), range_request());
+        let result2 = state.zrange("table2".to_string(), range_request());
+        assert_eq!(result1, "[]");
+        assert_eq!(result2, "[]");
+    }
+
+    #[test]
+    fn stress_test_performance() {
+        use std::sync::Arc;
+        use std::thread;
+        use std::time::Instant;
+
+        let state = Arc::new(RankedState::new());
+        let num_entries = 50_000_000;
+        let num_threads = 8;
+        let entries_per_thread = num_entries / num_threads;
+
+        println!("Starting stress test with {} entries...", num_entries);
+
+        // 데이터 삽입 테스트
+        let insert_start = Instant::now();
+        let mut handles = vec![];
+
+        for thread_id in 0..num_threads {
+            let state = Arc::clone(&state);
+            let handle = thread::spawn(move || {
+                let start = thread_id * entries_per_thread;
+                let end = start + entries_per_thread;
+                for i in start..end {
+                    let request = ZIncrByPeriodRequest {
+                        increment: (i % 1000) as i64 + 1,
+                        member: format!("user{}", i),
+                        expire: 3600, // 1시간
+                    };
+                    let result = state.zincrbyp("test".to_string(), request);
+                    assert_eq!(result, "OK");
+                }
+            });
+            handles.push(handle);
+        }
+
+        for handle in handles {
+            handle.join().unwrap();
+        }
+
+        let insert_duration = insert_start.elapsed();
+        println!("Insertion completed in {:?}", insert_duration);
+        println!(
+            "Insertion rate: {:.2} entries/sec",
+            num_entries as f64 / insert_duration.as_secs_f64()
+        );
+
+        // zrevrange 성능 테스트
+        let range_request = ZRangeRequest {
+            offset: 0,
+            count: 100,
+            withscores: true,
+        };
+
+        // 100번 반복 테스트
+        let mut total_query_duration = Duration::new(0, 0);
+        for _ in 0..100 {
+            let query_start = Instant::now();
+            let _result = state.zrevrange("test".to_string(), range_request.clone());
+            total_query_duration += query_start.elapsed();
+        }
+
+        let avg_query_duration = total_query_duration / 100;
+        println!(
+            "zrevrange query completed in {:?} (average over 100 iterations)",
+            avg_query_duration
+        );
+        println!(
+            "zrevrange query rate: {:.2} queries/sec",
+            100.0 / total_query_duration.as_secs_f64()
+        );
+
+        // 메모리 사용량 확인
+        let tables = state.tables.lock().unwrap();
+        let (entries, _) = tables.get("test").unwrap();
+        println!("Total entries in memory: {}", entries.len());
+        println!(
+            "Memory usage per entry: ~{} bytes",
+            std::mem::size_of::<RankedEntry>() + std::mem::size_of::<String>() * 2
+        ); // member와 table 문자열의 평균 크기
+
+        // 만료 큐 크기 확인
+        let expire_queue = state.expire_queue.lock().unwrap();
+        println!("Total entries in expire queue: {}", expire_queue.len());
+    }
+}
