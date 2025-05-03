@@ -52,8 +52,10 @@ async fn flushall(state: &State<RankedState>) -> String {
 
 #[launch]
 fn rocket() -> _ {
-    rocket::build().manage(RankedState::new()).mount(
-        "/",
-        routes![zadd, zincrby, zincrbyp, zrange, zrevrange, flushall],
-    )
+    rocket::build()
+        .manage(RankedState::new("pages".to_string()))
+        .mount(
+            "/",
+            routes![zadd, zincrby, zincrbyp, zrange, zrevrange, flushall],
+        )
 }
