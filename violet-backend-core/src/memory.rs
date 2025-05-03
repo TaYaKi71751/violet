@@ -1,8 +1,10 @@
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
-use std::collections::{BTreeSet, BinaryHeap, HashMap};
+use std::collections::{BinaryHeap, HashMap};
 use std::sync::{Arc, Mutex, RwLock};
 use std::time::{SystemTime, UNIX_EPOCH};
+
+use crate::indexableset::IndexableSet;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RankedEntry {
@@ -83,7 +85,7 @@ pub struct ZRangeRequest {
 
 #[allow(clippy::type_complexity)]
 pub struct RankedState {
-    tables: RwLock<HashMap<String, BTreeSet<RankedEntry>>>,
+    tables: RwLock<HashMap<String, IndexableSet<RankedEntry>>>,
     expire_queue: Mutex<BinaryHeap<ExpireEntry>>,
     table_lookup: RwLock<Vec<String>>,
     table_indices: RwLock<HashMap<String, usize>>,
@@ -161,7 +163,7 @@ impl RankedState {
 
         let member = Arc::new(request.member);
         let mut tables = self.tables.write().unwrap();
-        let sorted_entries = tables.entry(table).or_insert_with(BTreeSet::new);
+        let sorted_entries = tables.entry(table).or_insert_with(IndexableSet::new);
 
         let entry = RankedEntry {
             value: request.value,
@@ -169,7 +171,7 @@ impl RankedState {
             expire: None,
         };
 
-        sorted_entries.replace(entry);
+        sorted_entries.insert(entry);
 
         "OK".to_string()
     }
@@ -179,7 +181,7 @@ impl RankedState {
 
         let member = Arc::new(request.member);
         let mut tables = self.tables.write().unwrap();
-        let sorted_entries = tables.entry(table).or_insert_with(BTreeSet::new);
+        let sorted_entries = tables.entry(table).or_insert_with(IndexableSet::new);
 
         let mut entry = sorted_entries
             .take(&RankedEntry {
@@ -212,7 +214,7 @@ impl RankedState {
 
         let mut tables = self.tables.write().unwrap();
         let mut expire_queue = self.expire_queue.lock().unwrap();
-        let sorted_entries = tables.entry(table).or_insert_with(BTreeSet::new);
+        let sorted_entries = tables.entry(table).or_insert_with(IndexableSet::new);
 
         let mut entry = sorted_entries
             .take(&RankedEntry {
@@ -246,9 +248,8 @@ impl RankedState {
         let tables = self.tables.read().unwrap();
         if let Some(sorted_entries) = tables.get(&table) {
             let result: Vec<_> = sorted_entries
-                .iter()
-                .skip(request.offset)
-                .take(request.count)
+                .range(request.offset..request.offset + request.count)
+                .into_iter()
                 .map(|entry| {
                     if request.withscores {
                         format!("{}:{}", entry.member, entry.value)
@@ -269,10 +270,9 @@ impl RankedState {
         let tables = self.tables.read().unwrap();
         if let Some(sorted_entries) = tables.get(&table) {
             let result: Vec<_> = sorted_entries
-                .iter()
-                .rev()
-                .skip(request.offset)
-                .take(request.count)
+                .range(request.offset..request.offset + request.count)
+                .into_iter()
+                .rev() // TODO: 수정
                 .map(|entry| {
                     if request.withscores {
                         format!("{}:{}", entry.member, entry.value)
@@ -707,7 +707,7 @@ mod tests {
         use std::time::Instant;
 
         let state = Arc::new(RankedState::new());
-        let num_entries = 50_000_000;
+        let num_entries = 50_000_00;
         let num_threads = 8;
         let entries_per_thread = num_entries / num_threads;
 
@@ -753,7 +753,7 @@ mod tests {
         // 100번 반복 테스트
         for _ in 0..10 {
             // 0부터 5000만까지 랜덤 오프셋 생성
-            let random_offset = rng.gen_range(0..50_000_000);
+            let random_offset = rng.gen_range(0..50_000_00);
             let range_request = ZRangeRequest {
                 offset: random_offset,
                 count: 100,
@@ -778,7 +778,7 @@ mod tests {
         // 메모리 사용량 확인
         let tables = state.tables.read().unwrap();
         let sorted_entries = tables.get("test").unwrap();
-        println!("Total entries in memory: {}", sorted_entries.len());
+        // println!("Total entries in memory: {}", sorted_entries.len());
 
         let size_of_ranked_entry = std::mem::size_of::<RankedEntry>();
         let size_of_expire_entry = std::mem::size_of::<ExpireEntry>();
@@ -807,10 +807,10 @@ mod tests {
             "Memory optimization: Saving ~{} bytes per entry",
             original_exp_entry_size - size_of_expire_entry
         );
-        println!(
-            "Total memory saved: ~{} MB",
-            (original_exp_entry_size - size_of_expire_entry) * sorted_entries.len() / (1024 * 1024)
-        );
+        // println!(
+        //     "Total memory saved: ~{} MB",
+        //     (original_exp_entry_size - size_of_expire_entry) * sorted_entries.len() / (1024 * 1024)
+        // );
 
         // 만료 큐 크기 확인
         let expire_queue = state.expire_queue.lock().unwrap();
