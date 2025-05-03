@@ -6,8 +6,8 @@ use std::path::Path;
 use std::sync::{Arc, Mutex, RwLock};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-const PAGE_SIZE: usize = 5_000_000;
-const MAX_MEMORY_ENTRIES: usize = 5_000_000; // 약 2GB 제한
+const PAGE_SIZE: usize = 5_000_00;
+const MAX_MEMORY_ENTRIES: usize = 3_000_00; // 약 2GB 제한
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RankedEntry {
@@ -63,14 +63,31 @@ impl Page {
     }
 
     fn save_to_file(&self, path: &Path) -> std::io::Result<()> {
-        let json = serde_json::to_string(self)?;
+        let entries: Vec<_> = self
+            .entries
+            .iter()
+            .map(|entry| {
+                let member = entry.member.as_ref().clone();
+                (entry.value, member, entry.expire)
+            })
+            .collect();
+        let json = serde_json::to_string(&entries)?;
         fs::write(path, json)?;
         Ok(())
     }
 
     fn load_from_file(path: &Path) -> std::io::Result<Self> {
         let json = fs::read_to_string(path)?;
-        let page: Page = serde_json::from_str(&json)?;
+        let entries: Vec<(i64, String, Option<u64>)> = serde_json::from_str(&json)?;
+
+        let mut page = Page::new();
+        for (value, member, expire) in entries {
+            page.add_entry(RankedEntry {
+                value,
+                member: Arc::new(member),
+                expire,
+            });
+        }
         Ok(page)
     }
 }
@@ -403,52 +420,95 @@ impl RankedState {
         let mut remaining = request.count;
         let mut offset = request.offset;
 
-        // 현재 메모리에 있는 데이터 처리
+        // 1. 메모리에 있는 데이터 처리
         {
             let tables = self.tables.read().unwrap();
             if let Some(sorted_entries) = tables.get(&table) {
-                let entries: Vec<_> = sorted_entries.iter().collect();
-                let start = offset.min(entries.len());
-                let end = (start + remaining).min(entries.len());
+                // 메모리에 있는 데이터의 범위 확인
+                let memory_min = sorted_entries.first().map(|e| e.value).unwrap_or(i64::MAX);
+                let memory_max = sorted_entries.last().map(|e| e.value).unwrap_or(i64::MIN);
 
-                for entry in &entries[start..end] {
-                    if request.withscores {
-                        result.push(format!("{}:{}", entry.member, entry.value));
-                    } else {
-                        result.push(entry.member.to_string());
+                // 현재 페이지 번호 확인
+                let current_page = self.current_page.read().unwrap();
+                let page_num = *current_page.get(&table).unwrap_or(&0);
+
+                // 디스크의 페이지들을 확인하여 정렬 순서 결정
+                let mut disk_pages = Vec::new();
+                for i in 0..page_num {
+                    if let Ok(page) =
+                        Page::load_from_file(Path::new(&self.get_page_path(&table, i)))
+                    {
+                        disk_pages.push((i, page.min_value, page.max_value));
                     }
                 }
 
-                remaining -= end - start;
-                offset = offset.saturating_sub(entries.len());
+                // 메모리 데이터가 처리될 위치 계산
+                let mut memory_start = 0;
+                let mut memory_end = sorted_entries.len();
+
+                // 디스크 페이지 중 메모리 데이터보다 작은 값이 있는지 확인
+                for (_, min, max) in &disk_pages {
+                    if *max < memory_min {
+                        memory_start += PAGE_SIZE;
+                        memory_end += PAGE_SIZE;
+                    } else if *min > memory_max {
+                        break;
+                    }
+                }
+
+                // 메모리 데이터 처리
+                let start = offset.saturating_sub(memory_start);
+                let end = (start + remaining).min(memory_end - memory_start);
+
+                if start < sorted_entries.len() {
+                    result = sorted_entries
+                        .iter()
+                        .skip(start)
+                        .take(end - start)
+                        .map(|entry| {
+                            if request.withscores {
+                                format!("{}:{}", entry.member, entry.value)
+                            } else {
+                                entry.member.to_string()
+                            }
+                        })
+                        .collect();
+
+                    remaining -= end - start;
+                    offset = offset.saturating_sub(memory_end);
+                }
             }
         }
 
-        // 디스크의 페이지 처리
+        // 2. 디스크의 페이지 처리
         if remaining > 0 {
             let current_page = self.current_page.read().unwrap();
             let mut page_num = *current_page.get(&table).unwrap_or(&0);
 
             while remaining > 0 && page_num > 0 {
                 page_num -= 1;
-                if let Ok(_) = self.load_page(&table, page_num) {
-                    let tables = self.tables.read().unwrap();
-                    if let Some(sorted_entries) = tables.get(&table) {
-                        let entries: Vec<_> = sorted_entries.iter().collect();
-                        let start = offset.min(entries.len());
-                        let end = (start + remaining).min(entries.len());
+                if let Ok(page) =
+                    Page::load_from_file(Path::new(&self.get_page_path(&table, page_num)))
+                {
+                    let start = offset.min(page.entries.len());
+                    let end = (start + remaining).min(page.entries.len());
 
-                        for entry in &entries[start..end] {
-                            if request.withscores {
-                                result.push(format!("{}:{}", entry.member, entry.value));
-                            } else {
-                                result.push(entry.member.to_string());
-                            }
-                        }
+                    result.extend(
+                        page.entries
+                            .iter()
+                            .skip(start)
+                            .take(end - start)
+                            .map(|entry| {
+                                if request.withscores {
+                                    format!("{}:{}", entry.member, entry.value)
+                                } else {
+                                    entry.member.to_string()
+                                }
+                            }),
+                    );
 
-                        remaining -= end - start;
-                        offset = offset.saturating_sub(entries.len());
-                    }
+                    remaining -= end - start;
+                    offset = offset.saturating_sub(page.entries.len());
                 }
             }
         }
@@ -1012,7 +1072,7 @@ mod tests {
             };
 
             let query_start = std::time::Instant::now();
-            let _result = state.zrevrange("test".to_string(), range_request);
+            let _result = state.zrange("test".to_string(), range_request);
             total_query_duration += query_start.elapsed();
         }
 
