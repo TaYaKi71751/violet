@@ -6,8 +6,8 @@ use std::path::Path;
 use std::sync::{Arc, Mutex, RwLock};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-const PAGE_SIZE: usize = 5_000_00000;
-const MAX_MEMORY_ENTRIES: usize = 2_000_00000; // 약 2GB 제한
+const PAGE_SIZE: usize = 5_000_000;
+const MAX_MEMORY_ENTRIES: usize = 5_000_000; // 약 2GB 제한
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RankedEntry {
@@ -467,12 +467,14 @@ impl RankedState {
         {
             let tables = self.tables.read().unwrap();
             if let Some(sorted_entries) = tables.get(&table) {
-                let entries: Vec<_> = sorted_entries.iter().rev().collect();
-                let start = offset.min(entries.len());
-                let end = (start + remaining).min(entries.len());
+                let start = offset.min(sorted_entries.len());
+                let end = (start + remaining).min(sorted_entries.len());
 
-                result = entries[start..end]
+                result = sorted_entries
                     .iter()
+                    .rev()
+                    .skip(start)
+                    .take(end - start)
                     .map(|entry| {
                         if request.withscores {
                             format!("{}:{}", entry.member, entry.value)
@@ -482,16 +484,8 @@ impl RankedState {
                     })
                     .collect();
 
-                // for entry in &entries[start..end] {
-                //     if request.withscores {
-                //         result.push(format!("{}:{}", entry.member, entry.value));
-                //     } else {
-                //         result.push(entry.member.to_string());
-                //     }
-                // }
-
                 remaining -= end - start;
-                offset = offset.saturating_sub(entries.len());
+                offset = offset.saturating_sub(sorted_entries.len());
             }
         }
 
@@ -505,20 +499,26 @@ impl RankedState {
                 if let Ok(_) = self.load_page(&table, page_num) {
                     let tables = self.tables.read().unwrap();
                     if let Some(sorted_entries) = tables.get(&table) {
-                        let entries: Vec<_> = sorted_entries.iter().rev().collect();
-                        let start = offset.min(entries.len());
-                        let end = (start + remaining).min(entries.len());
+                        let start = offset.min(sorted_entries.len());
+                        let end = (start + remaining).min(sorted_entries.len());
 
-                        for entry in &entries[start..end] {
-                            if request.withscores {
-                                result.push(format!("{}:{}", entry.member, entry.value));
-                            } else {
-                                result.push(entry.member.to_string());
-                            }
-                        }
+                        result.extend(
+                            sorted_entries
+                                .iter()
+                                .rev()
+                                .skip(start)
+                                .take(end - start)
+                                .map(|entry| {
+                                    if request.withscores {
+                                        format!("{}:{}", entry.member, entry.value)
+                                    } else {
+                                        entry.member.to_string()
+                                    }
+                                }),
+                        );
 
                         remaining -= end - start;
-                        offset = offset.saturating_sub(entries.len());
+                        offset = offset.saturating_sub(sorted_entries.len());
                     }
                 }
             }
@@ -556,6 +556,8 @@ impl RankedState {
 #[cfg(test)]
 mod tests {
     use std::{sync::Arc, thread, time::Duration};
+
+    use rand::Rng;
 
     use super::*;
 
@@ -952,7 +954,7 @@ mod tests {
     #[test]
     fn test_page_stress() {
         let state = Arc::new(RankedState::new("./page".to_string()));
-        let num_entries = 50_000_0;
+        let num_entries = 50_000_00;
         let num_threads = 8;
         let entries_per_thread = num_entries / num_threads;
 
@@ -995,18 +997,22 @@ mod tests {
         let page_count = current_page.get("test").unwrap_or(&0);
         println!("Total pages created: {}", page_count);
 
-        // 쿼리 테스트
-        let range_request = ZRangeRequest {
-            offset: 0,
-            count: 100,
-            withscores: true,
-        };
+        // 쿼리 테스트 - 랜덤 액세스
+        let mut rng = rand::thread_rng();
+        let mut total_query_duration = Duration::new(0, 0);
 
         // 100번 반복 테스트
-        let mut total_query_duration = Duration::new(0, 0);
-        for _ in 0..100 {
+        for _ in 0..10 {
+            // 0부터 5000만까지 랜덤 오프셋 생성
+            let random_offset = rng.gen_range(0..50_000_00);
+            let range_request = ZRangeRequest {
+                offset: random_offset,
+                count: 100,
+                withscores: true,
+            };
+
             let query_start = std::time::Instant::now();
-            let _result = state.zrevrange("test".to_string(), range_request.clone());
+            let _result = state.zrevrange("test".to_string(), range_request);
             total_query_duration += query_start.elapsed();
         }
 
