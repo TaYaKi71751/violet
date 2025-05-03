@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::{BTreeSet, BinaryHeap, HashMap};
-use std::sync::Mutex;
+use std::sync::{Mutex, RwLock};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -84,14 +84,14 @@ pub struct ZRangeRequest {
 
 #[allow(clippy::type_complexity)]
 pub struct RankedState {
-    tables: Mutex<HashMap<String, (HashMap<String, RankedEntry>, BTreeSet<RankedEntry>)>>,
+    tables: RwLock<HashMap<String, (HashMap<String, RankedEntry>, BTreeSet<RankedEntry>)>>,
     expire_queue: Mutex<BinaryHeap<ExpireEntry>>,
 }
 
 impl RankedState {
     pub fn new() -> Self {
         RankedState {
-            tables: Mutex::new(HashMap::new()),
+            tables: RwLock::new(HashMap::new()),
             expire_queue: Mutex::new(BinaryHeap::new()),
         }
     }
@@ -102,7 +102,7 @@ impl RankedState {
             .unwrap()
             .as_secs();
 
-        let mut tables = self.tables.lock().unwrap();
+        let mut tables = self.tables.write().unwrap();
         let mut expire_queue = self.expire_queue.lock().unwrap();
 
         while let Some(entry) = expire_queue.peek() {
@@ -135,7 +135,7 @@ impl RankedState {
     pub fn zadd(&self, table: String, request: ZAddRequest) -> String {
         self.process_expired_entries();
 
-        let mut tables = self.tables.lock().unwrap();
+        let mut tables = self.tables.write().unwrap();
         let (entries, sorted_entries) = tables
             .entry(table)
             .or_insert_with(|| (HashMap::new(), BTreeSet::new()));
@@ -161,7 +161,7 @@ impl RankedState {
     pub fn zincrby(&self, table: String, request: ZIncrByRequest) -> String {
         self.process_expired_entries();
 
-        let mut tables = self.tables.lock().unwrap();
+        let mut tables = self.tables.write().unwrap();
         let (entries, sorted_entries) = tables
             .entry(table)
             .or_insert_with(|| (HashMap::new(), BTreeSet::new()));
@@ -190,7 +190,7 @@ impl RankedState {
             .unwrap()
             .as_secs();
 
-        let mut tables = self.tables.lock().unwrap();
+        let mut tables = self.tables.write().unwrap();
         let mut expire_queue = self.expire_queue.lock().unwrap();
         let (entries, sorted_entries) = tables
             .entry(table.clone())
@@ -226,7 +226,7 @@ impl RankedState {
     pub fn zrange(&self, table: String, request: ZRangeRequest) -> String {
         self.process_expired_entries();
 
-        let tables = self.tables.lock().unwrap();
+        let tables = self.tables.read().unwrap();
         if let Some((_, sorted_entries)) = tables.get(&table) {
             let result: Vec<_> = sorted_entries
                 .iter()
@@ -250,7 +250,7 @@ impl RankedState {
     pub fn zrevrange(&self, table: String, request: ZRangeRequest) -> String {
         self.process_expired_entries();
 
-        let tables = self.tables.lock().unwrap();
+        let tables = self.tables.read().unwrap();
         if let Some((_, sorted_entries)) = tables.get(&table) {
             let result: Vec<_> = sorted_entries
                 .iter()
@@ -273,7 +273,7 @@ impl RankedState {
     }
 
     pub fn flushall(&self) -> String {
-        let mut tables = self.tables.lock().unwrap();
+        let mut tables = self.tables.write().unwrap();
         let mut expire_queue = self.expire_queue.lock().unwrap();
         tables.clear();
         expire_queue.clear();
@@ -749,7 +749,7 @@ mod tests {
         );
 
         // 메모리 사용량 확인
-        let tables = state.tables.lock().unwrap();
+        let tables = state.tables.read().unwrap();
         let (entries, _) = tables.get("test").unwrap();
         println!("Total entries in memory: {}", entries.len());
         println!(
