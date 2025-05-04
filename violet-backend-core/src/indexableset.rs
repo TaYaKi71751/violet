@@ -32,6 +32,7 @@ unsafe impl<T: Send + Ord + Clone + fmt::Debug> Send for IndexableSet<T> {}
 unsafe impl<T: Send + Ord + Clone + fmt::Debug> Sync for IndexableSet<T> {}
 
 impl<T: Ord + Clone + fmt::Debug> IndexableSet<T> {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             root: Some(Box::new(Node::new(true))),
@@ -108,13 +109,14 @@ impl<T: Ord + Clone + fmt::Debug> IndexableSet<T> {
         parent.children[i] = Some(y);
     }
 
+    #[allow(clippy::borrowed_box)]
     fn find_first_leaf(node: Option<&Box<Node<T>>>) -> Option<NonNull<Node<T>>> {
         let mut curr = node;
         while let Some(n) = curr {
             if n.leaf {
                 return Some(NonNull::from(&**n));
             }
-            curr = n.children.get(0)?.as_ref();
+            curr = n.children.first()?.as_ref();
         }
         None
     }

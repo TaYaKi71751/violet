@@ -161,11 +161,11 @@ impl RankedState {
 
         let member = Arc::new(request.member);
         let mut tables = self.tables.write().unwrap();
-        let sorted_entries = tables.entry(table).or_insert_with(BTreeSet::new);
+        let sorted_entries = tables.entry(table).or_default();
 
         let entry = RankedEntry {
             value: request.value,
-            member: member,
+            member,
             expire: None,
         };
 
@@ -179,19 +179,14 @@ impl RankedState {
 
         let member = Arc::new(request.member);
         let mut tables = self.tables.write().unwrap();
-        let sorted_entries = tables.entry(table).or_insert_with(BTreeSet::new);
+        let sorted_entries = tables.entry(table).or_default();
 
-        let mut entry = sorted_entries
-            .take(&RankedEntry {
-                value: 0,
-                member: member.clone(),
-                expire: None,
-            })
-            .unwrap_or_else(|| RankedEntry {
-                value: 0,
-                member: member,
-                expire: None,
-            });
+        let entry = RankedEntry {
+            value: 0,
+            member: member.clone(),
+            expire: None,
+        };
+        let mut entry = sorted_entries.take(&entry).unwrap_or(entry);
 
         entry.value += request.increment;
         sorted_entries.insert(entry);
@@ -212,19 +207,15 @@ impl RankedState {
 
         let mut tables = self.tables.write().unwrap();
         let mut expire_queue = self.expire_queue.lock().unwrap();
-        let sorted_entries = tables.entry(table).or_insert_with(BTreeSet::new);
+        let sorted_entries = tables.entry(table).or_default();
 
-        let mut entry = sorted_entries
-            .take(&RankedEntry {
-                value: 0,
-                member: member.clone(),
-                expire: None,
-            })
-            .unwrap_or_else(|| RankedEntry {
-                value: 0,
-                member: member.clone(),
-                expire: None,
-            });
+        let entry = RankedEntry {
+            value: 0,
+            member: member.clone(),
+            expire: None,
+        };
+
+        let mut entry = sorted_entries.take(&entry).unwrap_or(entry);
 
         entry.value += request.increment;
         entry.expire = Some(now + request.expire);
@@ -232,8 +223,8 @@ impl RankedState {
 
         expire_queue.push(ExpireEntry {
             expire_time: now + request.expire,
-            table_id: table_id,
-            member: member,
+            table_id,
+            member,
             value: request.increment,
         });
 
