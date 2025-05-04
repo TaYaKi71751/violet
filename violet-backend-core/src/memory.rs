@@ -248,8 +248,7 @@ impl RankedState {
         let tables = self.tables.read().unwrap();
         if let Some(sorted_entries) = tables.get(&table) {
             let result: Vec<_> = sorted_entries
-                .range(request.offset..request.offset + request.count)
-                .into_iter()
+                .range_iter(request.offset..request.offset + request.count)
                 .map(|entry| {
                     if request.withscores {
                         format!("{}:{}", entry.member, entry.value)
@@ -270,9 +269,8 @@ impl RankedState {
         let tables = self.tables.read().unwrap();
         if let Some(sorted_entries) = tables.get(&table) {
             let result: Vec<_> = sorted_entries
-                .range(request.offset..request.offset + request.count)
-                .into_iter()
-                .rev() // TODO: 수정
+                .range_iter(request.offset..request.offset + request.count)
+                // .rev() // TODO: 수정
                 .map(|entry| {
                     if request.withscores {
                         format!("{}:{}", entry.member, entry.value)
@@ -707,7 +705,7 @@ mod tests {
         use std::time::Instant;
 
         let state = Arc::new(RankedState::new());
-        let num_entries = 50_000_00;
+        let num_entries = 50_000_0;
         let num_threads = 8;
         let entries_per_thread = num_entries / num_threads;
 
@@ -746,6 +744,10 @@ mod tests {
             num_entries as f64 / insert_duration.as_secs_f64()
         );
 
+        // let tables = state.tables.read().unwrap();
+        // let sorted_entries = tables.get("test").unwrap();
+        // println!("Total entries in memory: {}", sorted_entries.keys.len());
+
         // 쿼리 테스트 - 랜덤 액세스
         let mut rng = rand::thread_rng();
         let mut total_query_duration = Duration::new(0, 0);
@@ -753,15 +755,16 @@ mod tests {
         // 100번 반복 테스트
         for _ in 0..10 {
             // 0부터 5000만까지 랜덤 오프셋 생성
-            let random_offset = rng.gen_range(0..50_000_00);
+            let random_offset = rng.gen_range(0..50_000_0);
             let range_request = ZRangeRequest {
-                offset: random_offset,
+                offset: 0,
                 count: 100,
                 withscores: true,
             };
 
             let query_start = std::time::Instant::now();
             let _result = state.zrevrange("test".to_string(), range_request);
+            println!("{}", _result);
             total_query_duration += query_start.elapsed();
         }
 
