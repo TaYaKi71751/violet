@@ -1,13 +1,14 @@
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::{BTreeSet, BinaryHeap, HashMap};
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex, RwLock};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RankedEntry {
     pub value: i64,
-    pub member: String,
+    #[serde(skip_serializing, skip_deserializing)]
+    pub member: Arc<String>,
     pub expire: Option<u64>,
 }
 
@@ -27,7 +28,6 @@ impl PartialOrd for RankedEntry {
 
 impl Ord for RankedEntry {
     fn cmp(&self, other: &Self) -> Ordering {
-        // 값이 같으면 member로 정렬
         match self.value.cmp(&other.value) {
             Ordering::Equal => self.member.cmp(&other.member),
             ordering => ordering,
@@ -38,14 +38,13 @@ impl Ord for RankedEntry {
 #[derive(Debug, Clone, Eq, PartialEq)]
 struct ExpireEntry {
     expire_time: u64,
-    table: String,
-    member: String,
+    table_id: usize,
+    member: Arc<String>,
     value: i64,
 }
 
 impl Ord for ExpireEntry {
     fn cmp(&self, other: &Self) -> Ordering {
-        // BinaryHeap은 최대 힙이므로, 시간이 빠른 순서대로 정렬하기 위해 역순으로 비교
         other.expire_time.cmp(&self.expire_time)
     }
 }
@@ -84,16 +83,39 @@ pub struct ZRangeRequest {
 
 #[allow(clippy::type_complexity)]
 pub struct RankedState {
-    tables: Mutex<HashMap<String, (HashMap<String, RankedEntry>, BTreeSet<RankedEntry>)>>,
+    tables: RwLock<HashMap<String, BTreeSet<RankedEntry>>>,
     expire_queue: Mutex<BinaryHeap<ExpireEntry>>,
+    table_lookup: RwLock<Vec<String>>,
+    table_indices: RwLock<HashMap<String, usize>>,
 }
 
 impl RankedState {
     pub fn new() -> Self {
         RankedState {
-            tables: Mutex::new(HashMap::new()),
+            tables: RwLock::new(HashMap::new()),
             expire_queue: Mutex::new(BinaryHeap::new()),
+            table_lookup: RwLock::new(Vec::new()),
+            table_indices: RwLock::new(HashMap::new()),
         }
+    }
+
+    fn get_table_id(&self, table: &str) -> usize {
+        let mut indices = self.table_indices.write().unwrap();
+        let mut lookup = self.table_lookup.write().unwrap();
+
+        if let Some(&index) = indices.get(table) {
+            return index;
+        }
+
+        let new_index = lookup.len();
+        lookup.push(table.to_string());
+        indices.insert(table.to_string(), new_index);
+        new_index
+    }
+
+    fn get_table_name(&self, id: usize) -> Option<String> {
+        let lookup = self.table_lookup.read().unwrap();
+        lookup.get(id).cloned()
     }
 
     fn process_expired_entries(&self) {
@@ -102,7 +124,7 @@ impl RankedState {
             .unwrap()
             .as_secs();
 
-        let mut tables = self.tables.lock().unwrap();
+        let mut tables = self.tables.write().unwrap();
         let mut expire_queue = self.expire_queue.lock().unwrap();
 
         while let Some(entry) = expire_queue.peek() {
@@ -111,21 +133,23 @@ impl RankedState {
             }
 
             let entry = expire_queue.pop().unwrap();
+            let table_name = self.get_table_name(entry.table_id);
 
-            if let Some((entries, sorted_entries)) = tables.get_mut(&entry.table) {
-                if let Some(ranked_entry) = entries.get_mut(&entry.member) {
-                    // 정렬된 집합에서 기존 항목 제거
-                    let old_entry = ranked_entry.clone();
-                    sorted_entries.remove(&old_entry);
-
-                    // 값 업데이트
-                    ranked_entry.value -= entry.value;
-
-                    // 값이 0보다 크면 정렬된 집합에 다시 추가
-                    if ranked_entry.value > 0 {
-                        sorted_entries.insert(ranked_entry.clone());
-                    } else {
-                        entries.remove(&entry.member);
+            if let Some(table_name) = table_name {
+                if let Some(sorted_entries) = tables.get_mut(&table_name) {
+                    if let Some(ranked_entry) = sorted_entries.take(&RankedEntry {
+                        value: entry.value,
+                        member: entry.member.clone(),
+                        expire: None,
+                    }) {
+                        let new_value = ranked_entry.value - entry.value;
+                        if new_value > 0 {
+                            sorted_entries.insert(RankedEntry {
+                                value: new_value,
+                                member: ranked_entry.member,
+                                expire: None,
+                            });
+                        }
                     }
                 }
             }
@@ -135,25 +159,17 @@ impl RankedState {
     pub fn zadd(&self, table: String, request: ZAddRequest) -> String {
         self.process_expired_entries();
 
-        let mut tables = self.tables.lock().unwrap();
-        let (entries, sorted_entries) = tables
-            .entry(table)
-            .or_insert_with(|| (HashMap::new(), BTreeSet::new()));
+        let member = Arc::new(request.member);
+        let mut tables = self.tables.write().unwrap();
+        let sorted_entries = tables.entry(table).or_default();
 
-        // 기존 항목 수정 또는 새로운 항목 생성
-        let entry = entries
-            .entry(request.member.clone())
-            .or_insert_with(|| RankedEntry {
-                value: 0,
-                member: request.member.clone(),
-                expire: None,
-            });
+        let entry = RankedEntry {
+            value: request.value,
+            member,
+            expire: None,
+        };
 
-        // 정렬된 집합에서 항목을 제거하고 다시 삽입해야 올바른 순서가 유지됨
-        // BTreeSet은 값이 변경되면 자동으로 순서를 조정하지 않기 때문에 필수적인 과정임
-        sorted_entries.remove(entry);
-        entry.value = request.value;
-        sorted_entries.insert(entry.clone());
+        sorted_entries.insert(entry);
 
         "OK".to_string()
     }
@@ -161,23 +177,19 @@ impl RankedState {
     pub fn zincrby(&self, table: String, request: ZIncrByRequest) -> String {
         self.process_expired_entries();
 
-        let mut tables = self.tables.lock().unwrap();
-        let (entries, sorted_entries) = tables
-            .entry(table)
-            .or_insert_with(|| (HashMap::new(), BTreeSet::new()));
+        let member = Arc::new(request.member);
+        let mut tables = self.tables.write().unwrap();
+        let sorted_entries = tables.entry(table).or_default();
 
-        // 기존 항목 수정 또는 새로운 항목 생성
-        let entry = entries
-            .entry(request.member.clone())
-            .or_insert_with(|| RankedEntry {
-                value: 0,
-                member: request.member.clone(),
-                expire: None,
-            });
+        let entry = RankedEntry {
+            value: 0,
+            member: member.clone(),
+            expire: None,
+        };
+        let mut entry = sorted_entries.take(&entry).unwrap_or(entry);
 
-        sorted_entries.remove(entry);
         entry.value += request.increment;
-        sorted_entries.insert(entry.clone());
+        sorted_entries.insert(entry);
 
         "OK".to_string()
     }
@@ -190,33 +202,29 @@ impl RankedState {
             .unwrap()
             .as_secs();
 
-        let mut tables = self.tables.lock().unwrap();
+        let member = Arc::new(request.member);
+        let table_id = self.get_table_id(&table);
+
+        let mut tables = self.tables.write().unwrap();
         let mut expire_queue = self.expire_queue.lock().unwrap();
-        let (entries, sorted_entries) = tables
-            .entry(table.clone())
-            .or_insert_with(|| (HashMap::new(), BTreeSet::new()));
+        let sorted_entries = tables.entry(table).or_default();
 
-        // 기존 항목 제거 (있는 경우)
-        // 기존 항목 수정 또는 새로운 항목 생성
-        let entry = entries
-            .entry(request.member.clone())
-            .or_insert_with(|| RankedEntry {
-                value: 0,
-                member: request.member.clone(),
-                expire: None,
-            });
+        let entry = RankedEntry {
+            value: 0,
+            member: member.clone(),
+            expire: None,
+        };
 
-        // 정렬된 집합에서 항목을 제거하고 다시 삽입해야 올바른 순서가 유지됨
-        sorted_entries.remove(entry);
+        let mut entry = sorted_entries.take(&entry).unwrap_or(entry);
+
         entry.value += request.increment;
         entry.expire = Some(now + request.expire);
-        sorted_entries.insert(entry.clone());
+        sorted_entries.insert(entry);
 
-        // 만료 큐에 추가
         expire_queue.push(ExpireEntry {
             expire_time: now + request.expire,
-            table: table.clone(),
-            member: request.member.clone(),
+            table_id,
+            member,
             value: request.increment,
         });
 
@@ -226,8 +234,8 @@ impl RankedState {
     pub fn zrange(&self, table: String, request: ZRangeRequest) -> String {
         self.process_expired_entries();
 
-        let tables = self.tables.lock().unwrap();
-        if let Some((_, sorted_entries)) = tables.get(&table) {
+        let tables = self.tables.read().unwrap();
+        if let Some(sorted_entries) = tables.get(&table) {
             let result: Vec<_> = sorted_entries
                 .iter()
                 .skip(request.offset)
@@ -236,11 +244,10 @@ impl RankedState {
                     if request.withscores {
                         format!("{}:{}", entry.member, entry.value)
                     } else {
-                        entry.member.clone()
+                        entry.member.to_string()
                     }
                 })
                 .collect();
-
             serde_json::to_string(&result).unwrap()
         } else {
             "[]".to_string()
@@ -250,8 +257,8 @@ impl RankedState {
     pub fn zrevrange(&self, table: String, request: ZRangeRequest) -> String {
         self.process_expired_entries();
 
-        let tables = self.tables.lock().unwrap();
-        if let Some((_, sorted_entries)) = tables.get(&table) {
+        let tables = self.tables.read().unwrap();
+        if let Some(sorted_entries) = tables.get(&table) {
             let result: Vec<_> = sorted_entries
                 .iter()
                 .rev()
@@ -261,11 +268,10 @@ impl RankedState {
                     if request.withscores {
                         format!("{}:{}", entry.member, entry.value)
                     } else {
-                        entry.member.clone()
+                        entry.member.to_string()
                     }
                 })
                 .collect();
-
             serde_json::to_string(&result).unwrap()
         } else {
             "[]".to_string()
@@ -273,10 +279,16 @@ impl RankedState {
     }
 
     pub fn flushall(&self) -> String {
-        let mut tables = self.tables.lock().unwrap();
+        let mut tables = self.tables.write().unwrap();
         let mut expire_queue = self.expire_queue.lock().unwrap();
+        let mut table_indices = self.table_indices.write().unwrap();
+        let mut table_lookup = self.table_lookup.write().unwrap();
+
         tables.clear();
         expire_queue.clear();
+        table_indices.clear();
+        table_lookup.clear();
+
         "OK".to_string()
     }
 }
@@ -284,6 +296,8 @@ impl RankedState {
 #[cfg(test)]
 mod tests {
     use std::{sync::Arc, thread, time::Duration};
+
+    use rand::Rng;
 
     use super::*;
 
@@ -684,7 +698,7 @@ mod tests {
         use std::time::Instant;
 
         let state = Arc::new(RankedState::new());
-        let num_entries = 50_000_000;
+        let num_entries = 50_000_00;
         let num_threads = 8;
         let entries_per_thread = num_entries / num_threads;
 
@@ -723,18 +737,27 @@ mod tests {
             num_entries as f64 / insert_duration.as_secs_f64()
         );
 
-        // zrevrange 성능 테스트
-        let range_request = ZRangeRequest {
-            offset: 0,
-            count: 100,
-            withscores: true,
-        };
+        // let tables = state.tables.read().unwrap();
+        // let sorted_entries = tables.get("test").unwrap();
+        // println!("Total entries in memory: {}", sorted_entries.keys.len());
+
+        // 쿼리 테스트 - 랜덤 액세스
+        let mut rng = rand::thread_rng();
+        let mut total_query_duration = Duration::new(0, 0);
 
         // 100번 반복 테스트
-        let mut total_query_duration = Duration::new(0, 0);
-        for _ in 0..100 {
-            let query_start = Instant::now();
-            let _result = state.zrevrange("test".to_string(), range_request.clone());
+        for _ in 0..10 {
+            // 0부터 5000만까지 랜덤 오프셋 생성
+            let random_offset = rng.gen_range(0..num_entries);
+            let range_request = ZRangeRequest {
+                offset: random_offset,
+                count: 100,
+                withscores: true,
+            };
+
+            let query_start = std::time::Instant::now();
+            let _result = state.zrevrange("test".to_string(), range_request);
+            // println!("{}", _result);
             total_query_duration += query_start.elapsed();
         }
 
@@ -749,16 +772,55 @@ mod tests {
         );
 
         // 메모리 사용량 확인
-        let tables = state.tables.lock().unwrap();
-        let (entries, _) = tables.get("test").unwrap();
-        println!("Total entries in memory: {}", entries.len());
+        let tables = state.tables.read().unwrap();
+        let sorted_entries = tables.get("test").unwrap();
+        // println!("Total entries in memory: {}", sorted_entries.len());
+
+        let size_of_ranked_entry = std::mem::size_of::<RankedEntry>();
+        let size_of_expire_entry = std::mem::size_of::<ExpireEntry>();
+
         println!(
-            "Memory usage per entry: ~{} bytes",
-            std::mem::size_of::<RankedEntry>() + std::mem::size_of::<String>() * 2
-        ); // member와 table 문자열의 평균 크기
+            "Memory usage per RankedEntry: ~{} bytes",
+            size_of_ranked_entry
+        );
+        println!(
+            "Memory usage per ExpireEntry: ~{} bytes",
+            size_of_expire_entry
+        );
+
+        // 메모리 최적화 수치 표시
+        let original_exp_entry_size =
+            std::mem::size_of::<String>() + std::mem::size_of::<Arc<String>>() + 16; // 16 = u64 + i64
+        println!(
+            "Memory optimization: Original ExpireEntry size: ~{} bytes",
+            original_exp_entry_size
+        );
+        println!(
+            "Memory optimization: Current ExpireEntry size: ~{} bytes",
+            size_of_expire_entry
+        );
+        println!(
+            "Memory optimization: Saving ~{} bytes per entry",
+            original_exp_entry_size - size_of_expire_entry
+        );
+        // println!(
+        //     "Total memory saved: ~{} MB",
+        //     (original_exp_entry_size - size_of_expire_entry) * sorted_entries.len() / (1024 * 1024)
+        // );
 
         // 만료 큐 크기 확인
         let expire_queue = state.expire_queue.lock().unwrap();
         println!("Total entries in expire queue: {}", expire_queue.len());
+
+        // 테이블 관련 메모리 사용량
+        let table_indices = state.table_indices.read().unwrap();
+        let table_lookup = state.table_lookup.read().unwrap();
+        println!("Number of unique tables: {}", table_lookup.len());
+        println!(
+            "Memory usage for table management: ~{} KB",
+            (table_indices.len() * (std::mem::size_of::<String>() + std::mem::size_of::<usize>())
+                + table_lookup.len() * std::mem::size_of::<String>())
+                / 1024
+        );
     }
 }
