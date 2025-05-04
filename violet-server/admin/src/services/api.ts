@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000/api/v2';
 
 const api = axios.create({
     baseURL: API_URL,
@@ -21,6 +21,11 @@ export const getComments = async () => {
 
 export const getStats = async () => {
     const response = await api.get('/stats');
+    return response.data;
+};
+
+export const getSettings = async () => {
+    const response = await api.get('/settings');
     return response.data;
 };
 

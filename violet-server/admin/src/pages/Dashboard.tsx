@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Grid, Paper, Typography, Box } from '@mui/material';
 import { Line } from 'react-chartjs-2';
 import {
@@ -11,6 +11,7 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js';
+import { getStats } from '../services/api';
 
 ChartJS.register(
     CategoryScale,
@@ -22,13 +23,52 @@ ChartJS.register(
     Legend
 );
 
+interface Stats {
+    totalUsers: number;
+    totalComments: number;
+    userGrowth: {
+        labels: string[];
+        data: number[];
+    };
+    commentGrowth: {
+        labels: string[];
+        data: number[];
+    };
+}
+
 const Dashboard: React.FC = () => {
+    const [stats, setStats] = useState<Stats | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const data = await getStats();
+                setStats(data);
+            } catch (error) {
+                console.error('통계 데이터를 가져오는데 실패했습니다:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchStats();
+    }, []);
+
+    if (loading) {
+        return <Typography>로딩 중...</Typography>;
+    }
+
+    if (!stats) {
+        return <Typography>데이터를 불러오는데 실패했습니다.</Typography>;
+    }
+
     const userData = {
-        labels: ['1월', '2월', '3월', '4월', '5월', '6월'],
+        labels: stats.userGrowth.labels,
         datasets: [
             {
                 label: '신규 사용자',
-                data: [65, 59, 80, 81, 56, 55],
+                data: stats.userGrowth.data,
                 borderColor: 'rgb(75, 192, 192)',
                 tension: 0.1,
             },
@@ -36,11 +76,11 @@ const Dashboard: React.FC = () => {
     };
 
     const commentData = {
-        labels: ['1월', '2월', '3월', '4월', '5월', '6월'],
+        labels: stats.commentGrowth.labels,
         datasets: [
             {
                 label: '댓글 수',
-                data: [12, 19, 3, 5, 2, 3],
+                data: stats.commentGrowth.data,
                 borderColor: 'rgb(255, 99, 132)',
                 tension: 0.1,
             },
@@ -79,28 +119,20 @@ const Dashboard: React.FC = () => {
                         <Line options={options} data={commentData} />
                     </Paper>
                 </Grid>
-                <Grid component="div" sx={{ width: { xs: '100%', md: '33.33%' } }}>
+                <Grid component="div" sx={{ width: { xs: '100%', md: '50%' } }}>
                     <Paper sx={{ p: 2 }}>
                         <Typography variant="h6" gutterBottom>
                             총 사용자 수
                         </Typography>
-                        <Typography variant="h4">1,234</Typography>
+                        <Typography variant="h4">{stats.totalUsers.toLocaleString()}</Typography>
                     </Paper>
                 </Grid>
-                <Grid component="div" sx={{ width: { xs: '100%', md: '33.33%' } }}>
+                <Grid component="div" sx={{ width: { xs: '100%', md: '50%' } }}>
                     <Paper sx={{ p: 2 }}>
                         <Typography variant="h6" gutterBottom>
                             총 댓글 수
                         </Typography>
-                        <Typography variant="h4">5,678</Typography>
-                    </Paper>
-                </Grid>
-                <Grid component="div" sx={{ width: { xs: '100%', md: '33.33%' } }}>
-                    <Paper sx={{ p: 2 }}>
-                        <Typography variant="h6" gutterBottom>
-                            활성 사용자
-                        </Typography>
-                        <Typography variant="h4">890</Typography>
+                        <Typography variant="h4">{stats.totalComments.toLocaleString()}</Typography>
                     </Paper>
                 </Grid>
             </Grid>

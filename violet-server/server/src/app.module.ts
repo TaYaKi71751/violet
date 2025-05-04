@@ -14,6 +14,7 @@ import { RedisModule } from './redis/redis.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import * as Joi from 'joi';
 import { AWSModule } from './aws/aws.module';
+import { StatsModule } from './stats/stats.module';
 
 export const envValidationSchema = Joi.object({
   NODE_ENV: Joi.string().valid('dev', 'prod', 'test').required(),
@@ -68,6 +69,7 @@ export const envValidationSchema = Joi.object({
     ViewModule,
     RedisModule,
     AWSModule,
+    StatsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
