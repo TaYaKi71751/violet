@@ -1,10 +1,8 @@
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
-use std::collections::{BinaryHeap, HashMap};
+use std::collections::{BTreeSet, BinaryHeap, HashMap};
 use std::sync::{Arc, Mutex, RwLock};
 use std::time::{SystemTime, UNIX_EPOCH};
-
-use crate::indexableset::IndexableSet;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RankedEntry {
@@ -85,7 +83,7 @@ pub struct ZRangeRequest {
 
 #[allow(clippy::type_complexity)]
 pub struct RankedState {
-    tables: RwLock<HashMap<String, IndexableSet<RankedEntry>>>,
+    tables: RwLock<HashMap<String, BTreeSet<RankedEntry>>>,
     expire_queue: Mutex<BinaryHeap<ExpireEntry>>,
     table_lookup: RwLock<Vec<String>>,
     table_indices: RwLock<HashMap<String, usize>>,
@@ -163,7 +161,7 @@ impl RankedState {
 
         let member = Arc::new(request.member);
         let mut tables = self.tables.write().unwrap();
-        let sorted_entries = tables.entry(table).or_insert_with(IndexableSet::new);
+        let sorted_entries = tables.entry(table).or_insert_with(BTreeSet::new);
 
         let entry = RankedEntry {
             value: request.value,
@@ -181,7 +179,7 @@ impl RankedState {
 
         let member = Arc::new(request.member);
         let mut tables = self.tables.write().unwrap();
-        let sorted_entries = tables.entry(table).or_insert_with(IndexableSet::new);
+        let sorted_entries = tables.entry(table).or_insert_with(BTreeSet::new);
 
         let mut entry = sorted_entries
             .take(&RankedEntry {
@@ -214,7 +212,7 @@ impl RankedState {
 
         let mut tables = self.tables.write().unwrap();
         let mut expire_queue = self.expire_queue.lock().unwrap();
-        let sorted_entries = tables.entry(table).or_insert_with(IndexableSet::new);
+        let sorted_entries = tables.entry(table).or_insert_with(BTreeSet::new);
 
         let mut entry = sorted_entries
             .take(&RankedEntry {
@@ -248,7 +246,9 @@ impl RankedState {
         let tables = self.tables.read().unwrap();
         if let Some(sorted_entries) = tables.get(&table) {
             let result: Vec<_> = sorted_entries
-                .range_iter(request.offset..request.offset + request.count)
+                .iter()
+                .skip(request.offset)
+                .take(request.count)
                 .map(|entry| {
                     if request.withscores {
                         format!("{}:{}", entry.member, entry.value)
@@ -269,8 +269,10 @@ impl RankedState {
         let tables = self.tables.read().unwrap();
         if let Some(sorted_entries) = tables.get(&table) {
             let result: Vec<_> = sorted_entries
-                .range_iter(request.offset..request.offset + request.count)
-                // .rev() // TODO: 수정
+                .iter()
+                .rev()
+                .skip(request.offset)
+                .take(request.count)
                 .map(|entry| {
                     if request.withscores {
                         format!("{}:{}", entry.member, entry.value)

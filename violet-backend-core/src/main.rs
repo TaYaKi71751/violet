@@ -3,7 +3,7 @@ use rocket::State;
 
 use memory::{RankedState, ZAddRequest, ZIncrByPeriodRequest, ZIncrByRequest, ZRangeRequest};
 
-mod indexableset;
+pub mod indexableset;
 mod memory;
 
 #[macro_use]
