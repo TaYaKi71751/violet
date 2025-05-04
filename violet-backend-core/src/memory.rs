@@ -705,7 +705,7 @@ mod tests {
         use std::time::Instant;
 
         let state = Arc::new(RankedState::new());
-        let num_entries = 50_000_0;
+        let num_entries = 50_000_00;
         let num_threads = 8;
         let entries_per_thread = num_entries / num_threads;
 
@@ -755,16 +755,16 @@ mod tests {
         // 100번 반복 테스트
         for _ in 0..10 {
             // 0부터 5000만까지 랜덤 오프셋 생성
-            let random_offset = rng.gen_range(0..50_000_0);
+            let random_offset = rng.gen_range(0..num_entries);
             let range_request = ZRangeRequest {
-                offset: 0,
+                offset: random_offset,
                 count: 100,
                 withscores: true,
             };
 
             let query_start = std::time::Instant::now();
             let _result = state.zrevrange("test".to_string(), range_request);
-            println!("{}", _result);
+            // println!("{}", _result);
             total_query_duration += query_start.elapsed();
         }
 

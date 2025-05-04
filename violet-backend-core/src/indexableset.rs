@@ -1,7 +1,7 @@
 use core::fmt;
-use std::{cmp::Ordering, marker::PhantomData, ops::Range, ptr::NonNull};
+use std::{marker::PhantomData, ops::Range, ptr::NonNull};
 
-const MIN_DEGREE: usize = 4;
+const MIN_DEGREE: usize = 40;
 
 #[derive(Debug, Clone)]
 struct Node<T: Clone + fmt::Debug> {
@@ -63,16 +63,16 @@ impl<T: Ord + Clone + fmt::Debug> IndexableSet<T> {
                 Err(i) => node.keys.insert(i, val),
             }
         } else {
-            let i = match node.keys.binary_search(&val) {
+            let mut i = match node.keys.binary_search(&val) {
                 Ok(i) => i + 1,
                 Err(i) => i,
             };
+
             let child = node.children[i].as_mut().unwrap();
             if child.keys.len() == 2 * MIN_DEGREE - 1 {
                 self.split_child(node, i);
                 if val > node.keys[i] {
-                    self.insert_non_full(node.children[i + 1].as_mut().unwrap(), val);
-                    return;
+                    i += 1;
                 }
             }
             self.insert_non_full(node.children[i].as_mut().unwrap(), val);
@@ -82,26 +82,28 @@ impl<T: Ord + Clone + fmt::Debug> IndexableSet<T> {
     fn split_child(&mut self, parent: &mut Box<Node<T>>, i: usize) {
         let mut y = parent.children[i].take().unwrap();
         let mut z = Box::new(Node::new(y.leaf));
-
         let mid = MIN_DEGREE;
 
-        // B+Tree에서는 key는 leaf에도 남겨둠
-        z.keys.extend_from_slice(&y.keys[mid..]);
-        y.keys.truncate(mid);
+        // 키 분할
+        z.keys.extend(y.keys.drain(mid..));
 
         if y.leaf {
-            // z는 y 다음 leaf가 된다
+            // ✅ leaf chaining 유지
             z.next = y.next;
             let z_ptr = NonNull::from(&*z);
             y.next = Some(z_ptr);
+
+            // ✅ B+Tree에서는 leaf split 시 promote하지 않고 key만 복사
+            let separator = z.keys[0].clone();
+            parent.keys.insert(i, separator);
         } else {
-            // 내부 노드의 경우 children 도 잘라줘야 함
+            // ✅ internal node는 key를 하나 promote (중간 key)
+            let promoted = y.keys.pop().unwrap(); // mid번째 key
             z.children.extend(y.children.drain(mid..));
+
+            parent.keys.insert(i, promoted);
         }
 
-        // B+Tree에서는 오른쪽 child의 첫 키를 promote
-        let promoted = z.keys[0].clone();
-        parent.keys.insert(i, promoted);
         parent.children.insert(i + 1, Some(z));
         parent.children[i] = Some(y);
     }
@@ -288,20 +290,72 @@ mod tests {
     }
 
     #[test]
+    fn test_insert_path_debug() {
+        let mut set = IndexableSet::new();
+
+        // 일부러 split 유도하는 값들 삽입
+        for &v in &[10, 20, 30, 40, 50, 60, 70, 49] {
+            println!("Inserting: {}", v);
+            print_leaf_chain_via_tree(&set.root);
+            set.insert(v);
+        }
+
+        // 트리 구조 출력
+        fn print_tree<T: std::fmt::Debug + Clone>(node: &Option<Box<Node<T>>>, depth: usize) {
+            if let Some(n) = node {
+                let indent = "  ".repeat(depth);
+                println!("{}Node (leaf={}): keys = {:?}", indent, n.leaf, n.keys);
+                if !n.leaf {
+                    for (i, c) in n.children.iter().enumerate() {
+                        println!("{}  child[{}]:", indent, i);
+                        print_tree(c, depth + 2);
+                    }
+                } else if let Some(next) = n.next {
+                    let next_node = unsafe { next.as_ref() };
+                    println!("{}  → next: keys = {:?}", indent, next_node.keys);
+                }
+            }
+        }
+
+        println!("===== Tree Structure =====");
+        print_tree(&set.root, 0);
+
+        // leaf chain도 직접 확인
+        println!("===== Leaf chain via next pointers =====");
+        let mut ptr = set.first_leaf;
+        while let Some(p) = ptr {
+            unsafe {
+                let node = p.as_ref();
+                println!("Leaf @{:p}: keys = {:?}", node as *const _, node.keys);
+                ptr = node.next;
+            }
+        }
+
+        // range_iter 결과 비교
+        let collected: Vec<_> = set.range_iter(0..8).copied().collect();
+        println!("Collected range_iter(0..8): {:?}", collected);
+    }
+
+    #[test]
     fn test_large_insert_and_range_iter_order() {
         use rand::{seq::SliceRandom, thread_rng};
         let mut set = IndexableSet::new();
-        let mut data: Vec<u32> = (0..1_00).collect();
+        let max = 10_000_000usize;
+        let mut data: Vec<usize> = (0..max).collect();
         data.shuffle(&mut thread_rng());
 
         for &val in &data {
-            println!("val: {}", val);
             set.insert(val);
         }
 
+        if max < 1000 {
+            println!("== Leaf chain traversal via tree ==");
+            print_leaf_chain_via_tree(&set.root);
+        }
+
         // 결과가 정렬되어 있어야 한다
-        let collected: Vec<_> = set.range_iter(0..1_00).copied().collect();
-        assert_eq!(collected, (0..1_00).collect::<Vec<_>>());
+        let collected: Vec<_> = set.range_iter(0..max).copied().collect();
+        assert_eq!(collected, (0..max).collect::<Vec<_>>());
     }
 
     #[test]
@@ -310,7 +364,7 @@ mod tests {
         set.insert(10);
         set.insert(10);
         let collected: Vec<_> = set.range_iter(0..2).copied().collect();
-        assert_eq!(collected, vec![10, 10]);
+        assert_eq!(collected, vec![10]);
     }
 
     #[test]
