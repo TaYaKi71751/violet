@@ -13,7 +13,7 @@ import { User } from './entity/user.entity';
 @ApiTags('user')
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Get()
   @ApiOperation({ summary: 'Get current user information' })
@@ -21,6 +21,14 @@ export class UserController {
   @UseGuards(AccessTokenGuard)
   getCurrentUser(@CurrentUser() currentUser: User): User {
     return plainToClass(User, currentUser);
+  }
+
+  @Get('list')
+  @ApiOperation({ summary: 'Get all users' })
+  @ApiCreatedResponse({ description: 'List of users', type: [User] })
+  // @UseGuards(AccessTokenGuard)
+  async getAllUsers(): Promise<User[]> {
+    return await this.userService.getAllUsers();
   }
 
   @Post('/')

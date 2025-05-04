@@ -1,41 +1,104 @@
-import React from 'react';
-import { Box, Paper, Typography } from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import React, { useEffect, useState } from 'react';
+import { getUsers, updateUserStatus, deleteUser } from '../services/api';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, IconButton, Select, MenuItem, FormControl, Box } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
-const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID', width: 90 },
-    { field: 'username', headerName: '사용자명', width: 150 },
-    { field: 'email', headerName: '이메일', width: 200 },
-    { field: 'role', headerName: '역할', width: 130 },
-    { field: 'status', headerName: '상태', width: 130 },
-    { field: 'createdAt', headerName: '가입일', width: 180 },
-];
-
-const rows = [
-    { id: 1, username: 'user1', email: 'user1@example.com', role: '일반', status: '활성', createdAt: '2024-01-01' },
-    { id: 2, username: 'user2', email: 'user2@example.com', role: '관리자', status: '활성', createdAt: '2024-01-02' },
-    { id: 3, username: 'user3', email: 'user3@example.com', role: '일반', status: '비활성', createdAt: '2024-01-03' },
-];
+interface User {
+    userAppId: string;
+    createdAt: string;
+    updatedAt: string;
+    status: string;
+}
 
 const Users: React.FC = () => {
+    const [users, setUsers] = useState<User[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const data = await getUsers();
+                setUsers(data);
+                setLoading(false);
+            } catch (err) {
+                setError('사용자 목록을 불러오는데 실패했습니다.');
+                setLoading(false);
+            }
+        };
+
+        fetchUsers();
+    }, []);
+
+    const handleStatusChange = async (userAppId: string, newStatus: string) => {
+        try {
+            await updateUserStatus(userAppId, newStatus);
+            setUsers(users.map(user =>
+                user.userAppId === userAppId ? { ...user, status: newStatus } : user
+            ));
+        } catch (err) {
+            setError('사용자 상태 변경에 실패했습니다.');
+        }
+    };
+
+    const handleDelete = async (userAppId: string) => {
+        if (window.confirm('정말로 이 사용자를 삭제하시겠습니까?')) {
+            try {
+                await deleteUser(userAppId);
+                setUsers(users.filter(user => user.userAppId !== userAppId));
+            } catch (err) {
+                setError('사용자 삭제에 실패했습니다.');
+            }
+        }
+    };
+
+    if (loading) return <Typography>로딩 중...</Typography>;
+    if (error) return <Typography color="error">{error}</Typography>;
+
     return (
-        <Box>
+        <Box sx={{ p: 3 }}>
             <Typography variant="h4" gutterBottom>
                 사용자 관리
             </Typography>
-            <Paper sx={{ height: 400, width: '100%' }}>
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    initialState={{
-                        pagination: {
-                            paginationModel: { page: 0, pageSize: 5 },
-                        },
-                    }}
-                    pageSizeOptions={[5, 10]}
-                    checkboxSelection
-                />
-            </Paper>
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>사용자 ID</TableCell>
+                            <TableCell>상태</TableCell>
+                            <TableCell>가입일</TableCell>
+                            <TableCell>마지막 수정일</TableCell>
+                            <TableCell>관리</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {users.map((user) => (
+                            <TableRow key={user.userAppId}>
+                                <TableCell>{user.userAppId}</TableCell>
+                                <TableCell>
+                                    <FormControl size="small">
+                                        <Select
+                                            value={user.status || 'active'}
+                                            onChange={(e) => handleStatusChange(user.userAppId, e.target.value)}
+                                        >
+                                            <MenuItem value="active">활성</MenuItem>
+                                            <MenuItem value="inactive">비활성</MenuItem>
+                                            <MenuItem value="banned">차단</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </TableCell>
+                                <TableCell>{new Date(user.createdAt).toLocaleString()}</TableCell>
+                                <TableCell>{new Date(user.updatedAt).toLocaleString()}</TableCell>
+                                <TableCell>
+                                    <IconButton onClick={() => handleDelete(user.userAppId)} color="error">
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
         </Box>
     );
 };

@@ -8,10 +8,29 @@ import { UserRepository } from './user.repository';
 import { UserRegisterDTO } from './dtos/user-register.dto';
 import { ListDiscordUserAppIdsResponseDto } from './dtos/list-discord.dto';
 import { CommonResponseDto } from 'src/common/dtos/common.dto';
+import { User } from './entity/user.entity';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(private readonly userRepository: UserRepository) { }
+
+  async getAllUsers(): Promise<User[]> {
+    try {
+      return await this.userRepository.find({
+        select: {
+          userAppId: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+        order: {
+          createdAt: 'DESC',
+        },
+      });
+    } catch (e) {
+      Logger.error(e);
+      throw e;
+    }
+  }
 
   async registerUser(dto: UserRegisterDTO): Promise<CommonResponseDto> {
     try {

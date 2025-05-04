@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Query,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -20,7 +21,7 @@ import { CommonResponseDto } from 'src/common/dtos/common.dto';
 @ApiTags('comment')
 @Controller('comment')
 export class CommentController {
-  constructor(private readonly commentService: CommentService) {}
+  constructor(private readonly commentService: CommentService) { }
 
   @Get('/')
   @UsePipes(new ValidationPipe({ transform: true }))
@@ -29,9 +30,9 @@ export class CommentController {
     type: CommentGetResponseDto,
   })
   @ApiOperation({ summary: 'Get Comment' })
-  @UseGuards(HmacAuthGuard)
-  @UseGuards(AccessTokenGuard)
-  async getComment(@Body() dto: CommentGetDto): Promise<CommentGetResponseDto> {
+  // @UseGuards(HmacAuthGuard)
+  // @UseGuards(AccessTokenGuard)
+  async getComment(@Query() dto: CommentGetDto): Promise<CommentGetResponseDto> {
     return await this.commentService.getComment(dto);
   }
 

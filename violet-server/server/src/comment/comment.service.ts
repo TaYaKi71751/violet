@@ -11,7 +11,7 @@ import { CommonResponseDto } from 'src/common/dtos/common.dto';
 
 @Injectable()
 export class CommentService {
-  constructor(private repository: CommentRepository) {}
+  constructor(private repository: CommentRepository) { }
 
   async getComment(dto: CommentGetDto): Promise<CommentGetResponseDto> {
     try {
