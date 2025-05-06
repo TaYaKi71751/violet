@@ -8,10 +8,14 @@ import {
   CommentGetResponseDtoElement,
 } from './dtos/comment-get.dto';
 import { CommonResponseDto } from 'src/common/dtos/common.dto';
+import { DiscordService } from '../discord/discord.service';
 
 @Injectable()
 export class CommentService {
-  constructor(private repository: CommentRepository) { }
+  constructor(
+    private repository: CommentRepository,
+    private readonly discordService: DiscordService,
+  ) { }
 
   async getComment(dto: CommentGetDto): Promise<CommentGetResponseDto> {
     try {
@@ -30,6 +34,11 @@ export class CommentService {
   ): Promise<CommonResponseDto> {
     try {
       await this.repository.createComment(user, dto);
+
+      await this.discordService.sendCommentNotification(
+        user.userAppId,
+        dto
+      );
 
       return { ok: true };
     } catch (e) {
