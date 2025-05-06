@@ -26,7 +26,7 @@ export class AWSService {
     }: {
       maxSize?: number;
       contentType?: string;
-    },
+    } = {},
   ): Promise<PresignedPost> {
     return await createPresignedPost(this.s3, {
       Bucket: bucket,

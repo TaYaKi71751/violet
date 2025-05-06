@@ -5,5 +5,6 @@ import { AWSService } from './aws.service';
 @Module({
   imports: [ConfigModule],
   providers: [AWSService],
+  exports: [AWSService],
 })
-export class AWSModule {}
+export class AWSModule { }
