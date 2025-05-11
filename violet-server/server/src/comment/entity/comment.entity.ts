@@ -28,6 +28,13 @@ export class Comment extends CoreEntity {
   @Column()
   body: string;
 
+  @ApiProperty({
+    description: 'Comment hidden status',
+    default: false,
+  })
+  @Column({ default: false })
+  isHidden: boolean;
+
   @ManyToOne(() => Comment, (comment) => comment.childs)
   @JoinColumn({ name: 'parentId' })
   parent?: Comment;

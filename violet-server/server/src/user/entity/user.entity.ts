@@ -5,6 +5,11 @@ import { Column, Entity, OneToMany, Index } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Comment } from 'src/comment/entity/comment.entity';
 
+export enum UserRole {
+  ADMIN = 'admin',
+  USER = 'user',
+}
+
 @Entity()
 export class User extends CoreEntity {
   @ApiProperty({
@@ -14,6 +19,18 @@ export class User extends CoreEntity {
   @IsNotEmpty({ message: 'User id is required for register.' })
   @Column({ unique: true })
   userAppId: string;
+
+  @ApiProperty({
+    description: 'User Role',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  role: UserRole;
 
   @ApiProperty({
     description: 'Discord Id',

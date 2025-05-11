@@ -7,6 +7,8 @@ import {
   UseGuards,
   UsePipes,
   ValidationPipe,
+  Param,
+  Patch,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { HmacAuthGuard } from 'src/auth/guards/hmac.guard';
@@ -17,6 +19,7 @@ import { User } from 'src/user/entity/user.entity';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { CommentGetDto, CommentGetResponseDto } from './dtos/comment-get.dto';
 import { CommonResponseDto } from 'src/common/dtos/common.dto';
+import { CommentOwnerGuard } from './guards/comment-owner.guard';
 
 @ApiTags('comment')
 @Controller('comment')
@@ -46,5 +49,18 @@ export class CommentController {
     @Body() dto: CommentPostDto,
   ): Promise<CommonResponseDto> {
     return await this.commentService.postComment(currentUser, dto);
+  }
+
+  @Patch('/:id/hidden')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @ApiOperation({ summary: 'Toggle comment hidden status' })
+  @UseGuards(HmacAuthGuard)
+  @UseGuards(AccessTokenGuard)
+  @UseGuards(CommentOwnerGuard)
+  async toggleCommentHidden(
+    @Param('id') id: number,
+    @Body('isHidden') isHidden: boolean,
+  ): Promise<CommonResponseDto> {
+    return await this.commentService.toggleCommentHidden(id, isHidden);
   }
 }
