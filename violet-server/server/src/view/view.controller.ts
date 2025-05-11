@@ -24,7 +24,7 @@ import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 @ApiTags('view')
 @Controller('view')
 export class ViewController {
-  constructor(private readonly viewService: ViewService) {}
+  constructor(private readonly viewService: ViewService) { }
 
   @Get()
   @UsePipes(new ValidationPipe({ transform: true }))
@@ -33,7 +33,7 @@ export class ViewController {
     description: 'View Result (Article, Count)',
     type: ViewGetResponseDto,
   })
-  // @UseGuards(HmacAuthGuard)
+  @UseGuards(HmacAuthGuard)
   async get(@Query() dto: ViewGetRequestDto): Promise<ViewGetResponseDto> {
     return this.viewService.getView(dto);
   }

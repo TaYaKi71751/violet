@@ -30,8 +30,8 @@ export class CommentController {
     type: CommentGetResponseDto,
   })
   @ApiOperation({ summary: 'Get Comment' })
-  // @UseGuards(HmacAuthGuard)
-  // @UseGuards(AccessTokenGuard)
+  @UseGuards(HmacAuthGuard)
+  @UseGuards(AccessTokenGuard)
   async getComment(@Query() dto: CommentGetDto): Promise<CommentGetResponseDto> {
     return await this.commentService.getComment(dto);
   }
