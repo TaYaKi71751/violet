@@ -1,0 +1,61 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty } from 'class-validator';
+import { CoreEntity } from 'src/common/entities/core.entity';
+import { Column, Entity, OneToMany, Index } from 'typeorm';
+import { Exclude } from 'class-transformer';
+import { Comment } from 'src/comment/entity/comment.entity';
+
+export enum UserRole {
+  ADMIN = 'admin',
+  USER = 'user',
+}
+
+@Entity()
+export class User extends CoreEntity {
+  @ApiProperty({
+    description: 'User Id',
+    required: true,
+  })
+  @IsNotEmpty({ message: 'User id is required for register.' })
+  @Column({ unique: true })
+  userAppId: string;
+
+  @ApiProperty({
+    description: 'User Role',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  role: UserRole;
+
+  @ApiProperty({
+    description: 'Discord Id',
+  })
+  @Column({ nullable: true })
+  @Index()
+  discordId?: string;
+
+  @ApiProperty({
+    description: 'Avatar',
+  })
+  @Column({ nullable: true })
+  avatar?: string;
+
+  @ApiProperty({
+    description: 'Nickname',
+  })
+  @Column({ unique: true, nullable: true })
+  nickname?: string;
+
+  @Column({ nullable: true })
+  @Exclude()
+  @Index()
+  refreshToken?: string;
+
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comments: Comment[];
+}
