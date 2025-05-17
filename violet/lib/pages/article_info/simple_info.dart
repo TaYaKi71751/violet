@@ -26,37 +26,34 @@ class SimpleInfoWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = thumbnailSize();
     final data = Provider.of<ArticleInfo>(context);
-    return Container(
-      color: Colors.white,
-      child: Stack(
-        children: <Widget>[
-          Row(
-            children: [
-              Stack(
-                children: <Widget>[
-                  thumbnail(context, data),
-                  bookmark(data),
-                ],
-              ),
-              Expanded(
-                child: SizedBox(
-                  height: size.height,
-                  width: size.width,
-                  child: Padding(
-                    padding: const EdgeInsets.all(4),
-                    child: simpleInfo(data),
-                  ),
+    return Stack(
+      children: <Widget>[
+        Row(
+          children: [
+            Stack(
+              children: <Widget>[
+                thumbnail(context, data),
+                bookmark(data),
+              ],
+            ),
+            Expanded(
+              child: SizedBox(
+                height: size.height,
+                width: size.width,
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: simpleInfo(data),
                 ),
               ),
-            ],
-          ),
-          Positioned(
-            right: 16,
-            bottom: MediaQuery.of(context).padding.bottom + 16,
-            child: floatingSimilarView(context, data),
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+        Positioned(
+          right: 16,
+          bottom: MediaQuery.of(context).padding.bottom + 16,
+          child: floatingSimilarView(context, data),
+        ),
+      ],
     );
   }
 
