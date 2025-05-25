@@ -5,14 +5,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_crop/image_crop.dart';
-import 'package:violet/database/user/bookmark.dart';
 import 'package:violet/log/log.dart';
-import 'package:violet/pages/common/toast.dart';
 import 'package:violet/pages/segment/platform_navigator.dart';
 import 'package:violet/pages/viewer/viewer_controller.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/settings/settings_wrapper.dart';
+import 'package:violet/pages/viewer/image/image_crop_bookmark.dart';
 
 typedef VImageWidgetBuilder = Widget Function(
     BuildContext context, Widget child);
@@ -96,6 +94,7 @@ class _ProviderImageState extends State<ProviderImage> {
             headers: widget.imgHeader,
             articleId: c.articleId,
             page: widget.index,
+            isNetworkImage: true,
           ),
         );
       },
@@ -165,72 +164,5 @@ class _ProviderImageState extends State<ProviderImage> {
     c.isImageLoaded[widget.index] = true;
 
     return state.completedWidget;
-  }
-}
-
-class ImageCropBookmark extends StatelessWidget {
-  final GlobalKey<CropState> cropKey = GlobalKey<CropState>();
-  final String url;
-  final Map<String, String>? headers;
-  final int articleId;
-  final int page;
-  late final double aspectRatio;
-
-  ImageCropBookmark({
-    super.key,
-    required this.url,
-    required this.headers,
-    required this.articleId,
-    required this.page,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: Container(
-            color: Colors.black,
-            padding: const EdgeInsets.all(20.0),
-            child: Crop(
-              key: cropKey,
-              image: NetworkImage(url, headers: headers)
-                ..resolve(ImageConfiguration.empty)
-                    .addListener(ImageStreamListener((imageInfo, _) {
-                  aspectRatio = imageInfo.image.width / imageInfo.image.height;
-                })),
-            ),
-          ),
-        ),
-        TextButton(
-          child: const Text(
-            'Bookmark Image',
-            style: TextStyle(color: Colors.white),
-          ),
-          onPressed: () => bookmarkImage(context),
-        ),
-        SizedBox.fromSize(size: const Size.fromHeight(24.0))
-      ],
-    );
-  }
-
-  Future<void> bookmarkImage(BuildContext context) async {
-    final area = cropKey.currentState!.area;
-    if (area == null) {
-      // cannot crop, widget is not setup
-      return;
-    }
-
-    await (await Bookmark.getInstance()).insertCropImage(articleId, page,
-        '${area.left},${area.top},${area.right},${area.bottom}', aspectRatio);
-
-    showToast(
-      level: ToastLevel.check,
-      message:
-          '$articleId(${page}p): [${area.toString().split('(')[1].split(')')[0]}] Saved!',
-    );
-
-    // ignore: use_build_context_synchronously
-    Navigator.pop(context);
   }
 }
