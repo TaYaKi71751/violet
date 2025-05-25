@@ -182,6 +182,41 @@ class CropState extends State<Crop> with TickerProviderStateMixin {
         child: Listener(
           onPointerDown: (event) => pointers++,
           onPointerUp: (event) => pointers = 0,
+          onPointerSignal: (event) {
+            if (event is PointerScrollEvent && _isEnabled) {
+              final image = _image;
+              final boundaries = _boundaries;
+              if (image == null || boundaries == null) return;
+
+              final delta = event.scrollDelta.dy;
+              final scaleFactor = delta > 0 ? 0.9 : 1.1;
+
+              // 현재 스케일이 최대/최소 범위에 있는지 확인
+              final newScale = _scale * scaleFactor;
+              if (newScale < (_minimumScale ?? 1.0) ||
+                  newScale > _maximumScale) {
+                return; // 범위를 벗어나면 이벤트 무시
+              }
+
+              setState(() {
+                _scale = newScale;
+
+                final dx = boundaries.width *
+                    (1.0 - scaleFactor) /
+                    (image.width * _scale * _ratio);
+                final dy = boundaries.height *
+                    (1.0 - scaleFactor) /
+                    (image.height * _scale * _ratio);
+
+                _view = Rect.fromLTWH(
+                  _view.left + dx / 2,
+                  _view.top + dy / 2,
+                  _view.width,
+                  _view.height,
+                );
+              });
+            }
+          },
           child: GestureDetector(
             key: _surfaceKey,
             behavior: HitTestBehavior.opaque,
