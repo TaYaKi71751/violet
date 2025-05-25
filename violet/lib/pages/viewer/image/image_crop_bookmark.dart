@@ -3,9 +3,9 @@
 
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_crop/image_crop.dart';
 import 'package:violet/database/user/bookmark.dart';
 import 'package:violet/pages/common/toast.dart';
+import 'package:violet/pages/viewer/image/crop.dart';
 
 class ImageCropBookmark extends StatelessWidget {
   final GlobalKey<CropState> cropKey = GlobalKey<CropState>();
