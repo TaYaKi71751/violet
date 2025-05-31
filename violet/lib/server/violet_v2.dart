@@ -4,12 +4,13 @@
 import 'dart:async';
 
 import 'package:chopper/chopper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:violet/api/api.swagger.dart';
 import 'package:violet/server/wsalt.dart';
 
 class VioletServerV2 {
-  static const protocol = 'https';
-  static const host = 'koromo.xyz';
+  static const protocol = 'http';
+  static const host = 'localhost:3000';
   static const api = '$protocol://$host';
 
   static late final Api instance;
@@ -18,6 +19,24 @@ class VioletServerV2 {
     instance = Api.create(
       baseUrl: Uri.parse(api),
       interceptors: [HmacInterceptor()],
+    );
+  }
+
+  static String? _userId;
+  static Future<String> _getUserAppId() async {
+    if (_userId == null) {
+      final prefs = await SharedPreferences.getInstance();
+      _userId = prefs.getString('fa_userid');
+    }
+    return _userId!;
+  }
+
+  static Future<void> view(int articleid) async {
+    final userId = await _getUserAppId();
+    await VioletServerV2.instance.apiV2ViewPost(
+      articleId: articleid,
+      viewSeconds: 0,
+      userAppId: userId,
     );
   }
 }
