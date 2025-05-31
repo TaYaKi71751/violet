@@ -3,7 +3,7 @@ import { Type } from 'class-transformer';
 import { Comment } from 'src/comment/entity/comment.entity';
 import {
   IsArray,
-  IsNumber,
+  IsInt,
   IsOptional,
   IsString,
   Matches,
@@ -21,7 +21,7 @@ export class CommentGetDto {
 }
 
 export class CommentGetResponseDtoElement {
-  @IsNumber()
+  @IsInt()
   @ApiProperty({
     description: 'Comment Id',
     required: true,

@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
-  IsNumber,
+  IsInt,
   IsOptional,
   IsString,
   Matches,
@@ -28,7 +28,7 @@ export class CommentPostDto {
   @MaxLength(500)
   body: string;
 
-  @IsNumber()
+  @IsInt()
   @IsOptional()
   @ApiProperty({
     description: 'Parent Comment',

@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
-  IsNumber,
+  IsInt,
   IsOptional,
   IsString,
   Matches,
@@ -18,7 +18,7 @@ export const RANK_REQUEST_TYPE = {
 };
 
 export class ViewGetRequestDto {
-  @IsNumber()
+  @IsInt()
   @Type(() => Number)
   @Min(0)
   @ApiProperty({
@@ -27,7 +27,7 @@ export class ViewGetRequestDto {
   })
   offset: number;
 
-  @IsNumber()
+  @IsInt()
   @Type(() => Number)
   @Min(0)
   @Max(1000)
@@ -45,14 +45,14 @@ export class ViewGetRequestDto {
 }
 
 export class ViewGetResponseDtoElement {
-  @IsNumber()
+  @IsInt()
   @ApiProperty({
     description: 'Article Id',
     required: true,
   })
   articleId: number;
 
-  @IsNumber()
+  @IsInt()
   @ApiProperty({
     description: 'Count',
     required: true,
