@@ -10,8 +10,7 @@ import 'package:get/get.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:violet/pages/segment/platform_navigator.dart';
-import 'package:violet/pages/viewer/image/file_image.dart' as f;
-import 'package:violet/pages/viewer/image/provider_image.dart' as p;
+import 'package:violet/pages/viewer/image/image_crop_bookmark.dart';
 import 'package:violet/pages/viewer/others/photo_view_gallery.dart';
 import 'package:violet/pages/viewer/viewer_controller.dart';
 import 'package:violet/pages/viewer/widget/tap_litstener.dart';
@@ -487,20 +486,22 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
         if (c.provider.useFileSystem) {
           PlatformNavigator.navigateSlide(
             context,
-            f.ImageCropBookmark(
+            ImageCropBookmark(
               url: c.provider.uris[index],
               articleId: c.articleId,
               page: index,
+              isNetworkImage: false,
             ),
           );
         } else if (c.provider.useProvider) {
           PlatformNavigator.navigateSlide(
             context,
-            p.ImageCropBookmark(
+            ImageCropBookmark(
               url: c.urlCache[index]!.value,
               headers: c.headerCache[index],
               articleId: c.articleId,
               page: index,
+              isNetworkImage: true,
             ),
           );
         }

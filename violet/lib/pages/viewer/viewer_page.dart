@@ -47,14 +47,6 @@ class _ViewerPageState extends State<ViewerPage> {
   Timer? _nextPageTimer;
   int _inactivateSeconds = 0;
 
-  _tidyImageCache() {
-    ImageCache imageCache = PaintingBinding.instance.imageCache;
-    if (imageCache.currentSizeBytes >= (1024 + 256) << 20) {
-      imageCache.clear();
-      imageCache.clearLiveImages();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     _tidyImageCache();
@@ -139,7 +131,16 @@ class _ViewerPageState extends State<ViewerPage> {
   @override
   void initState() {
     super.initState();
-    _init();
+
+    _initProvider = CallOnce(_initAfterProvider);
+    _startsTime = DateTime.now();
+
+    _enterFullScreen();
+
+    _jumpPage();
+
+    _allocDeviceEventHandler();
+    _allocLifetimeEventHandler();
   }
 
   @override
@@ -150,19 +151,31 @@ class _ViewerPageState extends State<ViewerPage> {
 
   @override
   void dispose() {
-    _dispose();
+    _clearImageCache();
+    WidgetsBinding.instance.removeObserver(_lifecycleEventHandler);
+    _exitFullScreen();
+
+    ViewerContext.pop();
+    Get.delete<ViewerController>(tag: getxId);
+
     if (_nextPageTimer != null) _nextPageTimer!.cancel();
     super.dispose();
   }
 
-  _init() {
-    _initProvider = CallOnce(_initAfterProvider);
-    _startsTime = DateTime.now();
-
+  _enterFullScreen() {
     if (!Settings.disableFullScreen) {
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     }
+  }
 
+  _exitFullScreen() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
+      SystemUiOverlay.top,
+      SystemUiOverlay.bottom,
+    ]);
+  }
+
+  _jumpPage() {
     Future.delayed(const Duration(milliseconds: 100)).then((value) async {
       if (_pageInfo.jumpPage != null) {
         c.jump(_pageInfo.jumpPage!);
@@ -178,7 +191,31 @@ class _ViewerPageState extends State<ViewerPage> {
 
       c.startTimer();
     });
+  }
 
+  _allocDeviceEventHandler() {
+    ApplePencilDoubleTap().listen(v1Callback: (PreferredAction preferedAction) {
+      if (ModalRoute.of(context)!.isCurrent) {
+        c.next();
+      }
+    });
+
+    if (Platform.isAndroid) {
+      const EventChannel('xyz.project.violet/volume')
+          .receiveBroadcastStream()
+          .listen((event) {
+        if (event is String) {
+          if (event == 'up') {
+            c.prev();
+          } else if (event == 'down') {
+            c.next();
+          }
+        }
+      });
+    }
+  }
+
+  _allocLifetimeEventHandler() {
     _lifecycleEventHandler = LifecycleEventHandler(
       inactiveCallBack: () async {
         _inactivateTime = DateTime.now();
@@ -192,31 +229,26 @@ class _ViewerPageState extends State<ViewerPage> {
       },
     );
 
-    ApplePencilDoubleTap().listen(v1Callback: (PreferredAction preferedAction) {
-      if (ModalRoute.of(context)!.isCurrent) {
-        c.next();
-      }
-    });
-
     WidgetsBinding.instance.addObserver(_lifecycleEventHandler);
   }
 
-  _dispose() {
+  _tidyImageCache() {
+    ImageCache imageCache = PaintingBinding.instance.imageCache;
+    if (imageCache.currentSizeBytes >= (1024 + 256) << 20) {
+      imageCache.clear();
+      imageCache.clearLiveImages();
+    }
+  }
+
+  void _clearImageCache() {
     PaintingBinding.instance.imageCache.clear();
     if (_pageInfo.useWeb) {
       evictImageUrls(_pageInfo.uris);
     }
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
-      SystemUiOverlay.top,
-      SystemUiOverlay.bottom,
-    ]);
     imageCache.clear();
     imageCache.clearLiveImages();
     PaintingBinding.instance.imageCache.clear();
     PaintingBinding.instance.imageCache.clearLiveImages();
-    WidgetsBinding.instance.removeObserver(_lifecycleEventHandler);
-    ViewerContext.pop();
-    Get.delete<ViewerController>(tag: getxId);
   }
 
   void startTimer() {
@@ -258,8 +290,6 @@ class _ViewerPageState extends State<ViewerPage> {
       tag: getxId,
     );
     ViewerContext.push(c);
-
-    if (Platform.isAndroid) _setupVolume();
   }
 
   Future<void> _close() async {
@@ -271,27 +301,14 @@ class _ViewerPageState extends State<ViewerPage> {
     await _close();
   }
 
-  _setupVolume() {
-    const EventChannel('xyz.project.violet/volume')
-        .receiveBroadcastStream()
-        .listen((event) {
-      if (event is String) {
-        if (event == 'up') {
-          c.prev();
-        } else if (event == 'down') {
-          c.next();
-        }
-      }
-    });
-  }
-
-  _checkLatestRead([bool moveAnywhere = false]) async {
+  _checkLatestRead() async {
     final user = await User.getInstance();
     final log = await user.getUserLog();
 
     final x = log.where((e) => e.articleId() == _pageInfo.id.toString());
     if (x.length < 2) return;
 
+    // 최근 읽은 기록 조회
     final e = x.elementAt(1);
     if (e.lastPage() == null) return;
     if (e.lastPage()! <= 1 ||
@@ -300,19 +317,18 @@ class _ViewerPageState extends State<ViewerPage> {
       return;
     }
 
-    if (!moveAnywhere) {
-      if (!mounted) return;
-      final isJump = await showYesNoDialog(
-        context,
-        locale.Translations.instance!
-            .trans('recordmessage')
-            .replaceAll('%s', e.lastPage().toString()),
-        locale.Translations.instance!.trans('record'),
-      );
-      if (!isJump) return;
+    // Jump 실행
+    if (!mounted) return;
+    final doJump = await showYesNoDialog(
+      context,
+      locale.Translations.instance!
+          .trans('recordmessage')
+          .replaceAll('%s', e.lastPage().toString()),
+      locale.Translations.instance!.trans('record'),
+    );
+    if (!doJump) return;
 
-      c.jump(e.lastPage()! - 1);
-    }
+    c.jump(e.lastPage()! - 1);
   }
 
   _savePageRead() async {
