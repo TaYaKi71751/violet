@@ -1,3 +1,4 @@
+// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'api.swagger.dart';
@@ -41,14 +42,14 @@ final class _$Api extends Api {
 
   @override
   Future<Response<CommentGetResponseDto>> _apiV2CommentGet(
-      {required CommentGetDto? body}) {
+      {required String? where}) {
     final Uri $url = Uri.parse('/api/v2/comment');
-    final $body = body;
+    final Map<String, dynamic> $params = <String, dynamic>{'where': where};
     final Request $request = Request(
       'GET',
       $url,
       client.baseUrl,
-      body: $body,
+      parameters: $params,
     );
     return client.send<CommentGetResponseDto, CommentGetResponseDto>($request);
   }
@@ -62,6 +63,17 @@ final class _$Api extends Api {
       $url,
       client.baseUrl,
       body: $body,
+    );
+    return client.send<dynamic, dynamic>($request);
+  }
+
+  @override
+  Future<Response<dynamic>> _apiV2CommentIdHiddenPatch({required num? id}) {
+    final Uri $url = Uri.parse('/api/v2/comment/${id}/hidden');
+    final Request $request = Request(
+      'PATCH',
+      $url,
+      client.baseUrl,
     );
     return client.send<dynamic, dynamic>($request);
   }
@@ -88,6 +100,17 @@ final class _$Api extends Api {
       body: $body,
     );
     return client.send<dynamic, dynamic>($request);
+  }
+
+  @override
+  Future<Response<List<User>>> _apiV2UserListGet() {
+    final Uri $url = Uri.parse('/api/v2/user/list');
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+    );
+    return client.send<List<User>, User>($request);
   }
 
   @override
@@ -218,6 +241,39 @@ final class _$Api extends Api {
       $url,
       client.baseUrl,
       parameters: $params,
+    );
+    return client.send<dynamic, dynamic>($request);
+  }
+
+  @override
+  Future<Response<StatsResponseDto>> _apiV2StatsGet() {
+    final Uri $url = Uri.parse('/api/v2/stats');
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+    );
+    return client.send<StatsResponseDto, StatsResponseDto>($request);
+  }
+
+  @override
+  Future<Response<dynamic>> _apiV2BookmarkBackupPost() {
+    final Uri $url = Uri.parse('/api/v2/bookmark/backup');
+    final Request $request = Request(
+      'POST',
+      $url,
+      client.baseUrl,
+    );
+    return client.send<dynamic, dynamic>($request);
+  }
+
+  @override
+  Future<Response<dynamic>> _apiV2BookmarkGet() {
+    final Uri $url = Uri.parse('/api/v2/bookmark');
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
     );
     return client.send<dynamic, dynamic>($request);
   }

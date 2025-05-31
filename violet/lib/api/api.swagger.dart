@@ -1,6 +1,7 @@
 // ignore_for_file: type=lint
 
 import 'package:json_annotation/json_annotation.dart';
+import 'package:json_annotation/json_annotation.dart' as json;
 import 'package:collection/collection.dart';
 import 'dart:convert';
 
@@ -11,6 +12,8 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart' show MultipartFile;
 import 'package:chopper/chopper.dart' as chopper;
+import 'api.enums.swagger.dart' as enums;
+export 'api.enums.swagger.dart';
 
 part 'api.swagger.chopper.dart';
 part 'api.swagger.g.dart';
@@ -64,18 +67,20 @@ abstract class Api extends ChopperService {
   Future<chopper.Response> _apiV2HmacGet();
 
   ///Get Comment
+  ///@param where Where to get
   Future<chopper.Response<CommentGetResponseDto>> apiV2CommentGet(
-      {required CommentGetDto? body}) {
+      {required String? where}) {
     generatedMapping.putIfAbsent(
         CommentGetResponseDto, () => CommentGetResponseDto.fromJsonFactory);
 
-    return _apiV2CommentGet(body: body);
+    return _apiV2CommentGet(where: where);
   }
 
   ///Get Comment
+  ///@param where Where to get
   @Get(path: '/api/v2/comment')
   Future<chopper.Response<CommentGetResponseDto>> _apiV2CommentGet(
-      {@Body() required CommentGetDto? body});
+      {@Query('where') required String? where});
 
   ///Post Comment
   Future<chopper.Response> apiV2CommentPost({required CommentPostDto? body}) {
@@ -89,6 +94,21 @@ abstract class Api extends ChopperService {
   )
   Future<chopper.Response> _apiV2CommentPost(
       {@Body() required CommentPostDto? body});
+
+  ///Toggle comment hidden status
+  ///@param id
+  Future<chopper.Response> apiV2CommentIdHiddenPatch({required num? id}) {
+    return _apiV2CommentIdHiddenPatch(id: id);
+  }
+
+  ///Toggle comment hidden status
+  ///@param id
+  @Patch(
+    path: '/api/v2/comment/{id}/hidden',
+    optionalBody: true,
+  )
+  Future<chopper.Response> _apiV2CommentIdHiddenPatch(
+      {@Path('id') required num? id});
 
   ///Get current user information
   Future<chopper.Response<User>> apiV2UserGet() {
@@ -113,6 +133,17 @@ abstract class Api extends ChopperService {
   )
   Future<chopper.Response> _apiV2UserPost(
       {@Body() required UserRegisterDTO? body});
+
+  ///Get all users
+  Future<chopper.Response<List<User>>> apiV2UserListGet() {
+    generatedMapping.putIfAbsent(User, () => User.fromJsonFactory);
+
+    return _apiV2UserListGet();
+  }
+
+  ///Get all users
+  @Get(path: '/api/v2/user/list')
+  Future<chopper.Response<List<User>>> _apiV2UserListGet();
 
   ///Get userAppIds registered by discord id
   Future<chopper.Response<ListDiscordUserAppIdsResponseDto>>
@@ -262,48 +293,39 @@ abstract class Api extends ChopperService {
     @Query('viewSeconds') required num? viewSeconds,
     @Query('userAppId') required String? userAppId,
   });
-}
 
-@JsonSerializable(explicitToJson: true)
-class CommentGetDto {
-  const CommentGetDto({
-    required this.where,
-  });
+  ///통계 데이터 조회
+  Future<chopper.Response<StatsResponseDto>> apiV2StatsGet() {
+    generatedMapping.putIfAbsent(
+        StatsResponseDto, () => StatsResponseDto.fromJsonFactory);
 
-  factory CommentGetDto.fromJson(Map<String, dynamic> json) =>
-      _$CommentGetDtoFromJson(json);
-
-  static const toJsonFactory = _$CommentGetDtoToJson;
-  Map<String, dynamic> toJson() => _$CommentGetDtoToJson(this);
-
-  @JsonKey(name: 'where')
-  final String where;
-  static const fromJsonFactory = _$CommentGetDtoFromJson;
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other is CommentGetDto &&
-            (identical(other.where, where) ||
-                const DeepCollectionEquality().equals(other.where, where)));
+    return _apiV2StatsGet();
   }
 
-  @override
-  String toString() => jsonEncode(this);
+  ///통계 데이터 조회
+  @Get(path: '/api/v2/stats')
+  Future<chopper.Response<StatsResponseDto>> _apiV2StatsGet();
 
-  @override
-  int get hashCode =>
-      const DeepCollectionEquality().hash(where) ^ runtimeType.hashCode;
-}
-
-extension $CommentGetDtoExtension on CommentGetDto {
-  CommentGetDto copyWith({String? where}) {
-    return CommentGetDto(where: where ?? this.where);
+  ///Create Bookmark Backup
+  Future<chopper.Response> apiV2BookmarkBackupPost() {
+    return _apiV2BookmarkBackupPost();
   }
 
-  CommentGetDto copyWithWrapped({Wrapped<String>? where}) {
-    return CommentGetDto(where: (where != null ? where.value : this.where));
+  ///Create Bookmark Backup
+  @Post(
+    path: '/api/v2/bookmark/backup',
+    optionalBody: true,
+  )
+  Future<chopper.Response> _apiV2BookmarkBackupPost();
+
+  ///Get User Bookmarks
+  Future<chopper.Response> apiV2BookmarkGet() {
+    return _apiV2BookmarkGet();
   }
+
+  ///Get User Bookmarks
+  @Get(path: '/api/v2/bookmark')
+  Future<chopper.Response> _apiV2BookmarkGet();
 }
 
 @JsonSerializable(explicitToJson: true)
@@ -513,6 +535,7 @@ class User {
     required this.createdAt,
     required this.updatedAt,
     required this.userAppId,
+    required this.role,
     required this.discordId,
     required this.avatar,
     required this.nickname,
@@ -531,6 +554,15 @@ class User {
   final DateTime updatedAt;
   @JsonKey(name: 'userAppId')
   final String userAppId;
+  @JsonKey(
+    name: 'role',
+    toJson: userRoleToJson,
+    fromJson: userRoleRoleFromJson,
+  )
+  final enums.UserRole role;
+  static enums.UserRole userRoleRoleFromJson(Object? value) =>
+      userRoleFromJson(value, enums.UserRole.user);
+
   @JsonKey(name: 'discordId')
   final String discordId;
   @JsonKey(name: 'avatar')
@@ -554,6 +586,8 @@ class User {
             (identical(other.userAppId, userAppId) ||
                 const DeepCollectionEquality()
                     .equals(other.userAppId, userAppId)) &&
+            (identical(other.role, role) ||
+                const DeepCollectionEquality().equals(other.role, role)) &&
             (identical(other.discordId, discordId) ||
                 const DeepCollectionEquality()
                     .equals(other.discordId, discordId)) &&
@@ -573,6 +607,7 @@ class User {
       const DeepCollectionEquality().hash(createdAt) ^
       const DeepCollectionEquality().hash(updatedAt) ^
       const DeepCollectionEquality().hash(userAppId) ^
+      const DeepCollectionEquality().hash(role) ^
       const DeepCollectionEquality().hash(discordId) ^
       const DeepCollectionEquality().hash(avatar) ^
       const DeepCollectionEquality().hash(nickname) ^
@@ -585,6 +620,7 @@ extension $UserExtension on User {
       DateTime? createdAt,
       DateTime? updatedAt,
       String? userAppId,
+      enums.UserRole? role,
       String? discordId,
       String? avatar,
       String? nickname}) {
@@ -593,6 +629,7 @@ extension $UserExtension on User {
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
         userAppId: userAppId ?? this.userAppId,
+        role: role ?? this.role,
         discordId: discordId ?? this.discordId,
         avatar: avatar ?? this.avatar,
         nickname: nickname ?? this.nickname);
@@ -603,6 +640,7 @@ extension $UserExtension on User {
       Wrapped<DateTime>? createdAt,
       Wrapped<DateTime>? updatedAt,
       Wrapped<String>? userAppId,
+      Wrapped<enums.UserRole>? role,
       Wrapped<String>? discordId,
       Wrapped<String>? avatar,
       Wrapped<String>? nickname}) {
@@ -611,6 +649,7 @@ extension $UserExtension on User {
         createdAt: (createdAt != null ? createdAt.value : this.createdAt),
         updatedAt: (updatedAt != null ? updatedAt.value : this.updatedAt),
         userAppId: (userAppId != null ? userAppId.value : this.userAppId),
+        role: (role != null ? role.value : this.role),
         discordId: (discordId != null ? discordId.value : this.discordId),
         avatar: (avatar != null ? avatar.value : this.avatar),
         nickname: (nickname != null ? nickname.value : this.nickname));
@@ -883,6 +922,151 @@ extension $ViewGetResponseDtoExtension on ViewGetResponseDto {
     return ViewGetResponseDto(
         elements: (elements != null ? elements.value : this.elements));
   }
+}
+
+@JsonSerializable(explicitToJson: true)
+class StatsResponseDto {
+  const StatsResponseDto({
+    required this.totalUsers,
+    required this.totalComments,
+    required this.userGrowth,
+    required this.commentGrowth,
+  });
+
+  factory StatsResponseDto.fromJson(Map<String, dynamic> json) =>
+      _$StatsResponseDtoFromJson(json);
+
+  static const toJsonFactory = _$StatsResponseDtoToJson;
+  Map<String, dynamic> toJson() => _$StatsResponseDtoToJson(this);
+
+  @JsonKey(name: 'totalUsers')
+  final double totalUsers;
+  @JsonKey(name: 'totalComments')
+  final double totalComments;
+  @JsonKey(name: 'userGrowth')
+  final Object userGrowth;
+  @JsonKey(name: 'commentGrowth')
+  final Object commentGrowth;
+  static const fromJsonFactory = _$StatsResponseDtoFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is StatsResponseDto &&
+            (identical(other.totalUsers, totalUsers) ||
+                const DeepCollectionEquality()
+                    .equals(other.totalUsers, totalUsers)) &&
+            (identical(other.totalComments, totalComments) ||
+                const DeepCollectionEquality()
+                    .equals(other.totalComments, totalComments)) &&
+            (identical(other.userGrowth, userGrowth) ||
+                const DeepCollectionEquality()
+                    .equals(other.userGrowth, userGrowth)) &&
+            (identical(other.commentGrowth, commentGrowth) ||
+                const DeepCollectionEquality()
+                    .equals(other.commentGrowth, commentGrowth)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(totalUsers) ^
+      const DeepCollectionEquality().hash(totalComments) ^
+      const DeepCollectionEquality().hash(userGrowth) ^
+      const DeepCollectionEquality().hash(commentGrowth) ^
+      runtimeType.hashCode;
+}
+
+extension $StatsResponseDtoExtension on StatsResponseDto {
+  StatsResponseDto copyWith(
+      {double? totalUsers,
+      double? totalComments,
+      Object? userGrowth,
+      Object? commentGrowth}) {
+    return StatsResponseDto(
+        totalUsers: totalUsers ?? this.totalUsers,
+        totalComments: totalComments ?? this.totalComments,
+        userGrowth: userGrowth ?? this.userGrowth,
+        commentGrowth: commentGrowth ?? this.commentGrowth);
+  }
+
+  StatsResponseDto copyWithWrapped(
+      {Wrapped<double>? totalUsers,
+      Wrapped<double>? totalComments,
+      Wrapped<Object>? userGrowth,
+      Wrapped<Object>? commentGrowth}) {
+    return StatsResponseDto(
+        totalUsers: (totalUsers != null ? totalUsers.value : this.totalUsers),
+        totalComments:
+            (totalComments != null ? totalComments.value : this.totalComments),
+        userGrowth: (userGrowth != null ? userGrowth.value : this.userGrowth),
+        commentGrowth:
+            (commentGrowth != null ? commentGrowth.value : this.commentGrowth));
+  }
+}
+
+String? userRoleNullableToJson(enums.UserRole? userRole) {
+  return userRole?.value;
+}
+
+String? userRoleToJson(enums.UserRole userRole) {
+  return userRole.value;
+}
+
+enums.UserRole userRoleFromJson(
+  Object? userRole, [
+  enums.UserRole? defaultValue,
+]) {
+  return enums.UserRole.values.firstWhereOrNull((e) => e.value == userRole) ??
+      defaultValue ??
+      enums.UserRole.swaggerGeneratedUnknown;
+}
+
+enums.UserRole? userRoleNullableFromJson(
+  Object? userRole, [
+  enums.UserRole? defaultValue,
+]) {
+  if (userRole == null) {
+    return null;
+  }
+  return enums.UserRole.values.firstWhereOrNull((e) => e.value == userRole) ??
+      defaultValue;
+}
+
+String userRoleExplodedListToJson(List<enums.UserRole>? userRole) {
+  return userRole?.map((e) => e.value!).join(',') ?? '';
+}
+
+List<String> userRoleListToJson(List<enums.UserRole>? userRole) {
+  if (userRole == null) {
+    return [];
+  }
+
+  return userRole.map((e) => e.value!).toList();
+}
+
+List<enums.UserRole> userRoleListFromJson(
+  List? userRole, [
+  List<enums.UserRole>? defaultValue,
+]) {
+  if (userRole == null) {
+    return defaultValue ?? [];
+  }
+
+  return userRole.map((e) => userRoleFromJson(e.toString())).toList();
+}
+
+List<enums.UserRole>? userRoleNullableListFromJson(
+  List? userRole, [
+  List<enums.UserRole>? defaultValue,
+]) {
+  if (userRole == null) {
+    return defaultValue;
+  }
+
+  return userRole.map((e) => userRoleFromJson(e.toString())).toList();
 }
 
 typedef $JsonFactory<T> = T Function(Map<String, dynamic> json);

@@ -6,16 +6,6 @@ part of 'api.swagger.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-CommentGetDto _$CommentGetDtoFromJson(Map<String, dynamic> json) =>
-    CommentGetDto(
-      where: json['where'] as String,
-    );
-
-Map<String, dynamic> _$CommentGetDtoToJson(CommentGetDto instance) =>
-    <String, dynamic>{
-      'where': instance.where,
-    };
-
 CommentGetResponseDtoElement _$CommentGetResponseDtoElementFromJson(
         Map<String, dynamic> json) =>
     CommentGetResponseDtoElement(
@@ -71,6 +61,7 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       userAppId: json['userAppId'] as String,
+      role: User.userRoleRoleFromJson(json['role']),
       discordId: json['discordId'] as String,
       avatar: json['avatar'] as String,
       nickname: json['nickname'] as String,
@@ -81,6 +72,7 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),
       'userAppId': instance.userAppId,
+      'role': userRoleToJson(instance.role),
       'discordId': instance.discordId,
       'avatar': instance.avatar,
       'nickname': instance.nickname,
@@ -153,4 +145,20 @@ ViewGetResponseDto _$ViewGetResponseDtoFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$ViewGetResponseDtoToJson(ViewGetResponseDto instance) =>
     <String, dynamic>{
       'elements': instance.elements.map((e) => e.toJson()).toList(),
+    };
+
+StatsResponseDto _$StatsResponseDtoFromJson(Map<String, dynamic> json) =>
+    StatsResponseDto(
+      totalUsers: (json['totalUsers'] as num).toDouble(),
+      totalComments: (json['totalComments'] as num).toDouble(),
+      userGrowth: json['userGrowth'] as Object,
+      commentGrowth: json['commentGrowth'] as Object,
+    );
+
+Map<String, dynamic> _$StatsResponseDtoToJson(StatsResponseDto instance) =>
+    <String, dynamic>{
+      'totalUsers': instance.totalUsers,
+      'totalComments': instance.totalComments,
+      'userGrowth': instance.userGrowth,
+      'commentGrowth': instance.commentGrowth,
     };

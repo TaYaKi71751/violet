@@ -13,7 +13,7 @@ services:
 
   local-redis:
     platform: linux/x86_64
-    image: redis
+    image: redis:latest
     restart: always
     container_name: violet-dev-redis
     command: sh -cx "redis-server --daemonize yes && redis-cli config set notify-keyspace-events KEA && sleep infinity"

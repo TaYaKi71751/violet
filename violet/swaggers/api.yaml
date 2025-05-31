@@ -22,13 +22,13 @@ paths:
     get:
       operationId: CommentController_getComment
       summary: Get Comment
-      parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CommentGetDto'
+      parameters:
+        - name: where
+          required: true
+          in: query
+          description: Where to get
+          schema:
+            type: string
       responses:
         '201':
           description: Comment Elements
@@ -50,6 +50,21 @@ paths:
               $ref: '#/components/schemas/CommentPostDto'
       responses:
         '201':
+          description: ''
+      tags:
+        - comment
+  /api/v2/comment/{id}/hidden:
+    patch:
+      operationId: CommentController_toggleCommentHidden
+      summary: Toggle comment hidden status
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
           description: ''
       tags:
         - comment
@@ -80,6 +95,22 @@ paths:
       responses:
         '201':
           description: ''
+      tags:
+        - user
+  /api/v2/user/list:
+    get:
+      operationId: UserController_getAllUsers
+      summary: Get all users
+      parameters: []
+      responses:
+        '201':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
       tags:
         - user
   /api/v2/user/discord:
@@ -246,6 +277,40 @@ paths:
           description: ''
       tags:
         - view
+  /api/v2/stats:
+    get:
+      operationId: StatsController_getStats
+      summary: 통계 데이터 조회
+      parameters: []
+      responses:
+        '200':
+          description: 통계 데이터
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsResponseDto'
+      tags:
+        - stats
+  /api/v2/bookmark/backup:
+    post:
+      operationId: BookmarkController_createBookmarkBackup
+      summary: Create Bookmark Backup
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+        - bookmark
+  /api/v2/bookmark:
+    get:
+      operationId: BookmarkController_getUserBookmarks
+      summary: Get User Bookmarks
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - bookmark
 info:
   title: Violet Server API Docs
   description: Violet Server API description
@@ -255,14 +320,6 @@ tags: []
 servers: []
 components:
   schemas:
-    CommentGetDto:
-      type: object
-      properties:
-        where:
-          type: string
-          description: Where to get
-      required:
-        - where
     CommentGetResponseDtoElement:
       type: object
       properties:
@@ -329,6 +386,13 @@ components:
         userAppId:
           type: string
           description: User Id
+        role:
+          type: string
+          description: User Role
+          enum:
+            - admin
+            - user
+          default: user
         discordId:
           type: string
           description: Discord Id
@@ -343,6 +407,7 @@ components:
         - createdAt
         - updatedAt
         - userAppId
+        - role
         - discordId
         - avatar
         - nickname
@@ -401,3 +466,23 @@ components:
             $ref: '#/components/schemas/ViewGetResponseDtoElement'
       required:
         - elements
+    StatsResponseDto:
+      type: object
+      properties:
+        totalUsers:
+          type: number
+          description: 총 사용자 수
+        totalComments:
+          type: number
+          description: 총 댓글 수
+        userGrowth:
+          type: object
+          description: 사용자 성장 데이터
+        commentGrowth:
+          type: object
+          description: 댓글 성장 데이터
+      required:
+        - totalUsers
+        - totalComments
+        - userGrowth
+        - commentGrowth
