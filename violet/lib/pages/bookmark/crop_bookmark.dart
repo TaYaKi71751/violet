@@ -344,7 +344,6 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
                   CropBookmarkPage(
                       bookmarks: bookmarks
                           .sortedBy((e) => DateTime.parse(e.datetime()))
-                          .reversed
                           .toList()),
                   opaque: false,
                 );
