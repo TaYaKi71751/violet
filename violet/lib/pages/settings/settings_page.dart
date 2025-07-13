@@ -2352,23 +2352,8 @@ class _SettingsPageState extends State<SettingsPage>
                 );
 
                 if (dialog != null && dialog == true) {
-                  var cookie =
+                  final cookie =
                       'sk=${sController.text};ipb_member_id=${imiController.text};ipb_pass_hash=${iphController.text};igneous=${iController.text}';
-
-                  await catchUnwind(() async {
-                    final res = await http.get('https://exhentai.org',
-                        headers: {'Cookie': cookie});
-
-                    final setCookie = res.headers['set-cookie'];
-                    if (setCookie != null &&
-                        (setCookie.startsWith('sk=') ||
-                            setCookie.startsWith('igneous='))) {
-                      if (setCookie.contains('=mystery')) {
-                        return;
-                      }
-                      cookie += ';${setCookie.split(';')[0]}';
-                    }
-                  });
 
                   await prefs.setString('eh_cookies', cookie);
                 }
