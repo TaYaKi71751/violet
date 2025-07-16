@@ -75,8 +75,6 @@ Future<http.Response> _ehentaiGet(String url,
       ? HttpWrapper.throttlerExHentai
       : HttpWrapper.throttlerEHentai;
 
-  final release = await throttler.acquire();
-
   if (HttpWrapper.cacheResponse.containsKey(url)) {
     throttler.release();
     return HttpWrapper.cacheResponse[url]!;
@@ -111,7 +109,7 @@ Future<http.Response> _ehentaiGet(String url,
       Logger.error('[Http Request] GET: $url\n'
           'E:$e\n'
           '$st');
-      release.call();
+      throttler.release();
       if (!(timeout || e.toString().contains('Connection reset by peer')) ||
           (timeout && retry > 10)) {
         rethrow;
@@ -124,7 +122,10 @@ Future<http.Response> _ehentaiGet(String url,
     retry++;
 
     if (timeout) {
-      if (retry > 3) release.call();
+      if (retry > 3) {
+        throttler.release();
+        return Response('', 200);
+      }
       Logger.info('[Http Request] GETS: $url, $retry');
       continue;
     }
@@ -139,7 +140,7 @@ Future<http.Response> _ehentaiGet(String url,
       HttpWrapper.cacheResponse[url] = res;
     }
 
-    release.call();
+    throttler.release();
     return res;
   }
 }
