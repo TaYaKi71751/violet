@@ -315,16 +315,30 @@ class HentaiManager {
               final ehash = qr.ehash() ?? await tryGetEhHash(qr.id(), false);
               final html = await EHSession.requestString(
                   'https://e-hentai.org/g/${qr.id()}/$ehash/?p=0&inline_set=ts_m');
+              String showingText = parse(html)
+                  .querySelector('[class="gtb"] > [class="gpc"]')!
+                  .text;
+              int firstIndex = int.parse(showingText
+                      .substring(showingText.indexOf('Showing ') + 8,
+                          showingText.indexOf(' - '))
+                      .trim()) -
+                  1;
+              int lastIndex = int.parse(showingText
+                  .substring(showingText.indexOf(' - ') + 3,
+                      showingText.indexOf(' of '))
+                  .trim());
+
+              int imagesPerPage = lastIndex - firstIndex;
               final article = EHParser.parseArticleData(html);
               return EHentaiImageProvider(
-                count: article.length,
-                thumbnail: article.thumbnail,
-                pagesUrl: List<String>.generate(
-                    (article.length / 40).ceil(),
-                    (index) =>
-                        'https://e-hentai.org/g/${qr.id()}/$ehash/?p=$index'),
-                isEHentai: true,
-              );
+                  count: article.length,
+                  thumbnail: article.thumbnail,
+                  pagesUrl: List<String>.generate(
+                      (article.length / imagesPerPage).ceil(),
+                      (index) =>
+                          'https://e-hentai.org/g/${qr.id()}/$ehash/?p=$index'),
+                  isEHentai: true,
+                  imagesPerPage: imagesPerPage);
             }
 
           case 'ExHentai':
@@ -332,15 +346,30 @@ class HentaiManager {
               final ehash = qr.ehash() ?? await tryGetEhHash(qr.id(), true);
               final html = await EHSession.requestString(
                   'https://exhentai.org/g/${qr.id()}/$ehash/?p=0&inline_set=ts_m');
+              String showingText = parse(html)
+                  .querySelector('[class="gtb"] > [class="gpc"]')!
+                  .text;
+              int firstIndex = int.parse(showingText
+                      .substring(showingText.indexOf('Showing ') + 8,
+                          showingText.indexOf(' - '))
+                      .trim()) -
+                  1;
+              int lastIndex = int.parse(showingText
+                  .substring(showingText.indexOf(' - ') + 3,
+                      showingText.indexOf(' of '))
+                  .trim());
+
+              int imagesPerPage = lastIndex - firstIndex;
               final article = EHParser.parseArticleData(html);
               return EHentaiImageProvider(
                 count: article.length,
                 thumbnail: article.thumbnail,
                 pagesUrl: List<String>.generate(
-                    (article.length / 40).ceil(),
+                    (article.length / imagesPerPage).ceil(),
                     (index) =>
                         'https://exhentai.org/g/${qr.id()}/$ehash/?p=$index'),
                 isEHentai: false,
+                imagesPerPage: imagesPerPage,
               );
             }
 
