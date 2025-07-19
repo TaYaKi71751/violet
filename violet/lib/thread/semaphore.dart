@@ -53,7 +53,7 @@ class Semaphore {
     if (_waitQueue.isNotEmpty) {
       _currentCount++;
       final completer = _waitQueue.removeFirst();
-      completer.$2.complete(CallOnce(() {}));
+      completer.$2.complete(CallOnce(release));
     }
   }
 }
