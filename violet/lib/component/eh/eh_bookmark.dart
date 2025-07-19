@@ -19,30 +19,33 @@ class EHBookmark {
       'https://exhentai.org',
       'https://e-hentai.org',
     ];
-
     for (final host in candidateHosts) {
       for (int i = 0; i < 10; i++) {
-        var bookmark = HashSet<int>();
-
         await catchUnwind(() async {
-          for (int j = 0; j < 1000; j++) {
-            final html = await EHSession.requestString(
-                '$host/favorites.php?favcat=$i&page=$j');
-            final prev = bookmark.length;
+          var bookmark = HashSet<int>();
 
+          int? next;
+          while (next != -1) {
+            final html = await EHSession.requestString(
+                '$host/favorites.php?favcat=$i&inline_set=fs_p${next == null ? '' : '&next=$next'}');
             parse(html).querySelectorAll('a[href*="/g/"]').forEach((element) {
               final href = element.attributes['href'];
               if (href == null) return;
               bookmark.add(int.parse((href.split('/')[4])));
             });
-
-            if (prev == bookmark.length) {
-              break;
+            if (parse(html).querySelectorAll('a[href*="/g/"]').isEmpty) {
+              next = -1;
+            } else {
+              if (next == bookmark.last) {
+                next = -1;
+              } else {
+                next = bookmark.last;
+              }
             }
           }
-        });
 
-        result.add(bookmark);
+          result.add(bookmark);
+        });
       }
     }
 
