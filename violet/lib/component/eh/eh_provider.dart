@@ -19,12 +19,14 @@ class EHentaiImageProvider extends VioletImageProvider {
   late List<String?> urls;
   late List<String> imgUrls;
   late Semaphore pageThrottler;
+  int imagesPerPage;
 
   EHentaiImageProvider({
     required this.count,
     required this.thumbnail,
     required this.pagesUrl,
     required this.isEHentai,
+    required this.imagesPerPage,
   });
 
   @override
@@ -68,13 +70,13 @@ class EHentaiImageProvider extends VioletImageProvider {
 
     if (urls[page] == null) {
       // 40item per page
-      var ppage = page ~/ 40;
+      var ppage = page ~/ imagesPerPage;
       var phtml =
           await EHSession.requestString('${pagesUrl[ppage]}&inline_set=ts_m');
       var pages = EHParser.getImagesUrl(phtml);
 
       for (int i = 0; i < pages.length; i++) {
-        urls[ppage * 40 + i] = pages[i];
+        urls[ppage * imagesPerPage + i] = pages[i];
       }
     }
 

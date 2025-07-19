@@ -22,6 +22,7 @@ class EHArticle {
   late String fileSize;
   late int length;
   late int favorited;
+  late int imagesPerPage;
 
   // Right side of article info
   String? reclass;
@@ -114,6 +115,19 @@ class EHParser {
     } catch (e) {
       rethrow;
     }
+
+    final imagesPerPageRegex = RegExp(r'(\d+)\s*-\s*(\d+)\s*of\s*(\d+)');
+
+    final imagesPerPageMatch = imagesPerPageRegex.firstMatch(
+        parse(html).querySelector('[class="gtb"] > [class="gpc"]')!.text);
+    int firstIndex = imagesPerPageMatch!.group(1) != null
+        ? int.parse(imagesPerPageMatch.group(1)!) - 1
+        : 0;
+    int lastIndex = imagesPerPageMatch.group(2) != null
+        ? int.parse(imagesPerPageMatch.group(2)!)
+        : 0;
+
+    article.imagesPerPage = lastIndex - firstIndex;
 
     article.title = doc.querySelector("div[id='gd2'] h1[id='gn']")!.text;
     article.subTitle = doc.querySelector("div[id='gd2'] h1[id='gj']")!.text;
