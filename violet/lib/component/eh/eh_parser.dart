@@ -152,6 +152,7 @@ class EHParser {
         .querySelector("td[class='gdt2']")!
         .text
         .replaceAll('times', '')
+        .replaceAll('Once', '1')
         .trim());
 
     var nodesData =
