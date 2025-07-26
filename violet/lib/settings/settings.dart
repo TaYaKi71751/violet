@@ -135,10 +135,10 @@ class Settings {
   static Future<void> initFirst() async {
     prefs = await SharedPreferences.getInstance();
 
-    await _setSecureMode();
+    await setSecureMode();
   }
 
-  static Future<void> _setSecureMode() async {
+  static Future<void> setSecureMode() async {
     if (Platform.isAndroid) {
       if (Settings.useSecureMode.value) {
         await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
