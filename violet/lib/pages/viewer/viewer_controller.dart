@@ -92,7 +92,7 @@ class ViewerController extends GetxController {
   var horizontalPageController = PreloadPageController();
   var thumbController = ScrollController();
   final searchText = TextEditingController(text: '');
-  SuggestionsBoxController? suggestionsBoxController;
+  SuggestionsController<(String, String, int)>? suggestionsController;
 
   /// Is enabled search?
   var messages = <MessageSearchResult>[];
@@ -287,7 +287,7 @@ class ViewerController extends GetxController {
   }
 
   onModifiedText() async {
-    suggestionsBoxController!.close();
+    suggestionsController!.close();
     if (latestSearch == searchText.text) return;
     latestSearch == searchText.text;
     messages =

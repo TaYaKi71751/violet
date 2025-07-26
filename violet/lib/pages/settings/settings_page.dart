@@ -18,7 +18,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:mdi/mdi.dart';
 import 'package:path_provider/path_provider.dart';
@@ -1154,9 +1153,9 @@ class _SettingsPageState extends State<SettingsPage>
   Future<void> _setSecureMode() async {
     if (Platform.isAndroid) {
       if (Settings.useSecureMode) {
-        await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
+        await PlatformMiscMethods.instance.setWindowSecure();
       } else {
-        await FlutterWindowManager.clearFlags(FlutterWindowManager.FLAG_SECURE);
+        await PlatformMiscMethods.instance.setWindowInsecure();
       }
     }
   }

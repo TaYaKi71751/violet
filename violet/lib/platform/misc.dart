@@ -35,4 +35,20 @@ class PlatformMiscMethods {
       },
     );
   }
+
+  Future<void> setWindowSecure() async {
+    if (!Platform.isAndroid) {
+      throw UnsupportedError('Android only');
+    }
+
+    await _methodChannel.invokeMethod('setWindowSecure');
+  }
+
+  Future<void> setWindowInsecure() async {
+    if (!Platform.isAndroid) {
+      throw UnsupportedError('Android only');
+    }
+
+    await _methodChannel.invokeMethod('setWindowInsecure');
+  }
 }

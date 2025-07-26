@@ -234,16 +234,22 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
         Expanded(
           flex: 3,
           child: TypeAheadField<String>(
-            textFieldConfiguration: TextFieldConfiguration(
-              controller: _searchQueryController,
-              decoration: const InputDecoration(
-                labelText: '검색어',
-                hintText: '검색할 키워드를 입력하세요',
-                border: OutlineInputBorder(),
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-              ),
-            ),
+            controller: _searchQueryController,
+            builder: (context, controller, focusNode) {
+              return TextField(
+                controller: controller,
+                focusNode: focusNode,
+                decoration: const InputDecoration(
+                  labelText: '검색어',
+                  hintText: '검색할 키워드를 입력하세요',
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
+                ),
+              );
+            },
             suggestionsCallback: (pattern) async {
               final db = await LLMSearchLogDatabase.getInstance();
               final queries = await db.getQueries();
@@ -263,12 +269,12 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
                 dense: true,
               );
             },
-            onSuggestionSelected: (String suggestion) {
+            onSelected: (String suggestion) {
               _searchQueryController.text = suggestion;
             },
             hideOnEmpty: true,
             hideOnLoading: true,
-            direction: AxisDirection.down,
+            direction: VerticalDirection.down,
           ),
         ),
         const SizedBox(width: 8),

@@ -6,12 +6,12 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:app_links/app_links.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:uni_links/uni_links.dart';
 import 'package:violet/locale/locale.dart';
 import 'package:violet/log/act_log.dart';
 import 'package:violet/other/named_color.dart';
@@ -49,7 +49,7 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
     FToast().init(context);
 
     if (Platform.isAndroid || Platform.isIOS) {
-      uriLinkStream.listen(handleDeeplink);
+      AppLinks().uriLinkStream.listen(handleDeeplink);
     }
 
     Future.delayed(const Duration(milliseconds: 200))

@@ -832,7 +832,7 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
       },
     );
 
-    c.suggestionsBoxController ??= SuggestionsBoxController();
+    c.suggestionsController ??= SuggestionsController();
 
     return Row(
       children: [
@@ -841,7 +841,7 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
         const SizedBox(width: 16.0),
         Expanded(
           child: TypeAheadField(
-            suggestionsBoxController: c.suggestionsBoxController,
+            suggestionsController: c.suggestionsController,
             suggestionsCallback: (pattern) async {
               var ppattern = TagTranslate.disassembly(pattern);
 
@@ -866,27 +866,30 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
                 dense: true,
               );
             },
-            direction: AxisDirection.up,
-            onSuggestionSelected: ((String, String, int) suggestion) {
+            direction: VerticalDirection.up,
+            onSelected: ((String, String, int) suggestion) {
               c.searchText.text = suggestion.$1;
               setState(() {});
               Future.delayed(const Duration(milliseconds: 100))
                   .then((value) async {
                 c.onModifiedText();
-                c.suggestionsBoxController!.close();
+                c.suggestionsController!.close();
               });
             },
             hideOnEmpty: true,
             hideOnLoading: true,
-            textFieldConfiguration: TextFieldConfiguration(
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration.collapsed(
-                  hintText: '대사 입력',
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.5))),
-              controller: c.searchText,
-              // autofocus: true,
-              onEditingComplete: c.onModifiedText,
-            ),
+            builder: (context, controller, focusNode) {
+              return TextField(
+                controller: controller,
+                focusNode: focusNode,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration.collapsed(
+                    hintText: '대사 입력',
+                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.5))),
+                // autofocus: true,
+                onEditingComplete: c.onModifiedText,
+              );
+            },
           ),
         ),
         upIndicator,

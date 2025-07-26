@@ -284,8 +284,8 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
                       dense: true,
                     );
                   },
-                  direction: AxisDirection.up,
-                  onSuggestionSelected: ((String, String, int) suggestion) {
+                  direction: VerticalDirection.up,
+                  onSelected: ((String, String, int) suggestion) {
                     text.text = suggestion.$1;
                     setState(() {});
                     Future.delayed(const Duration(milliseconds: 100))
@@ -295,13 +295,17 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
                   },
                   hideOnEmpty: true,
                   hideOnLoading: true,
-                  textFieldConfiguration: TextFieldConfiguration(
-                    decoration:
-                        const InputDecoration.collapsed(hintText: '대사 입력'),
-                    controller: text,
-                    // autofocus: true,
-                    onEditingComplete: _onModifiedText,
-                  ),
+                  controller: text,
+                  builder: (context, controller, focusNode) {
+                    return TextField(
+                      controller: controller,
+                      focusNode: focusNode,
+                      decoration:
+                          const InputDecoration.collapsed(hintText: '대사 입력'),
+                      // autofocus: true,
+                      onEditingComplete: _onModifiedText,
+                    );
+                  },
                 ),
               ),
               IconButton(
