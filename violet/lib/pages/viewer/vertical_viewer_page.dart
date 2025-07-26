@@ -132,7 +132,7 @@ class _VerticalViewerPageState extends State<VerticalViewerPage>
           child: AbsorbPointer(
             absorbing: !_scrollListEnable,
             child: ColoredBox(
-              color: Settings.themeWhat && Settings.themeBlack
+              color: Settings.themeWhat.value && Settings.themeBlack.value
                   ? Colors.black
                   : const Color(0xff444444),
               child: notificationListener,

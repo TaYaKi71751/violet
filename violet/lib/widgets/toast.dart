@@ -117,7 +117,7 @@ class _ToastWrapperState extends State<ToastWrapper>
                     padding: const EdgeInsets.symmetric(
                         horizontal: 24.0, vertical: 12.0),
                     decoration: BoxDecoration(
-                        color: Settings.themeWhat
+                        color: Settings.themeWhat.value
                             ? Colors.black.withOpacity(0.6)
                             : Colors.grey.withOpacity(0.1)),
                     // decoration: BoxDecoration(

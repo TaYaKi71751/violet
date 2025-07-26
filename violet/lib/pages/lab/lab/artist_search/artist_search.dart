@@ -188,8 +188,8 @@ class _ArtistSearchState extends State<ArtistSearch> {
         height: heightMap[min(5, tagGroup.length) - 1],
         child: charts.BarChart(
           [series],
-          primaryMeasureAxis: Settings.themeWhat ? axis2 : null,
-          domainAxis: Settings.themeWhat ? axis1 : null,
+          primaryMeasureAxis: Settings.themeWhat.value ? axis2 : null,
+          domainAxis: Settings.themeWhat.value ? axis1 : null,
           animate: true,
           vertical: false,
         ),

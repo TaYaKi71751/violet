@@ -29,7 +29,8 @@ class SimilarListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return CardPanel.build(
       context,
-      enableBackgroundColor: Settings.themeWhat && Settings.themeBlack,
+      enableBackgroundColor:
+          Settings.themeWhat.value && Settings.themeBlack.value,
       child: ListView.builder(
         padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
         physics: const ClampingScrollPhysics(),

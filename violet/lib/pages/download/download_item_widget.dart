@@ -417,11 +417,11 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
               ? const EdgeInsets.only(bottom: 6)
               : const EdgeInsets.only(bottom: 50)
           : EdgeInsets.zero,
-      decoration: !Settings.themeFlat
+      decoration: !Settings.themeFlat.value
           ? BoxDecoration(
               color: style.showDetail
-                  ? Settings.themeWhat
-                      ? Settings.themeBlack
+                  ? Settings.themeWhat.value
+                      ? Settings.themeBlack.value
                           ? Palette.blackThemeBackground
                           : Colors.grey.shade800
                       : Colors.white70
@@ -429,7 +429,7 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
               borderRadius: const BorderRadius.all(Radius.circular(5)),
               boxShadow: [
                 BoxShadow(
-                  color: Settings.themeWhat
+                  color: Settings.themeWhat.value
                       ? Colors.grey.withOpacity(0.08)
                       : Colors.grey.withOpacity(0.4),
                   spreadRadius: 5,
@@ -439,9 +439,9 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
               ],
             )
           : null,
-      color: !Settings.themeFlat || !style.showDetail
+      color: !Settings.themeFlat.value || !style.showDetail
           ? null
-          : Settings.themeWhat
+          : Settings.themeWhat.value
               ? Colors.black26
               : Colors.white,
       child: style.showDetail
@@ -499,7 +499,7 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
                 length - latestReadPage <= 2 &&
                 Settings.showArticleProgress
             ? BoxDecoration(
-                color: Settings.themeWhat
+                color: Settings.themeWhat.value
                     ? Colors.grey.shade800
                     : Colors.grey.shade300,
                 backgroundBlendMode: BlendMode.saturation,
@@ -533,7 +533,7 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
     var pp =
         '${Translations.instance!.trans('date')}: ${widget.item.dateTime()!}';
 
-    var statecolor = !Settings.themeWhat ? Colors.black : Colors.white;
+    var statecolor = !Settings.themeWhat.value ? Colors.black : Colors.white;
     var statebold = FontWeight.normal;
 
     switch (widget.item.state()) {
@@ -769,7 +769,7 @@ class _ThumbnailWidget extends StatelessWidget {
           width: 30,
           height: 30,
           child: CircularProgressIndicator(
-            color: Settings.majorColor.withAlpha(150),
+            color: Settings.majorColor.value.withAlpha(150),
           ),
         ),
       );
@@ -844,7 +844,7 @@ class _FileThumbnailWidget extends StatelessWidget {
           width: 30,
           height: 30,
           child: CircularProgressIndicator(
-            color: Settings.majorColor.withAlpha(150),
+            color: Settings.majorColor.value.withAlpha(150),
           ),
         ),
       );

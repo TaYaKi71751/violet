@@ -415,8 +415,8 @@ class _ArtistInfoPageState extends State<ArtistInfoPage> {
                         }
                       }),
                 ],
-                primaryMeasureAxis: Settings.themeWhat ? axis2 : null,
-                domainAxis: Settings.themeWhat ? axis1 : null,
+                primaryMeasureAxis: Settings.themeWhat.value ? axis2 : null,
+                domainAxis: Settings.themeWhat.value ? axis1 : null,
                 animate: true,
                 vertical: false,
               )),
@@ -438,7 +438,8 @@ class _ArtistInfoPageState extends State<ArtistInfoPage> {
             child: ScrollOnExpand(
               child: ExpandablePanel(
                 theme: ExpandableThemeData(
-                    iconColor: Settings.themeWhat ? Colors.white : Colors.grey,
+                    iconColor:
+                        Settings.themeWhat.value ? Colors.white : Colors.grey,
                     animationDuration: const Duration(milliseconds: 500)),
                 header: Padding(
                   padding: const EdgeInsets.fromLTRB(12, 12, 0, 0),
@@ -465,7 +466,8 @@ class _ArtistInfoPageState extends State<ArtistInfoPage> {
             child: ScrollOnExpand(
               child: ExpandablePanel(
                 theme: ExpandableThemeData(
-                    iconColor: Settings.themeWhat ? Colors.white : Colors.grey,
+                    iconColor:
+                        Settings.themeWhat.value ? Colors.white : Colors.grey,
                     animationDuration: const Duration(milliseconds: 500)),
                 header: Padding(
                   padding: const EdgeInsets.fromLTRB(12, 12, 0, 0),
@@ -485,8 +487,9 @@ class _ArtistInfoPageState extends State<ArtistInfoPage> {
                   child: ScrollOnExpand(
                     child: ExpandablePanel(
                       theme: ExpandableThemeData(
-                          iconColor:
-                              Settings.themeWhat ? Colors.white : Colors.grey,
+                          iconColor: Settings.themeWhat.value
+                              ? Colors.white
+                              : Colors.grey,
                           animationDuration: const Duration(milliseconds: 500)),
                       header: Padding(
                         padding: const EdgeInsets.fromLTRB(12, 12, 0, 0),
@@ -507,8 +510,9 @@ class _ArtistInfoPageState extends State<ArtistInfoPage> {
                   child: ScrollOnExpand(
                     child: ExpandablePanel(
                       theme: ExpandableThemeData(
-                          iconColor:
-                              Settings.themeWhat ? Colors.white : Colors.grey,
+                          iconColor: Settings.themeWhat.value
+                              ? Colors.white
+                              : Colors.grey,
                           animationDuration: const Duration(milliseconds: 500)),
                       header: Padding(
                         padding: const EdgeInsets.fromLTRB(12, 12, 0, 0),
@@ -528,7 +532,8 @@ class _ArtistInfoPageState extends State<ArtistInfoPage> {
             child: ScrollOnExpand(
               child: ExpandablePanel(
                 theme: ExpandableThemeData(
-                    iconColor: Settings.themeWhat ? Colors.white : Colors.grey,
+                    iconColor:
+                        Settings.themeWhat.value ? Colors.white : Colors.grey,
                     animationDuration: const Duration(milliseconds: 500)),
                 header: Padding(
                   padding: const EdgeInsets.fromLTRB(12, 12, 0, 0),
@@ -547,7 +552,8 @@ class _ArtistInfoPageState extends State<ArtistInfoPage> {
             child: ScrollOnExpand(
               child: ExpandablePanel(
                 theme: ExpandableThemeData(
-                    iconColor: Settings.themeWhat ? Colors.white : Colors.grey,
+                    iconColor:
+                        Settings.themeWhat.value ? Colors.white : Colors.grey,
                     animationDuration: const Duration(milliseconds: 500)),
                 header: Padding(
                   padding: const EdgeInsets.fromLTRB(12, 12, 0, 0),
@@ -770,7 +776,8 @@ class _ArtistInfoPageState extends State<ArtistInfoPage> {
       onTap: () async {
         TextEditingController text = TextEditingController();
         Widget okButton = TextButton(
-          style: TextButton.styleFrom(foregroundColor: Settings.majorColor),
+          style:
+              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
           child: Text(Translations.instance!.trans('ok')),
           onPressed: () async {
             if (text.text.length < 5 || text.text.length > 500) {
@@ -785,7 +792,8 @@ class _ArtistInfoPageState extends State<ArtistInfoPage> {
           },
         );
         Widget cancelButton = TextButton(
-          style: TextButton.styleFrom(foregroundColor: Settings.majorColor),
+          style:
+              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
           child: Text(Translations.instance!.trans('cancel')),
           onPressed: () {
             Navigator.pop(context, false);

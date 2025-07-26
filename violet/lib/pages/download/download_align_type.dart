@@ -11,7 +11,7 @@ class DownloadAlignType extends StatelessWidget {
   const DownloadAlignType({super.key});
 
   Color getColor(int i) {
-    return Settings.themeWhat
+    return Settings.themeWhat.value
         ? Settings.downloadAlignType == i
             ? Colors.grey.shade200
             : Colors.grey.shade400

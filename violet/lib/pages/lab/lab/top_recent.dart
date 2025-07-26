@@ -168,8 +168,9 @@ class _LabTopRecentState extends State<LabTopRecent> {
                         max: 30000,
                         min: 1,
                         divisions: (30000 - 1),
-                        inactiveColor: Settings.majorColor.withOpacity(0.7),
-                        activeColor: Settings.majorColor,
+                        inactiveColor:
+                            Settings.majorColor.value.withOpacity(0.7),
+                        activeColor: Settings.majorColor.value,
                         onChangeEnd: (value) async {
                           limit = value.toInt();
                           await updateRercord(null);

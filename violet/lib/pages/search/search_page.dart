@@ -267,7 +267,7 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
 
   Widget _floatingActionButton() {
     return FloatingActionButton.extended(
-      backgroundColor: Settings.majorColor,
+      backgroundColor: Settings.majorColor.value,
       label: Obx(
         () => AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
@@ -349,8 +349,8 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
     final searchBar = Column(
       children: <Widget>[
         Material(
-          color: Settings.themeWhat
-              ? Settings.themeBlack
+          color: Settings.themeWhat.value
+              ? Settings.themeBlack.value
                   ? Palette.blackThemeBackground
                   : Colors.grey.shade900.withOpacity(0.4)
               : Colors.grey.shade200.withOpacity(0.4),
@@ -397,7 +397,7 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
               Radius.circular(4.0),
             ),
           ),
-          elevation: !Settings.themeFlat ? 100 : 0,
+          elevation: !Settings.themeFlat.value ? 100 : 0,
           clipBehavior: Clip.antiAliasWithSaveLayer,
           child: Stack(
             children: <Widget>[
@@ -474,7 +474,7 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
       color: Palette.themeColor,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(4.0))),
-      elevation: !Settings.themeFlat ? 100 : 0,
+      elevation: !Settings.themeFlat.value ? 100 : 0,
       clipBehavior: Clip.antiAliasWithSaveLayer,
       child: msgsearchOverlay,
     );
@@ -516,7 +516,7 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
       color: Palette.themeColor,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(4.0))),
-      elevation: !Settings.themeFlat ? 100 : 0,
+      elevation: !Settings.themeFlat.value ? 100 : 0,
       clipBehavior: Clip.antiAliasWithSaveLayer,
       child: alignOverlay,
     );

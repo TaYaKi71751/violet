@@ -147,7 +147,7 @@ class _GroupArtistListState extends State<LabGroupArtistList>
               Radius.circular(8.0),
             ),
           ),
-          elevation: !Settings.themeFlat ? 100 : 0,
+          elevation: !Settings.themeFlat.value ? 100 : 0,
           clipBehavior: Clip.antiAliasWithSaveLayer,
           child: InkWell(
             onTap: _progressingFilter

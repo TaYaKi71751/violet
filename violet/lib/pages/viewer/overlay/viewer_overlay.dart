@@ -541,8 +541,8 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
         min: 1,
         label: '${c.page.value + 1}',
         divisions: c.maxPage,
-        inactiveColor: Settings.majorColor.withOpacity(0.7),
-        activeColor: Settings.majorColor,
+        inactiveColor: Settings.majorColor.value.withOpacity(0.7),
+        activeColor: Settings.majorColor.value,
         onChangeStart: (value) {
           c.sliderOnChange = true;
         },

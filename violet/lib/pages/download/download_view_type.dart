@@ -11,7 +11,7 @@ class DownloadViewType extends StatelessWidget {
   const DownloadViewType({super.key});
 
   Color getColor(DownloadResultType type) {
-    return Settings.themeWhat
+    return Settings.themeWhat.value
         ? Settings.downloadResultType == type
             ? Colors.grey.shade200
             : Colors.grey.shade400

@@ -23,7 +23,7 @@ class _LabSettingState extends State<LabSetting> {
         children: [
           InkWell(
             child: ListTile(
-              leading: Icon(MdiIcons.flask, color: Settings.majorColor),
+              leading: Icon(MdiIcons.flask, color: Settings.majorColor.value),
               title: const Text('Simple item widget loading icon'),
               subtitle: const Text('using circular bar instead of flare'),
               trailing: Switch(
@@ -32,8 +32,8 @@ class _LabSettingState extends State<LabSetting> {
                   await Settings.setSimpleItemWidgetLoadingIcon(newValue);
                   setState(() {});
                 },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
             onTap: () async {
@@ -45,7 +45,7 @@ class _LabSettingState extends State<LabSetting> {
           _buildDivider(),
           InkWell(
             child: ListTile(
-              leading: Icon(MdiIcons.flask, color: Settings.majorColor),
+              leading: Icon(MdiIcons.flask, color: Settings.majorColor.value),
               title: const Text('Artist article list tap option'),
               subtitle: const Text(
                   'show new viewer when artist article list item tapped'),
@@ -56,8 +56,8 @@ class _LabSettingState extends State<LabSetting> {
                       newValue);
                   setState(() {});
                 },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
             onTap: () async {
@@ -69,7 +69,7 @@ class _LabSettingState extends State<LabSetting> {
           _buildDivider(),
           InkWell(
             child: ListTile(
-              leading: Icon(MdiIcons.flask, color: Settings.majorColor),
+              leading: Icon(MdiIcons.flask, color: Settings.majorColor.value),
               title: const Text('Enable viewer function backdrop filter'),
               subtitle: const Text(
                   'apply ios style blur effect to viewer functions. this blur effect may decrease performance.'),
@@ -80,8 +80,8 @@ class _LabSettingState extends State<LabSetting> {
                       newValue);
                   setState(() {});
                 },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
             onTap: () async {
@@ -93,7 +93,7 @@ class _LabSettingState extends State<LabSetting> {
           _buildDivider(),
           InkWell(
             child: ListTile(
-              leading: Icon(MdiIcons.flask, color: Settings.majorColor),
+              leading: Icon(MdiIcons.flask, color: Settings.majorColor.value),
               title: const Text('Using PushReplacement On Article Read'),
               subtitle: const Text(
                   'when tap Read button in the article-info, the article-info closes.'),
@@ -103,8 +103,8 @@ class _LabSettingState extends State<LabSetting> {
                   await Settings.setUsingPushReplacementOnArticleRead(newValue);
                   setState(() {});
                 },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
             onTap: () async {
@@ -116,7 +116,7 @@ class _LabSettingState extends State<LabSetting> {
           _buildDivider(),
           InkWell(
             child: ListTile(
-              leading: Icon(MdiIcons.flask, color: Settings.majorColor),
+              leading: Icon(MdiIcons.flask, color: Settings.majorColor.value),
               title: const Text('Download E(x)hentai Raw Image'),
               subtitle: const Text(
                   'download the original image. many network errors (connection reset ... etc) can occur during this operation.'),
@@ -126,8 +126,8 @@ class _LabSettingState extends State<LabSetting> {
                   await Settings.setDownloadEhRawImage(newValue);
                   setState(() {});
                 },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
             onTap: () async {
@@ -139,7 +139,7 @@ class _LabSettingState extends State<LabSetting> {
           _buildDivider(),
           InkWell(
             child: ListTile(
-              leading: Icon(MdiIcons.flask, color: Settings.majorColor),
+              leading: Icon(MdiIcons.flask, color: Settings.majorColor.value),
               title: const Text('Bookmark Scrollbar Position To Left'),
               subtitle: const Text('Reposition Bookmark Scrollber'),
               trailing: Switch(
@@ -148,8 +148,8 @@ class _LabSettingState extends State<LabSetting> {
                   await Settings.setBookmarkScrollbarPositionToLeft(newValue);
                   setState(() {});
                 },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
             onTap: () async {
@@ -161,7 +161,7 @@ class _LabSettingState extends State<LabSetting> {
           _buildDivider(),
           InkWell(
             child: ListTile(
-              leading: Icon(MdiIcons.flask, color: Settings.majorColor),
+              leading: Icon(MdiIcons.flask, color: Settings.majorColor.value),
               title: const Text('In Viewer Message Search'),
               subtitle: const Text('Support message search on viewer mode.'),
               trailing: Switch(
@@ -170,8 +170,8 @@ class _LabSettingState extends State<LabSetting> {
                   await Settings.setInViewerMessageSearch(newValue);
                   setState(() {});
                 },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
             onTap: () async {
@@ -192,7 +192,9 @@ class _LabSettingState extends State<LabSetting> {
       ),
       width: double.infinity,
       height: 1.0,
-      color: Settings.themeWhat ? Colors.grey.shade600 : Colors.grey.shade400,
+      color: Settings.themeWhat.value
+          ? Colors.grey.shade600
+          : Colors.grey.shade400,
     );
   }
 }

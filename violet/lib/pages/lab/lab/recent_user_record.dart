@@ -200,8 +200,9 @@ class _LabUserRecentRecordsState extends State<LabUserRecentRecords> {
                         max: 180,
                         min: 0,
                         divisions: (180 - 0),
-                        inactiveColor: Settings.majorColor.withOpacity(0.7),
-                        activeColor: Settings.majorColor,
+                        inactiveColor:
+                            Settings.majorColor.value.withOpacity(0.7),
+                        activeColor: Settings.majorColor.value,
                         onChangeEnd: (value) async {
                           limit = value.toInt();
                           records = <(QueryResult, int)>[];
@@ -339,8 +340,8 @@ class _LabUserRecentRecordsState extends State<LabUserRecentRecords> {
                       }
                     }),
               ],
-              primaryMeasureAxis: Settings.themeWhat ? axis2 : null,
-              domainAxis: Settings.themeWhat ? axis1 : null,
+              primaryMeasureAxis: Settings.themeWhat.value ? axis2 : null,
+              domainAxis: Settings.themeWhat.value ? axis1 : null,
               animate: true,
               vertical: false,
             )),

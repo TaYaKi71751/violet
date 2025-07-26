@@ -132,7 +132,9 @@ class _LockScreenState extends State<LockScreen> with TickerProviderStateMixin {
     );
 
     final page = Material(
-      color: Settings.themeBlack && Settings.themeWhat ? Colors.black : null,
+      color: Settings.themeBlack.value && Settings.themeWhat.value
+          ? Colors.black
+          : null,
       child: Container(
         padding: const EdgeInsets.all(16.0),
         width: double.infinity,
@@ -230,7 +232,7 @@ class _LockScreenState extends State<LockScreen> with TickerProviderStateMixin {
 
   Future<void> _passwordMissing() async {
     final Widget yesButton = TextButton(
-      style: TextButton.styleFrom(foregroundColor: Settings.majorColor),
+      style: TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
       child: Text(Translations.instance!.trans('ok')),
       onPressed: () {
         Navigator.pop(context, true);
@@ -238,7 +240,7 @@ class _LockScreenState extends State<LockScreen> with TickerProviderStateMixin {
     );
 
     final Widget noButton = TextButton(
-      style: TextButton.styleFrom(foregroundColor: Settings.majorColor),
+      style: TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
       child: Text(Translations.instance!.trans('cancel')),
       onPressed: () {
         Navigator.pop(context, false);

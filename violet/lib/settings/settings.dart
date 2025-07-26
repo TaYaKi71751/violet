@@ -28,22 +28,23 @@ class Settings {
   static late bool ignoreTimeout; // default false
 
   // Color Settings
-  static late Color themeColor; // default light
-  static late bool themeWhat; // default false == light
-  static late Color majorColor; // default purple
-  static late Color majorAccentColor;
+  static Color get themeColor => themeWhat.value ? Colors.white : Colors.black;
+  static final themeWhat = SettingItem<bool>('themeColor', false);
+  static final majorColor = SettingItem<Color>('majorColor', Colors.purple);
+  static final majorAccentColor =
+      SettingItem<Color>('majorAccentColor', Colors.purpleAccent);
   static late SearchResultType searchResultType;
   static late DownloadResultType downloadResultType;
   static late int downloadAlignType;
-  static late bool themeFlat;
-  static late bool themeBlack; // default false
+  static final themeFlat = SettingItem<bool>('themeFlat', false);
+  static final themeBlack = SettingItem<bool>('themeBlack', false);
   static late bool useTabletMode;
 
   // Tag Settings
   static late String includeTags;
   static late List<String> excludeTags;
   static late List<String> blurredTags;
-  static late String? language; // System Language
+  static final language = SettingItem<String>('language', '');
   static late bool translateTags;
 
   static String get serializedExcludeTags => Settings.excludeTags
@@ -85,6 +86,8 @@ class Settings {
   static late bool showRecordJumpMessage;
 
   // Download Options
+  static final threadCount = SettingItem<int>('thread_count', 4);
+
   static late bool useInnerStorage;
   static late String downloadBasePath;
   static late String downloadRule;
@@ -126,35 +129,18 @@ class Settings {
   static late bool bookmarkScrollbarPositionToLeft;
   static late bool inViewerMessageSearch;
 
-  static late bool useLockScreen;
-  static late bool useSecureMode;
+  static final useLockScreen = SettingItem<bool>('useLockScreen', false);
+  static final useSecureMode = SettingItem<bool>('useSecureMode', false);
 
   static Future<void> initFirst() async {
     prefs = await SharedPreferences.getInstance();
 
-    final mc = await _getInt('majorColor', Colors.purple.value);
-    final mac = await _getInt('majorAccentColor', Colors.purpleAccent.value);
-
-    majorColor = Color(mc);
-    majorAccentColor = Color(mac);
-
-    themeWhat = await _getBool('themeColor');
-    themeColor = !themeWhat ? Colors.white : Colors.black;
-    themeFlat = await _getBool('themeFlat');
-    themeBlack = await _getBool('themeBlack');
-
-    language = prefs.getString('language');
-
-    useLockScreen = await _getBool('useLockScreen');
-    useSecureMode = await _getBool('useSecureMode');
     await _setSecureMode();
-
-    await _getInt('thread_count', 4);
   }
 
   static Future<void> _setSecureMode() async {
     if (Platform.isAndroid) {
-      if (Settings.useSecureMode) {
+      if (Settings.useSecureMode.value) {
         await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
       } else {
         await FlutterWindowManager.clearFlags(FlutterWindowManager.FLAG_SECURE);
@@ -384,7 +370,7 @@ class Settings {
     var includetags = prefs.getString('includetags');
 
     var language = 'lang:english';
-    var langcode = Settings.language!;
+    var langcode = Settings.language.value;
     if (langcode == 'ko') {
       language = 'lang:korean';
     } else if (langcode == 'ja') {
@@ -475,34 +461,10 @@ class Settings {
     return downloadBasePath;
   }
 
-  static Future<void> setThemeWhat(bool wh) async {
-    themeWhat = wh;
-    if (!themeWhat) {
-      themeColor = Colors.white;
-    } else {
-      themeColor = Colors.black;
-    }
-
-    await prefs.setBool('themeColor', themeWhat);
-  }
-
-  static Future<void> setThemeBlack(bool wh) async {
-    themeBlack = wh;
-
-    await prefs.setBool('themeBlack', themeBlack);
-  }
-
-  static Future<void> setThemeFlat(bool nn) async {
-    themeFlat = nn;
-
-    await prefs.setBool('themeFlat', nn);
-  }
-
   static Future<void> setMajorColor(Color color) async {
-    if (majorColor == color) return;
+    if (majorColor.value == color) return;
 
-    await prefs.setInt('majorColor', color.value);
-    majorColor = color;
+    await majorColor.setValue(color);
 
     Color? accent;
     for (int i = 0; i < Colors.primaries.length - 2; i++) {
@@ -524,8 +486,7 @@ class Settings {
       }
     }
 
-    await prefs.setInt('majorAccentColor', accent!.value);
-    majorAccentColor = accent;
+    await majorAccentColor.setValue(accent!);
   }
 
   static Future<void> setBookmarkRepository(String value) async {
@@ -556,12 +517,6 @@ class Settings {
     downloadAlignType = wh;
 
     await prefs.setInt('downloadAlignType', downloadAlignType);
-  }
-
-  static Future<void> setLanguage(String lang) async {
-    language = lang;
-
-    await prefs.setString('language', lang);
   }
 
   static Future<void> setIncludeTags(String nn) async {
@@ -888,17 +843,57 @@ class Settings {
 
     await prefs.setBool('inViewerMessageSearch', nn);
   }
+}
 
-  static Future<void> setUseLockScreen(bool nn) async {
-    useLockScreen = nn;
+class SettingItem<T> {
+  final String key;
+  final T defaultValue;
+  T? _value;
 
-    await prefs.setBool('useLockScreen', nn);
+  SettingItem(this.key, this.defaultValue) {
+    load();
   }
 
-  static Future<void> setUseSecureMode(bool nn) async {
-    useSecureMode = nn;
+  T get value => _value ?? defaultValue;
+  Future<void> setValue(T v) async {
+    _value = v;
+    await _save(v);
+  }
 
-    await prefs.setBool('useSecureMode', nn);
+  void load() {
+    final prefs = Settings.prefs;
+    if (T == bool) {
+      _value = prefs.getBool(key) as T? ?? defaultValue;
+    } else if (T == int) {
+      _value = prefs.getInt(key) as T? ?? defaultValue;
+    } else if (T == double) {
+      _value = prefs.getDouble(key) as T? ?? defaultValue;
+    } else if (T == String) {
+      _value = prefs.getString(key) as T? ?? defaultValue;
+    } else if (T == Color) {
+      _value =
+          Color(prefs.getInt(key) ?? (defaultValue as Color).value) as T? ??
+              defaultValue;
+    } else {
+      throw Exception('Unsupported type');
+    }
+  }
+
+  Future<void> _save(T v) async {
+    final prefs = Settings.prefs;
+    if (v is bool) {
+      await prefs.setBool(key, v);
+    } else if (v is int) {
+      await prefs.setInt(key, v);
+    } else if (v is double) {
+      await prefs.setDouble(key, v);
+    } else if (v is String) {
+      await prefs.setString(key, v);
+    } else if (v is Color) {
+      await prefs.setInt(key, v.value);
+    } else {
+      throw Exception('Unsupported type');
+    }
   }
 }
 

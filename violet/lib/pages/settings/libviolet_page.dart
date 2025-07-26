@@ -13,7 +13,7 @@ class LibvioletPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Settings.majorColor,
+        backgroundColor: Settings.majorColor.value,
         title: const Text('LIBVIOLET'),
       ),
       body: SingleChildScrollView(
@@ -25,8 +25,9 @@ class LibvioletPage extends StatelessWidget {
                 child: ScrollOnExpand(
                   child: ExpandablePanel(
                     theme: ExpandableThemeData(
-                        iconColor:
-                            Settings.themeWhat ? Colors.white : Colors.grey,
+                        iconColor: Settings.themeWhat.value
+                            ? Colors.white
+                            : Colors.grey,
                         animationDuration: const Duration(milliseconds: 500)),
                     header: const Padding(
                       padding: EdgeInsets.fromLTRB(12, 12, 0, 0),
@@ -51,7 +52,7 @@ class LibvioletPage extends StatelessWidget {
             Container(
               width: double.infinity,
               height: 0.5,
-              color: Settings.themeWhat
+              color: Settings.themeWhat.value
                   ? Colors.grey.shade600
                   : Colors.grey.shade400,
             ),
@@ -69,7 +70,7 @@ class LibvioletPage extends StatelessWidget {
             Container(
               width: double.infinity,
               height: 0.5,
-              color: Settings.themeWhat
+              color: Settings.themeWhat.value
                   ? Colors.grey.shade600
                   : Colors.grey.shade400,
             ),
@@ -87,7 +88,7 @@ class LibvioletPage extends StatelessWidget {
             Container(
               width: double.infinity,
               height: 0.5,
-              color: Settings.themeWhat
+              color: Settings.themeWhat.value
                   ? Colors.grey.shade600
                   : Colors.grey.shade400,
             ),
@@ -105,7 +106,7 @@ class LibvioletPage extends StatelessWidget {
             Container(
               width: double.infinity,
               height: 0.5,
-              color: Settings.themeWhat
+              color: Settings.themeWhat.value
                   ? Colors.grey.shade600
                   : Colors.grey.shade400,
             ),
@@ -122,7 +123,7 @@ class LibvioletPage extends StatelessWidget {
             Container(
               width: double.infinity,
               height: 0.5,
-              color: Settings.themeWhat
+              color: Settings.themeWhat.value
                   ? Colors.grey.shade600
                   : Colors.grey.shade400,
             ),
@@ -140,7 +141,7 @@ class LibvioletPage extends StatelessWidget {
             Container(
               width: double.infinity,
               height: 0.5,
-              color: Settings.themeWhat
+              color: Settings.themeWhat.value
                   ? Colors.grey.shade600
                   : Colors.grey.shade400,
             ),
@@ -157,7 +158,7 @@ class LibvioletPage extends StatelessWidget {
             Container(
               width: double.infinity,
               height: 0.5,
-              color: Settings.themeWhat
+              color: Settings.themeWhat.value
                   ? Colors.grey.shade600
                   : Colors.grey.shade400,
             ),
@@ -174,7 +175,7 @@ class LibvioletPage extends StatelessWidget {
             Container(
               width: double.infinity,
               height: 0.5,
-              color: Settings.themeWhat
+              color: Settings.themeWhat.value
                   ? Colors.grey.shade600
                   : Colors.grey.shade400,
             ),
@@ -192,7 +193,7 @@ class LibvioletPage extends StatelessWidget {
             Container(
               width: double.infinity,
               height: 0.5,
-              color: Settings.themeWhat
+              color: Settings.themeWhat.value
                   ? Colors.grey.shade600
                   : Colors.grey.shade400,
             ),
@@ -210,7 +211,7 @@ class LibvioletPage extends StatelessWidget {
             Container(
               width: double.infinity,
               height: 0.5,
-              color: Settings.themeWhat
+              color: Settings.themeWhat.value
                   ? Colors.grey.shade600
                   : Colors.grey.shade400,
             ),

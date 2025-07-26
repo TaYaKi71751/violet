@@ -602,32 +602,33 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
         key: heightRefHeader == null ? heightRefHeader ??= GlobalKey() : null,
         padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
         child: Container(
-          decoration: !Settings.themeFlat
+          decoration: !Settings.themeFlat.value
               ? BoxDecoration(
-                  color: Settings.themeWhat ? Colors.black26 : Colors.white,
+                  color:
+                      Settings.themeWhat.value ? Colors.black26 : Colors.white,
                   borderRadius: BorderRadius.circular(8.0),
                   boxShadow: [
                     BoxShadow(
-                      color: Settings.themeWhat
+                      color: Settings.themeWhat.value
                           ? Colors.black26
                           : Colors.grey.withOpacity(0.1),
-                      spreadRadius: Settings.themeWhat ? 0 : 5,
+                      spreadRadius: Settings.themeWhat.value ? 0 : 5,
                       blurRadius: 7,
                       offset: const Offset(0, 3), // changes position of shadow
                     ),
                   ],
                 )
               : null,
-          color: !Settings.themeFlat
+          color: !Settings.themeFlat.value
               ? null
-              : Settings.themeWhat
+              : Settings.themeWhat.value
                   ? Colors.black26
                   : Colors.white,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
             child: Material(
-              color: Settings.themeWhat
-                  ? Settings.themeBlack
+              color: Settings.themeWhat.value
+                  ? Settings.themeBlack.value
                       ? Palette.blackThemeBackground
                       : Colors.black38
                   : Colors.white,
@@ -716,15 +717,15 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
               Radius.circular(4.0),
             ),
           ),
-          elevation: !Settings.themeFlat ? 100 : 0,
+          elevation: !Settings.themeFlat.value ? 100 : 0,
           clipBehavior: Clip.antiAliasWithSaveLayer,
           child: Stack(
             children: <Widget>[
               Column(
                 children: <Widget>[
                   Material(
-                    color: Settings.themeWhat
-                        ? Settings.themeBlack
+                    color: Settings.themeWhat.value
+                        ? Settings.themeBlack.value
                             ? Palette.blackThemeBackground
                             : Colors.grey.shade900.withOpacity(0.4)
                         : Colors.grey.shade200.withOpacity(0.4),
@@ -772,7 +773,7 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
                       }
                       Widget yesButton = TextButton(
                         style: TextButton.styleFrom(
-                            foregroundColor: Settings.majorColor),
+                            foregroundColor: Settings.majorColor.value),
                         child: Text(Translations.instance!.trans('ok')),
                         onPressed: () {
                           Navigator.pop(context, true);
@@ -780,7 +781,7 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
                       );
                       Widget noButton = TextButton(
                         style: TextButton.styleFrom(
-                            foregroundColor: Settings.majorColor),
+                            foregroundColor: Settings.majorColor.value),
                         child: Text(Translations.instance!.trans('cancel')),
                         onPressed: () {
                           Navigator.pop(context, false);
@@ -848,7 +849,7 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
                 Radius.circular(4.0),
               ),
             ),
-            elevation: !Settings.themeFlat ? 100 : 0,
+            elevation: !Settings.themeFlat.value ? 100 : 0,
             clipBehavior: Clip.antiAliasWithSaveLayer,
             child: InkWell(
               onTap: _featuresOnTap,
@@ -921,7 +922,7 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
                 Radius.circular(4.0),
               ),
             ),
-            elevation: !Settings.themeFlat ? 100 : 0,
+            elevation: !Settings.themeFlat.value ? 100 : 0,
             clipBehavior: Clip.antiAliasWithSaveLayer,
             child: InkWell(
               onTap: _alignOnTap,

@@ -67,8 +67,8 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
                       max: 20,
                       min: 1,
                       divisions: (20 - 1) * 2,
-                      inactiveColor: Settings.majorColor.withOpacity(0.7),
-                      activeColor: Settings.majorColor,
+                      inactiveColor: Settings.majorColor.value.withOpacity(0.7),
+                      activeColor: Settings.majorColor.value,
                       onChangeEnd: (value) async {
                         await Settings.setTimerTick(value);
                       },
@@ -340,7 +340,7 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
       trailing: Switch(
         onChanged: enabled ? onChanged : null,
         value: value,
-        activeColor: Settings.majorColor,
+        activeColor: Settings.majorColor.value,
       ),
       title: Text(title, style: const TextStyle(color: Colors.white)),
       onTap: () => onChanged(value),

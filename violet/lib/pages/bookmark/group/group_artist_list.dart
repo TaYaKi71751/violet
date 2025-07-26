@@ -163,7 +163,7 @@ class _GroupArtistListState extends State<GroupArtistList>
               Radius.circular(8.0),
             ),
           ),
-          elevation: !Settings.themeFlat ? 100 : 0,
+          elevation: !Settings.themeFlat.value ? 100 : 0,
           clipBehavior: Clip.antiAliasWithSaveLayer,
           child: InkWell(
             onTap: _progressingFilter
@@ -435,8 +435,7 @@ class _GroupArtistListState extends State<GroupArtistList>
                   actions: <Widget>[
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Settings.majorColor,
-                      ),
+                          backgroundColor: Settings.majorColor.value),
                       child: Text(Translations.instance!.trans('cancel')),
                       onPressed: () {
                         Navigator.pop(context, 0);

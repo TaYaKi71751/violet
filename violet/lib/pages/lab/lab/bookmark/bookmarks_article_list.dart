@@ -218,7 +218,7 @@ class _GroupArticleListPageState extends State<LabGroupArticleListPage> {
               Radius.circular(8.0),
             ),
           ),
-          elevation: !Settings.themeFlat ? 100 : 0,
+          elevation: !Settings.themeFlat.value ? 100 : 0,
           clipBehavior: Clip.antiAliasWithSaveLayer,
           child: InkWell(
             child: const SizedBox(

@@ -78,7 +78,7 @@ class ThumbnailWidget extends StatelessWidget {
                         width: 30,
                         height: 30,
                         child: CircularProgressIndicator(
-                          color: Settings.majorColor.withAlpha(150),
+                          color: Settings.majorColor.value.withAlpha(150),
                         ),
                       ),
                     ),
@@ -139,7 +139,7 @@ class ThumbnailImageWidget extends StatelessWidget {
                   fit: !showUltra ? BoxFit.cover : BoxFit.contain,
                   colorFilter: greyScale
                       ? ColorFilter.mode(
-                          Settings.themeWhat
+                          Settings.themeWhat.value
                               ? Colors.grey.shade800
                               : Colors.grey.shade300,
                           BlendMode.saturation,
@@ -157,7 +157,7 @@ class ThumbnailImageWidget extends StatelessWidget {
                   width: 30,
                   height: 30,
                   child: CircularProgressIndicator(
-                    color: Settings.majorColor.withAlpha(150),
+                    color: Settings.majorColor.value.withAlpha(150),
                   ),
                 ),
               );
@@ -176,7 +176,7 @@ class ThumbnailImageWidget extends StatelessWidget {
                     width: 30,
                     height: 30,
                     child: CircularProgressIndicator(
-                      color: Settings.majorColor.withAlpha(150),
+                      color: Settings.majorColor.value.withAlpha(150),
                     ),
                   ),
                 );
@@ -224,10 +224,10 @@ class BookmarkIndicatorWidget extends StatelessWidget {
                     color: c.isBookmarked.value
                         ? !greyScale
                             ? const Color(0xFFE2264D)
-                            : Settings.themeWhat
+                            : Settings.themeWhat.value
                                 ? const Color(0xFF626262)
                                 : const Color(0xFF636363)
-                        : !Settings.themeWhat
+                        : !Settings.themeWhat.value
                             ? Colors.black
                             : Colors.white,
                   ),

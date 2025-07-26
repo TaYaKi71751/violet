@@ -9,14 +9,14 @@ class Palette {
   static const darkThemeBackground = Color(0xFF353535);
   static final lightThemeBackground = Colors.grey.shade100;
 
-  static Color get themeColor => Settings.themeWhat
-      ? Settings.themeBlack
+  static Color get themeColor => Settings.themeWhat.value
+      ? Settings.themeBlack.value
           ? Palette.blackThemeBackground
           : Palette.darkThemeBackground
       : Palette.lightThemeBackground;
 
-  static Color get themeColorLightShallow => Settings.themeWhat
-      ? Settings.themeBlack
+  static Color get themeColorLightShallow => Settings.themeWhat.value
+      ? Settings.themeBlack.value
           ? Palette.blackThemeBackground
           : Palette.darkThemeBackground
       : Colors.grey.shade200;

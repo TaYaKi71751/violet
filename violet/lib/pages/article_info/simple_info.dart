@@ -122,7 +122,7 @@ class SimpleInfoWidget extends StatelessWidget {
                       width: 30,
                       height: 30,
                       child: CircularProgressIndicator(
-                        color: Settings.majorColor.withAlpha(150),
+                        color: Settings.majorColor.value.withAlpha(150),
                       ),
                     ),
                   ),
@@ -167,7 +167,9 @@ class SimpleInfoWidget extends StatelessWidget {
           child: Theme(
             data: ThemeData(
                 iconTheme: IconThemeData(
-                    color: !Settings.themeWhat ? Colors.black : Colors.white)),
+                    color: !Settings.themeWhat.value
+                        ? Colors.black
+                        : Colors.white)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisAlignment: MainAxisAlignment.start,

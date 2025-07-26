@@ -57,12 +57,12 @@ class _BookmarkPageState extends ThemeSwitchableState<BookmarkPage>
         overlayColor: Colors.transparent,
         overlayOpacity: 0.2,
         heroTag: 'speed-dial-hero-tag',
-        backgroundColor: Settings.themeWhat
-            ? Settings.themeBlack
+        backgroundColor: Settings.themeWhat.value
+            ? Settings.themeBlack.value
                 ? Palette.blackThemeBackground
                 : Colors.grey.shade800
             : Colors.white,
-        foregroundColor: Settings.majorColor,
+        foregroundColor: Settings.majorColor.value,
         elevation: 1.0,
         shape: const CircleBorder(),
         children: [
@@ -85,19 +85,19 @@ class _BookmarkPageState extends ThemeSwitchableState<BookmarkPage>
 
   _dialButton(IconData? icon, String label, Function() onTap) {
     return SpeedDialChild(
-      child: Icon(icon, color: Settings.majorColor),
-      backgroundColor: Settings.themeWhat
-          ? Settings.themeBlack
+      child: Icon(icon, color: Settings.majorColor.value),
+      backgroundColor: Settings.themeWhat.value
+          ? Settings.themeBlack.value
               ? Palette.blackThemeBackground
               : Colors.grey.shade800
           : Colors.white,
       label: Translations.instance!.trans(label),
       labelStyle: TextStyle(
         fontSize: 14.0,
-        color: Settings.themeWhat ? Colors.white : Colors.grey.shade800,
+        color: Settings.themeWhat.value ? Colors.white : Colors.grey.shade800,
       ),
-      labelBackgroundColor: Settings.themeWhat
-          ? Settings.themeBlack
+      labelBackgroundColor: Settings.themeWhat.value
+          ? Settings.themeBlack.value
               ? Palette.blackThemeBackground
               : Colors.grey.shade800
           : Colors.white,
@@ -212,7 +212,7 @@ class _BookmarkPageState extends ThemeSwitchableState<BookmarkPage>
           margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Settings.themeWhat ? Colors.black26 : Colors.white,
+            color: Settings.themeWhat.value ? Colors.black26 : Colors.white,
             borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(8),
                 topRight: Radius.circular(8),
@@ -220,10 +220,10 @@ class _BookmarkPageState extends ThemeSwitchableState<BookmarkPage>
                 bottomRight: Radius.circular(8)),
             boxShadow: [
               BoxShadow(
-                color: Settings.themeWhat
+                color: Settings.themeWhat.value
                     ? Colors.black26
                     : Colors.grey.withOpacity(0.1),
-                spreadRadius: Settings.themeWhat ? 0 : 5,
+                spreadRadius: Settings.themeWhat.value ? 0 : 5,
                 blurRadius: 7,
                 offset: const Offset(0, 3), // changes position of shadow
               ),
@@ -232,8 +232,8 @@ class _BookmarkPageState extends ThemeSwitchableState<BookmarkPage>
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
             child: Material(
-              color: Settings.themeWhat
-                  ? Settings.themeBlack
+              color: Settings.themeWhat.value
+                  ? Settings.themeBlack.value
                       ? Palette.blackThemeBackground
                       : Colors.black38
                   : Colors.white,

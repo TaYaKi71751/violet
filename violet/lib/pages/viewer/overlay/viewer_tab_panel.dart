@@ -352,7 +352,7 @@ class __ArtistsArticleTabListState extends State<_ArtistsArticleTabList>
               width: 30,
               height: 30,
               child: CircularProgressIndicator(
-                color: Settings.majorColor.withAlpha(150),
+                color: Settings.majorColor.value.withAlpha(150),
               ),
             ),
           )

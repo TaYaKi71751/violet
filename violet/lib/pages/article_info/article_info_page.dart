@@ -72,7 +72,7 @@ class ArticleInfoPage extends StatelessWidget {
           width: width - 16,
           height: Variables.articleInfoHeight,
           child: Container(
-            color: Settings.themeWhat
+            color: Settings.themeWhat.value
                 ? Colors.black.withOpacity(0.9)
                 : Colors.white.withOpacity(0.97),
             child: ListView(
@@ -81,7 +81,7 @@ class ArticleInfoPage extends StatelessWidget {
                 Container(
                   width: width,
                   height: simpleInfoHeight(),
-                  color: Settings.themeWhat
+                  color: Settings.themeWhat.value
                       ? Colors.grey.shade900.withOpacity(0.6)
                       : Colors.white.withOpacity(0.2),
                   child: SimpleInfoWidget(),
@@ -102,8 +102,9 @@ class ArticleInfoPage extends StatelessWidget {
                       scrollOnCollapse: false,
                       child: ExpandablePanel(
                         theme: ExpandableThemeData(
-                            iconColor:
-                                Settings.themeWhat ? Colors.white : Colors.grey,
+                            iconColor: Settings.themeWhat.value
+                                ? Colors.white
+                                : Colors.grey,
                             animationDuration:
                                 const Duration(milliseconds: 500)),
                         header: Padding(
@@ -131,7 +132,7 @@ class ArticleInfoPage extends StatelessWidget {
                         scrollOnCollapse: false,
                         child: ExpandablePanel(
                           theme: ExpandableThemeData(
-                              iconColor: Settings.themeWhat
+                              iconColor: Settings.themeWhat.value
                                   ? Colors.white
                                   : Colors.grey,
                               animationDuration:
@@ -198,7 +199,7 @@ class ArticleInfoPage extends StatelessWidget {
       children: <Widget>[
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Settings.majorColor.withAlpha(230),
+            backgroundColor: Settings.majorColor.value.withAlpha(230),
           ),
           onPressed: () async => await downloadButtonEvent(context, data),
           child: buttonInner(
@@ -209,8 +210,7 @@ class ArticleInfoPage extends StatelessWidget {
         const SizedBox(width: 4.0),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Settings.majorColor,
-          ),
+              backgroundColor: Settings.majorColor.value),
           onPressed: data.lockRead
               ? null
               : () async => await readButtonEvent(context, data),
@@ -327,7 +327,9 @@ class DividerWidget extends StatelessWidget {
       ),
       width: double.infinity,
       height: 1.0,
-      color: Settings.themeWhat ? Colors.grey.shade600 : Colors.grey.shade400,
+      color: Settings.themeWhat.value
+          ? Colors.grey.shade600
+          : Colors.grey.shade400,
     );
   }
 }
@@ -565,7 +567,8 @@ class __InfoAreaWidgetState extends State<_InfoAreaWidget> {
         child: ScrollOnExpand(
           child: ExpandablePanel(
             theme: ExpandableThemeData(
-                iconColor: Settings.themeWhat ? Colors.white : Colors.grey,
+                iconColor:
+                    Settings.themeWhat.value ? Colors.white : Colors.grey,
                 animationDuration: const Duration(milliseconds: 500)),
             header: Padding(
               padding: const EdgeInsets.fromLTRB(12, 12, 0, 0),
@@ -685,7 +688,8 @@ class __InfoAreaWidgetState extends State<_InfoAreaWidget> {
 
         TextEditingController text = TextEditingController();
         Widget okButton = TextButton(
-          style: TextButton.styleFrom(foregroundColor: Settings.majorColor),
+          style:
+              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
           child: Text(Translations.instance!.trans('ok')),
           onPressed: () async {
             if ((await EHSession.postComment(
@@ -701,7 +705,8 @@ class __InfoAreaWidgetState extends State<_InfoAreaWidget> {
           },
         );
         Widget cancelButton = TextButton(
-          style: TextButton.styleFrom(foregroundColor: Settings.majorColor),
+          style:
+              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
           child: Text(Translations.instance!.trans('cancel')),
           onPressed: () {
             Navigator.pop(context, false);

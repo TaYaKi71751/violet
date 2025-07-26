@@ -43,7 +43,7 @@ class _TagRebuildPageState extends State<TagRebuildPage> {
           borderRadius: const BorderRadius.all(Radius.circular(1)),
           boxShadow: [
             BoxShadow(
-              color: Settings.themeWhat
+              color: Settings.themeWhat.value
                   ? Colors.black.withOpacity(0.4)
                   : Colors.grey.withOpacity(0.2),
               spreadRadius: 1,
@@ -57,7 +57,7 @@ class _TagRebuildPageState extends State<TagRebuildPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Card(
-              color: Settings.themeWhat
+              color: Settings.themeWhat.value
                   ? Palette.darkThemeBackground
                   : Palette.lightThemeBackground,
               elevation: 100,

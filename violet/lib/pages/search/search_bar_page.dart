@@ -108,8 +108,8 @@ class _SearchBarPageState extends State<SearchBarPage>
     _initBottomPadding ??= (mediaQuery.padding + mediaQuery.viewInsets).bottom;
 
     return Container(
-      color: Settings.themeWhat
-          ? Settings.themeBlack
+      color: Settings.themeWhat.value
+          ? Settings.themeBlack.value
               ? Palette.blackThemeBackground
               : Colors.grey.shade900
           : Colors.white,
@@ -123,11 +123,11 @@ class _SearchBarPageState extends State<SearchBarPage>
               elevation: 100,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4)),
-              color: Settings.themeWhat && Settings.themeBlack
+              color: Settings.themeWhat.value && Settings.themeBlack.value
                   ? Palette.blackThemeBackground
                   : null,
               child: Material(
-                color: Settings.themeWhat && Settings.themeBlack
+                color: Settings.themeWhat.value && Settings.themeBlack.value
                     ? Palette.blackThemeBackground
                     : null,
                 child: Column(
@@ -166,7 +166,7 @@ class _SearchBarPageState extends State<SearchBarPage>
 
   _searchBar() {
     return Material(
-      color: Settings.themeWhat && Settings.themeBlack
+      color: Settings.themeWhat.value && Settings.themeBlack.value
           ? Palette.blackThemeBackground
           : null,
       child: ListTile(
@@ -224,7 +224,7 @@ class _SearchBarPageState extends State<SearchBarPage>
       padding: const EdgeInsets.fromLTRB(8, 2, 8, 2),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Settings.majorColor,
+          backgroundColor: Settings.majorColor.value,
         ),
         child: Text(Translations.instance!.trans('search')),
         onPressed: () async {
@@ -375,10 +375,10 @@ class _SearchBarPageState extends State<SearchBarPage>
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  if (Settings.language == 'ko')
+                  if (Settings.language.value == 'ko')
                     ListTile(
-                      leading:
-                          Icon(Icons.translate, color: Settings.majorColor),
+                      leading: Icon(Icons.translate,
+                          color: Settings.majorColor.value),
                       title:
                           Text(Translations.instance!.trans('tagtranslation')),
                       trailing: Switch(
@@ -387,8 +387,8 @@ class _SearchBarPageState extends State<SearchBarPage>
                           await Settings.setSearchTagTranslation(newValue);
                           setState(() {});
                         },
-                        activeTrackColor: Settings.majorColor,
-                        activeColor: Settings.majorAccentColor,
+                        activeTrackColor: Settings.majorColor.value,
+                        activeColor: Settings.majorAccentColor.value,
                       ),
                       onTap: () async {
                         await Settings.setSearchTagTranslation(
@@ -396,7 +396,7 @@ class _SearchBarPageState extends State<SearchBarPage>
                         setState(() {});
                       },
                     ),
-                  if (Settings.language == 'ko')
+                  if (Settings.language.value == 'ko')
                     Container(
                       margin: const EdgeInsets.symmetric(
                         horizontal: 8.0,
@@ -405,10 +405,10 @@ class _SearchBarPageState extends State<SearchBarPage>
                       height: 1.0,
                       color: Colors.grey.shade400,
                     ),
-                  if (Settings.language == 'ko')
+                  if (Settings.language.value == 'ko')
                     ListTile(
                       leading: Icon(MdiIcons.layersSearch,
-                          color: Settings.majorColor),
+                          color: Settings.majorColor.value),
                       title: const Text('한글 검색'),
                       trailing: Switch(
                         value: Settings.searchUseTranslated,
@@ -416,8 +416,8 @@ class _SearchBarPageState extends State<SearchBarPage>
                           await Settings.setSearchUseTranslated(newValue);
                           setState(() {});
                         },
-                        activeTrackColor: Settings.majorColor,
-                        activeColor: Settings.majorAccentColor,
+                        activeTrackColor: Settings.majorColor.value,
+                        activeColor: Settings.majorAccentColor.value,
                       ),
                       onTap: () async {
                         await Settings.setSearchUseTranslated(
@@ -425,7 +425,7 @@ class _SearchBarPageState extends State<SearchBarPage>
                         setState(() {});
                       },
                     ),
-                  if (Settings.language == 'ko')
+                  if (Settings.language.value == 'ko')
                     Container(
                       margin: const EdgeInsets.symmetric(
                         horizontal: 8.0,
@@ -435,7 +435,8 @@ class _SearchBarPageState extends State<SearchBarPage>
                       color: Colors.grey.shade400,
                     ),
                   ListTile(
-                    leading: Icon(MdiIcons.counter, color: Settings.majorColor),
+                    leading: Icon(MdiIcons.counter,
+                        color: Settings.majorColor.value),
                     title: Text(Translations.instance!.trans('showcount')),
                     trailing: Switch(
                       value: Settings.searchShowCount,
@@ -443,8 +444,8 @@ class _SearchBarPageState extends State<SearchBarPage>
                         await Settings.setSearchShowCount(newValue);
                         setState(() {});
                       },
-                      activeTrackColor: Settings.majorColor,
-                      activeColor: Settings.majorAccentColor,
+                      activeTrackColor: Settings.majorColor.value,
+                      activeColor: Settings.majorAccentColor.value,
                     ),
                     onTap: () async {
                       await Settings.setSearchShowCount(
@@ -461,8 +462,8 @@ class _SearchBarPageState extends State<SearchBarPage>
                     color: Colors.grey.shade400,
                   ),
                   ListTile(
-                    leading:
-                        Icon(MdiIcons.chartBubble, color: Settings.majorColor),
+                    leading: Icon(MdiIcons.chartBubble,
+                        color: Settings.majorColor.value),
                     title: Text(Translations.instance!.trans('fuzzysearch')),
                     trailing: Switch(
                       value: Settings.searchUseFuzzy,
@@ -470,8 +471,8 @@ class _SearchBarPageState extends State<SearchBarPage>
                         await Settings.setSearchUseFuzzy(newValue);
                         setState(() {});
                       },
-                      activeTrackColor: Settings.majorColor,
-                      activeColor: Settings.majorAccentColor,
+                      activeTrackColor: Settings.majorColor.value,
+                      activeColor: Settings.majorAccentColor.value,
                     ),
                     onTap: () async {
                       await Settings.setSearchUseFuzzy(
@@ -490,10 +491,10 @@ class _SearchBarPageState extends State<SearchBarPage>
                   // ListTile(
                   //   leading: Icon(
                   //       MdiIcons.viewGridPlusOutline,
-                  //       color: Settings.majorColor),
+                  //       color: Settings.majorColor.value),
                   //   title: Slider(
-                  //     activeColor: Settings.majorColor,
-                  //     inactiveColor: Settings.majorColor
+                  //     activeColor: Settings.majorColor.value
+                  //     inactiveColor: Settings.majorColor.value
                   //         .withOpacity(0.2),
                   //     min: 60.0,
                   //     max: 2000.0,
@@ -529,7 +530,7 @@ class _SearchBarPageState extends State<SearchBarPage>
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   foregroundColor: Colors.black,
-                                  backgroundColor: Settings.themeWhat
+                                  backgroundColor: Settings.themeWhat.value
                                       ? Colors.grey.shade800
                                       : Colors.grey,
                                 ),
@@ -544,7 +545,7 @@ class _SearchBarPageState extends State<SearchBarPage>
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   foregroundColor: Colors.black,
-                                  backgroundColor: Settings.themeWhat
+                                  backgroundColor: Settings.themeWhat.value
                                       ? Colors.grey.shade800
                                       : Colors.grey,
                                 ),

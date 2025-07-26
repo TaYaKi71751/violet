@@ -89,10 +89,11 @@ class _UserStatusCardState extends ThemeSwitchableState<UserStatusCard>
           margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
           alignment: Alignment.centerLeft,
           height: 84,
-          decoration: !Settings.themeFlat
+          decoration: !Settings.themeFlat.value
               ? BoxDecoration(
                   // color: Colors.white,
-                  color: Settings.themeWhat ? Colors.black26 : Colors.white,
+                  color:
+                      Settings.themeWhat.value ? Colors.black26 : Colors.white,
                   borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(8),
                       topRight: Radius.circular(8),
@@ -100,28 +101,30 @@ class _UserStatusCardState extends ThemeSwitchableState<UserStatusCard>
                       bottomRight: Radius.circular(8)),
                   boxShadow: [
                     BoxShadow(
-                      color: Settings.themeWhat
+                      color: Settings.themeWhat.value
                           ? Colors.black26
                           : Colors.grey.withOpacity(0.1),
-                      spreadRadius: Settings.themeWhat ? 0 : 5,
+                      spreadRadius: Settings.themeWhat.value ? 0 : 5,
                       blurRadius: 7,
                       offset: const Offset(0, 3), // changes position of shadow
                     ),
                   ],
                 )
               : null,
-          color: !Settings.themeFlat
+          color: !Settings.themeFlat.value
               ? null
-              : Settings.themeWhat
+              : Settings.themeWhat.value
                   ? Colors.black26
                   : Colors.white,
           // decoration:
           child: Ink(
-            child: !Settings.themeFlat
+            child: !Settings.themeFlat.value
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(8.0),
                     child: Material(
-                      color: Settings.themeWhat ? Colors.black38 : Colors.white,
+                      color: Settings.themeWhat.value
+                          ? Colors.black38
+                          : Colors.white,
                       child: _statusCardContent(),
                     ))
                 : _statusCardContent(),
@@ -223,7 +226,7 @@ class _UserStatusCardState extends ThemeSwitchableState<UserStatusCard>
                         'N',
                         style: TextStyle(color: Colors.white, fontSize: 12.0),
                       ),
-                      // badgeColor: Settings.majorAccentColor,
+                      // badgeColor: Settings.majorAccentColor.value,
                       child: Icon(MdiIcons.cloudUpload, size: 30),
                     ),
                   ),
@@ -284,7 +287,9 @@ class _UserStatusCardState extends ThemeSwitchableState<UserStatusCard>
       margin: const EdgeInsets.fromLTRB(0, 8, 0, 8),
       height: double.infinity,
       width: 1.0,
-      color: Settings.themeWhat ? Colors.grey.shade600 : Colors.grey.shade400,
+      color: Settings.themeWhat.value
+          ? Colors.grey.shade600
+          : Colors.grey.shade400,
     );
   }
 }

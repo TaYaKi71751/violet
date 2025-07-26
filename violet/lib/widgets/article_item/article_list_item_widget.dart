@@ -426,11 +426,11 @@ class BodyWidget extends StatelessWidget {
               ? const EdgeInsets.only(bottom: 6)
               : const EdgeInsets.only(bottom: 50)
           : EdgeInsets.zero,
-      decoration: !Settings.themeFlat
+      decoration: !Settings.themeFlat.value
           ? BoxDecoration(
               color: c.articleListItem.showDetail
-                  ? Settings.themeWhat
-                      ? Settings.themeBlack
+                  ? Settings.themeWhat.value
+                      ? Settings.themeBlack.value
                           ? Palette.blackThemeBackground
                           : Colors.grey.shade800
                       : Colors.white70
@@ -438,7 +438,7 @@ class BodyWidget extends StatelessWidget {
               borderRadius: const BorderRadius.all(Radius.circular(3)),
               boxShadow: [
                 BoxShadow(
-                  color: Settings.themeWhat
+                  color: Settings.themeWhat.value
                       ? Colors.grey.withOpacity(0.08)
                       : Colors.grey.withOpacity(0.4),
                   spreadRadius: 5,
@@ -448,9 +448,9 @@ class BodyWidget extends StatelessWidget {
               ],
             )
           : null,
-      color: !Settings.themeFlat || !c.articleListItem.showDetail
+      color: !Settings.themeFlat.value || !c.articleListItem.showDetail
           ? null
-          : Settings.themeWhat
+          : Settings.themeWhat.value
               ? Colors.black26
               : Colors.white,
       child: c.articleListItem.showDetail
@@ -493,7 +493,8 @@ class _DetailWidget extends StatelessWidget {
         data: ThemeData(
             useMaterial3: false,
             iconTheme: IconThemeData(
-                color: !Settings.themeWhat ? Colors.black : Colors.white)),
+                color:
+                    !Settings.themeWhat.value ? Colors.black : Colors.white)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[

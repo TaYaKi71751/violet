@@ -110,7 +110,7 @@ class _ProviderImageState extends State<ProviderImage> {
       final iconButton = IconButton(
         icon: Icon(
           Icons.refresh,
-          color: Settings.majorColor,
+          color: Settings.majorColor.value,
         ),
         onPressed: () => setState(() {
           c.imgKeys[widget.index] = GlobalKey();
