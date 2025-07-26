@@ -585,7 +585,7 @@ class _SettingsPageState extends State<SettingsPage>
                   Text(Translations.instance!.trans('defaulttag')),
                   Text(
                     Translations.instance!.trans('currenttag') +
-                        Settings.includeTags,
+                        Settings.includeTags.value,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -600,7 +600,7 @@ class _SettingsPageState extends State<SettingsPage>
               );
 
               if (vv != null && vv.$1 == 1) {
-                Settings.setIncludeTags(vv.$2);
+                Settings.includeTags.setValue(vv.$2);
                 setState(() {
                   _shouldReload = true;
                 });
@@ -622,7 +622,7 @@ class _SettingsPageState extends State<SettingsPage>
               );
 
               if (vv?.$1 == 1) {
-                Settings.setExcludeTags(vv!.$2);
+                Settings.excludeTags.setValue(vv!.$2.split(' ').toList());
                 setState(() {
                   _shouldReload = true;
                 });
@@ -981,9 +981,9 @@ class _SettingsPageState extends State<SettingsPage>
               leading: Icon(Icons.translate, color: Settings.majorColor.value),
               title: Text(Translations.instance!.trans('translatetagtokorean')),
               trailing: Switch(
-                value: Settings.translateTags,
+                value: Settings.translateTags.value,
                 onChanged: (newValue) async {
-                  await Settings.setTranslateTags(newValue);
+                  await Settings.translateTags.setValue(newValue);
                   setState(() {
                     _shouldReload = true;
                   });
@@ -992,7 +992,8 @@ class _SettingsPageState extends State<SettingsPage>
                 activeColor: Settings.majorAccentColor.value,
               ),
               onTap: () async {
-                await Settings.setTranslateTags(!Settings.translateTags);
+                await Settings.translateTags
+                    .setValue(!Settings.translateTags.value);
                 setState(() {
                   _shouldReload = true;
                 });
@@ -1275,7 +1276,7 @@ class _SettingsPageState extends State<SettingsPage>
               Navigator.of(context)
                   .push(MaterialPageRoute(
                       builder: (context) => DataBaseDownloadPage(
-                            dbType: Settings.databaseType,
+                            dbType: Settings.databaseType.value,
                             isSync: true,
                           )))
                   .then(
@@ -1627,8 +1628,8 @@ class _SettingsPageState extends State<SettingsPage>
             onTap: Settings.useInnerStorage.value
                 ? null
                 : () async {
-                    TextEditingController text =
-                        TextEditingController(text: Settings.downloadBasePath);
+                    TextEditingController text = TextEditingController(
+                        text: Settings.downloadBasePath.value);
                     Widget yesButton = TextButton(
                       style: TextButton.styleFrom(
                           foregroundColor: Settings.majorColor.value),
@@ -1673,14 +1674,15 @@ class _SettingsPageState extends State<SettingsPage>
                     if (dialog != null && dialog == true) {
                       try {
                         if (await Permission.manageExternalStorage.isGranted) {
-                          var prevDir = Directory(Settings.downloadBasePath);
+                          var prevDir =
+                              Directory(Settings.downloadBasePath.value);
                           if (await prevDir.exists()) {
                             await prevDir.rename(text.text);
                           }
                         }
                       } catch (_) {}
 
-                      await Settings.setBaseDownloadPath(text.text);
+                      await Settings.downloadBasePath.setValue(text.text);
                     }
                   },
             child: ListTile(
@@ -1691,7 +1693,7 @@ class _SettingsPageState extends State<SettingsPage>
                 children: [
                   Text(Translations.instance!.trans('downloadpath')),
                   Text(
-                    '${Translations.instance!.trans('curdownloadpath')}: ${Settings.downloadBasePath}',
+                    '${Translations.instance!.trans('curdownloadpath')}: ${Settings.downloadBasePath.value}',
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],

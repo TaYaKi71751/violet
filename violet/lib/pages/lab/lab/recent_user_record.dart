@@ -56,7 +56,7 @@ class _LabUserRecentRecordsState extends State<LabUserRecentRecords> {
       var xrecords = trecords as List<(int, int, int)>;
 
       var queryRaw =
-          '${translate2query('${Settings.includeTags} ${Settings.serializedExcludeTags}')} AND ';
+          '${translate2query('${Settings.includeTags.value} ${Settings.serializedExcludeTags}')} AND ';
 
       queryRaw += '(${xrecords.map((e) => 'Id=${e.$2}').join(' OR ')})';
       var query = await QueryManager.query(queryRaw);

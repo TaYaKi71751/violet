@@ -205,7 +205,7 @@ class DownloadRoutine {
     if (Settings.useInnerStorage.value) {
       return (await getApplicationDocumentsDirectory()).path;
     } else {
-      return Settings.downloadBasePath;
+      return Settings.downloadBasePath.value;
     }
   }
 }

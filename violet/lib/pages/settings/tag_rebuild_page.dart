@@ -120,7 +120,7 @@ class _TagRebuildPageState extends State<TagRebuildPage> {
   Future indexing() async {
     final qm = QueryManager.queryPagination(
         translate2query(
-            '${Settings.includeTags} ${Settings.serializedExcludeTags}'),
+            '${Settings.includeTags.value} ${Settings.serializedExcludeTags}'),
         50000);
 
     var tags = <String, int>{};

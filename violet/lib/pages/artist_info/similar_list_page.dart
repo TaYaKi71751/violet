@@ -70,7 +70,7 @@ Future<List<QueryResult>> queryDedupedArtistArticles(
     ArtistType type, String e) async {
   final postfix = e.toLowerCase().replaceAll(' ', '_');
   final queryString = translate2query(
-      '${type.name}:$postfix ${Settings.includeTags} ${Settings.serializedExcludeTags}');
+      '${type.name}:$postfix ${Settings.includeTags.value} ${Settings.serializedExcludeTags}');
   final qm = QueryManager.queryPagination(queryString, 10);
   final quries = await qm.next();
 

@@ -301,7 +301,7 @@ class __ArtistsArticleTabListState extends State<_ArtistsArticleTabList>
       }
 
       final queryString = translate2query(
-          '($what) ${Settings.includeTags} ${Settings.serializedExcludeTags}');
+          '($what) ${Settings.includeTags.value} ${Settings.serializedExcludeTags}');
       var queryResult = (await (await DataBaseManager.getInstance())
               .query('$queryString ORDER BY Id DESC LIMIT 500'))
           .map((e) => QueryResult(result: e))

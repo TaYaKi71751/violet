@@ -208,7 +208,7 @@ class SyncManager {
             .toList();
 
         // Third, filtering records with language
-        var lang = translateToLanguage(Settings.databaseType);
+        var lang = translateToLanguage(Settings.databaseType.value);
         if (lang != '') {
           quries = quries.where((element) {
             var ll = element.language() as String;
@@ -235,7 +235,7 @@ class SyncManager {
 
       if (Settings.useOptimizeDatabase.value && filteredIter.isNotEmpty) {
         final sql = translate2query(
-          '${Settings.includeTags} ${Settings.serializedExcludeTags}',
+          '${Settings.includeTags.value} ${Settings.serializedExcludeTags}',
           filter: false,
         );
 

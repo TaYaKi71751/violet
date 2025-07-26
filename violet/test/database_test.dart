@@ -18,8 +18,8 @@ void main() {
 
   setUp(() async {
     Settings.searchPure.value = true;
-    Settings.includeTags = '';
-    Settings.excludeTags = [''];
+    Settings.includeTags.value = '';
+    Settings.excludeTags.value = [''];
 
     db ??= await databaseFactoryFfi
         .openDatabase(join(Directory.current.path, 'test/db/data.db'));

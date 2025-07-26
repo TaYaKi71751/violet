@@ -193,7 +193,7 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
       }
 
       var queryRaw =
-          '${translate2query('${Settings.includeTags} ${Settings.serializedExcludeTags}')} AND ';
+          '${translate2query('${Settings.includeTags.value} ${Settings.serializedExcludeTags}')} AND ';
       queryRaw += '(${value.map((e) => 'Id=${e.$1}').join(' OR ')})';
       final query = await QueryManager.query(queryRaw);
 

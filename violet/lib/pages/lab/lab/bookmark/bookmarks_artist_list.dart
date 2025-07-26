@@ -50,7 +50,7 @@ class _GroupArtistListState extends State<LabGroupArtistList>
     for (int i = 0; i < artists.length; i++) {
       final postfix = artists[i].artist().toLowerCase().replaceAll(' ', '_');
       final queryString = translate2query(
-          '${artists[i].type().name}:$postfix ${Settings.includeTags}');
+          '${artists[i].type().name}:$postfix ${Settings.includeTags.value}');
       final qm = QueryManager.queryPagination(queryString, 1);
       var query = (await qm.next())[0].id();
       ids.add((query, i));
@@ -68,7 +68,7 @@ class _GroupArtistListState extends State<LabGroupArtistList>
   Future<List<QueryResult>> _future(String e, ArtistType type) async {
     var postfix = e.toLowerCase().replaceAll(' ', '_');
     var queryString =
-        translate2query('${type.name}:$postfix ${Settings.includeTags}');
+        translate2query('${type.name}:$postfix ${Settings.includeTags.value}');
     final qm = QueryManager.queryPagination(queryString, 3);
     return await qm.next();
   }

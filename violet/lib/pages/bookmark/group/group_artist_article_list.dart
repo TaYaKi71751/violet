@@ -52,7 +52,7 @@ class _GroupArtistArticleListState extends State<GroupArtistArticleList>
 
         final queryString = translate2query(artists
             .map((e) =>
-                '${e.type().name}:${e.artist().toLowerCase().replaceAll(' ', '_')} ${Settings.includeTags}')
+                '${e.type().name}:${e.artist().toLowerCase().replaceAll(' ', '_')} ${Settings.includeTags.value}')
             .join(' or '));
 
         final qm = QueryManager.queryPagination(queryString, 100);

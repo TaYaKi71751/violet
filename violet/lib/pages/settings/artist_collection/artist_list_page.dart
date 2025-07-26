@@ -33,7 +33,7 @@ class ArtistListPage extends StatelessWidget {
 
     final postfix = e.trim().toLowerCase().replaceAll(' ', '_');
     final queryString = translate2query(
-        '${isLast ? '' : 'artist:'}$postfix ${Settings.includeTags} ${Settings.serializedExcludeTags}');
+        '${isLast ? '' : 'artist:'}$postfix ${Settings.includeTags.value} ${Settings.serializedExcludeTags}');
 
     final queryManager = QueryManager.queryPagination(queryString, 10);
 

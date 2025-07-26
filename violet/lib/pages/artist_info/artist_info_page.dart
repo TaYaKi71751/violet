@@ -228,7 +228,7 @@ class _ArtistInfoPageState extends State<ArtistInfoPage> {
   Future<List<QueryResult>> query() async {
     final token = '${widget.type.name}:${widget.name.replaceAll(' ', '_')}';
     final query = translate2query(
-        '$token ${Settings.includeTags} ${Settings.serializedExcludeTags}');
+        '$token ${Settings.includeTags.value} ${Settings.serializedExcludeTags}');
     final qm = await QueryManager.query('$query ORDER BY Id DESC');
     return qm.results!;
   }

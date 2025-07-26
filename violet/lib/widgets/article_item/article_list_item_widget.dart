@@ -606,7 +606,7 @@ class TagChip extends StatelessWidget {
     var tagDisplayed = name;
     Color color = Colors.grey;
 
-    if (Settings.translateTags) {
+    if (Settings.translateTags.value) {
       tagDisplayed =
           TagTranslate.ofAny(tagDisplayed).split(':').last.split('|').first;
     }
@@ -689,12 +689,12 @@ class TagChip extends StatelessWidget {
       },
       onLongPress: () async {
         final targetTag = '${normalize(group)}:${name.replaceAll(' ', '_')}';
-        if (!Settings.excludeTags.contains(targetTag)) {
+        if (!Settings.excludeTags.value.contains(targetTag)) {
           final yn =
               await showYesNoDialog(context, '$targetTag 태그를 제외태그에 추가할까요?');
           if (yn) {
-            Settings.excludeTags.add(targetTag);
-            await Settings.setExcludeTags(Settings.excludeTags.join(' '));
+            Settings.excludeTags.value.add(targetTag);
+            await Settings.excludeTags.setValue(Settings.excludeTags.value);
             if (context.mounted) {
               await showOkDialog(context, '제외태그에 성공적으로 추가했습니다!');
             }

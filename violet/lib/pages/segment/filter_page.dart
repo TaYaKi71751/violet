@@ -405,7 +405,7 @@ class __ChipState extends State<_Chip> {
     var group = widget.group;
     Color color = Colors.grey;
 
-    if (Settings.translateTags) {
+    if (Settings.translateTags.value) {
       tagDisplayed =
           TagTranslate.ofAny(tagDisplayed).split(':').last.split('|').first;
     }

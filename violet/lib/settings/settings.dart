@@ -11,7 +11,6 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:violet/component/hitomi/shielder.dart';
 import 'package:violet/database/user/download.dart';
 import 'package:violet/log/log.dart';
 import 'package:violet/platform/android_external_storage_directory.dart';
@@ -46,13 +45,24 @@ class Settings {
   static final useTabletMode = SettingItem<bool>('usetabletmode', false);
 
   // Tag Settings
-  static late String includeTags;
-  static late List<String> excludeTags;
-  static late List<String> blurredTags;
+  static final includeTags = SettingItem<String>('includetags', () {
+    final langcode = Platform.localeName.split('_')[0];
+    var language = 'lang:english';
+    if (langcode == 'ko') {
+      language = 'lang:korean';
+    } else if (langcode == 'ja') {
+      language = 'lang:japanese';
+    } else if (langcode.startsWith('zh')) {
+      language = 'lang:chinese';
+    }
+    return '($language)';
+  }());
+  static final excludeTags = SettingItem<List<String>>('excludetags', []);
+  static final blurredTags = SettingItem<List<String>>('blurredtags', []);
   static final language = SettingItem<String>('language', '');
-  static late bool translateTags;
+  static final translateTags = SettingItem<bool>('translatetags', false);
 
-  static String get serializedExcludeTags => Settings.excludeTags
+  static String get serializedExcludeTags => Settings.excludeTags.value
       .where((e) => e.trim() != '')
       .map((e) => '-$e')
       .join(' ')
@@ -70,7 +80,14 @@ class Settings {
   static final searchCategory = SettingItem<int>('searchCategory', 993);
 
   // Global? English? Korean?
-  static late String databaseType;
+  static final databaseType = SettingItem<String>('databasetype', () {
+    final langcode = Platform.localeName.split('_')[0];
+    final acclc = ['ko', 'ja', 'en', 'ru', 'zh'];
+
+    if (!acclc.contains(langcode)) return 'global';
+
+    return langcode;
+  }());
 
   // Reader Option
   static final rightToLeft = SettingItem<bool>('rightToLeft', true);
@@ -111,7 +128,64 @@ class Settings {
     }
     return Platform.isIOS;
   });
-  static late String downloadBasePath;
+  static final downloadBasePath =
+      FutureSettingItem<String>('downloadbasepath', () async {
+    if (Platform.isAndroid) {
+      final String path = await AndroidExternalStorageDirectory.instance
+          .getExternalStorageDirectory();
+      var downloadBasePath = join(path, '.violet');
+
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      final sdkInt = androidInfo.version.sdkInt;
+
+      if (sdkInt >= 30 && prefs.getBool('android30downpath') == null) {
+        await prefs.setBool('android30downpath', true);
+        var ext = await getExternalStorageDirectory();
+        downloadBasePath = ext!.path;
+      } else if (sdkInt < 30 &&
+          downloadBasePath == join(path, 'Violet') &&
+          prefs.getBool('downloadbasepathcc1') == null) {
+        downloadBasePath = join(path, '.violet');
+        await prefs.setBool('downloadbasepathcc1', true);
+
+        try {
+          if (await Permission.manageExternalStorage.isGranted) {
+            var prevDir = Directory(join(path, 'Violet'));
+            if (await prevDir.exists()) {
+              await prevDir.rename(join(path, '.violet'));
+            }
+
+            var downloaded =
+                await (await Download.getInstance()).getDownloadItems();
+            for (var download in downloaded) {
+              Map<String, dynamic> result =
+                  Map<String, dynamic>.from(download.result);
+              if (download.files() != null) {
+                result['Files'] =
+                    download.files()!.replaceAll('/Violet/', '/.violet/');
+              }
+              if (download.path() != null) {
+                result['Path'] =
+                    download.path()!.replaceAll('/Violet/', '/.violet/');
+              }
+              download.result = result;
+              await download.update();
+            }
+          }
+        } catch (e, st) {
+          Logger.error('[Settings] E: $e\n'
+              '$st');
+          FirebaseCrashlytics.instance.recordError(e, st);
+        }
+      }
+      return downloadBasePath;
+    } else if (Platform.isIOS) {
+      return 'not supported';
+    } else {
+      // Desktop
+      return join(dirname(Platform.resolvedExecutable), 'download');
+    }
+  });
   static final downloadRule = SettingItem<String>(
       'downloadrule', '%(extractor)s/%(id)s/%(file)s.%(ext)s');
 
@@ -188,33 +262,6 @@ class Settings {
   }
 
   static Future<void> init() async {
-    var includetags = prefs.getString('includetags');
-    var excludetags = prefs.getString('excludetags');
-    var blurredtags = prefs.getString('blurredtags');
-
-    if (includetags == null) {
-      var language = 'lang:english';
-      var langcode = Platform.localeName.split('_')[0];
-      if (langcode == 'ko') {
-        language = 'lang:korean';
-      } else if (langcode == 'ja') {
-        language = 'lang:japanese';
-      } else if (langcode.startsWith('zh')) {
-        language = 'lang:chinese';
-      }
-      includetags = '($language)';
-      await prefs.setString('includetags', includetags);
-    }
-    if (excludetags == null ||
-        excludetags == MinorShielderFilter.tags.join('|')) {
-      excludetags = '';
-      await prefs.setString('excludetags', excludetags);
-    }
-    includeTags = includetags;
-    excludeTags = excludetags.split('|').toList();
-    blurredTags = blurredtags != null ? blurredtags.split(' ').toList() : [];
-    translateTags = await _getBool('translatetags');
-
     routingRule = (await _getString(
             'routingrule', 'Hitomi|EHentai|ExHentai|Hiyobi|NHentai'))
         .split('|');
@@ -227,87 +274,8 @@ class Settings {
       await prefs.setString('routingrule', routingRule.join('|'));
     }
 
-    var databasetype = prefs.getString('databasetype');
-    if (databasetype == null) {
-      var langcode = Platform.localeName.split('_')[0];
-      var acclc = ['ko', 'ja', 'en', 'ru', 'zh'];
-
-      if (!acclc.contains(langcode)) langcode = 'global';
-
-      databasetype = langcode;
-
-      await prefs.setString('databasetype', langcode);
-    }
-    databaseType = databasetype;
-
     await useInnerStorage.load();
-
-    String? tDownloadBasePath;
-    if (Platform.isAndroid) {
-      tDownloadBasePath = prefs.getString('downloadbasepath');
-      final String path = await AndroidExternalStorageDirectory.instance
-          .getExternalStorageDirectory();
-
-      var androidInfo = await DeviceInfoPlugin().androidInfo;
-      var sdkInt = androidInfo.version.sdkInt;
-
-      if (sdkInt >= 30 && prefs.getBool('android30downpath') == null) {
-        await prefs.setBool('android30downpath', true);
-        var ext = await getExternalStorageDirectory();
-        tDownloadBasePath = ext!.path;
-        await prefs.setString('downloadbasepath', tDownloadBasePath);
-      }
-
-      if (tDownloadBasePath == null) {
-        tDownloadBasePath = join(path, '.violet');
-        await prefs.setString('downloadbasepath', tDownloadBasePath);
-      }
-
-      if (sdkInt < 30 &&
-          tDownloadBasePath == join(path, 'Violet') &&
-          prefs.getBool('downloadbasepathcc1') == null) {
-        tDownloadBasePath = join(path, '.violet');
-        await prefs.setString('downloadbasepath', tDownloadBasePath);
-        await prefs.setBool('downloadbasepathcc1', true);
-
-        try {
-          if (await Permission.manageExternalStorage.isGranted) {
-            var prevDir = Directory(join(path, 'Violet'));
-            if (await prevDir.exists()) {
-              await prevDir.rename(join(path, '.violet'));
-            }
-
-            var downloaded =
-                await (await Download.getInstance()).getDownloadItems();
-            for (var download in downloaded) {
-              Map<String, dynamic> result =
-                  Map<String, dynamic>.from(download.result);
-              if (download.files() != null) {
-                result['Files'] =
-                    download.files()!.replaceAll('/Violet/', '/.violet/');
-              }
-              if (download.path() != null) {
-                result['Path'] =
-                    download.path()!.replaceAll('/Violet/', '/.violet/');
-              }
-              download.result = result;
-              await download.update();
-            }
-          }
-        } catch (e, st) {
-          Logger.error('[Settings] E: $e\n'
-              '$st');
-          FirebaseCrashlytics.instance.recordError(e, st);
-        }
-      }
-    } else if (Platform.isIOS) {
-      tDownloadBasePath = await _getString('downloadbasepath', 'not supported');
-    } else {
-      // Desktop
-      tDownloadBasePath =
-          join(dirname(Platform.resolvedExecutable), 'download');
-    }
-    downloadBasePath = tDownloadBasePath;
+    await downloadBasePath.load();
 
     // main에서 셋팅됨
     if (Platform.isAndroid || Platform.isIOS) {
@@ -320,8 +288,6 @@ class Settings {
   }
 
   static Future resetIncludeTags() async {
-    var includetags = prefs.getString('includetags');
-
     var language = 'lang:english';
     var langcode = Settings.language.value;
     if (langcode == 'ko') {
@@ -331,10 +297,7 @@ class Settings {
     } else if (langcode.startsWith('zh')) {
       language = 'lang:chinese';
     }
-    includetags = '($language)';
-    await prefs.setString('includetags', includetags);
-
-    includeTags = includetags;
+    await includeTags.setValue('($language)');
   }
 
   static Future regacy1_20_2() async {
@@ -357,15 +320,6 @@ class Settings {
     return true;
   }
 
-  static Future<bool> _getBool(String key, [bool defaultValue = false]) async {
-    var nn = prefs.getBool(key);
-    if (nn == null) {
-      nn = defaultValue;
-      await prefs.setBool(key, nn);
-    }
-    return nn;
-  }
-
   static Future<String> _getString(String key,
       [String defaultValue = '']) async {
     var nn = prefs.getString(key);
@@ -382,17 +336,10 @@ class Settings {
 
     if (sdkInt >= 30) {
       var ext = await getExternalStorageDirectory();
-      downloadBasePath = ext!.path;
+      return ext!.path;
     }
 
-    /*
-    if (downloadBasePath == null) {
-      final String path = await ExtStorage.getExternalStorageDirectory();
-      downloadBasePath = join(path, '.violet');
-    }
-     */
-
-    return downloadBasePath;
+    return downloadBasePath.value;
   }
 
   static Future<void> setMajorColor(Color color) async {
@@ -422,36 +369,6 @@ class Settings {
 
     await majorAccentColor.setValue(accent!);
   }
-
-  static Future<void> setIncludeTags(String nn) async {
-    includeTags = nn;
-
-    await prefs.setString('includetags', includeTags);
-  }
-
-  static Future<void> setExcludeTags(String nn) async {
-    excludeTags = nn.split(' ').toList();
-
-    await prefs.setString('excludetags', excludeTags.join('|'));
-  }
-
-  static Future<void> setBlurredTags(String nn) async {
-    blurredTags = nn.split(' ').toList();
-
-    await prefs.setString('blurredtags', blurredTags.join('|'));
-  }
-
-  static Future<void> setTranslateTags(bool nn) async {
-    translateTags = nn;
-
-    await prefs.setBool('translatetags', translateTags);
-  }
-
-  static Future<void> setBaseDownloadPath(String nn) async {
-    downloadBasePath = nn;
-
-    await prefs.setString('downloadbasepath', nn);
-  }
 }
 
 class SettingItem<T> {
@@ -471,6 +388,11 @@ class SettingItem<T> {
 
   void load() {
     _value = loadFromPrefs<T>(key, defaultValue);
+  }
+
+  @override
+  String toString() {
+    throw UnsupportedError('donot support toString()');
   }
 }
 
@@ -503,6 +425,11 @@ class FutureSettingItem<T> {
     }
     _initialized = true;
   }
+
+  @override
+  String toString() {
+    throw UnsupportedError('donot support toString()');
+  }
 }
 
 T? loadFromPrefs<T>(String key, T? fallback) {
@@ -514,6 +441,10 @@ T? loadFromPrefs<T>(String key, T? fallback) {
   if (T == Color) {
     final val = prefs.getInt(key);
     return (val != null ? Color(val) : fallback) as T?;
+  }
+  if (T == List<String>) {
+    final val = prefs.getString(key);
+    return (val != null ? val.split('|') : fallback) as T?;
   }
   throw Exception('Unsupported type');
 }
@@ -530,6 +461,8 @@ Future<void> saveToPrefs<T>(String key, T value) async {
     await prefs.setString(key, value);
   } else if (value is Color) {
     await prefs.setInt(key, value.value);
+  } else if (value is List<String>) {
+    await prefs.setString(key, value.join('|'));
   } else {
     throw Exception('Unsupported type');
   }

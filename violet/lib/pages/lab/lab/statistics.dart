@@ -71,7 +71,7 @@ class _StatisticsState extends State<Statistics> {
               }));
 
       final queryRaw =
-          '${translate2query('${Settings.includeTags} ${Settings.serializedExcludeTags}')} AND '
+          '${translate2query('${Settings.includeTags.value} ${Settings.serializedExcludeTags}')} AND '
           'Id IN (${articles.map((e) => e.articleId()).join(',')})';
       final query = await QueryManager.query(queryRaw);
 
