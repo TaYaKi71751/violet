@@ -43,7 +43,7 @@ void main() {
     });
 
     test('Hitomi Query To Sql', () {
-      Settings.searchPure.value = false;
+      Settings.searchPure.setValue(false);
       final result0 =
           translate2query('female:sole_female (lang:korean or lang:n/a)');
       final result1 =
