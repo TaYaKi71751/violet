@@ -72,7 +72,7 @@ class _ViewerThumbnailState extends State<ViewerThumbnail> {
 
   @override
   Widget build(BuildContext context) {
-    if (Settings.enableViewerFunctionBackdropFilter) {
+    if (Settings.enableViewerFunctionBackdropFilter.value) {
       return ClipRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),

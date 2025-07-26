@@ -29,7 +29,8 @@ class SimilarListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return CardPanel.build(
       context,
-      enableBackgroundColor: Settings.themeWhat && Settings.themeBlack,
+      enableBackgroundColor:
+          Settings.themeWhat.value && Settings.themeBlack.value,
       child: ListView.builder(
         padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
         physics: const ClampingScrollPhysics(),
@@ -69,7 +70,7 @@ Future<List<QueryResult>> queryDedupedArtistArticles(
     ArtistType type, String e) async {
   final postfix = e.toLowerCase().replaceAll(' ', '_');
   final queryString = translate2query(
-      '${type.name}:$postfix ${Settings.includeTags} ${Settings.serializedExcludeTags}');
+      '${type.name}:$postfix ${Settings.includeTags.value} ${Settings.serializedExcludeTags}');
   final qm = QueryManager.queryPagination(queryString, 10);
   final quries = await qm.next();
 

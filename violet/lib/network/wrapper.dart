@@ -97,7 +97,7 @@ Future<http.Response> _ehentaiGet(String url,
 
     try {
       final sent = client.send(request);
-      if (!Settings.ignoreTimeout) {
+      if (!Settings.ignoreTimeout.value) {
         sent.timeout(
           const Duration(seconds: 3),
           onTimeout: () {
@@ -161,7 +161,7 @@ Future<http.Response> _scriptGet(String url,
     do {
       isTimeout = false;
       final sent = http.get(Uri.parse(url), headers: headers);
-      if (!Settings.ignoreTimeout) {
+      if (!Settings.ignoreTimeout.value) {
         sent.timeout(
           timeout,
           onTimeout: () {

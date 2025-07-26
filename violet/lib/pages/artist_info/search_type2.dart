@@ -9,7 +9,7 @@ import 'package:violet/style/palette.dart';
 
 class SearchType2 extends StatelessWidget {
   Color getColor(int i) {
-    return Settings.themeWhat
+    return Settings.themeWhat.value
         ? nowType == i
             ? Colors.grey.shade200
             : Colors.grey.shade400
@@ -28,7 +28,7 @@ class SearchType2 extends StatelessWidget {
         borderRadius: const BorderRadius.all(Radius.circular(1)),
         boxShadow: [
           BoxShadow(
-            color: Settings.themeWhat
+            color: Settings.themeWhat.value
                 ? Colors.black.withOpacity(0.4)
                 : Colors.grey.withOpacity(0.2),
             spreadRadius: 1,

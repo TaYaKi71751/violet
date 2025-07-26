@@ -63,8 +63,8 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
     super.didChangeAppLifecycleState(state);
     switch (state) {
       case AppLifecycleState.resumed:
-        if (Settings.useLockScreen &&
-            Settings.useSecureMode &&
+        if (Settings.useLockScreen.value &&
+            Settings.useSecureMode.value &&
             !_alreadyLocked) {
           _alreadyLocked = true;
           Navigator.of(context)
@@ -109,9 +109,9 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
       ? _pageController.page!.round()
       : defaultInitialPage;
 
-  bool get _usesDrawer => Settings.useDrawer;
+  bool get _usesDrawer => Settings.useDrawer.value;
 
-  bool get _usesBottomNavigationBar => !Settings.useDrawer;
+  bool get _usesBottomNavigationBar => !Settings.useDrawer.value;
 
   DateTime? _lastPopAt;
 
@@ -125,8 +125,8 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
 
     BottomNavigationBarItem buildItem(IconData iconData, String key) {
       return BottomNavigationBarItem(
-        backgroundColor: Settings.themeWhat
-            ? Settings.themeBlack
+        backgroundColor: Settings.themeWhat.value
+            ? Settings.themeBlack.value
                 ? const Color(0xFF060606)
                 : Colors.grey.shade900.withOpacity(0.90)
             : Colors.grey.shade50,
@@ -137,16 +137,17 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
 
     Widget result = Theme(
       data: Theme.of(context).copyWith(
-        canvasColor: Settings.themeWhat && Settings.themeBlack
+        canvasColor: Settings.themeWhat.value && Settings.themeBlack.value
             ? const Color(0xFF060606)
             : null,
       ),
       child: BottomNavigationBar(
         showUnselectedLabels: false,
         type: BottomNavigationBarType.shifting,
-        fixedColor: Settings.majorColor,
-        unselectedItemColor: Settings.themeWhat ? Colors.white : Colors.black,
-        backgroundColor: Settings.themeWhat && Settings.themeBlack
+        fixedColor: Settings.majorColor.value,
+        unselectedItemColor:
+            Settings.themeWhat.value ? Colors.white : Colors.black,
+        backgroundColor: Settings.themeWhat.value && Settings.themeBlack.value
             ? const Color(0xFF060606)
             : null,
         currentIndex: _currentPage,
@@ -202,7 +203,7 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
     final translations = Translations.instance!;
 
     Widget buildButton(IconData iconData, int page, String key) {
-      final color = Settings.majorColor;
+      final color = Settings.majorColor.value;
 
       return Container(
         padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
@@ -254,7 +255,7 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
                 children: <Widget>[
                   InkWell(
                     child: Image.asset(
-                      'assets/images/logo-${Settings.majorColor.name}.png',
+                      'assets/images/logo-${Settings.majorColor.value.name}.png',
                       width: 100,
                       height: 100,
                     ),
@@ -263,7 +264,9 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
                   Text(
                     'Project Violet',
                     style: TextStyle(
-                      color: Settings.themeWhat ? Colors.white : Colors.black87,
+                      color: Settings.themeWhat.value
+                          ? Colors.white
+                          : Colors.black87,
                       fontSize: 18.0,
                       fontFamily: 'Calibre-Semibold',
                       letterSpacing: 1.0,
@@ -289,7 +292,7 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
             Text(
               'Copyright (C) 2020-2024\nby project-violet',
               style: TextStyle(
-                color: Settings.themeWhat ? Colors.white : Colors.black87,
+                color: Settings.themeWhat.value ? Colors.white : Colors.black87,
                 fontSize: 12.0,
                 fontFamily: 'Calibre-Semibold',
                 letterSpacing: 1.0,
@@ -365,7 +368,7 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
               : null,
           drawer: _usesDrawer ? _buildDrawer(context) : null,
           body: AnnotatedRegion<SystemUiOverlayStyle>(
-            value: !Settings.themeWhat
+            value: !Settings.themeWhat.value
                 ? SystemUiOverlayStyle.dark
                 : SystemUiOverlayStyle.light,
             child: Stack(

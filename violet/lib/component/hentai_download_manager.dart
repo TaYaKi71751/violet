@@ -24,7 +24,7 @@ class HentaiDonwloadManager {
 
   String defaultFormat() {
     //return "%(extractor)s/[%(id)s] %(title)s/%(file)s.%(ext)s";
-    return Settings.downloadRule;
+    return Settings.downloadRule.value;
   }
 
   String fav() {

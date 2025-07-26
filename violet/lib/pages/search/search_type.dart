@@ -18,7 +18,7 @@ class SearchType extends StatelessWidget {
   });
 
   Color getColor(SearchResultType type) {
-    return Settings.themeWhat
+    return Settings.themeWhat.value
         ? previousType == type
             ? Colors.grey.shade200
             : Colors.grey.shade400

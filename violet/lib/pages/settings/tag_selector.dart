@@ -23,13 +23,14 @@ class _TagSelectorDialogState extends State<TagSelectorDialog> {
   void initState() {
     super.initState();
     if (widget.what == 'include') {
-      _searchController = TextEditingController(text: Settings.includeTags);
+      _searchController =
+          TextEditingController(text: Settings.includeTags.value);
     } else if (widget.what == 'exclude') {
       _searchController =
-          TextEditingController(text: Settings.excludeTags.join(' '));
+          TextEditingController(text: Settings.excludeTags.value.join(' '));
     } else if (widget.what == 'blurred') {
       _searchController =
-          TextEditingController(text: Settings.blurredTags.join(' '));
+          TextEditingController(text: Settings.blurredTags.value.join(' '));
     } else {
       _searchController = TextEditingController();
     }
@@ -119,7 +120,7 @@ class _TagSelectorDialogState extends State<TagSelectorDialog> {
       actions: <Widget>[
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Settings.majorColor,
+            backgroundColor: Settings.majorColor.value,
           ),
           child: Text(Translations.instance!.trans('ok')),
           onPressed: () {
@@ -128,7 +129,7 @@ class _TagSelectorDialogState extends State<TagSelectorDialog> {
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Settings.majorColor,
+            backgroundColor: Settings.majorColor.value,
           ),
           child: Text(Translations.instance!.trans('cancel')),
           onPressed: () {

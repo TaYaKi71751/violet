@@ -104,7 +104,7 @@ class UpdateManager {
         return;
       }
 
-      await Settings.setUseVioletServer(true);
+      await Settings.useVioletServer.setValue(true);
       await prefs.setBool('usevioletserver_check', false);
     });
   }

@@ -59,7 +59,7 @@ class HentaiManager {
       return await _randomSearch(what, offset);
     }
     // is db search?
-    else if (!Settings.searchNetwork) {
+    else if (!Settings.searchNetwork.value) {
       return await _dbSearch(what, offset);
     }
     // is web search?
@@ -173,7 +173,7 @@ class HentaiManager {
       }
     }
     final queryString = translate2query(
-        '$wwhat ${Settings.includeTags} ${Settings.serializedExcludeTags}');
+        '$wwhat ${Settings.includeTags.value} ${Settings.serializedExcludeTags}');
 
     // if (offset == 0 && seed < 0) _latestSeed = new Random().nextDouble() + 1;
     await Logger.info('[Database Query]\nSQL: $queryString');
@@ -194,7 +194,7 @@ class HentaiManager {
 
   static Future<SearchResult> _dbSearch(String what, [int offset = 0]) async {
     final queryString = translate2query(
-        '$what ${Settings.includeTags} ${Settings.serializedExcludeTags}');
+        '$what ${Settings.includeTags.value} ${Settings.serializedExcludeTags}');
 
     await Logger.info('[Database Query]\nSQL: $queryString');
 
@@ -251,7 +251,7 @@ class HentaiManager {
 
   static Future<int> countSearch(String what) async {
     final queryString = translate2query(
-        '$what ${Settings.includeTags} ${Settings.serializedExcludeTags}');
+        '$what ${Settings.includeTags.value} ${Settings.serializedExcludeTags}');
 
     var count = (await (await DataBaseManager.getInstance()).query(queryString
             .replaceAll('SELECT * FROM', 'SELECT COUNT(*) AS C FROM')))
@@ -368,9 +368,9 @@ class HentaiManager {
   static Future<List<QueryResult>> searchEHentai(String what,
       [int next = 0, bool exh = false]) async {
     final search = Uri.encodeComponent(
-        '${Settings.includeTagNetwork ? '${Settings.includeTags} ' : ''}$what${Settings.excludeTagNetwork ? ' ${Settings.serializedExcludeTags}' : ''}');
+        '${Settings.includeTagNetwork.value ? '${Settings.includeTags.value} ' : ''}$what${Settings.excludeTagNetwork.value ? ' ${Settings.serializedExcludeTags}' : ''}');
     final url =
-        'https://e${exh ? 'x' : '-'}hentai.org/?${next == 0 ? '' : 'next=$next&'}f_cats=${Settings.searchCategory}&f_search=$search&advsearch=1&f_sname=on&f_stags=on${Settings.searchExpunged ? '&f_sh=on' : ''}&f_spf=&f_spt=';
+        'https://e${exh ? 'x' : '-'}hentai.org/?${next == 0 ? '' : 'next=$next&'}f_cats=${Settings.searchCategory.value}&f_search=$search&advsearch=1&f_sname=on&f_stags=on${Settings.searchExpunged.value ? '&f_sh=on' : ''}&f_spf=&f_spt=';
 
     final cookie =
         (await SharedPreferences.getInstance()).getString('eh_cookies') ?? '';

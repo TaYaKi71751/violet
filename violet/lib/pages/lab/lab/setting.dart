@@ -23,160 +23,162 @@ class _LabSettingState extends State<LabSetting> {
         children: [
           InkWell(
             child: ListTile(
-              leading: Icon(MdiIcons.flask, color: Settings.majorColor),
+              leading: Icon(MdiIcons.flask, color: Settings.majorColor.value),
               title: const Text('Simple item widget loading icon'),
               subtitle: const Text('using circular bar instead of flare'),
               trailing: Switch(
-                value: Settings.simpleItemWidgetLoadingIcon,
+                value: Settings.simpleItemWidgetLoadingIcon.value,
                 onChanged: (newValue) async {
-                  await Settings.setSimpleItemWidgetLoadingIcon(newValue);
+                  await Settings.simpleItemWidgetLoadingIcon.setValue(newValue);
                   setState(() {});
                 },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
             onTap: () async {
-              await Settings.setSimpleItemWidgetLoadingIcon(
-                  !Settings.simpleItemWidgetLoadingIcon);
+              await Settings.simpleItemWidgetLoadingIcon
+                  .setValue(!Settings.simpleItemWidgetLoadingIcon.value);
               setState(() {});
             },
           ),
           _buildDivider(),
           InkWell(
             child: ListTile(
-              leading: Icon(MdiIcons.flask, color: Settings.majorColor),
+              leading: Icon(MdiIcons.flask, color: Settings.majorColor.value),
               title: const Text('Artist article list tap option'),
               subtitle: const Text(
                   'show new viewer when artist article list item tapped'),
               trailing: Switch(
-                value: Settings.showNewViewerWhenArtistArticleListItemTap,
+                value: Settings.showNewViewerWhenArtistArticleListItemTap.value,
                 onChanged: (newValue) async {
-                  await Settings.setShowNewViewerWhenArtistArticleListItemTap(
-                      newValue);
+                  await Settings.showNewViewerWhenArtistArticleListItemTap
+                      .setValue(newValue);
                   setState(() {});
                 },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
             onTap: () async {
-              await Settings.setShowNewViewerWhenArtistArticleListItemTap(
-                  !Settings.showNewViewerWhenArtistArticleListItemTap);
+              await Settings.showNewViewerWhenArtistArticleListItemTap.setValue(
+                  !Settings.showNewViewerWhenArtistArticleListItemTap.value);
               setState(() {});
             },
           ),
           _buildDivider(),
           InkWell(
             child: ListTile(
-              leading: Icon(MdiIcons.flask, color: Settings.majorColor),
+              leading: Icon(MdiIcons.flask, color: Settings.majorColor.value),
               title: const Text('Enable viewer function backdrop filter'),
               subtitle: const Text(
                   'apply ios style blur effect to viewer functions. this blur effect may decrease performance.'),
               trailing: Switch(
-                value: Settings.enableViewerFunctionBackdropFilter,
+                value: Settings.enableViewerFunctionBackdropFilter.value,
                 onChanged: (newValue) async {
-                  await Settings.setEnableViewerFunctionBackdropFilter(
-                      newValue);
+                  await Settings.enableViewerFunctionBackdropFilter
+                      .setValue(newValue);
                   setState(() {});
                 },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
             onTap: () async {
-              await Settings.setEnableViewerFunctionBackdropFilter(
-                  !Settings.enableViewerFunctionBackdropFilter);
+              await Settings.enableViewerFunctionBackdropFilter
+                  .setValue(!Settings.enableViewerFunctionBackdropFilter.value);
               setState(() {});
             },
           ),
           _buildDivider(),
           InkWell(
             child: ListTile(
-              leading: Icon(MdiIcons.flask, color: Settings.majorColor),
+              leading: Icon(MdiIcons.flask, color: Settings.majorColor.value),
               title: const Text('Using PushReplacement On Article Read'),
               subtitle: const Text(
                   'when tap Read button in the article-info, the article-info closes.'),
               trailing: Switch(
-                value: Settings.usingPushReplacementOnArticleRead,
+                value: Settings.usingPushReplacementOnArticleRead.value,
                 onChanged: (newValue) async {
-                  await Settings.setUsingPushReplacementOnArticleRead(newValue);
+                  await Settings.usingPushReplacementOnArticleRead
+                      .setValue(newValue);
                   setState(() {});
                 },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
             onTap: () async {
-              await Settings.setUsingPushReplacementOnArticleRead(
-                  !Settings.usingPushReplacementOnArticleRead);
+              await Settings.usingPushReplacementOnArticleRead
+                  .setValue(!Settings.usingPushReplacementOnArticleRead.value);
               setState(() {});
             },
           ),
           _buildDivider(),
           InkWell(
             child: ListTile(
-              leading: Icon(MdiIcons.flask, color: Settings.majorColor),
+              leading: Icon(MdiIcons.flask, color: Settings.majorColor.value),
               title: const Text('Download E(x)hentai Raw Image'),
               subtitle: const Text(
                   'download the original image. many network errors (connection reset ... etc) can occur during this operation.'),
               trailing: Switch(
-                value: Settings.downloadEhRawImage,
+                value: Settings.downloadEhRawImage.value,
                 onChanged: (newValue) async {
-                  await Settings.setDownloadEhRawImage(newValue);
+                  await Settings.downloadEhRawImage.setValue(newValue);
                   setState(() {});
                 },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
             onTap: () async {
-              await Settings.setDownloadEhRawImage(
-                  !Settings.downloadEhRawImage);
+              await Settings.downloadEhRawImage
+                  .setValue(!Settings.downloadEhRawImage.value);
               setState(() {});
             },
           ),
           _buildDivider(),
           InkWell(
             child: ListTile(
-              leading: Icon(MdiIcons.flask, color: Settings.majorColor),
+              leading: Icon(MdiIcons.flask, color: Settings.majorColor.value),
               title: const Text('Bookmark Scrollbar Position To Left'),
               subtitle: const Text('Reposition Bookmark Scrollber'),
               trailing: Switch(
-                value: Settings.bookmarkScrollbarPositionToLeft,
+                value: Settings.bookmarkScrollbarPositionToLeft.value,
                 onChanged: (newValue) async {
-                  await Settings.setBookmarkScrollbarPositionToLeft(newValue);
+                  await Settings.bookmarkScrollbarPositionToLeft
+                      .setValue(newValue);
                   setState(() {});
                 },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
             onTap: () async {
-              await Settings.setBookmarkScrollbarPositionToLeft(
-                  !Settings.bookmarkScrollbarPositionToLeft);
+              await Settings.bookmarkScrollbarPositionToLeft
+                  .setValue(!Settings.bookmarkScrollbarPositionToLeft.value);
               setState(() {});
             },
           ),
           _buildDivider(),
           InkWell(
             child: ListTile(
-              leading: Icon(MdiIcons.flask, color: Settings.majorColor),
+              leading: Icon(MdiIcons.flask, color: Settings.majorColor.value),
               title: const Text('In Viewer Message Search'),
               subtitle: const Text('Support message search on viewer mode.'),
               trailing: Switch(
-                value: Settings.inViewerMessageSearch,
+                value: Settings.inViewerMessageSearch.value,
                 onChanged: (newValue) async {
-                  await Settings.setInViewerMessageSearch(newValue);
+                  await Settings.inViewerMessageSearch.setValue(newValue);
                   setState(() {});
                 },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
             onTap: () async {
-              await Settings.setInViewerMessageSearch(
-                  !Settings.inViewerMessageSearch);
+              await Settings.inViewerMessageSearch
+                  .setValue(!Settings.inViewerMessageSearch.value);
               setState(() {});
             },
           ),
@@ -192,7 +194,9 @@ class _LabSettingState extends State<LabSetting> {
       ),
       width: double.infinity,
       height: 1.0,
-      color: Settings.themeWhat ? Colors.grey.shade600 : Colors.grey.shade400,
+      color: Settings.themeWhat.value
+          ? Colors.grey.shade600
+          : Colors.grey.shade400,
     );
   }
 }

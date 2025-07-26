@@ -49,7 +49,7 @@ class _GroupArtistListState extends State<GroupArtistList>
     for (int i = 0; i < artists.length; i++) {
       var postfix = artists[i].artist().toLowerCase().replaceAll(' ', '_');
       var queryString = translate2query(
-          '${artists[i].type().name}:$postfix ${Settings.includeTags}');
+          '${artists[i].type().name}:$postfix ${Settings.includeTags.value}');
       final qm = QueryManager.queryPagination(queryString, 1);
       var query = (await qm.next())[0].id();
       ids.add((query, i));
@@ -67,7 +67,7 @@ class _GroupArtistListState extends State<GroupArtistList>
   Future<List<QueryResult>> _future(String e, ArtistType type) async {
     var postfix = e.toLowerCase().replaceAll(' ', '_');
     var queryString =
-        translate2query('${type.name}:$postfix ${Settings.includeTags}');
+        translate2query('${type.name}:$postfix ${Settings.includeTags.value}');
     final qm = QueryManager.queryPagination(queryString, 4);
     return await qm.next();
   }
@@ -102,9 +102,10 @@ class _GroupArtistListState extends State<GroupArtistList>
           return PrimaryScrollController(
             controller: ScrollController(),
             child: CupertinoScrollbar(
-              scrollbarOrientation: Settings.bookmarkScrollbarPositionToLeft
-                  ? ScrollbarOrientation.left
-                  : ScrollbarOrientation.right,
+              scrollbarOrientation:
+                  Settings.bookmarkScrollbarPositionToLeft.value
+                      ? ScrollbarOrientation.left
+                      : ScrollbarOrientation.right,
               child: CustomScrollView(
                 physics: const BouncingScrollPhysics(),
                 slivers: <Widget>[
@@ -163,7 +164,7 @@ class _GroupArtistListState extends State<GroupArtistList>
               Radius.circular(8.0),
             ),
           ),
-          elevation: !Settings.themeFlat ? 100 : 0,
+          elevation: !Settings.themeFlat.value ? 100 : 0,
           clipBehavior: Clip.antiAliasWithSaveLayer,
           child: InkWell(
             onTap: _progressingFilter
@@ -435,8 +436,7 @@ class _GroupArtistListState extends State<GroupArtistList>
                   actions: <Widget>[
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Settings.majorColor,
-                      ),
+                          backgroundColor: Settings.majorColor.value),
                       child: Text(Translations.instance!.trans('cancel')),
                       onPressed: () {
                         Navigator.pop(context, 0);

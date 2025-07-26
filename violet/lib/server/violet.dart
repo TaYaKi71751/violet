@@ -420,7 +420,7 @@ class VioletServer {
   static Future<List<MessageSearchResult>?> searchMessage(
       String type, String what) async {
     final gg = await http.get(
-      '${Settings.searchMessageAPI}/$type/${Uri.encodeFull(what)}',
+      '${Settings.searchMessageAPI.value}/$type/${Uri.encodeFull(what)}',
       headers: _vwHeader(),
     );
 
@@ -441,7 +441,7 @@ class VioletServer {
   static Future<List<MessageSearchResult>?> searchMessageWord(
       int articleId, String what) async {
     final gg = await http.get(
-      '${Settings.searchMessageAPI}/wcontains/$articleId/${Uri.encodeFull(what)}',
+      '${Settings.searchMessageAPI.value}/wcontains/$articleId/${Uri.encodeFull(what)}',
       headers: _vwHeader(),
     );
 

@@ -18,11 +18,11 @@ void main() {
           'ipb_member_id=2742770; ipb_pass_hash=622fcc2be82c922135bb0516e0ee497d; sk=t8inbzaqn45ttyn9f78eanzuqizh; igneous=rcrmcztqgf1v8p1e0'
     });
 
-    Settings.searchCategory = 1;
-    Settings.searchExpunged = false;
-    Settings.ignoreTimeout = true;
-    Settings.includeTagNetwork = false;
-    Settings.excludeTagNetwork = false;
+    Settings.searchCategory.setValue(1);
+    Settings.searchExpunged.setValue(false);
+    Settings.ignoreTimeout.setValue(true);
+    Settings.includeTagNetwork.setValue(false);
+    Settings.excludeTagNetwork.setValue(false);
   });
 
   test('EHentai Gallery Parse', () async {

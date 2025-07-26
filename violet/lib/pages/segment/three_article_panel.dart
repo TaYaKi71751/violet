@@ -52,7 +52,7 @@ class ThreeArticlePanel extends StatelessWidget {
                   Text(
                     count,
                     style: TextStyle(
-                      color: Settings.themeWhat
+                      color: Settings.themeWhat.value
                           ? Colors.grey.shade300
                           : Colors.grey.shade700,
                     ),

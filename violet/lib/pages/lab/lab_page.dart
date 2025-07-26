@@ -192,7 +192,7 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                 () async {
                   Widget yesButton = TextButton(
                     style: TextButton.styleFrom(
-                        foregroundColor: Settings.majorColor),
+                        foregroundColor: Settings.majorColor.value),
                     child: Text(Translations.instance!.trans('ok')),
                     onPressed: () {
                       Navigator.pop(context, true);
@@ -200,7 +200,7 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                   );
                   Widget noButton = TextButton(
                     style: TextButton.styleFrom(
-                        foregroundColor: Settings.majorColor),
+                        foregroundColor: Settings.majorColor.value),
                     child: Text(Translations.instance!.trans('cancel')),
                     onPressed: () {
                       Navigator.pop(context, false);
@@ -299,7 +299,7 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                 },
               ),
               _buildItem(
-                Icon(Icons.receipt, size: 40, color: Settings.majorColor),
+                Icon(Icons.receipt, size: 40, color: Settings.majorColor.value),
                 '#015 Log Message',
                 'Log Message',
                 null,
@@ -308,7 +308,7 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                 },
               ),
               _buildItem(
-                Icon(MdiIcons.cog, size: 40, color: Settings.majorColor),
+                Icon(MdiIcons.cog, size: 40, color: Settings.majorColor.value),
                 '#016 Settings',
                 'Lab Settings',
                 null,
@@ -442,7 +442,7 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
             Text(
               'Violet Laboratory',
               style: TextStyle(
-                color: Settings.themeWhat ? Colors.white : Colors.black87,
+                color: Settings.themeWhat.value ? Colors.white : Colors.black87,
                 fontSize: 16.0,
                 fontFamily: 'Calibre-Semibold',
                 letterSpacing: 1.0,
@@ -459,7 +459,7 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Settings.themeWhat ? Colors.black26 : Colors.white,
+        color: Settings.themeWhat.value ? Colors.black26 : Colors.white,
         borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(8),
             topRight: Radius.circular(8),
@@ -467,10 +467,10 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
             bottomRight: Radius.circular(8)),
         boxShadow: [
           BoxShadow(
-            color: Settings.themeWhat
+            color: Settings.themeWhat.value
                 ? Colors.black26
                 : Colors.grey.withOpacity(0.1),
-            spreadRadius: Settings.themeWhat ? 0 : 5,
+            spreadRadius: Settings.themeWhat.value ? 0 : 5,
             blurRadius: 7,
             offset: const Offset(0, 3), // changes position of shadow
           ),
@@ -479,8 +479,8 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8.0),
         child: Material(
-          color: Settings.themeWhat
-              ? Settings.themeBlack
+          color: Settings.themeWhat.value
+              ? Settings.themeBlack.value
                   ? Palette.blackThemeBackground
                   : Colors.black38
               : Colors.white,

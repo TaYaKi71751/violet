@@ -56,7 +56,7 @@ class _LockSettingPageState extends State<LockSettingPage> {
           Container(
             width: double.infinity,
             height: 0.5,
-            color: Settings.themeWhat
+            color: Settings.themeWhat.value
                 ? Colors.grey.shade600
                 : Colors.grey.shade400,
           ),
@@ -70,7 +70,7 @@ class _LockSettingPageState extends State<LockSettingPage> {
           Container(
             width: double.infinity,
             height: 0.5,
-            color: Settings.themeWhat
+            color: Settings.themeWhat.value
                 ? Colors.grey.shade600
                 : Colors.grey.shade400,
           ),
@@ -84,7 +84,7 @@ class _LockSettingPageState extends State<LockSettingPage> {
           Container(
             width: double.infinity,
             height: 0.5,
-            color: Settings.themeWhat
+            color: Settings.themeWhat.value
                 ? Colors.grey.shade600
                 : Colors.grey.shade400,
           ),
@@ -97,7 +97,7 @@ class _LockSettingPageState extends State<LockSettingPage> {
             trailing: Switch(
               activeTrackColor: Colors.red,
               activeColor: Colors.redAccent,
-              value: Settings.useLockScreen,
+              value: Settings.useLockScreen.value,
               onChanged: (value) async {
                 _toggleAppLock();
               },
@@ -117,7 +117,7 @@ class _LockSettingPageState extends State<LockSettingPage> {
       return;
     }
 
-    await Settings.setUseLockScreen(!Settings.useLockScreen);
+    await Settings.useLockScreen.setValue(!Settings.useLockScreen.value);
     setState(() {});
   }
 }

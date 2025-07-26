@@ -61,7 +61,7 @@ class _LabTopRecentState extends State<LabTopRecent> {
       var xrecords = trecords as List<(int, int)>;
 
       var queryRaw =
-          '${translate2query('${Settings.includeTags} ${Settings.serializedExcludeTags}')} AND ';
+          '${translate2query('${Settings.includeTags.value} ${Settings.serializedExcludeTags}')} AND ';
 
       queryRaw += 'Id IN (${xrecords.map((e) => e.$1).join(',')})';
       var query = await QueryManager.query(queryRaw);
@@ -168,8 +168,9 @@ class _LabTopRecentState extends State<LabTopRecent> {
                         max: 30000,
                         min: 1,
                         divisions: (30000 - 1),
-                        inactiveColor: Settings.majorColor.withOpacity(0.7),
-                        activeColor: Settings.majorColor,
+                        inactiveColor:
+                            Settings.majorColor.value.withOpacity(0.7),
+                        activeColor: Settings.majorColor.value,
                         onChangeEnd: (value) async {
                           limit = value.toInt();
                           await updateRercord(null);

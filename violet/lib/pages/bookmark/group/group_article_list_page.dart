@@ -194,9 +194,10 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
         : PrimaryScrollController(
             controller: _scroll,
             child: CupertinoScrollbar(
-              scrollbarOrientation: Settings.bookmarkScrollbarPositionToLeft
-                  ? ScrollbarOrientation.left
-                  : ScrollbarOrientation.right,
+              scrollbarOrientation:
+                  Settings.bookmarkScrollbarPositionToLeft.value
+                      ? ScrollbarOrientation.left
+                      : ScrollbarOrientation.right,
               child: scrollView,
             ),
           );
@@ -332,7 +333,7 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
               Radius.circular(8.0),
             ),
           ),
-          elevation: !Settings.themeFlat ? 100 : 0,
+          elevation: !Settings.themeFlat.value ? 100 : 0,
           clipBehavior: Clip.antiAliasWithSaveLayer,
           child: InkWell(
             onTap: alignOnTap,
@@ -478,8 +479,7 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
         actions: <Widget>[
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Settings.majorColor,
-            ),
+                backgroundColor: Settings.majorColor.value),
             child: Text(Translations.instance!.trans('cancel')),
             onPressed: () {
               Navigator.pop(context, 0);
