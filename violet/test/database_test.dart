@@ -17,9 +17,9 @@ void main() {
   databaseFactory = databaseFactoryFfi;
 
   setUp(() async {
-    Settings.searchPure.setValue(true);
-    Settings.includeTags.setValue('');
-    Settings.excludeTags.setValue(['']);
+    Settings.searchPure.value = true;
+    Settings.includeTags.value = '';
+    Settings.excludeTags.value = [''];
 
     db ??= await databaseFactoryFfi
         .openDatabase(join(Directory.current.path, 'test/db/data.db'));
