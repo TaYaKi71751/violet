@@ -263,7 +263,7 @@ class ArticleInfoPage extends StatelessWidget {
   }
 
   readButtonEvent(BuildContext context, ArticleInfo data, [int? page]) async {
-    if (Settings.useVioletServer) {
+    if (Settings.useVioletServer.value) {
       Future.delayed(const Duration(milliseconds: 100)).then((value) async {
         await VioletServer.view(data.queryResult.id());
       });
@@ -282,7 +282,7 @@ class ArticleInfoPage extends StatelessWidget {
 
     dynamic navigatorFunc = Navigator.push;
 
-    if (Settings.usingPushReplacementOnArticleRead) {
+    if (Settings.usingPushReplacementOnArticleRead.value) {
       navigatorFunc = Navigator.pushReplacement;
     }
 

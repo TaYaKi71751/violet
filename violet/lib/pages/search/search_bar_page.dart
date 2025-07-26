@@ -382,17 +382,18 @@ class _SearchBarPageState extends State<SearchBarPage>
                       title:
                           Text(Translations.instance!.trans('tagtranslation')),
                       trailing: Switch(
-                        value: Settings.searchTagTranslation,
+                        value: Settings.searchTagTranslation.value,
                         onChanged: (newValue) async {
-                          await Settings.setSearchTagTranslation(newValue);
+                          await Settings.searchTagTranslation
+                              .setValue(newValue);
                           setState(() {});
                         },
                         activeTrackColor: Settings.majorColor.value,
                         activeColor: Settings.majorAccentColor.value,
                       ),
                       onTap: () async {
-                        await Settings.setSearchTagTranslation(
-                            !Settings.searchTagTranslation);
+                        await Settings.searchTagTranslation
+                            .setValue(!Settings.searchTagTranslation.value);
                         setState(() {});
                       },
                     ),
@@ -411,17 +412,17 @@ class _SearchBarPageState extends State<SearchBarPage>
                           color: Settings.majorColor.value),
                       title: const Text('한글 검색'),
                       trailing: Switch(
-                        value: Settings.searchUseTranslated,
+                        value: Settings.searchUseTranslated.value,
                         onChanged: (newValue) async {
-                          await Settings.setSearchUseTranslated(newValue);
+                          await Settings.searchUseTranslated.setValue(newValue);
                           setState(() {});
                         },
                         activeTrackColor: Settings.majorColor.value,
                         activeColor: Settings.majorAccentColor.value,
                       ),
                       onTap: () async {
-                        await Settings.setSearchUseTranslated(
-                            !Settings.searchUseTranslated);
+                        await Settings.searchUseTranslated
+                            .setValue(!Settings.searchUseTranslated.value);
                         setState(() {});
                       },
                     ),
@@ -439,17 +440,17 @@ class _SearchBarPageState extends State<SearchBarPage>
                         color: Settings.majorColor.value),
                     title: Text(Translations.instance!.trans('showcount')),
                     trailing: Switch(
-                      value: Settings.searchShowCount,
+                      value: Settings.searchShowCount.value,
                       onChanged: (newValue) async {
-                        await Settings.setSearchShowCount(newValue);
+                        await Settings.searchShowCount.setValue(newValue);
                         setState(() {});
                       },
                       activeTrackColor: Settings.majorColor.value,
                       activeColor: Settings.majorAccentColor.value,
                     ),
                     onTap: () async {
-                      await Settings.setSearchShowCount(
-                          !Settings.searchShowCount);
+                      await Settings.searchShowCount
+                          .setValue(!Settings.searchShowCount.value);
                       setState(() {});
                     },
                   ),
@@ -466,17 +467,17 @@ class _SearchBarPageState extends State<SearchBarPage>
                         color: Settings.majorColor.value),
                     title: Text(Translations.instance!.trans('fuzzysearch')),
                     trailing: Switch(
-                      value: Settings.searchUseFuzzy,
+                      value: Settings.searchUseFuzzy.value,
                       onChanged: (newValue) async {
-                        await Settings.setSearchUseFuzzy(newValue);
+                        await Settings.searchUseFuzzy.setValue(newValue);
                         setState(() {});
                       },
                       activeTrackColor: Settings.majorColor.value,
                       activeColor: Settings.majorAccentColor.value,
                     ),
                     onTap: () async {
-                      await Settings.setSearchUseFuzzy(
-                          !Settings.searchUseFuzzy);
+                      await Settings.searchUseFuzzy
+                          .setValue(!Settings.searchUseFuzzy.value);
                       setState(() {});
                     },
                   ),
@@ -701,16 +702,16 @@ class _SearchBarPageState extends State<SearchBarPage>
           .map((e) => (DisplayedTag(group: 'page', name: e), 0)));
     }
 
-    if (!Settings.searchUseFuzzy) {
+    if (!Settings.searchUseFuzzy.value) {
       final searchResult = (await HentaiIndex.queryAutoComplete(
-              token, Settings.searchUseTranslated))
+              token, Settings.searchUseTranslated.value))
           .take(_searchResultMaximum)
           .toList();
       if (searchResult.isEmpty) _nothing = true;
       result.addAll(searchResult);
     } else {
       final searchResult = (await HentaiIndex.queryAutoCompleteFuzzy(
-              token, Settings.searchUseTranslated))
+              token, Settings.searchUseTranslated.value))
           .take(_searchResultMaximum)
           .toList();
       if (searchResult.isEmpty) _nothing = true;
@@ -775,11 +776,12 @@ class _SearchBarPageState extends State<SearchBarPage>
     var count = '';
     Color color = Colors.grey;
 
-    if (Settings.searchTagTranslation || Settings.searchUseTranslated) {
+    if (Settings.searchTagTranslation.value ||
+        Settings.searchUseTranslated.value) {
       tagDisplayed = info.$1.getTranslated();
     }
 
-    if (info.$2 > 0 && Settings.searchShowCount) {
+    if (info.$2 > 0 && Settings.searchShowCount.value) {
       count = ' (${info.$2.toString() + (related ? '%' : '')})';
     }
 
@@ -804,7 +806,7 @@ class _SearchBarPageState extends State<SearchBarPage>
 
     if (color == Colors.pink) accColor = Colors.orange;
 
-    if (!Settings.searchUseFuzzy &&
+    if (!Settings.searchUseFuzzy.value &&
         latestToken != '' &&
         tagDisplayed.contains(latestToken) &&
         !related) {
@@ -824,7 +826,7 @@ class _SearchBarPageState extends State<SearchBarPage>
             color: Colors.white,
           ),
           text: tagDisplayed.split(latestToken)[1]));
-    } else if (!Settings.searchUseFuzzy &&
+    } else if (!Settings.searchUseFuzzy.value &&
         latestToken.contains(':') &&
         latestToken.split(':')[1] != '' &&
         tagDisplayed.contains(latestToken.split(':')[1]) &&
@@ -845,8 +847,8 @@ class _SearchBarPageState extends State<SearchBarPage>
             color: Colors.white,
           ),
           text: tagDisplayed.split(latestToken.split(':')[1])[1]));
-    } else if (!Settings.searchUseFuzzy &&
-        !Settings.searchUseTranslated &&
+    } else if (!Settings.searchUseFuzzy.value &&
+        !Settings.searchUseTranslated.value &&
         !related) {
       ts.add(TextSpan(
           style: const TextStyle(

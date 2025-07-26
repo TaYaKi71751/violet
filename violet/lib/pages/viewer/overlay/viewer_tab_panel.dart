@@ -100,7 +100,7 @@ class _ViewerTabPanelState extends State<ViewerTabPanel> {
       ],
     );
 
-    if (Settings.enableViewerFunctionBackdropFilter) {
+    if (Settings.enableViewerFunctionBackdropFilter.value) {
       return ClipRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
@@ -387,7 +387,8 @@ class __ArtistsArticleTabListState extends State<_ArtistsArticleTabList>
                                 selectMode: true,
                                 selectCallback: () async {
                                   if (!Settings
-                                      .showNewViewerWhenArtistArticleListItemTap) {
+                                      .showNewViewerWhenArtistArticleListItemTap
+                                      .value) {
                                     _showArticleInfo(e);
                                   } else {
                                     _showViewer(e);
@@ -416,7 +417,7 @@ class __ArtistsArticleTabListState extends State<_ArtistsArticleTabList>
   }
 
   Future<void> _showViewer(QueryResult e) async {
-    if (Settings.useVioletServer) {
+    if (Settings.useVioletServer.value) {
       Future.delayed(const Duration(milliseconds: 100)).then((value) async {
         await VioletServer.view(e.id());
       });

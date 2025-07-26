@@ -109,9 +109,9 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
       ? _pageController.page!.round()
       : defaultInitialPage;
 
-  bool get _usesDrawer => Settings.useDrawer;
+  bool get _usesDrawer => Settings.useDrawer.value;
 
-  bool get _usesBottomNavigationBar => !Settings.useDrawer;
+  bool get _usesBottomNavigationBar => !Settings.useDrawer.value;
 
   DateTime? _lastPopAt;
 

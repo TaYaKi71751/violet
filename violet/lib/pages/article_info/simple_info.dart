@@ -110,7 +110,7 @@ class SimpleInfoWidget extends StatelessWidget {
         : SizedBox(
             height: size.height,
             width: size.width,
-            child: !Settings.simpleItemWidgetLoadingIcon
+            child: !Settings.simpleItemWidgetLoadingIcon.value
                 ? const FlareActor(
                     'assets/flare/Loading2.flr',
                     alignment: Alignment.center,

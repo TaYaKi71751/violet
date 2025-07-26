@@ -395,9 +395,9 @@ class _SettingsPageState extends State<SettingsPage>
                 color: Settings.majorColor.value),
             title: Text(Translations.instance!.trans('usetabletmode')),
             trailing: Switch(
-              value: Settings.useTabletMode,
+              value: Settings.useTabletMode.value,
               onChanged: (newValue) async {
-                await Settings.setUseTabletMode(newValue);
+                await Settings.useTabletMode.setValue(newValue);
                 setState(() {
                   _shouldReload = true;
                 });
@@ -407,7 +407,8 @@ class _SettingsPageState extends State<SettingsPage>
             ),
           ),
           onTap: () async {
-            await Settings.setUseTabletMode(!Settings.useTabletMode);
+            await Settings.useTabletMode
+                .setValue(!Settings.useTabletMode.value);
             setState(() {
               _shouldReload = true;
             });
@@ -423,9 +424,9 @@ class _SettingsPageState extends State<SettingsPage>
                 Icon(MdiIcons.cellphoneText, color: Settings.majorColor.value),
             title: Text(Translations.instance!.trans('userdrawer')),
             trailing: Switch(
-              value: Settings.useDrawer,
+              value: Settings.useDrawer.value,
               onChanged: (newValue) async {
-                await Settings.setUseDrawer(newValue);
+                await Settings.useDrawer.setValue(newValue);
                 setState(() {
                   _shouldReload = true;
                 });
@@ -441,7 +442,7 @@ class _SettingsPageState extends State<SettingsPage>
             ),
           ),
           onTap: () async {
-            await Settings.setUseDrawer(!Settings.useDrawer);
+            await Settings.useDrawer.setValue(!Settings.useDrawer.value);
             setState(() {
               _shouldReload = true;
             });
@@ -661,9 +662,9 @@ class _SettingsPageState extends State<SettingsPage>
                   Icon(Mdi.compassOutline, color: Settings.majorColor.value),
               title: const Text('Pure Search'),
               trailing: Switch(
-                value: Settings.searchPure,
+                value: Settings.searchPure.value,
                 onChanged: (newValue) async {
-                  await Settings.setSearchPure(newValue);
+                  await Settings.searchPure.setValue(newValue);
                   setState(() {
                     _shouldReload = true;
                   });
@@ -673,7 +674,7 @@ class _SettingsPageState extends State<SettingsPage>
               ),
             ),
             onTap: () async {
-              await Settings.setSearchPure(!Settings.searchPure);
+              await Settings.searchPure.setValue(!Settings.searchPure.value);
               setState(() {
                 _shouldReload = true;
               });
@@ -691,9 +692,9 @@ class _SettingsPageState extends State<SettingsPage>
               ),
               title: Text(Translations.instance!.trans('usewebsearch')),
               trailing: Switch(
-                value: Settings.searchNetwork,
+                value: Settings.searchNetwork.value,
                 onChanged: (newValue) async {
-                  await Settings.setSearchOnWeb(newValue);
+                  await Settings.searchNetwork.setValue(newValue);
                   setState(() {
                     _shouldReload = true;
                   });
@@ -703,13 +704,14 @@ class _SettingsPageState extends State<SettingsPage>
               ),
             ),
             onTap: () async {
-              await Settings.setSearchOnWeb(!Settings.searchNetwork);
+              await Settings.searchNetwork
+                  .setValue(!Settings.searchNetwork.value);
               setState(() {
                 _shouldReload = true;
               });
             },
           ),
-          if (Settings.searchNetwork)
+          if (Settings.searchNetwork.value)
             InkWell(
               customBorder: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
@@ -722,9 +724,9 @@ class _SettingsPageState extends State<SettingsPage>
                 ),
                 title: Text(Translations.instance!.trans('usesearchexpunged')),
                 trailing: Switch(
-                  value: Settings.searchExpunged,
+                  value: Settings.searchExpunged.value,
                   onChanged: (newValue) async {
-                    await Settings.setSearchExpunged(newValue);
+                    await Settings.searchExpunged.setValue(newValue);
                     setState(() {
                       _shouldReload = true;
                     });
@@ -734,13 +736,14 @@ class _SettingsPageState extends State<SettingsPage>
                 ),
               ),
               onTap: () async {
-                await Settings.setSearchExpunged(!Settings.searchExpunged);
+                await Settings.searchExpunged
+                    .setValue(!Settings.searchExpunged.value);
                 setState(() {
                   _shouldReload = true;
                 });
               },
             ),
-          if (Settings.searchNetwork)
+          if (Settings.searchNetwork.value)
             InkWell(
               customBorder: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
@@ -753,9 +756,9 @@ class _SettingsPageState extends State<SettingsPage>
                 ),
                 title: Text(Translations.instance!.trans('includetagnetwork')),
                 trailing: Switch(
-                  value: Settings.includeTagNetwork,
+                  value: Settings.includeTagNetwork.value,
                   onChanged: (newValue) async {
-                    await Settings.setIncludeTagOnWeb(newValue);
+                    await Settings.includeTagNetwork.setValue(newValue);
                     setState(() {
                       _shouldReload = true;
                     });
@@ -765,13 +768,14 @@ class _SettingsPageState extends State<SettingsPage>
                 ),
               ),
               onTap: () async {
-                await Settings.setIncludeTagOnWeb(!Settings.includeTagNetwork);
+                await Settings.includeTagNetwork
+                    .setValue(!Settings.includeTagNetwork.value);
                 setState(() {
                   _shouldReload = true;
                 });
               },
             ),
-          if (Settings.searchNetwork)
+          if (Settings.searchNetwork.value)
             InkWell(
               customBorder: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
@@ -784,9 +788,9 @@ class _SettingsPageState extends State<SettingsPage>
                 ),
                 title: Text(Translations.instance!.trans('excludetagnetwork')),
                 trailing: Switch(
-                  value: Settings.excludeTagNetwork,
+                  value: Settings.excludeTagNetwork.value,
                   onChanged: (newValue) async {
-                    await Settings.setExcludeTagOnWeb(newValue);
+                    await Settings.excludeTagNetwork.setValue(newValue);
                     setState(() {
                       _shouldReload = true;
                     });
@@ -796,13 +800,14 @@ class _SettingsPageState extends State<SettingsPage>
                 ),
               ),
               onTap: () async {
-                await Settings.setExcludeTagOnWeb(!Settings.excludeTagNetwork);
+                await Settings.excludeTagNetwork
+                    .setValue(!Settings.excludeTagNetwork.value);
                 setState(() {
                   _shouldReload = true;
                 });
               },
             ),
-          if (Settings.searchNetwork)
+          if (Settings.searchNetwork.value)
             InkWell(
               customBorder: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(8.0)),
@@ -816,7 +821,7 @@ class _SettingsPageState extends State<SettingsPage>
                 trailing: const Icon(Icons.keyboard_arrow_right),
               ),
               onTap: () async {
-                var cats = Settings.searchCategory;
+                var cats = Settings.searchCategory.value;
 
                 var catsController = TextEditingController(text: '$cats');
 
@@ -846,7 +851,7 @@ class _SettingsPageState extends State<SettingsPage>
                   onPressed: () {
                     try {
                       cats = int.parse(catsController.text);
-                      Settings.setSearchCategory(cats);
+                      Settings.searchCategory.setValue(cats);
                     } catch (e, st) {
                       Logger.error('[Search Categories] $e\n'
                           '$st');
@@ -998,9 +1003,9 @@ class _SettingsPageState extends State<SettingsPage>
                 color: Settings.majorColor.value),
             title: Text(Translations.instance!.trans('lowresmode')),
             trailing: Switch(
-              value: Settings.useLowPerf,
+              value: Settings.useLowPerf.value,
               onChanged: (newValue) async {
-                await Settings.setUseLowPerf(newValue);
+                await Settings.useLowPerf.setValue(newValue);
                 setState(() {
                   _shouldReload = true;
                 });
@@ -1009,7 +1014,7 @@ class _SettingsPageState extends State<SettingsPage>
               activeColor: Settings.majorAccentColor.value,
             ),
             onTap: () async {
-              await Settings.setUseLowPerf(!Settings.useLowPerf);
+              await Settings.useLowPerf.setValue(!Settings.useLowPerf.value);
               setState(() {
                 _shouldReload = true;
               });
@@ -1217,9 +1222,9 @@ class _SettingsPageState extends State<SettingsPage>
               ),
               title: Text(Translations.instance!.trans('dbopt')),
               trailing: Switch(
-                value: Settings.useOptimizeDatabase,
+                value: Settings.useOptimizeDatabase.value,
                 onChanged: (newValue) async {
-                  await Settings.setUseOptimizeDatabase(newValue);
+                  await Settings.useOptimizeDatabase.setValue(newValue);
                   setState(() {
                     _shouldReload = true;
                   });
@@ -1229,8 +1234,8 @@ class _SettingsPageState extends State<SettingsPage>
               ),
             ),
             onTap: () async {
-              await Settings.setUseOptimizeDatabase(
-                  !Settings.useOptimizeDatabase);
+              await Settings.useOptimizeDatabase
+                  .setValue(!Settings.useOptimizeDatabase.value);
               setState(() {
                 _shouldReload = true;
               });
@@ -1371,7 +1376,7 @@ class _SettingsPageState extends State<SettingsPage>
             trailing: const Icon(Icons.keyboard_arrow_right),
             onTap: () async {
               TextEditingController text =
-                  TextEditingController(text: Settings.searchMessageAPI);
+                  TextEditingController(text: Settings.searchMessageAPI.value);
               Widget okButton = TextButton(
                 style: TextButton.styleFrom(
                     foregroundColor: Settings.majorColor.value),
@@ -1413,7 +1418,7 @@ class _SettingsPageState extends State<SettingsPage>
                 ),
               );
               if (dialog != null && dialog == true) {
-                await Settings.setSearchMessageAPI(text.text);
+                await Settings.searchMessageAPI.setValue(text.text);
               }
             },
           ),
@@ -1424,9 +1429,9 @@ class _SettingsPageState extends State<SettingsPage>
             ),
             title: Text(Translations.instance!.trans('ignoretimeout')),
             trailing: Switch(
-              value: Settings.ignoreTimeout,
+              value: Settings.ignoreTimeout.value,
               onChanged: (newValue) async {
-                await Settings.setIgnoreTimeout(newValue);
+                await Settings.ignoreTimeout.setValue(newValue);
                 setState(() {
                   _shouldReload = true;
                 });
@@ -1448,9 +1453,9 @@ class _SettingsPageState extends State<SettingsPage>
               ),
               title: Text(Translations.instance!.trans('usevioletserver')),
               trailing: Switch(
-                value: Settings.useVioletServer,
+                value: Settings.useVioletServer.value,
                 onChanged: (newValue) async {
-                  await Settings.setUseVioletServer(newValue);
+                  await Settings.useVioletServer.setValue(newValue);
                   setState(() {
                     _shouldReload = true;
                   });
@@ -1460,7 +1465,8 @@ class _SettingsPageState extends State<SettingsPage>
               ),
             ),
             onTap: () async {
-              await Settings.setUseVioletServer(!Settings.useVioletServer);
+              await Settings.useVioletServer
+                  .setValue(!Settings.useVioletServer.value);
               setState(() {
                 _shouldReload = true;
               });
@@ -1711,7 +1717,7 @@ class _SettingsPageState extends State<SettingsPage>
                 children: [
                   Text(Translations.instance!.trans('downloadrule')),
                   Text(
-                    '${Translations.instance!.trans('curdownloadrule')}: ${Settings.downloadRule}',
+                    '${Translations.instance!.trans('curdownloadrule')}: ${Settings.downloadRule.value}',
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -1720,7 +1726,7 @@ class _SettingsPageState extends State<SettingsPage>
             ),
             onTap: () async {
               TextEditingController text =
-                  TextEditingController(text: Settings.downloadRule);
+                  TextEditingController(text: Settings.downloadRule.value);
               Widget okButton = TextButton(
                 style: TextButton.styleFrom(
                     foregroundColor: Settings.majorColor.value),
@@ -1764,7 +1770,7 @@ class _SettingsPageState extends State<SettingsPage>
                 ),
               );
               if (dialog != null && dialog == true) {
-                await Settings.setDownloadRule(text.text);
+                await Settings.downloadRule.setValue(text.text);
               }
             },
           ),
@@ -1776,7 +1782,7 @@ class _SettingsPageState extends State<SettingsPage>
   List<Widget> _bookmarkGroup() {
     /*
     Future<void> toggleAutoBackupBookmark() async {
-      await Settings.setAutoBackupBookmark(!Settings.autobackupBookmark);
+      await Settings.setAutoBackupBookmark(!Settings.autobackupBookmark.value);
       setState(() {
         _shouldReload = true;
       });
@@ -1808,7 +1814,7 @@ class _SettingsPageState extends State<SettingsPage>
               ),
               title: Text(Translations.instance!.trans('autobackupbookmark')),
               trailing: Switch(
-                value: Settings.autobackupBookmark,
+                value: Settings.autobackupBookmark.value,
                 // onChanged: setAutoBackupBookmark,
                 onChanged: null,
                 activeTrackColor: Settings.majorColor.value,
@@ -2385,9 +2391,9 @@ class _SettingsPageState extends State<SettingsPage>
               ),
               title: Text(Translations.instance!.trans('showarticleprogress')),
               trailing: Switch(
-                value: Settings.showArticleProgress,
+                value: Settings.showArticleProgress.value,
                 onChanged: (newValue) async {
-                  await Settings.setShowArticleProgress(newValue);
+                  await Settings.showArticleProgress.setValue(newValue);
                   setState(() {
                     _shouldReload = true;
                   });
@@ -2397,8 +2403,8 @@ class _SettingsPageState extends State<SettingsPage>
               ),
             ),
             onTap: () async {
-              await Settings.setShowArticleProgress(
-                  !Settings.showArticleProgress);
+              await Settings.showArticleProgress
+                  .setValue(!Settings.showArticleProgress.value);
               setState(() {
                 _shouldReload = true;
               });

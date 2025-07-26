@@ -497,7 +497,7 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
         foregroundDecoration: isLastestRead &&
                 length > 0 &&
                 length - latestReadPage <= 2 &&
-                Settings.showArticleProgress
+                Settings.showArticleProgress.value
             ? BoxDecoration(
                 color: Settings.themeWhat.value
                     ? Colors.grey.shade800
@@ -756,7 +756,7 @@ class _ThumbnailWidget extends StatelessWidget {
   }
 
   Widget _getLoadingAnimation() {
-    if (!Settings.simpleItemWidgetLoadingIcon) {
+    if (!Settings.simpleItemWidgetLoadingIcon.value) {
       return const FlareActor(
         'assets/flare/Loading2.flr',
         alignment: Alignment.center,
@@ -831,7 +831,7 @@ class _FileThumbnailWidget extends StatelessWidget {
   }
 
   Widget _getLoadingAnimation() {
-    if (!Settings.simpleItemWidgetLoadingIcon) {
+    if (!Settings.simpleItemWidgetLoadingIcon.value) {
       return const FlareActor(
         'assets/flare/Loading2.flr',
         alignment: Alignment.center,

@@ -69,7 +69,7 @@ class _ThumbnailViewPageState extends State<ThumbnailViewPage> {
                     fit: !widget.showUltra ? BoxFit.cover : BoxFit.contain,
                     httpHeaders: widget.headers,
                     placeholder: (b, c) {
-                      if (!Settings.simpleItemWidgetLoadingIcon) {
+                      if (!Settings.simpleItemWidgetLoadingIcon.value) {
                         return const FlareActor(
                           'assets/flare/Loading2.flr',
                           alignment: Alignment.center,

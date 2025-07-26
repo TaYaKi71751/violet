@@ -92,7 +92,9 @@ class _ToastWrapperState extends State<ToastWrapper>
                 ? 0.0
                 : (Variables.bottomBarHeight.toDouble() +
                     6 +
-                    (Settings.useDrawer && !widget.ignoreDrawer ? 0.0 : 16.0)),
+                    (Settings.useDrawer.value && !widget.ignoreDrawer
+                        ? 0.0
+                        : 16.0)),
           ),
           child: SlideTransition(
             position: offset,

@@ -231,7 +231,7 @@ class _UserStatusCardState extends ThemeSwitchableState<UserStatusCard>
                     ),
                   ),
                   onTap: () async {
-                    // if (Settings.autobackupBookmark) {
+                    // if (Settings.autobackupBookmark.value) {
                     //   await showOkDialog(
                     //       context,
                     //       'Bookmark Auto-Backup function is enabled. Each time you restart the app, ' +

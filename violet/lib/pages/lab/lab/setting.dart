@@ -27,9 +27,9 @@ class _LabSettingState extends State<LabSetting> {
               title: const Text('Simple item widget loading icon'),
               subtitle: const Text('using circular bar instead of flare'),
               trailing: Switch(
-                value: Settings.simpleItemWidgetLoadingIcon,
+                value: Settings.simpleItemWidgetLoadingIcon.value,
                 onChanged: (newValue) async {
-                  await Settings.setSimpleItemWidgetLoadingIcon(newValue);
+                  await Settings.simpleItemWidgetLoadingIcon.setValue(newValue);
                   setState(() {});
                 },
                 activeTrackColor: Settings.majorColor.value,
@@ -37,8 +37,8 @@ class _LabSettingState extends State<LabSetting> {
               ),
             ),
             onTap: () async {
-              await Settings.setSimpleItemWidgetLoadingIcon(
-                  !Settings.simpleItemWidgetLoadingIcon);
+              await Settings.simpleItemWidgetLoadingIcon
+                  .setValue(!Settings.simpleItemWidgetLoadingIcon.value);
               setState(() {});
             },
           ),
@@ -50,10 +50,10 @@ class _LabSettingState extends State<LabSetting> {
               subtitle: const Text(
                   'show new viewer when artist article list item tapped'),
               trailing: Switch(
-                value: Settings.showNewViewerWhenArtistArticleListItemTap,
+                value: Settings.showNewViewerWhenArtistArticleListItemTap.value,
                 onChanged: (newValue) async {
-                  await Settings.setShowNewViewerWhenArtistArticleListItemTap(
-                      newValue);
+                  await Settings.showNewViewerWhenArtistArticleListItemTap
+                      .setValue(newValue);
                   setState(() {});
                 },
                 activeTrackColor: Settings.majorColor.value,
@@ -61,8 +61,8 @@ class _LabSettingState extends State<LabSetting> {
               ),
             ),
             onTap: () async {
-              await Settings.setShowNewViewerWhenArtistArticleListItemTap(
-                  !Settings.showNewViewerWhenArtistArticleListItemTap);
+              await Settings.showNewViewerWhenArtistArticleListItemTap.setValue(
+                  !Settings.showNewViewerWhenArtistArticleListItemTap.value);
               setState(() {});
             },
           ),
@@ -74,10 +74,10 @@ class _LabSettingState extends State<LabSetting> {
               subtitle: const Text(
                   'apply ios style blur effect to viewer functions. this blur effect may decrease performance.'),
               trailing: Switch(
-                value: Settings.enableViewerFunctionBackdropFilter,
+                value: Settings.enableViewerFunctionBackdropFilter.value,
                 onChanged: (newValue) async {
-                  await Settings.setEnableViewerFunctionBackdropFilter(
-                      newValue);
+                  await Settings.enableViewerFunctionBackdropFilter
+                      .setValue(newValue);
                   setState(() {});
                 },
                 activeTrackColor: Settings.majorColor.value,
@@ -85,8 +85,8 @@ class _LabSettingState extends State<LabSetting> {
               ),
             ),
             onTap: () async {
-              await Settings.setEnableViewerFunctionBackdropFilter(
-                  !Settings.enableViewerFunctionBackdropFilter);
+              await Settings.enableViewerFunctionBackdropFilter
+                  .setValue(!Settings.enableViewerFunctionBackdropFilter.value);
               setState(() {});
             },
           ),
@@ -98,9 +98,10 @@ class _LabSettingState extends State<LabSetting> {
               subtitle: const Text(
                   'when tap Read button in the article-info, the article-info closes.'),
               trailing: Switch(
-                value: Settings.usingPushReplacementOnArticleRead,
+                value: Settings.usingPushReplacementOnArticleRead.value,
                 onChanged: (newValue) async {
-                  await Settings.setUsingPushReplacementOnArticleRead(newValue);
+                  await Settings.usingPushReplacementOnArticleRead
+                      .setValue(newValue);
                   setState(() {});
                 },
                 activeTrackColor: Settings.majorColor.value,
@@ -108,8 +109,8 @@ class _LabSettingState extends State<LabSetting> {
               ),
             ),
             onTap: () async {
-              await Settings.setUsingPushReplacementOnArticleRead(
-                  !Settings.usingPushReplacementOnArticleRead);
+              await Settings.usingPushReplacementOnArticleRead
+                  .setValue(!Settings.usingPushReplacementOnArticleRead.value);
               setState(() {});
             },
           ),
@@ -121,9 +122,9 @@ class _LabSettingState extends State<LabSetting> {
               subtitle: const Text(
                   'download the original image. many network errors (connection reset ... etc) can occur during this operation.'),
               trailing: Switch(
-                value: Settings.downloadEhRawImage,
+                value: Settings.downloadEhRawImage.value,
                 onChanged: (newValue) async {
-                  await Settings.setDownloadEhRawImage(newValue);
+                  await Settings.downloadEhRawImage.setValue(newValue);
                   setState(() {});
                 },
                 activeTrackColor: Settings.majorColor.value,
@@ -131,8 +132,8 @@ class _LabSettingState extends State<LabSetting> {
               ),
             ),
             onTap: () async {
-              await Settings.setDownloadEhRawImage(
-                  !Settings.downloadEhRawImage);
+              await Settings.downloadEhRawImage
+                  .setValue(!Settings.downloadEhRawImage.value);
               setState(() {});
             },
           ),
@@ -143,9 +144,10 @@ class _LabSettingState extends State<LabSetting> {
               title: const Text('Bookmark Scrollbar Position To Left'),
               subtitle: const Text('Reposition Bookmark Scrollber'),
               trailing: Switch(
-                value: Settings.bookmarkScrollbarPositionToLeft,
+                value: Settings.bookmarkScrollbarPositionToLeft.value,
                 onChanged: (newValue) async {
-                  await Settings.setBookmarkScrollbarPositionToLeft(newValue);
+                  await Settings.bookmarkScrollbarPositionToLeft
+                      .setValue(newValue);
                   setState(() {});
                 },
                 activeTrackColor: Settings.majorColor.value,
@@ -153,8 +155,8 @@ class _LabSettingState extends State<LabSetting> {
               ),
             ),
             onTap: () async {
-              await Settings.setBookmarkScrollbarPositionToLeft(
-                  !Settings.bookmarkScrollbarPositionToLeft);
+              await Settings.bookmarkScrollbarPositionToLeft
+                  .setValue(!Settings.bookmarkScrollbarPositionToLeft.value);
               setState(() {});
             },
           ),
@@ -165,9 +167,9 @@ class _LabSettingState extends State<LabSetting> {
               title: const Text('In Viewer Message Search'),
               subtitle: const Text('Support message search on viewer mode.'),
               trailing: Switch(
-                value: Settings.inViewerMessageSearch,
+                value: Settings.inViewerMessageSearch.value,
                 onChanged: (newValue) async {
-                  await Settings.setInViewerMessageSearch(newValue);
+                  await Settings.inViewerMessageSearch.setValue(newValue);
                   setState(() {});
                 },
                 activeTrackColor: Settings.majorColor.value,
@@ -175,8 +177,8 @@ class _LabSettingState extends State<LabSetting> {
               ),
             ),
             onTap: () async {
-              await Settings.setInViewerMessageSearch(
-                  !Settings.inViewerMessageSearch);
+              await Settings.inViewerMessageSearch
+                  .setValue(!Settings.inViewerMessageSearch.value);
               setState(() {});
             },
           ),

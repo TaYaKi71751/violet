@@ -84,8 +84,8 @@ class _GroupArticleListPageState extends State<LabGroupArticleListPage> {
 
       //queryRaw += cc.map((e) => 'Id=${e.article()}').join(' OR ');
       queryRaw += 'Id IN (${cc.map((e) => e.article()).join(',')})';
-      QueryManager.query(
-              queryRaw + (!Settings.searchPure ? ' AND ExistOnHitomi=1' : ''))
+      QueryManager.query(queryRaw +
+              (!Settings.searchPure.value ? ' AND ExistOnHitomi=1' : ''))
           .then((value) async {
         var qr = <String, QueryResult>{};
         for (var element in value.results!) {

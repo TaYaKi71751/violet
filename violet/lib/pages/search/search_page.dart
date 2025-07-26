@@ -83,7 +83,7 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
   doInitialSearch() async {
     try {
       final search = HentaiManager.search(widget.searchKeyWord ?? '');
-      if (!Settings.ignoreTimeout) {
+      if (!Settings.ignoreTimeout.value) {
         search.timeout(const Duration(seconds: 5));
       }
       final result = await search;
@@ -140,8 +140,10 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
 
       c.itemKeys.clear();
 
+      print('searchResultType: ${Settings.searchResultType.value}');
+
       final panel = ResultPanelWidget(
-        searchResultType: Settings.searchResultType,
+        searchResultType: Settings.searchResultType.value,
         resultList: c.getSearchList(),
         itemKeys: c.itemKeys,
         sliverKey: sliverKey,
@@ -534,7 +536,7 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
   }
 
   alignOnTap() async {
-    final previousAlignType = Settings.searchResultType;
+    final previousAlignType = Settings.searchResultType.value;
     final newAlignType = await Navigator.of(context).push(PageRouteBuilder(
       opaque: false,
       transitionDuration: const Duration(milliseconds: 500),
@@ -552,7 +554,7 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
 
     if (newAlignType == null || previousAlignType == newAlignType) return;
 
-    await Settings.setSearchResultType(newAlignType);
+    await Settings.searchResultType.setValue(newAlignType);
     await Future.delayed(const Duration(milliseconds: 50), () {
       _shouldReload = true;
       c.resetItemHeight();
@@ -620,7 +622,7 @@ class ResultPanelWidget extends StatelessWidget {
         final columnCount =
             searchResultType == SearchResultType.threeGrid ? 3 : 2;
         final simpleModeColumnCount =
-            Settings.useTabletMode ? columnCount * 2 : columnCount;
+            Settings.useTabletMode.value ? columnCount * 2 : columnCount;
         return SliverPadding(
             padding: padding,
             sliver: SliverGrid(
@@ -648,11 +650,13 @@ class ResultPanelWidget extends StatelessWidget {
       case SearchResultType.bigLine:
       case SearchResultType.detail:
       case SearchResultType.ultra:
-        if (Settings.useTabletMode ||
+        if (Settings.useTabletMode.value ||
             MediaQuery.of(context).orientation == Orientation.landscape) {
           const kDetailModeColumnCount = 2;
           final aspectRatioHeight =
-              Settings.useTabletMode && searchResultType.isUltra ? 220 : 130;
+              Settings.useTabletMode.value && searchResultType.isUltra
+                  ? 220
+                  : 130;
 
           return SliverPadding(
             padding: padding,

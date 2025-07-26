@@ -194,9 +194,10 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
         : PrimaryScrollController(
             controller: _scroll,
             child: CupertinoScrollbar(
-              scrollbarOrientation: Settings.bookmarkScrollbarPositionToLeft
-                  ? ScrollbarOrientation.left
-                  : ScrollbarOrientation.right,
+              scrollbarOrientation:
+                  Settings.bookmarkScrollbarPositionToLeft.value
+                      ? ScrollbarOrientation.left
+                      : ScrollbarOrientation.right,
               child: scrollView,
             ),
           );

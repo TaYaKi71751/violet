@@ -106,7 +106,7 @@ class _ViewerRecordPanelState extends State<ViewerRecordPanel> {
       },
     );
 
-    if (Settings.enableViewerFunctionBackdropFilter) {
+    if (Settings.enableViewerFunctionBackdropFilter.value) {
       return ClipRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),

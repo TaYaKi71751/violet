@@ -248,7 +248,7 @@ class _ArticleListItemWidgetState extends State<ArticleListItemWidget>
 
   // ignore: unused_element
   _viewArticle() async {
-    if (Settings.useVioletServer) {
+    if (Settings.useVioletServer.value) {
       Future.delayed(const Duration(milliseconds: 100)).then((value) async {
         await VioletServer.view(data.queryResult.id());
       });
@@ -337,12 +337,12 @@ class _ArticleListItemWidgetState extends State<ArticleListItemWidget>
     c.isBookmarked.value = !c.isBookmarked.value;
 
     if (!c.isBookmarked.value) {
-      if (!Settings.simpleItemWidgetLoadingIcon) {
+      if (!Settings.simpleItemWidgetLoadingIcon.value) {
         c.flareController!.play('Unlike');
       }
     } else {
       controller.forward(from: 0.0);
-      if (!Settings.simpleItemWidgetLoadingIcon) {
+      if (!Settings.simpleItemWidgetLoadingIcon.value) {
         c.flareController!.play('Like');
       }
     }
@@ -571,7 +571,7 @@ class _DetailWidget extends StatelessWidget {
             ))
         .toList();
 
-    if (Settings.useTabletMode) {
+    if (Settings.useTabletMode.value) {
       return ExtendedWrap(
         spacing: 3.0,
         maxLines: 3,

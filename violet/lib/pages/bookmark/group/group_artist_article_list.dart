@@ -68,7 +68,7 @@ class _GroupArtistArticleListState extends State<GroupArtistArticleList>
         return PrimaryScrollController(
           controller: ScrollController(),
           child: CupertinoScrollbar(
-            scrollbarOrientation: Settings.bookmarkScrollbarPositionToLeft
+            scrollbarOrientation: Settings.bookmarkScrollbarPositionToLeft.value
                 ? ScrollbarOrientation.left
                 : ScrollbarOrientation.right,
             child: CustomScrollView(

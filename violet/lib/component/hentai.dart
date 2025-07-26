@@ -59,7 +59,7 @@ class HentaiManager {
       return await _randomSearch(what, offset);
     }
     // is db search?
-    else if (!Settings.searchNetwork) {
+    else if (!Settings.searchNetwork.value) {
       return await _dbSearch(what, offset);
     }
     // is web search?
@@ -367,9 +367,9 @@ class HentaiManager {
   static Future<List<QueryResult>> searchEHentai(String what,
       [int next = 0, bool exh = false]) async {
     final search = Uri.encodeComponent(
-        '${Settings.includeTagNetwork ? '${Settings.includeTags} ' : ''}$what${Settings.excludeTagNetwork ? ' ${Settings.serializedExcludeTags}' : ''}');
+        '${Settings.includeTagNetwork.value ? '${Settings.includeTags} ' : ''}$what${Settings.excludeTagNetwork.value ? ' ${Settings.serializedExcludeTags}' : ''}');
     final url =
-        'https://e${exh ? 'x' : '-'}hentai.org/?${next == 0 ? '' : 'next=$next&'}f_cats=${Settings.searchCategory}&f_search=$search&advsearch=1&f_sname=on&f_stags=on${Settings.searchExpunged ? '&f_sh=on' : ''}&f_spf=&f_spt=';
+        'https://e${exh ? 'x' : '-'}hentai.org/?${next == 0 ? '' : 'next=$next&'}f_cats=${Settings.searchCategory.value}&f_search=$search&advsearch=1&f_sname=on&f_stags=on${Settings.searchExpunged.value ? '&f_sh=on' : ''}&f_spf=&f_spt=';
 
     final cookie =
         (await SharedPreferences.getInstance()).getString('eh_cookies') ?? '';

@@ -143,7 +143,7 @@ class _SplashPageState extends State<SplashPage> {
 
       globalInitialized = true;
 
-      // if (Settings.autobackupBookmark) {
+      // if (Settings.autobackupBookmark.value) {
       //   setState(() {
       //     backupBookmark = true;
       //   });

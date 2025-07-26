@@ -17,7 +17,7 @@ void main() {
   databaseFactory = databaseFactoryFfi;
 
   setUp(() async {
-    Settings.searchPure = true;
+    Settings.searchPure.value = true;
     Settings.includeTags = '';
     Settings.excludeTags = [''];
 

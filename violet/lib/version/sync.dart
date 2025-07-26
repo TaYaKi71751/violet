@@ -233,7 +233,7 @@ class SyncManager {
         await prefs.setInt('synclatest', row.timestamp);
       }
 
-      if (Settings.useOptimizeDatabase && filteredIter.isNotEmpty) {
+      if (Settings.useOptimizeDatabase.value && filteredIter.isNotEmpty) {
         final sql = translate2query(
           '${Settings.includeTags} ${Settings.serializedExcludeTags}',
           filter: false,

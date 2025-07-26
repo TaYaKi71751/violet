@@ -102,9 +102,10 @@ class _GroupArtistListState extends State<GroupArtistList>
           return PrimaryScrollController(
             controller: ScrollController(),
             child: CupertinoScrollbar(
-              scrollbarOrientation: Settings.bookmarkScrollbarPositionToLeft
-                  ? ScrollbarOrientation.left
-                  : ScrollbarOrientation.right,
+              scrollbarOrientation:
+                  Settings.bookmarkScrollbarPositionToLeft.value
+                      ? ScrollbarOrientation.left
+                      : ScrollbarOrientation.right,
               child: CustomScrollView(
                 physics: const BouncingScrollPhysics(),
                 slivers: <Widget>[

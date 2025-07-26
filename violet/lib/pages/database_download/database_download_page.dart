@@ -177,7 +177,7 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
 
       await DataBaseManager.reloadInstance();
 
-      if (Settings.useOptimizeDatabase) {
+      if (Settings.useOptimizeDatabase.value) {
         try {
           await deleteUnused();
         } catch (e1, st1) {

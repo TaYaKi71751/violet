@@ -21,11 +21,12 @@ class Settings {
   static late final SharedPreferences prefs;
 
   // Bookmark Git Settings
-  static late String bookmarkRepository; // default 'example/bookmark'
-  static late String bookmarkHost; // default 'gitee.com'
+  static final bookmarkRepository =
+      SettingItem<String>('bookmarkRepository', 'example/bookmark');
+  static final bookmarkHost = SettingItem<String>('bookmarkHost', 'gitee.com');
 
   // Timeout Settings
-  static late bool ignoreTimeout; // default false
+  static final ignoreTimeout = SettingItem<bool>('ignoreTimeout', false);
 
   // Color Settings
   static Color get themeColor => themeWhat.value ? Colors.white : Colors.black;
@@ -33,12 +34,16 @@ class Settings {
   static final majorColor = SettingItem<Color>('majorColor', Colors.purple);
   static final majorAccentColor =
       SettingItem<Color>('majorAccentColor', Colors.purpleAccent);
-  static late SearchResultType searchResultType;
-  static late DownloadResultType downloadResultType;
-  static late int downloadAlignType;
+  static final searchResultType = EnumSettingItem<SearchResultType>(
+      'searchResultType', SearchResultType.values, SearchResultType.ultra);
+  static final downloadResultType = EnumSettingItem<DownloadResultType>(
+      'downloadResultType',
+      DownloadResultType.values,
+      DownloadResultType.detail);
+  static final downloadAlignType = SettingItem<int>('downloadAlignType', 0);
   static final themeFlat = SettingItem<bool>('themeFlat', false);
   static final themeBlack = SettingItem<bool>('themeBlack', false);
-  static late bool useTabletMode;
+  static final useTabletMode = SettingItem<bool>('usetabletmode', false);
 
   // Tag Settings
   static late String includeTags;
@@ -56,78 +61,105 @@ class Settings {
   // Like this Hitomi.la => e-hentai => exhentai => nhentai
   static late List<String> routingRule; // image routing rule
   static late List<String> searchRule;
-  static late bool searchNetwork;
-  static late bool includeTagNetwork;
-  static late bool excludeTagNetwork;
-  static late bool searchExpunged;
-  static late int searchCategory;
+  static final searchNetwork = SettingItem<bool>('searchNetwork', false);
+  static final includeTagNetwork =
+      SettingItem<bool>('includeTagNetwork', false);
+  static final excludeTagNetwork =
+      SettingItem<bool>('excludeTagNetwork', false);
+  static final searchExpunged = SettingItem<bool>('searchExpunged', false);
+  static final searchCategory = SettingItem<int>('searchCategory', 993);
 
   // Global? English? Korean?
   static late String databaseType;
 
   // Reader Option
-  static late bool rightToLeft;
-  static late bool isHorizontal;
-  static late bool scrollVertical;
-  static late bool animation;
-  static late bool padding;
-  static late bool disableOverlayButton;
-  static late bool disableFullScreen;
-  static late bool enableTimer;
-  static late double timerTick;
-  static late bool disableTwoPageView;
-  static late bool secondPageToSecondPage;
-  static late bool moveToAppBarToBottom;
-  static late bool showSlider;
-  static late int imageQuality;
-  static late int thumbSize;
-  static late bool enableThumbSlider;
-  static late bool showPageNumberIndicator;
-  static late bool showRecordJumpMessage;
+  static final rightToLeft = SettingItem<bool>('rightToLeft', true);
+  static final isHorizontal = SettingItem<bool>('ishorizontal', false);
+  static final scrollVertical = SettingItem<bool>('scrollvertical', false);
+  static final animation = SettingItem<bool>('animation', false);
+  static final padding = SettingItem<bool>('padding', false);
+  static final disableOverlayButton =
+      SettingItem<bool>('disableoverlaybutton', false);
+  static final disableFullScreen =
+      SettingItem<bool>('disablefullscreen', false);
+  static final enableTimer = SettingItem<bool>('enabletimer', false);
+  static final timerTick = SettingItem<double>('timertick', 1.0);
+  static final disableTwoPageView =
+      SettingItem<bool>('disableTwoPageView', false);
+  static final secondPageToSecondPage =
+      SettingItem<bool>('secondPageToSecondPage', false);
+  static final moveToAppBarToBottom =
+      SettingItem<bool>('movetoappbartobottom', Platform.isIOS);
+  static final showSlider = SettingItem<bool>('showslider', false);
+  static final imageQuality = SettingItem<int>('imagequality', 3);
+  static final thumbSize = SettingItem<int>('thumbSize', 1);
+  static final enableThumbSlider =
+      SettingItem<bool>('enableThumbSlider', false);
+  static final showPageNumberIndicator =
+      SettingItem<bool>('showPageNumberIndicator', true);
+  static final showRecordJumpMessage =
+      SettingItem<bool>('showRecordJumpMessage', true);
 
   // Download Options
   static final threadCount = SettingItem<int>('thread_count', 4);
 
   static late bool useInnerStorage;
   static late String downloadBasePath;
-  static late String downloadRule;
+  static final downloadRule = SettingItem<String>(
+      'downloadrule', '%(extractor)s/%(id)s/%(file)s.%(ext)s');
 
-  static late String searchMessageAPI;
-  static late bool useVioletServer;
+  static final searchMessageAPI = SettingItem<String>(
+      'searchmessageapi', 'https://koromo.xyz/api/search/msg');
+  static final useVioletServer = SettingItem<bool>('usevioletserver', false);
 
-  static late bool useDrawer;
+  static final useDrawer = SettingItem<bool>('usedrawer', false);
 
-  static late bool useOptimizeDatabase;
+  static final useOptimizeDatabase =
+      SettingItem<bool>('useoptimizedatabase', true);
 
-  static late bool useLowPerf;
+  static final useLowPerf = SettingItem<bool>('uselowperf', true);
 
   // View Option
-  static late bool showArticleProgress;
+  static final showArticleProgress =
+      SettingItem<bool>('showarticleprogress', false);
 
   // Search Option
-  static late bool searchUseFuzzy;
-  static late bool searchTagTranslation;
-  static late bool searchUseTranslated;
-  static late bool searchShowCount;
-  static late bool searchPure;
+  static final searchUseFuzzy = SettingItem<bool>('searchusefuzzy', false);
+  static final searchTagTranslation =
+      SettingItem<bool>('searchtagtranslation', false);
+  static final searchUseTranslated =
+      SettingItem<bool>('searchusetranslated', false);
+  static final searchShowCount = SettingItem<bool>('searchshowcount', true);
+  static final searchPure = SettingItem<bool>('searchPure', false);
 
   static late String userAppId;
 
-  static late bool autobackupBookmark;
+  static final autobackupBookmark =
+      SettingItem<bool>('autobackupbookmark', false);
 
   // Crop Bookmark
-  static late int cropBookmarkAlign;
-  static late bool cropBookmarkShowOverlay;
-  static late bool cropBookmarkSortDesc;
+  static final cropBookmarkAlign =
+      SettingItem<int>('cropBookmarkAlign', Device.get().isTablet ? 3 : 2);
+  static final cropBookmarkShowOverlay =
+      SettingItem<bool>('cropBookmarkShowOverlay', true);
+  static final cropBookmarkSortDesc =
+      SettingItem<bool>('cropBookmarkSortDesc', false);
 
   // Lab
-  static late bool simpleItemWidgetLoadingIcon;
-  static late bool showNewViewerWhenArtistArticleListItemTap;
-  static late bool enableViewerFunctionBackdropFilter;
-  static late bool usingPushReplacementOnArticleRead;
-  static late bool downloadEhRawImage;
-  static late bool bookmarkScrollbarPositionToLeft;
-  static late bool inViewerMessageSearch;
+  static final simpleItemWidgetLoadingIcon =
+      SettingItem<bool>('simpleItemWidgetLoadingIcon', true);
+  static final showNewViewerWhenArtistArticleListItemTap =
+      SettingItem<bool>('showNewViewerWhenArtistArticleListItemTap', true);
+  static final enableViewerFunctionBackdropFilter =
+      SettingItem<bool>('enableViewerFunctionBackdropFilter', true);
+  static final usingPushReplacementOnArticleRead =
+      SettingItem<bool>('usingPushReplacementOnArticleRead', true);
+  static final downloadEhRawImage =
+      SettingItem<bool>('downloadEhRawImage', false);
+  static final bookmarkScrollbarPositionToLeft =
+      SettingItem<bool>('bookmarkScrollbarPositionToLeft', false);
+  static final inViewerMessageSearch =
+      SettingItem<bool>('inViewerMessageSearch', false);
 
   static final useLockScreen = SettingItem<bool>('useLockScreen', false);
   static final useSecureMode = SettingItem<bool>('useSecureMode', false);
@@ -149,12 +181,6 @@ class Settings {
   }
 
   static Future<void> init() async {
-    searchResultType =
-        SearchResultType.values[await _getInt('searchResultType', 4)];
-    downloadResultType =
-        DownloadResultType.values[await _getInt('downloadResultType', 3)];
-    downloadAlignType = await _getInt('downloadAlignType', 0);
-
     var includetags = prefs.getString('includetags');
     var excludetags = prefs.getString('excludetags');
     var blurredtags = prefs.getString('blurredtags');
@@ -188,11 +214,6 @@ class Settings {
     searchRule =
         (await _getString('searchrule', 'Hitomi|EHentai|ExHentai|NHentai'))
             .split('|');
-    searchNetwork = await _getBool('searchnetwork');
-    includeTagNetwork = await _getBool('includetagnetwork');
-    excludeTagNetwork = await _getBool('excludetagnetwork');
-    searchExpunged = await _getBool('searchexpunged');
-    searchCategory = await _getInt('searchcategory', 993);
 
     if (!routingRule.contains('Hiyobi')) {
       routingRule.add('Hiyobi');
@@ -211,26 +232,6 @@ class Settings {
       await prefs.setString('databasetype', langcode);
     }
     databaseType = databasetype;
-
-    rightToLeft = await _getBool('right2left', true);
-    isHorizontal = await _getBool('ishorizontal');
-    scrollVertical = await _getBool('scrollvertical');
-    animation = await _getBool('animation');
-    padding = await _getBool('padding');
-    disableOverlayButton = await _getBool('disableoverlaybutton');
-    disableFullScreen = await _getBool('disablefullscreen');
-    enableTimer = await _getBool('enabletimer');
-    timerTick = await _getDouble('timertick', 1.0);
-    disableTwoPageView = await _getBool('disableTwoPageView');
-    secondPageToSecondPage = await _getBool('secondPageToSecondPage');
-    moveToAppBarToBottom =
-        await _getBool('movetoappbartobottom', Platform.isIOS);
-    showSlider = await _getBool('showslider');
-    imageQuality = await _getInt('imagequality', 3);
-    thumbSize = await _getInt('imageQuality', 1);
-    enableThumbSlider = await _getBool('enableThumbSlider');
-    showPageNumberIndicator = await _getBool('showPageNumberIndicator', true);
-    showRecordJumpMessage = await _getBool('showRecordJumpMessage', true);
 
     var tUseInnerStorage = prefs.getBool('useinnerstorage');
     if (tUseInnerStorage == null) {
@@ -312,56 +313,12 @@ class Settings {
     }
     downloadBasePath = tDownloadBasePath;
 
-    downloadRule = await _getString(
-        'downloadrule', '%(extractor)s/%(id)s/%(file)s.%(ext)s');
-    searchMessageAPI = await _getString(
-        'searchmessageapi', 'https://koromo.xyz/api/search/msg');
-
-    bookmarkRepository =
-        await _getString('bookmarkRepository', 'example/bookmark');
-    bookmarkHost = await _getString('bookmarkHost', 'gitee.com');
-    ignoreTimeout = await _getBool('ignoretimeout');
-    useVioletServer = await _getBool('usevioletserver');
-    useDrawer = await _getBool('usedrawer');
-    showArticleProgress = await _getBool('showarticleprogress');
-    useOptimizeDatabase = await _getBool('useoptimizedatabase', true);
-
-    useLowPerf = await _getBool('uselowperf', true);
-
-    searchUseFuzzy = await _getBool('searchusefuzzy');
-    searchTagTranslation = await _getBool('searchtagtranslation');
-    searchUseTranslated = await _getBool('searchusetranslated');
-    searchShowCount = await _getBool('searchshowcount', true);
-    searchPure = await _getBool('searchPure');
-
     // main에서 셋팅됨
     if (Platform.isAndroid || Platform.isIOS) {
       userAppId = prefs.getString('fa_userid')!;
     } else {
       userAppId = 'null';
     }
-
-    autobackupBookmark = await _getBool('autobackupbookmark', false);
-
-    useTabletMode = await _getBool('usetabletmode', Device.get().isTablet);
-
-    cropBookmarkAlign =
-        await _getInt('cropBookmarkAlign', useTabletMode ? 3 : 2);
-    cropBookmarkShowOverlay = await _getBool('cropBookmarkShowOverlay', true);
-    cropBookmarkSortDesc = await _getBool('cropBookmarkSortDesc', false);
-
-    simpleItemWidgetLoadingIcon =
-        await _getBool('simpleItemWidgetLoadingIcon', true);
-    showNewViewerWhenArtistArticleListItemTap =
-        await _getBool('showNewViewerWhenArtistArticleListItemTap', true);
-    enableViewerFunctionBackdropFilter =
-        await _getBool('enableViewerFunctionBackdropFilter');
-    usingPushReplacementOnArticleRead =
-        await _getBool('usingPushReplacementOnArticleRead', true);
-    downloadEhRawImage = await _getBool('downloadEhRawImage');
-    bookmarkScrollbarPositionToLeft =
-        await _getBool('bookmarkScrollbarPositionToLeft');
-    inViewerMessageSearch = await _getBool('inViewerMessageSearch');
 
     await regacy1_20_2();
   }
@@ -387,11 +344,11 @@ class Settings {
   static Future regacy1_20_2() async {
     if (await _checkLegacyExists('regacy1_20_2')) return;
 
-    if (!simpleItemWidgetLoadingIcon) {
-      await setSimpleItemWidgetLoadingIcon(true);
+    if (!simpleItemWidgetLoadingIcon.value) {
+      await simpleItemWidgetLoadingIcon.setValue(true);
     }
-    if (!showNewViewerWhenArtistArticleListItemTap) {
-      await setShowNewViewerWhenArtistArticleListItemTap(true);
+    if (!showNewViewerWhenArtistArticleListItemTap.value) {
+      await showNewViewerWhenArtistArticleListItemTap.setValue(true);
     }
   }
 
@@ -413,31 +370,12 @@ class Settings {
     return nn;
   }
 
-  static Future<int> _getInt(String key, [int defaultValue = 0]) async {
-    var nn = prefs.getInt(key);
-    if (nn == null) {
-      nn = defaultValue;
-      await prefs.setInt(key, nn);
-    }
-    return nn;
-  }
-
   static Future<String> _getString(String key,
       [String defaultValue = '']) async {
     var nn = prefs.getString(key);
     if (nn == null) {
       nn = defaultValue;
       await prefs.setString(key, nn);
-    }
-    return nn;
-  }
-
-  static Future<double> _getDouble(String key,
-      [double defaultValue = 0.0]) async {
-    var nn = prefs.getDouble(key);
-    if (nn == null) {
-      nn = defaultValue;
-      await prefs.setDouble(key, nn);
     }
     return nn;
   }
@@ -489,36 +427,6 @@ class Settings {
     await majorAccentColor.setValue(accent!);
   }
 
-  static Future<void> setBookmarkRepository(String value) async {
-    bookmarkRepository = value;
-
-    await prefs.setString('bookmarkRepository', bookmarkRepository);
-  }
-
-  static Future<void> setBookmarkHost(String value) async {
-    bookmarkHost = value;
-
-    await prefs.setString('bookmarkHost', bookmarkHost);
-  }
-
-  static Future<void> setSearchResultType(SearchResultType wh) async {
-    searchResultType = wh;
-
-    await prefs.setInt('searchResultType', searchResultType.index);
-  }
-
-  static Future<void> setDownloadResultType(DownloadResultType wh) async {
-    downloadResultType = wh;
-
-    await prefs.setInt('downloadResultType', downloadResultType.index);
-  }
-
-  static Future<void> setDownloadAlignType(int wh) async {
-    downloadAlignType = wh;
-
-    await prefs.setInt('downloadAlignType', downloadAlignType);
-  }
-
   static Future<void> setIncludeTags(String nn) async {
     includeTags = nn;
 
@@ -543,305 +451,16 @@ class Settings {
     await prefs.setBool('translatetags', translateTags);
   }
 
-  static Future<void> setRightToLeft(bool nn) async {
-    rightToLeft = nn;
-
-    await prefs.setBool('right2left', rightToLeft);
-  }
-
-  static Future<void> setIsHorizontal(bool nn) async {
-    isHorizontal = nn;
-
-    await prefs.setBool('ishorizontal', isHorizontal);
-  }
-
-  static Future<void> setScrollVertical(bool nn) async {
-    scrollVertical = nn;
-
-    await prefs.setBool('scrollvertical', scrollVertical);
-  }
-
-  static Future<void> setAnimation(bool nn) async {
-    animation = nn;
-
-    await prefs.setBool('animation', animation);
-  }
-
-  static Future<void> setPadding(bool nn) async {
-    padding = nn;
-
-    await prefs.setBool('padding', padding);
-  }
-
-  static Future<void> setDisableOverlayButton(bool nn) async {
-    disableOverlayButton = nn;
-
-    await prefs.setBool('disableoverlaybutton', disableOverlayButton);
-  }
-
-  static Future<void> setDisableFullScreen(bool nn) async {
-    disableFullScreen = nn;
-
-    await prefs.setBool('disablefullscreen', disableFullScreen);
-  }
-
-  static Future<void> setEnableTimer(bool nn) async {
-    enableTimer = nn;
-
-    await prefs.setBool('enabletimer', enableTimer);
-  }
-
-  static Future<void> setTimerTick(double nn) async {
-    timerTick = nn;
-
-    await prefs.setDouble('timertick', timerTick);
-  }
-
-  static Future<void> setDisableTwoPageView(bool nn) async {
-    disableTwoPageView = nn;
-
-    await prefs.setBool('onTwoPageView', disableTwoPageView);
-  }
-
-  static Future<void> setSecondPageToSecondPage(bool nn) async {
-    secondPageToSecondPage = nn;
-
-    await prefs.setBool('secondPageToSecondPage', secondPageToSecondPage);
-  }
-
-  static Future<void> setMoveToAppBarToBottom(bool nn) async {
-    moveToAppBarToBottom = nn;
-
-    await prefs.setBool('movetoappbartobottom', nn);
-  }
-
-  static Future<void> setImageQuality(int nn) async {
-    imageQuality = nn;
-
-    await prefs.setInt('imagequality', imageQuality);
-  }
-
-  static Future<void> setThumbSize(int nn) async {
-    thumbSize = nn;
-
-    await prefs.setInt('thumbSize', thumbSize);
-  }
-
-  static Future<void> setEnableThumbSlider(bool nn) async {
-    enableThumbSlider = nn;
-
-    await prefs.setBool('enableThumbSlider', enableThumbSlider);
-  }
-
-  static Future<void> setShowPageNumberIndicator(bool nn) async {
-    showPageNumberIndicator = nn;
-
-    await prefs.setBool('showPageNumberIndicator', showPageNumberIndicator);
-  }
-
-  static Future<void> setShowRecordJumpMessage(bool nn) async {
-    showRecordJumpMessage = nn;
-
-    await prefs.setBool('showRecordJumpMessage', showRecordJumpMessage);
-  }
-
-  static Future<void> setShowSlider(bool nn) async {
-    showSlider = nn;
-
-    await prefs.setBool('showslider', nn);
-  }
-
-  static Future<void> setSearchOnWeb(bool nn) async {
-    searchNetwork = nn;
-
-    await prefs.setBool('searchnetwork', nn);
-  }
-
-  static Future<void> setIncludeTagOnWeb(bool nn) async {
-    includeTagNetwork = nn;
-
-    await prefs.setBool('includetagnetwork', nn);
-  }
-
-  static Future<void> setExcludeTagOnWeb(bool nn) async {
-    excludeTagNetwork = nn;
-
-    await prefs.setBool('excludetagnetwork', nn);
-  }
-
-  static Future<void> setSearchExpunged(bool nn) async {
-    searchExpunged = nn;
-
-    await prefs.setBool('searchexpunged', nn);
-  }
-
-  static Future<void> setSearchCategory(int nn) async {
-    searchCategory = nn;
-
-    await prefs.setInt('searchcategory', nn);
-  }
-
-  static Future<void> setSearchPure(bool nn) async {
-    searchPure = nn;
-
-    await prefs.setBool('searchPure', nn);
-  }
-
-  static Future<void> setIgnoreTimeout(bool nn) async {
-    ignoreTimeout = nn;
-
-    await prefs.setBool('ignoretimeout', nn);
-  }
-
-  static Future<void> setUseVioletServer(bool nn) async {
-    useVioletServer = nn;
-
-    await prefs.setBool('usevioletserver', nn);
-  }
-
-  static Future<void> setUseDrawer(bool nn) async {
-    useDrawer = nn;
-
-    await prefs.setBool('usedrawer', nn);
-  }
-
   static Future<void> setBaseDownloadPath(String nn) async {
     downloadBasePath = nn;
 
     await prefs.setString('downloadbasepath', nn);
   }
 
-  static Future<void> setDownloadRule(String nn) async {
-    downloadRule = nn;
-
-    await prefs.setString('downloadrule', nn);
-  }
-
-  static Future<void> setSearchMessageAPI(String nn) async {
-    searchMessageAPI = nn;
-
-    await prefs.setString('searchmessageapi', nn);
-  }
-
   static Future<void> setUserInnerStorage(bool nn) async {
     useInnerStorage = nn;
 
     await prefs.setBool('useinnerstorage', nn);
-  }
-
-  static Future<void> setShowArticleProgress(bool nn) async {
-    showArticleProgress = nn;
-
-    await prefs.setBool('showarticleprogress', nn);
-  }
-
-  static Future<void> setUseOptimizeDatabase(bool nn) async {
-    useOptimizeDatabase = nn;
-
-    await prefs.setBool('useoptimizedatabase', nn);
-  }
-
-  static Future<void> setUseLowPerf(bool nn) async {
-    useLowPerf = nn;
-
-    await prefs.setBool('uselowperf', nn);
-  }
-
-  static Future<void> setSearchUseFuzzy(bool nn) async {
-    searchUseFuzzy = nn;
-
-    await prefs.setBool('searchusefuzzy', nn);
-  }
-
-  static Future<void> setSearchTagTranslation(bool nn) async {
-    searchTagTranslation = nn;
-
-    await prefs.setBool('searchtagtranslation', nn);
-  }
-
-  static Future<void> setSearchUseTranslated(bool nn) async {
-    searchUseTranslated = nn;
-
-    await prefs.setBool('searchusetranslated', nn);
-  }
-
-  static Future<void> setSearchShowCount(bool nn) async {
-    searchShowCount = nn;
-
-    await prefs.setBool('searchshowcount', nn);
-  }
-
-  static Future<void> setAutoBackupBookmark(bool nn) async {
-    autobackupBookmark = nn;
-
-    await prefs.setBool('autobackupbookmark', nn);
-  }
-
-  static Future<void> setUseTabletMode(bool nn) async {
-    useTabletMode = nn;
-
-    await prefs.setBool('usetabletmode', nn);
-  }
-
-  static Future<void> setCropBookmarkAlign(int nn) async {
-    cropBookmarkAlign = nn;
-
-    await prefs.setInt('cropBookmarkAlign', nn);
-  }
-
-  static Future<void> setCropBookmarkShowOverlay(bool nn) async {
-    cropBookmarkShowOverlay = nn;
-
-    await prefs.setBool('cropBookmarkShowOverlay', nn);
-  }
-
-  static Future<void> setCropBookmarkSortDesc(bool nn) async {
-    cropBookmarkSortDesc = nn;
-
-    await prefs.setBool('cropBookmarkSortDesc', nn);
-  }
-
-  static Future<void> setSimpleItemWidgetLoadingIcon(bool nn) async {
-    simpleItemWidgetLoadingIcon = nn;
-
-    await prefs.setBool('simpleItemWidgetLoadingIcon', nn);
-  }
-
-  static Future<void> setShowNewViewerWhenArtistArticleListItemTap(
-      bool nn) async {
-    showNewViewerWhenArtistArticleListItemTap = nn;
-
-    await prefs.setBool('showNewViewerWhenArtistArticleListItemTap', nn);
-  }
-
-  static Future<void> setEnableViewerFunctionBackdropFilter(bool nn) async {
-    enableViewerFunctionBackdropFilter = nn;
-
-    await prefs.setBool('enableViewerFunctionBackdropFilter', nn);
-  }
-
-  static Future<void> setUsingPushReplacementOnArticleRead(bool nn) async {
-    usingPushReplacementOnArticleRead = nn;
-
-    await prefs.setBool('usingPushReplacementOnArticleRead', nn);
-  }
-
-  static Future<void> setDownloadEhRawImage(bool nn) async {
-    downloadEhRawImage = nn;
-
-    await prefs.setBool('downloadEhRawImage', nn);
-  }
-
-  static Future<void> setBookmarkScrollbarPositionToLeft(bool nn) async {
-    bookmarkScrollbarPositionToLeft = nn;
-
-    await prefs.setBool('bookmarkScrollbarPositionToLeft', nn);
-  }
-
-  static Future<void> setInViewerMessageSearch(bool nn) async {
-    inViewerMessageSearch = nn;
-
-    await prefs.setBool('inViewerMessageSearch', nn);
   }
 }
 
@@ -894,6 +513,28 @@ class SettingItem<T> {
     } else {
       throw Exception('Unsupported type');
     }
+  }
+}
+
+class EnumSettingItem<T extends Enum> {
+  final String key;
+  final List<T> values;
+  final T defaultValue;
+  T? _value;
+
+  EnumSettingItem(this.key, this.values, this.defaultValue) {
+    load();
+  }
+
+  T get value => _value ?? defaultValue;
+  Future<void> setValue(T v) async {
+    _value = v;
+    await Settings.prefs.setInt(key, values.indexOf(v));
+  }
+
+  void load() {
+    int index = Settings.prefs.getInt(key) ?? values.indexOf(defaultValue);
+    _value = values[index];
   }
 }
 

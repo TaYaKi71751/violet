@@ -12,10 +12,10 @@ class DownloadViewType extends StatelessWidget {
 
   Color getColor(DownloadResultType type) {
     return Settings.themeWhat.value
-        ? Settings.downloadResultType == type
+        ? Settings.downloadResultType.value == type
             ? Colors.grey.shade200
             : Colors.grey.shade400
-        : Settings.downloadResultType == type
+        : Settings.downloadResultType.value == type
             ? Colors.grey.shade900
             : Colors.grey.shade400;
   }
@@ -60,7 +60,7 @@ class DownloadViewType extends StatelessWidget {
       title: Text(Translations.instance!.trans(text),
           softWrap: false, style: TextStyle(color: getColor(selection))),
       onTap: () async {
-        await Settings.setDownloadResultType(selection);
+        await Settings.downloadResultType.setValue(selection);
 
         if (!context.mounted) return;
         Navigator.pop(context);

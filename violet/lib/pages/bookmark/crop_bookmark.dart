@@ -38,10 +38,10 @@ class CropBookmarkPage extends StatefulWidget {
 
 class _CropBookmarkPageState extends State<CropBookmarkPage> {
   final ValueNotifier<int> columnCount =
-      ValueNotifier(Settings.cropBookmarkAlign);
+      ValueNotifier(Settings.cropBookmarkAlign.value);
   final ValueNotifier<bool> showOverlay =
-      ValueNotifier(Settings.cropBookmarkShowOverlay);
-  bool sortDesc = Settings.cropBookmarkSortDesc;
+      ValueNotifier(Settings.cropBookmarkShowOverlay.value);
+  bool sortDesc = Settings.cropBookmarkSortDesc.value;
 
   List<String>? imagesUrlForEvict;
 
@@ -283,7 +283,7 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
         SliderMenuItem(
           initialValue: columnCount.value,
           onChanged: (int value) async {
-            await Settings.setCropBookmarkAlign(value);
+            await Settings.cropBookmarkAlign.setValue(value);
             setState(() {
               columnCount.value = value;
             });
@@ -294,7 +294,7 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
           title: 'Show Overlay',
           initialValue: showOverlay.value,
           onChanged: (bool value) async {
-            await Settings.setCropBookmarkShowOverlay(value);
+            await Settings.cropBookmarkShowOverlay.setValue(value);
             showOverlay.value = value;
           },
         ),
@@ -302,7 +302,7 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
           title: 'Sort Descending',
           initialValue: sortDesc,
           onChanged: (bool value) async {
-            await Settings.setCropBookmarkSortDesc(value);
+            await Settings.cropBookmarkSortDesc.setValue(value);
             sortDesc = value;
             setState(() {});
           },
