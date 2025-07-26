@@ -383,11 +383,15 @@ class SettingItem<T> {
   T get value => _value!;
   Future<void> setValue(T v) async {
     _value = v;
-    await saveToPrefs(key, v);
+    if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+      await saveToPrefs(key, v);
+    }
   }
 
   void load() {
-    _value = loadFromPrefs<T>(key, defaultValue);
+    if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+      _value = loadFromPrefs<T>(key, defaultValue);
+    }
   }
 
   @override
