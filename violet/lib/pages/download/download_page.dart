@@ -761,7 +761,7 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
                   child: InkWell(
                     onTap: () async {
                       final prefs = await SharedPreferences.getInstance();
-                      if (!Settings.useInnerStorage &&
+                      if (!Settings.useInnerStorage.value &&
                           prefs.getBool('checkauthalready') == null) {
                         await prefs.setBool('checkauthalready', true);
                         if (await Permission.manageExternalStorage.request() ==

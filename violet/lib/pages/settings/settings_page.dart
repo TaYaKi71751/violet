@@ -1490,8 +1490,8 @@ class _SettingsPageState extends State<SettingsPage>
             onTap: Platform.isIOS
                 ? null
                 : () async {
-                    await Settings.setUserInnerStorage(
-                        !Settings.useInnerStorage);
+                    await Settings.useInnerStorage
+                        .setValue(!Settings.useInnerStorage.value);
                     setState(() {
                       _shouldReload = true;
                     });
@@ -1503,11 +1503,11 @@ class _SettingsPageState extends State<SettingsPage>
               ),
               title: Text(Translations.instance!.trans('useinnerstorage')),
               trailing: Switch(
-                value: Settings.useInnerStorage,
+                value: Settings.useInnerStorage.value,
                 onChanged: Platform.isIOS
                     ? null
                     : (newValue) async {
-                        await Settings.setUserInnerStorage(newValue);
+                        await Settings.useInnerStorage.setValue(newValue);
                         setState(() {
                           _shouldReload = true;
                         });
@@ -1624,7 +1624,7 @@ class _SettingsPageState extends State<SettingsPage>
             //   borderRadius: BorderRadius.all(
             //     Radius.circular(8.0),
             //   ),
-            onTap: Settings.useInnerStorage
+            onTap: Settings.useInnerStorage.value
                 ? null
                 : () async {
                     TextEditingController text =

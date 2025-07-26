@@ -224,7 +224,7 @@ class ArticleInfoPage extends StatelessWidget {
   }
 
   downloadButtonEvent(context, data) async {
-    if (!Settings.useInnerStorage &&
+    if (!Settings.useInnerStorage.value &&
         !await Permission.manageExternalStorage.isGranted) {
       if (await Permission.manageExternalStorage.request() ==
           PermissionStatus.denied) {

@@ -202,7 +202,7 @@ class DownloadRoutine {
   }
 
   Future<String> downloadBasePath() async {
-    if (Settings.useInnerStorage) {
+    if (Settings.useInnerStorage.value) {
       return (await getApplicationDocumentsDirectory()).path;
     } else {
       return Settings.downloadBasePath;

@@ -103,7 +103,14 @@ class Settings {
   // Download Options
   static final threadCount = SettingItem<int>('thread_count', 4);
 
-  static late bool useInnerStorage;
+  static final useInnerStorage =
+      FutureSettingItem<bool>('useinnerstorage', () async {
+    if (Platform.isAndroid) {
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      return androidInfo.version.sdkInt >= 30;
+    }
+    return Platform.isIOS;
+  });
   static late String downloadBasePath;
   static final downloadRule = SettingItem<String>(
       'downloadrule', '%(extractor)s/%(id)s/%(file)s.%(ext)s');
@@ -233,18 +240,7 @@ class Settings {
     }
     databaseType = databasetype;
 
-    var tUseInnerStorage = prefs.getBool('useinnerstorage');
-    if (tUseInnerStorage == null) {
-      tUseInnerStorage = Platform.isIOS;
-      if (Platform.isAndroid) {
-        var deviceInfoPlugin = DeviceInfoPlugin();
-        final androidInfo = await deviceInfoPlugin.androidInfo;
-        if (androidInfo.version.sdkInt >= 30) tUseInnerStorage = true;
-      }
-
-      await prefs.setBool('userinnerstorage', tUseInnerStorage);
-    }
-    useInnerStorage = tUseInnerStorage;
+    await useInnerStorage.load();
 
     String? tDownloadBasePath;
     if (Platform.isAndroid) {
@@ -456,12 +452,6 @@ class Settings {
 
     await prefs.setString('downloadbasepath', nn);
   }
-
-  static Future<void> setUserInnerStorage(bool nn) async {
-    useInnerStorage = nn;
-
-    await prefs.setBool('useinnerstorage', nn);
-  }
 }
 
 class SettingItem<T> {
@@ -473,46 +463,75 @@ class SettingItem<T> {
     load();
   }
 
-  T get value => _value ?? defaultValue;
+  T get value => _value!;
   Future<void> setValue(T v) async {
     _value = v;
-    await _save(v);
+    await saveToPrefs(key, v);
   }
 
   void load() {
-    final prefs = Settings.prefs;
-    if (T == bool) {
-      _value = prefs.getBool(key) as T? ?? defaultValue;
-    } else if (T == int) {
-      _value = prefs.getInt(key) as T? ?? defaultValue;
-    } else if (T == double) {
-      _value = prefs.getDouble(key) as T? ?? defaultValue;
-    } else if (T == String) {
-      _value = prefs.getString(key) as T? ?? defaultValue;
-    } else if (T == Color) {
-      _value =
-          Color(prefs.getInt(key) ?? (defaultValue as Color).value) as T? ??
-              defaultValue;
-    } else {
-      throw Exception('Unsupported type');
+    _value = loadFromPrefs<T>(key, defaultValue);
+  }
+}
+
+class FutureSettingItem<T> {
+  final String key;
+  final Future<T> Function() computeDefault;
+  T? _value;
+  bool _initialized = false;
+
+  FutureSettingItem(this.key, this.computeDefault);
+
+  T get value {
+    if (!_initialized) {
+      throw StateError(
+          'FutureSettingItem<$T> not initialized. Call `load()` first.');
     }
+    return _value!;
   }
 
-  Future<void> _save(T v) async {
-    final prefs = Settings.prefs;
-    if (v is bool) {
-      await prefs.setBool(key, v);
-    } else if (v is int) {
-      await prefs.setInt(key, v);
-    } else if (v is double) {
-      await prefs.setDouble(key, v);
-    } else if (v is String) {
-      await prefs.setString(key, v);
-    } else if (v is Color) {
-      await prefs.setInt(key, v.value);
-    } else {
-      throw Exception('Unsupported type');
+  Future<void> setValue(T v) async {
+    _value = v;
+    await saveToPrefs(key, v);
+  }
+
+  Future<void> load() async {
+    _value = loadFromPrefs<T>(key, null);
+    if (_value == null) {
+      _value = await computeDefault();
+      await saveToPrefs<T>(key, _value! as T);
     }
+    _initialized = true;
+  }
+}
+
+T? loadFromPrefs<T>(String key, T? fallback) {
+  final prefs = Settings.prefs;
+  if (T == bool) return prefs.getBool(key) as T? ?? fallback;
+  if (T == int) return prefs.getInt(key) as T? ?? fallback;
+  if (T == double) return prefs.getDouble(key) as T? ?? fallback;
+  if (T == String) return prefs.getString(key) as T? ?? fallback;
+  if (T == Color) {
+    final val = prefs.getInt(key);
+    return (val != null ? Color(val) : fallback) as T?;
+  }
+  throw Exception('Unsupported type');
+}
+
+Future<void> saveToPrefs<T>(String key, T value) async {
+  final prefs = Settings.prefs;
+  if (value is bool) {
+    await prefs.setBool(key, value);
+  } else if (value is int) {
+    await prefs.setInt(key, value);
+  } else if (value is double) {
+    await prefs.setDouble(key, value);
+  } else if (value is String) {
+    await prefs.setString(key, value);
+  } else if (value is Color) {
+    await prefs.setInt(key, value.value);
+  } else {
+    throw Exception('Unsupported type');
   }
 }
 
