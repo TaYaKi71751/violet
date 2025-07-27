@@ -399,7 +399,8 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
   }
 
   Future<void> _filter(BuildContext context) async {
-    final bookmarks = await (await Bookmark.getInstance()).getCropImages();
+    final bookmarks = widget.bookmarks ??
+        await (await Bookmark.getInstance()).getCropImages();
     final ids = bookmarks.map((e) => e.article()).toList();
     final queryResults = await QueryManager.queryIds(ids);
 
