@@ -4,6 +4,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:archive/archive_io.dart';
 import 'package:collection/collection.dart';
@@ -12,9 +13,9 @@ import 'package:extended_image/extended_image.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:violet/database/user/bookmark.dart';
@@ -59,6 +60,9 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
     evictImageUrls(imagesUrlForEvict);
   }
 
+  bool _isCapturing = false;
+  final GlobalKey _captureKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -68,19 +72,17 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
           ? Future.value(widget.bookmarks)
           : Bookmark.getInstance().then((value) => value.getCropImages()),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return Container();
-        }
-
+        if (!snapshot.hasData) return Container();
         var imgs = snapshot.data!;
-        if (sortDesc) {
-          imgs = imgs.reversed.toList();
-        }
-
+        if (sortDesc) imgs = imgs.reversed.toList();
         imagesUrlForEvict = List<String>.filled(imgs.length, '');
 
-        return MasonryGridView.count(
-          physics: const BouncingScrollPhysics(),
+        final masonryGrid = MasonryGridView.count(
+          key: _isCapturing ? null : PageStorageKey('lazyGrid'), // 스크롤 위치 유지
+          physics: _isCapturing
+              ? const NeverScrollableScrollPhysics()
+              : const BouncingScrollPhysics(),
+          shrinkWrap: _isCapturing, // 전체 렌더링 여부
           crossAxisCount: columnCount.value,
           mainAxisSpacing: 6.0 / columnCount.value,
           crossAxisSpacing: 6.0 / columnCount.value,
@@ -96,36 +98,46 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
               index,
               e.article(),
               e.page(),
-              Rect.fromLTRB(
-                area[0],
-                area[1],
-                area[2],
-                area[3],
-              ),
+              Rect.fromLTRB(area[0], area[1], area[2], area[3]),
               e.aspectRatio(),
             );
           },
         );
+
+        if (_isCapturing) {
+          return SingleChildScrollView(
+            child: RepaintBoundary(
+              key: _captureKey,
+              child: masonryGrid,
+            ),
+          );
+        } else {
+          return masonryGrid;
+        }
       },
     );
 
     return CupertinoPageScaffold(
       child: NestedScrollView(
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            CupertinoSliverNavigationBar(
-              leading: const CupertinoTheme(
-                data: CupertinoThemeData(brightness: Brightness.light),
-                child: Icon(MdiIcons.crop),
-              ),
-              largeTitle: const Text('Crop Bookmark'),
-              trailing: CupertinoTheme(
-                data: const CupertinoThemeData(brightness: Brightness.light),
-                child: settingMenu(),
-              ),
+        headerSliverBuilder: (context, _) => [
+          CupertinoSliverNavigationBar(
+            largeTitle: const Text('Crop Bookmark'),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (_isCapturing)
+                  const CupertinoActivityIndicator()
+                else
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: _startCapture,
+                    child: const Icon(CupertinoIcons.camera),
+                  ),
+                settingMenu(),
+              ],
             ),
-          ];
-        },
+          ),
+        ],
         body: listView,
       ),
     );
@@ -369,6 +381,29 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
         child: const Icon(CupertinoIcons.ellipsis_circle),
       ),
     );
+  }
+
+  void _startCapture() async {
+    setState(() => _isCapturing = true);
+
+    // 한 프레임 기다렸다가 렌더링 완료 후 캡처
+    await Future.delayed(Duration(milliseconds: 10000));
+    await Future.delayed(Duration.zero); // flutter 프레임 캐치
+
+    RenderRepaintBoundary boundary =
+        _captureKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+
+    final image = await boundary.toImage(pixelRatio: 3.0);
+    final byteData = await image.toByteData(format: ImageByteFormat.png);
+    if (byteData == null) return;
+
+    setState(() => _isCapturing = false);
+
+    final pngBytes = byteData.buffer.asUint8List();
+
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/masonry_capture.png');
+    await file.writeAsBytes(pngBytes);
   }
 }
 
