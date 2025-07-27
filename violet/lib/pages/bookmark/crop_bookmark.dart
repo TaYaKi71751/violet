@@ -14,15 +14,19 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:pull_down_button/pull_down_button.dart';
+import 'package:violet/database/query.dart';
 import 'package:violet/database/user/bookmark.dart';
 import 'package:violet/log/log.dart';
 import 'package:violet/other/dialogs.dart';
 import 'package:violet/pages/common/toast.dart';
 import 'package:violet/pages/common/utils.dart';
+import 'package:violet/pages/segment/filter_page.dart';
+import 'package:violet/pages/segment/filter_page_controller.dart';
 import 'package:violet/pages/segment/platform_navigator.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/util/evict_image_urls.dart';
@@ -43,6 +47,9 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
   final ValueNotifier<bool> showOverlay =
       ValueNotifier(Settings.cropBookmarkShowOverlay.value);
   bool sortDesc = Settings.cropBookmarkSortDesc.value;
+  final FilterController _filterController =
+      FilterController(heroKey: 'cropbookmark');
+  List<int> _filterIds = [];
 
   List<String>? imagesUrlForEvict;
 
@@ -74,6 +81,9 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
       builder: (context, snapshot) {
         if (!snapshot.hasData) return Container();
         var imgs = snapshot.data!;
+        if (_filterIds.isNotEmpty) {
+          imgs = imgs.where((e) => _filterIds.contains(e.article())).toList();
+        }
         if (sortDesc) imgs = imgs.reversed.toList();
         imagesUrlForEvict = List<String>.filled(imgs.length, '');
 
@@ -125,6 +135,11 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () => _filter(context),
+                  child: const Icon(MdiIcons.filter),
+                ),
                 if (_isCapturing)
                   const CupertinoActivityIndicator()
                 else
@@ -381,6 +396,28 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
         child: const Icon(CupertinoIcons.ellipsis_circle),
       ),
     );
+  }
+
+  Future<void> _filter(BuildContext context) async {
+    final bookmarks = await (await Bookmark.getInstance()).getCropImages();
+    final ids = bookmarks.map((e) => e.article()).toList();
+    final queryResults = await QueryManager.queryIds(ids);
+
+    if (!context.mounted) return;
+    await PlatformNavigator.navigateSlide(
+      context,
+      Provider<FilterController>.value(
+        value: _filterController,
+        child: FilterPage(
+          queryResult: queryResults,
+        ),
+      ),
+    );
+
+    final filtered = _filterController.applyFilter(queryResults);
+    setState(() {
+      _filterIds = filtered.map((e) => e.id()).toList();
+    });
   }
 
   void _startCapture() async {
