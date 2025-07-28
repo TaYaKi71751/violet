@@ -1,6 +1,8 @@
 // This source code is a part of Project Violet.
 // Copyright (C) 2020-2024. violet-team. Licensed under the Apache-2.0 License.
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:html_unescape/html_unescape_small.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -256,10 +258,13 @@ class _FilterPageState extends State<FilterPage> {
           .toList();
     }
 
+    final spacing = Platform.isWindows ? -7.0 : -7.0;
+    final runSpacing = Platform.isWindows ? 2.0 : -13.0;
+
     return Wrap(
         // alignment: WrapAlignment.center,
-        spacing: -7.0,
-        runSpacing: -13.0,
+        spacing: spacing,
+        runSpacing: runSpacing,
         children: tags.take(100).map(
           (element) {
             return _Chip(
