@@ -431,7 +431,7 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
     RenderRepaintBoundary boundary =
         _captureKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
 
-    final image = await boundary.toImage(pixelRatio: 3.0);
+    final image = await boundary.toImage(pixelRatio: 10.0);
     final byteData = await image.toByteData(format: ImageByteFormat.png);
     if (byteData == null) return;
 
