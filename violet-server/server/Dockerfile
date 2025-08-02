@@ -6,7 +6,6 @@ USER node
 WORKDIR /home/node
 
 COPY package*.json ./
-RUN npm ci
 
 COPY --chown=node:node . .
 RUN npm run build \
