@@ -54,8 +54,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: "{{defaultContext}}:violet-server"
-          file: violet-server/server/Dockerfile
+          context: "{{defaultContext}}:violet-server/server"
           push: true
           tags: violetdev/violet:latest
 
