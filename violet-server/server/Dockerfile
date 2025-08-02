@@ -9,9 +9,9 @@ COPY package*.json ./
 
 COPY --chown=node:node . .
 
-RUN npm install --legacy-peer-deps 
-RUN npm run build \
-  && npm prune --production
+RUN npm install --legacy-peer-deps
+RUN npm run build --legacy-peer-deps \
+  && npm prune --production --legacy-peer-deps
 
 # ---
 
