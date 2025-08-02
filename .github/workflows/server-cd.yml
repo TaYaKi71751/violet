@@ -55,6 +55,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: "{{defaultContext}}:violet-server"
+          file: violet-server/server/Dockerfile
           push: true
           tags: violetdev/violet:latest
 
