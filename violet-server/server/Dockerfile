@@ -14,7 +14,7 @@ RUN npm run build \
 
 # ---
 
-FROM node:16-alpine
+FROM node:22-alpine
 
 ENV NODE_ENV prod
 
