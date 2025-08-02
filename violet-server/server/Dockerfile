@@ -9,7 +9,7 @@ COPY package*.json ./
 
 COPY --chown=node:node . .
 
-RUN npm install -g @nestjs/cli
+RUN npm install
 RUN npm run build \
   && npm prune --production
 
