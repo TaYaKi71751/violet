@@ -8,6 +8,8 @@ WORKDIR /home/node
 COPY package*.json ./
 
 COPY --chown=node:node . .
+
+RUN npm install -g @nestjs/cli
 RUN npm run build \
   && npm prune --production
 
