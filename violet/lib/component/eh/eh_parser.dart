@@ -132,7 +132,7 @@ class EHParser {
     article.title = doc.querySelector("div[id='gd2'] h1[id='gn']")!.text;
     article.subTitle = doc.querySelector("div[id='gd2'] h1[id='gj']")!.text;
 
-    var tryUploader = doc.querySelector("div[id='gmid'] div[id='gdn'] a");
+    var tryUploader = doc.querySelector("div[id='gmid'] div[id='gdn']");
     if (tryUploader != null) article.uploader = tryUploader.text;
 
     var nodeStatic =
@@ -189,8 +189,13 @@ class EHParser {
     for (var element in nodeComments) {
       var date =
           hu.convert(element.querySelector('div.c2 div.c3')!.text.trim());
-      var author =
-          hu.convert(element.querySelector('div.c2 div.c3 > a')!.text.trim());
+      var author = hu.convert(
+          (element.querySelector('div.c2 div.c3 > a')?.text ??
+                  ((element.querySelector('div.c4.nosel')?.text ?? '').trim() ==
+                          'Uploader Comment'
+                      ? article.uploader
+                      : ''))
+              .trim());
       var contents = hu.convert(element
           .querySelector('div.c6')!
           .innerHtml
@@ -198,7 +203,8 @@ class EHParser {
       comments.add((
         df.parse(
             date
-                .substring(0, date.indexOf(' by'))
+                .substring(
+                    0, date.contains(' by') ? date.indexOf(' by') : date.length)
                 .substring('Posted on '.length),
             true),
         author,
