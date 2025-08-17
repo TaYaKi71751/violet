@@ -76,7 +76,7 @@ class _LabRecentRecordsUState extends State<LabRecentRecordsU> {
           max(latestId, xrecords.reduce((x, y) => x.$1 > y.$1 ? x : y).$1 + 1);
 
       var queryRaw =
-          '${translate2query('${Settings.includeTags} ${Settings.serializedExcludeTags}')} AND ';
+          '${translate2query('${Settings.includeTags.value} ${Settings.serializedExcludeTags}')} AND ';
 
       queryRaw += '(${xrecords.map((e) => 'Id=${e.$2}').join(' OR ')})';
       var query = await QueryManager.query(queryRaw);
@@ -175,8 +175,9 @@ class _LabRecentRecordsUState extends State<LabRecentRecordsU> {
                         max: 180,
                         min: 0,
                         divisions: (180 - 0),
-                        inactiveColor: Settings.majorColor.withOpacity(0.7),
-                        activeColor: Settings.majorColor,
+                        inactiveColor:
+                            Settings.majorColor.value.withOpacity(0.7),
+                        activeColor: Settings.majorColor.value,
                         onChangeEnd: (value) async {
                           limit = value.toInt();
                         },

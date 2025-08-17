@@ -123,7 +123,7 @@ Future<VioletImageProvider> getImageProvider(QueryResult queryResult) async {
 }
 
 Future<void> showViewer(BuildContext context, int articleId, int page) async {
-  if (Settings.useVioletServer) {
+  if (Settings.useVioletServer.value) {
     Future.delayed(const Duration(milliseconds: 100)).then((value) async {
       await VioletServerV2.view(articleId);
     });

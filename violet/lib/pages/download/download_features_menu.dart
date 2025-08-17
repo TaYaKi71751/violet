@@ -44,12 +44,14 @@ class DownloadFeaturesMenu extends StatelessWidget {
     return ListTile(
       leading: Icon(
         icon,
-        color: Settings.themeWhat ? Colors.grey.shade200 : Colors.grey.shade900,
+        color: Settings.themeWhat.value
+            ? Colors.grey.shade200
+            : Colors.grey.shade900,
       ),
       title: Text(text,
           softWrap: false,
           style: TextStyle(
-            color: Settings.themeWhat
+            color: Settings.themeWhat.value
                 ? Colors.grey.shade200
                 : Colors.grey.shade900,
           )),

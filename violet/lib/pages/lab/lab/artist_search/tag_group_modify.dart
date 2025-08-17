@@ -74,8 +74,7 @@ class _TagGroupModifyState extends State<TagGroupModify> {
         Expanded(
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Settings.majorColor,
-            ),
+                backgroundColor: Settings.majorColor.value),
             child: const Text('Add'),
             onPressed: () => showAddTagDialog(context),
           ),
@@ -84,8 +83,7 @@ class _TagGroupModifyState extends State<TagGroupModify> {
         Expanded(
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Settings.majorColor,
-            ),
+                backgroundColor: Settings.majorColor.value),
             child: const Text('Remove All'),
             onPressed: () => c.removeAll(),
           ),
@@ -94,8 +92,7 @@ class _TagGroupModifyState extends State<TagGroupModify> {
         Expanded(
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Settings.majorColor,
-            ),
+                backgroundColor: Settings.majorColor.value),
             child: const Text('Apply'),
             onPressed: () => apply(context),
           ),
@@ -162,7 +159,7 @@ class _TagGroupItem extends StatelessWidget {
     final countController = TextEditingController(text: item.value.toString());
 
     Widget okButton = TextButton(
-      style: TextButton.styleFrom(foregroundColor: Settings.majorColor),
+      style: TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
       child: Text(trans.Translations.instance!.trans('ok')),
       onPressed: () {
         Navigator.pop(context, true);
@@ -170,7 +167,7 @@ class _TagGroupItem extends StatelessWidget {
     );
 
     Widget cancelButton = TextButton(
-      style: TextButton.styleFrom(foregroundColor: Settings.majorColor),
+      style: TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
       child: Text(trans.Translations.instance!.trans('cancel')),
       onPressed: () {
         Navigator.pop(context, false);

@@ -163,7 +163,7 @@ class _ViewerPageState extends State<ViewerPage> {
   }
 
   _enterFullScreen() {
-    if (!Settings.disableFullScreen) {
+    if (!Settings.disableFullScreen.value) {
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     }
   }
@@ -183,7 +183,7 @@ class _ViewerPageState extends State<ViewerPage> {
         c.bookmark.value =
             await (await Bookmark.getInstance()).isBookmark(_pageInfo.id);
 
-        if (Settings.showRecordJumpMessage) {
+        if (Settings.showRecordJumpMessage.value) {
           await Future.delayed(const Duration(milliseconds: 100))
               .then((value) => _checkLatestRead());
         }
@@ -256,9 +256,9 @@ class _ViewerPageState extends State<ViewerPage> {
       _nextPageTimer!.cancel();
       _nextPageTimer = null;
     }
-    if (Settings.enableTimer) {
+    if (Settings.enableTimer.value) {
       _nextPageTimer = Timer.periodic(
-        Duration(milliseconds: (Settings.timerTick * 1000).toInt()),
+        Duration(milliseconds: (Settings.timerTick.value * 1000).toInt()),
         nextPageTimerCallback,
       );
     }
@@ -334,7 +334,7 @@ class _ViewerPageState extends State<ViewerPage> {
   _savePageRead() async {
     await (await User.getInstance())
         .updateUserLog(_pageInfo.id, c.page.value + 1);
-    if (!_pageInfo.useFileSystem && Settings.useVioletServer) {
+    if (!_pageInfo.useFileSystem && Settings.useVioletServer.value) {
       VioletServer.viewClose(
           _pageInfo.id,
           DateTime.now().difference(_startsTime).inSeconds -

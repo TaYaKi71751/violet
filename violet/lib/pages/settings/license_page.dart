@@ -14,7 +14,7 @@ class VioletLicensePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Settings.majorColor,
+        backgroundColor: Settings.majorColor.value,
         title: const Text('LICENSES'),
       ),
       body: SingleChildScrollView(
@@ -35,7 +35,7 @@ class VioletLicensePage extends StatelessWidget {
             Container(
               width: double.infinity,
               height: 0.5,
-              color: Settings.themeWhat
+              color: Settings.themeWhat.value
                   ? Colors.grey.shade600
                   : Colors.grey.shade400,
             ),
@@ -65,7 +65,7 @@ class VioletLicensePage extends StatelessWidget {
             Text(
               'This program was created using open sources.',
               style: TextStyle(
-                color: Settings.themeWhat ? Colors.white : Colors.black87,
+                color: Settings.themeWhat.value ? Colors.white : Colors.black87,
                 fontSize: 12.0,
                 // fontFamily: "Calibre-Semibold",
                 letterSpacing: 1.0,
@@ -124,7 +124,7 @@ class VioletLicensePage extends StatelessWidget {
             // Container(
             //   width: double.infinity,
             //   height: 0.5,
-            //   color: Settings.themeWhat
+            //   color: Settings.themeWhat.value
             //       ? Colors.grey.shade600
             //       : Colors.grey.shade400,
             // ),

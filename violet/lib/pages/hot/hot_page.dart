@@ -196,7 +196,7 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
       }
 
       var queryRaw =
-          '${translate2query('${Settings.includeTags} ${Settings.serializedExcludeTags}')} AND ';
+          '${translate2query('${Settings.includeTags.value} ${Settings.serializedExcludeTags}')} AND ';
       queryRaw +=
           '(${value.elements.map((e) => 'Id=${e.articleId}').join(' OR ')})';
       final query = await QueryManager.query(queryRaw);
@@ -229,8 +229,8 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
     return Align(
       alignment: Alignment.centerRight,
       child: PopupMenuButton(
-        color: Settings.themeWhat
-            ? Settings.themeBlack
+        color: Settings.themeWhat.value
+            ? Settings.themeBlack.value
                 ? const Color(0xFF060606)
                 : Colors.grey.shade900.withOpacity(0.90)
             : Colors.grey.shade50,
@@ -238,7 +238,8 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
           data: ThemeData(
               useMaterial3: false,
               iconTheme: IconThemeData(
-                  color: !Settings.themeWhat ? Colors.black : Colors.white)),
+                  color:
+                      !Settings.themeWhat.value ? Colors.black : Colors.white)),
           child: const Icon(MdiIcons.finance),
         ),
         itemBuilder: (ctx) => [
@@ -267,7 +268,9 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
             data: ThemeData(
                 useMaterial3: false,
                 iconTheme: IconThemeData(
-                    color: !Settings.themeWhat ? Colors.black : Colors.white)),
+                    color: !Settings.themeWhat.value
+                        ? Colors.black
+                        : Colors.white)),
             child: Icon(
               iconData,
             ),

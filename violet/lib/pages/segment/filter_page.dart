@@ -1,6 +1,8 @@
 // This source code is a part of Project Violet.
 // Copyright (C) 2020-2024. violet-team. Licensed under the Apache-2.0 License.
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:html_unescape/html_unescape_small.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -146,7 +148,7 @@ class _FilterPageState extends State<FilterPage> {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     return Container(
-      color: Settings.themeWhat ? Color(0xFF353535) : Palette.lightThemeBackground,
+      color: Settings.themeWhat.value ? Color(0xFF353535) : Palette.lightThemeBackground,
       padding: EdgeInsets.only(
           top: MediaQuery.of(context).padding.top,
           bottom: (mediaQuery.padding + mediaQuery.viewInsets).bottom),
@@ -167,7 +169,7 @@ class _FilterPageState extends State<FilterPage> {
         MediaQuery.of(context).padding.top -
         (mediaQuery.padding + mediaQuery.viewInsets).bottom;
     return Card(
-      color: Settings.themeWhat ? Color(0xFF353535) : Palette.lightThemeBackground,
+      color: Settings.themeWhat.value ? Color(0xFF353535) : Palette.lightThemeBackground,
       child: SizedBox(
         child: SizedBox(
           width: width - 16,
@@ -256,10 +258,13 @@ class _FilterPageState extends State<FilterPage> {
           .toList();
     }
 
+    final spacing = Platform.isWindows ? -7.0 : -7.0;
+    final runSpacing = Platform.isWindows ? 2.0 : -13.0;
+
     return Wrap(
         // alignment: WrapAlignment.center,
-        spacing: -7.0,
-        runSpacing: -13.0,
+        spacing: spacing,
+        runSpacing: runSpacing,
         children: tags.take(100).map(
           (element) {
             return _Chip(
@@ -405,7 +410,7 @@ class __ChipState extends State<_Chip> {
     var group = widget.group;
     Color color = Colors.grey;
 
-    if (Settings.translateTags) {
+    if (Settings.translateTags.value) {
       tagDisplayed =
           TagTranslate.ofAny(tagDisplayed).split(':').last.split('|').first;
     }

@@ -249,7 +249,7 @@ class _ArticleListItemWidgetState extends State<ArticleListItemWidget>
 
   // ignore: unused_element
   _viewArticle() async {
-    if (Settings.useVioletServer) {
+    if (Settings.useVioletServer.value) {
       Future.delayed(const Duration(milliseconds: 100)).then((value) async {
         await VioletServerV2.view(data.queryResult.id());
       });
@@ -338,12 +338,12 @@ class _ArticleListItemWidgetState extends State<ArticleListItemWidget>
     c.isBookmarked.value = !c.isBookmarked.value;
 
     if (!c.isBookmarked.value) {
-      if (!Settings.simpleItemWidgetLoadingIcon) {
+      if (!Settings.simpleItemWidgetLoadingIcon.value) {
         c.flareController!.play('Unlike');
       }
     } else {
       controller.forward(from: 0.0);
-      if (!Settings.simpleItemWidgetLoadingIcon) {
+      if (!Settings.simpleItemWidgetLoadingIcon.value) {
         c.flareController!.play('Like');
       }
     }
@@ -427,11 +427,11 @@ class BodyWidget extends StatelessWidget {
               ? const EdgeInsets.only(bottom: 6)
               : const EdgeInsets.only(bottom: 50)
           : EdgeInsets.zero,
-      decoration: !Settings.themeFlat
+      decoration: !Settings.themeFlat.value
           ? BoxDecoration(
               color: c.articleListItem.showDetail
-                  ? Settings.themeWhat
-                      ? Settings.themeBlack
+                  ? Settings.themeWhat.value
+                      ? Settings.themeBlack.value
                           ? Palette.blackThemeBackground
                           : Colors.grey.shade800
                       : Colors.white70
@@ -439,7 +439,7 @@ class BodyWidget extends StatelessWidget {
               borderRadius: const BorderRadius.all(Radius.circular(3)),
               boxShadow: [
                 BoxShadow(
-                  color: Settings.themeWhat
+                  color: Settings.themeWhat.value
                       ? Colors.grey.withOpacity(0.08)
                       : Colors.grey.withOpacity(0.4),
                   spreadRadius: 5,
@@ -449,9 +449,9 @@ class BodyWidget extends StatelessWidget {
               ],
             )
           : null,
-      color: !Settings.themeFlat || !c.articleListItem.showDetail
+      color: !Settings.themeFlat.value || !c.articleListItem.showDetail
           ? null
-          : Settings.themeWhat
+          : Settings.themeWhat.value
               ? Colors.black26
               : Colors.white,
       child: c.articleListItem.showDetail
@@ -494,7 +494,8 @@ class _DetailWidget extends StatelessWidget {
         data: ThemeData(
             useMaterial3: false,
             iconTheme: IconThemeData(
-                color: !Settings.themeWhat ? Colors.black : Colors.white)),
+                color:
+                    !Settings.themeWhat.value ? Colors.black : Colors.white)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
@@ -571,7 +572,7 @@ class _DetailWidget extends StatelessWidget {
             ))
         .toList();
 
-    if (Settings.useTabletMode) {
+    if (Settings.useTabletMode.value) {
       return ExtendedWrap(
         spacing: 3.0,
         maxLines: 3,
@@ -606,7 +607,7 @@ class TagChip extends StatelessWidget {
     var tagDisplayed = name;
     Color color = Colors.grey;
 
-    if (Settings.translateTags) {
+    if (Settings.translateTags.value) {
       tagDisplayed =
           TagTranslate.ofAny(tagDisplayed).split(':').last.split('|').first;
     }
@@ -689,12 +690,12 @@ class TagChip extends StatelessWidget {
       },
       onLongPress: () async {
         final targetTag = '${normalize(group)}:${name.replaceAll(' ', '_')}';
-        if (!Settings.excludeTags.contains(targetTag)) {
+        if (!Settings.excludeTags.value.contains(targetTag)) {
           final yn =
               await showYesNoDialog(context, '$targetTag 태그를 제외태그에 추가할까요?');
           if (yn) {
-            Settings.excludeTags.add(targetTag);
-            await Settings.setExcludeTags(Settings.excludeTags.join(' '));
+            Settings.excludeTags.value.add(targetTag);
+            await Settings.excludeTags.setValue(Settings.excludeTags.value);
             if (context.mounted) {
               await showOkDialog(context, '제외태그에 성공적으로 추가했습니다!');
             }

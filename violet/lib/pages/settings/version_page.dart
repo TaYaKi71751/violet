@@ -32,7 +32,7 @@ class VersionViewPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Card(
-              color: Settings.themeWhat
+              color: Settings.themeWhat.value
                   ? Colors.black.withOpacity(0.9)
                   : Colors.white.withOpacity(0.9),
               elevation: 10,

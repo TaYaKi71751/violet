@@ -73,7 +73,7 @@ class ArticleInfoPage extends StatelessWidget {
           width: width - 16,
           height: Variables.articleInfoHeight,
           child: Container(
-            color: Settings.themeWhat
+            color: Settings.themeWhat.value
                 ? Colors.black.withOpacity(0.9)
                 : Colors.white.withOpacity(0.97),
             child: ListView(
@@ -82,7 +82,7 @@ class ArticleInfoPage extends StatelessWidget {
                 Container(
                   width: width,
                   height: simpleInfoHeight(),
-                  color: Settings.themeWhat
+                  color: Settings.themeWhat.value
                       ? Colors.grey.shade900.withOpacity(0.6)
                       : Colors.white.withOpacity(0.2),
                   child: SimpleInfoWidget(),
@@ -103,8 +103,9 @@ class ArticleInfoPage extends StatelessWidget {
                       scrollOnCollapse: false,
                       child: ExpandablePanel(
                         theme: ExpandableThemeData(
-                            iconColor:
-                                Settings.themeWhat ? Colors.white : Colors.grey,
+                            iconColor: Settings.themeWhat.value
+                                ? Colors.white
+                                : Colors.grey,
                             animationDuration:
                                 const Duration(milliseconds: 500)),
                         header: Padding(
@@ -132,7 +133,7 @@ class ArticleInfoPage extends StatelessWidget {
                         scrollOnCollapse: false,
                         child: ExpandablePanel(
                           theme: ExpandableThemeData(
-                              iconColor: Settings.themeWhat
+                              iconColor: Settings.themeWhat.value
                                   ? Colors.white
                                   : Colors.grey,
                               animationDuration:
@@ -199,7 +200,7 @@ class ArticleInfoPage extends StatelessWidget {
       children: <Widget>[
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Settings.majorColor.withAlpha(230),
+            backgroundColor: Settings.majorColor.value.withAlpha(230),
           ),
           onPressed: () async => await downloadButtonEvent(context, data),
           child: buttonInner(
@@ -210,8 +211,7 @@ class ArticleInfoPage extends StatelessWidget {
         const SizedBox(width: 4.0),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Settings.majorColor,
-          ),
+              backgroundColor: Settings.majorColor.value),
           onPressed: data.lockRead
               ? null
               : () async => await readButtonEvent(context, data),
@@ -225,7 +225,7 @@ class ArticleInfoPage extends StatelessWidget {
   }
 
   downloadButtonEvent(context, data) async {
-    if (!Settings.useInnerStorage &&
+    if (!Settings.useInnerStorage.value &&
         !await Permission.manageExternalStorage.isGranted) {
       if (await Permission.manageExternalStorage.request() ==
           PermissionStatus.denied) {
@@ -264,7 +264,7 @@ class ArticleInfoPage extends StatelessWidget {
   }
 
   readButtonEvent(BuildContext context, ArticleInfo data, [int? page]) async {
-    if (Settings.useVioletServer) {
+    if (Settings.useVioletServer.value) {
       Future.delayed(const Duration(milliseconds: 100)).then((value) async {
         await VioletServerV2.view(data.queryResult.id());
       });
@@ -283,7 +283,7 @@ class ArticleInfoPage extends StatelessWidget {
 
     dynamic navigatorFunc = Navigator.push;
 
-    if (Settings.usingPushReplacementOnArticleRead) {
+    if (Settings.usingPushReplacementOnArticleRead.value) {
       navigatorFunc = Navigator.pushReplacement;
     }
 
@@ -328,7 +328,9 @@ class DividerWidget extends StatelessWidget {
       ),
       width: double.infinity,
       height: 1.0,
-      color: Settings.themeWhat ? Colors.grey.shade600 : Colors.grey.shade400,
+      color: Settings.themeWhat.value
+          ? Colors.grey.shade600
+          : Colors.grey.shade400,
     );
   }
 }
@@ -566,7 +568,8 @@ class __InfoAreaWidgetState extends State<_InfoAreaWidget> {
         child: ScrollOnExpand(
           child: ExpandablePanel(
             theme: ExpandableThemeData(
-                iconColor: Settings.themeWhat ? Colors.white : Colors.grey,
+                iconColor:
+                    Settings.themeWhat.value ? Colors.white : Colors.grey,
                 animationDuration: const Duration(milliseconds: 500)),
             header: Padding(
               padding: const EdgeInsets.fromLTRB(12, 12, 0, 0),
@@ -686,7 +689,8 @@ class __InfoAreaWidgetState extends State<_InfoAreaWidget> {
 
         TextEditingController text = TextEditingController();
         Widget okButton = TextButton(
-          style: TextButton.styleFrom(foregroundColor: Settings.majorColor),
+          style:
+              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
           child: Text(Translations.instance!.trans('ok')),
           onPressed: () async {
             if ((await EHSession.postComment(
@@ -702,7 +706,8 @@ class __InfoAreaWidgetState extends State<_InfoAreaWidget> {
           },
         );
         Widget cancelButton = TextButton(
-          style: TextButton.styleFrom(foregroundColor: Settings.majorColor),
+          style:
+              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
           child: Text(Translations.instance!.trans('cancel')),
           onPressed: () {
             Navigator.pop(context, false);
@@ -855,7 +860,7 @@ class _Chip extends StatelessWidget {
     var tagDisplayed = name;
     Color color = Colors.grey;
 
-    if (Settings.translateTags) {
+    if (Settings.translateTags.value) {
       tagDisplayed =
           TagTranslate.ofAny(tagDisplayed).split(':').last.split('|').first;
     }
@@ -946,13 +951,13 @@ class _Chip extends StatelessWidget {
         padding: const EdgeInsets.all(6.0),
       ),
       onLongPress: () async {
-        if (!Settings.excludeTags
+        if (!Settings.excludeTags.value
             .contains('${normalize(group)}:${name.replaceAll(' ', '_')}')) {
           final yn = await showYesNoDialog(context, '이 태그를 제외태그에 추가할까요?');
           if (yn) {
-            Settings.excludeTags
+            Settings.excludeTags.value
                 .add('${normalize(group)}:${name.replaceAll(' ', '_')}');
-            await Settings.setExcludeTags(Settings.excludeTags.join(' '));
+            await Settings.excludeTags.setValue(Settings.excludeTags.value);
             if (!context.mounted) return;
             await showOkDialog(context, '제외태그에 성공적으로 추가했습니다!');
           }

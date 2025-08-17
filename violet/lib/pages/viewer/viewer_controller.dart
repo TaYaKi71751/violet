@@ -29,7 +29,7 @@ class ViewerController extends GetxController {
   late final int articleId;
   late final int maxPage;
   var onTwoPage = false.obs;
-  var secondPageToSecondPage = Settings.secondPageToSecondPage.obs;
+  var secondPageToSecondPage = Settings.secondPageToSecondPage.value.obs;
 
   /// this variable used in [_appBarTwoPage] and [_HorizontalViewerPageState]
   /// if true, then lock the [_onPageChanged] method on [_HorizontalViewerPageState]
@@ -43,27 +43,29 @@ class ViewerController extends GetxController {
 
   /// common viewer options
   var page = 0.obs;
-  var viewType =
-      Settings.isHorizontal ? ViewType.horizontal.obs : ViewType.vertical.obs;
-  var animation = Settings.animation.obs;
-  var rightToLeft = Settings.rightToLeft.obs;
-  var imgQuality = Settings.imageQuality.obs;
-  var fullscreen = (!Settings.disableFullScreen).obs;
+  var viewType = Settings.isHorizontal.value
+      ? ViewType.horizontal.obs
+      : ViewType.vertical.obs;
+  var animation = Settings.animation.value.obs;
+  var rightToLeft = Settings.rightToLeft.value.obs;
+  var imgQuality = Settings.imageQuality.value.obs;
+  var fullscreen = (!Settings.disableFullScreen.value).obs;
 
   /// horizontal viewer option
-  var viewScrollType =
-      Settings.scrollVertical ? ViewType.vertical.obs : ViewType.horizontal.obs;
+  var viewScrollType = Settings.scrollVertical.value
+      ? ViewType.vertical.obs
+      : ViewType.horizontal.obs;
 
   /// vertical viewer options
-  var padding = Settings.padding.obs;
+  var padding = Settings.padding.value.obs;
 
   /// overlay options
-  var leftRightButton = (!Settings.disableOverlayButton).obs;
-  var appBarToBottom = Settings.moveToAppBarToBottom.obs;
-  var showSlider = Settings.showSlider.obs;
-  var indicator = Settings.showPageNumberIndicator.obs;
+  var leftRightButton = (!Settings.disableOverlayButton.value).obs;
+  var appBarToBottom = Settings.moveToAppBarToBottom.value.obs;
+  var showSlider = Settings.showSlider.value.obs;
+  var indicator = Settings.showPageNumberIndicator.value.obs;
   late RxBool thumb;
-  var thumbSize = Settings.thumbSize.obs;
+  var thumbSize = Settings.thumbSize.value.obs;
   var search = false.obs;
   var bookmark = false.obs;
 
@@ -73,7 +75,7 @@ class ViewerController extends GetxController {
 
   /// timer options
   var timer = false.obs;
-  var timerTick = Settings.timerTick.obs;
+  var timerTick = Settings.timerTick.value.obs;
 
   /// internal options
   var onSession = true.obs;
@@ -82,7 +84,7 @@ class ViewerController extends GetxController {
 
   /// these are used on overlay
   var overlay = false.obs;
-  var overlayButton = (!Settings.disableOverlayButton).obs;
+  var overlayButton = (!Settings.disableOverlayButton.value).obs;
   var opacity = 0.0.obs;
 
   /// scroll controllers
@@ -128,7 +130,7 @@ class ViewerController extends GetxController {
     isImageLoaded =
         List.filled(provider.uris.length, provider.useFileSystem).obs;
 
-    onTwoPage = (!Settings.disableTwoPageView &&
+    onTwoPage = (!Settings.disableTwoPageView.value &&
             MediaQuery.of(context).orientation == Orientation.landscape)
         .obs;
 
@@ -233,7 +235,7 @@ class ViewerController extends GetxController {
       CachedNetworkImageProvider(
         urlCache[index]!.value,
         headers: headerCache[index],
-        maxWidth: Settings.useLowPerf
+        maxWidth: Settings.useLowPerf.value
             ? (MediaQuery.of(context).size.width * 1.5).toInt()
             : null,
       ),
@@ -248,14 +250,14 @@ class ViewerController extends GetxController {
     if (!overlay.value) {
       overlay.value = !overlay.value;
       opacity.value = 1.0;
-      if (!Settings.disableFullScreen) {
+      if (!Settings.disableFullScreen.value) {
         SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
           SystemUiOverlay.top,
           SystemUiOverlay.bottom,
         ]);
       }
     } else {
-      if (!Settings.disableFullScreen) {
+      if (!Settings.disableFullScreen.value) {
         SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
       }
       opacity.value = 0.0;

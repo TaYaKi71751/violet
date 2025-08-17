@@ -52,7 +52,7 @@ class DotsIndicator extends AnimatedWidget {
       width: _kDotSpacing,
       child: Center(
         child: Material(
-          color: (Settings.themeWhat
+          color: (Settings.themeWhat.value
                   ? Palette.lightThemeBackground
                   : Palette.darkThemeBackground)
               .withAlpha((max(zoom - 1, 0.5) * 255).toInt()),

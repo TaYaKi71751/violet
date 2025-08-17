@@ -71,7 +71,7 @@ class _StatisticsState extends State<Statistics> {
               }));
 
       final queryRaw =
-          '${translate2query('${Settings.includeTags} ${Settings.serializedExcludeTags}')} AND '
+          '${translate2query('${Settings.includeTags.value} ${Settings.serializedExcludeTags}')} AND '
           'Id IN (${articles.map((e) => e.articleId()).join(',')})';
       final query = await QueryManager.query(queryRaw);
 
@@ -506,8 +506,8 @@ class _StatisticsState extends State<Statistics> {
                       }
                     }),
               ],
-              primaryMeasureAxis: Settings.themeWhat ? axis2 : null,
-              domainAxis: Settings.themeWhat ? axis1 : null,
+              primaryMeasureAxis: Settings.themeWhat.value ? axis2 : null,
+              domainAxis: Settings.themeWhat.value ? axis1 : null,
               animate: true,
               vertical: false,
             )),
@@ -626,7 +626,7 @@ class _StatisticsState extends State<Statistics> {
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(value.toString())));
           },
-          colorsets: {1: Settings.majorColor},
+          colorsets: {1: Settings.majorColor.value},
         ),
       ),
     );

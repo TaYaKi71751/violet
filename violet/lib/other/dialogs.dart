@@ -16,7 +16,8 @@ Future<void> showOkDialog(BuildContext context, String message,
       content: SelectableText(message),
       actions: [
         TextButton(
-          style: TextButton.styleFrom(foregroundColor: Settings.majorColor),
+          style:
+              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -53,7 +54,8 @@ Future<bool> showOkCancelDialog({
       contentPadding: contentPadding!,
       actions: [
         TextButton(
-          style: TextButton.styleFrom(foregroundColor: Settings.majorColor),
+          style:
+              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
           onPressed: () {
             if (onOkPressed != null) {
               onOkPressed();
@@ -64,7 +66,8 @@ Future<bool> showOkCancelDialog({
           child: Text(okText ?? Translations.instance!.trans('ok')),
         ),
         TextButton(
-          style: TextButton.styleFrom(foregroundColor: Settings.majorColor),
+          style:
+              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
           onPressed: () {
             if (onCancelPressed != null) {
               onCancelPressed();
@@ -88,14 +91,16 @@ Future<bool> showYesNoDialog(BuildContext context, String message,
       content: Text(message),
       actions: [
         TextButton(
-          style: TextButton.styleFrom(foregroundColor: Settings.majorColor),
+          style:
+              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
           onPressed: () {
             Navigator.pop(context, true);
           },
           child: Text(Translations.instance!.trans('yes')),
         ),
         TextButton(
-          style: TextButton.styleFrom(foregroundColor: Settings.majorColor),
+          style:
+              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
           onPressed: () {
             Navigator.pop(context, false);
           },
@@ -116,14 +121,16 @@ Future<bool?> showYesNoCancelDialog(BuildContext context, String message,
       content: Text(message),
       actions: [
         TextButton(
-          style: TextButton.styleFrom(foregroundColor: Settings.majorColor),
+          style:
+              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
           onPressed: () {
             Navigator.pop(context, true);
           },
           child: Text(Translations.instance!.trans('yes')),
         ),
         TextButton(
-          style: TextButton.styleFrom(foregroundColor: Settings.majorColor),
+          style:
+              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
           onPressed: () {
             Navigator.pop(context, false);
           },

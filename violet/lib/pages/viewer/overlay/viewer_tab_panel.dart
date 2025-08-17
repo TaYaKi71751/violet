@@ -101,7 +101,7 @@ class _ViewerTabPanelState extends State<ViewerTabPanel> {
       ],
     );
 
-    if (Settings.enableViewerFunctionBackdropFilter) {
+    if (Settings.enableViewerFunctionBackdropFilter.value) {
       return ClipRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
@@ -302,7 +302,7 @@ class __ArtistsArticleTabListState extends State<_ArtistsArticleTabList>
       }
 
       final queryString = translate2query(
-          '($what) ${Settings.includeTags} ${Settings.serializedExcludeTags}');
+          '($what) ${Settings.includeTags.value} ${Settings.serializedExcludeTags}');
       var queryResult = (await (await DataBaseManager.getInstance())
               .query('$queryString ORDER BY Id DESC LIMIT 500'))
           .map((e) => QueryResult(result: e))
@@ -353,7 +353,7 @@ class __ArtistsArticleTabListState extends State<_ArtistsArticleTabList>
               width: 30,
               height: 30,
               child: CircularProgressIndicator(
-                color: Settings.majorColor.withAlpha(150),
+                color: Settings.majorColor.value.withAlpha(150),
               ),
             ),
           )
@@ -388,7 +388,8 @@ class __ArtistsArticleTabListState extends State<_ArtistsArticleTabList>
                                 selectMode: true,
                                 selectCallback: () async {
                                   if (!Settings
-                                      .showNewViewerWhenArtistArticleListItemTap) {
+                                      .showNewViewerWhenArtistArticleListItemTap
+                                      .value) {
                                     _showArticleInfo(e);
                                   } else {
                                     _showViewer(e);
@@ -417,7 +418,7 @@ class __ArtistsArticleTabListState extends State<_ArtistsArticleTabList>
   }
 
   Future<void> _showViewer(QueryResult e) async {
-    if (Settings.useVioletServer) {
+    if (Settings.useVioletServer.value) {
       Future.delayed(const Duration(milliseconds: 100)).then((value) async {
         await VioletServerV2.view(e.id());
       });

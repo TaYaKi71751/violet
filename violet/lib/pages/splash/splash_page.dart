@@ -143,7 +143,7 @@ class _SplashPageState extends State<SplashPage> {
 
       globalInitialized = true;
 
-      // if (Settings.autobackupBookmark) {
+      // if (Settings.autobackupBookmark.value) {
       //   setState(() {
       //     backupBookmark = true;
       //   });
@@ -250,7 +250,7 @@ class _SplashPageState extends State<SplashPage> {
               top: showFirst ? 130 : height / 2 - 50,
               left: width / 2 - 50,
               child: Image.asset(
-                'assets/images/logo-${Settings.majorColor.name}.png',
+                'assets/images/logo-${Settings.majorColor.value.name}.png',
                 width: 100,
                 height: 100,
               ),
@@ -265,7 +265,7 @@ class _SplashPageState extends State<SplashPage> {
       ),
       backgroundColor: showFirst && !widget.switching
           ? const Color(0x7FB200ED)
-          : Settings.majorColor.withAlpha(200),
+          : Settings.majorColor.value.withAlpha(200),
     );
   }
 
@@ -297,7 +297,7 @@ class _SplashPageState extends State<SplashPage> {
                 width: 30,
                 height: 30,
                 child: CircularProgressIndicator(
-                  color: Settings.majorColor.withAlpha(150),
+                  color: Settings.majorColor.value.withAlpha(150),
                 ),
               ),
             ],
@@ -325,7 +325,7 @@ class _SplashPageState extends State<SplashPage> {
                 width: 30,
                 height: 30,
                 child: CircularProgressIndicator(
-                  color: Settings.majorColor.withAlpha(150),
+                  color: Settings.majorColor.value.withAlpha(150),
                 ),
               ),
             ],
@@ -347,7 +347,7 @@ class _SplashPageState extends State<SplashPage> {
           child: Card(
             elevation: 100,
             color: widget.switching
-                ? Settings.majorColor.withAlpha(150)
+                ? Settings.majorColor.value.withAlpha(150)
                 : Colors.purple.shade50,
             child: AnimatedOpacity(
               opacity: animateBox ? 1.0 : 0,
@@ -430,7 +430,7 @@ class _SplashPageState extends State<SplashPage> {
           MdiIcons.database,
           size: 50,
           color: widget.switching
-              ? Settings.majorAccentColor.withOpacity(0.8)
+              ? Settings.majorAccentColor.value.withOpacity(0.8)
               : Colors.grey,
         ),
         Container(
@@ -460,7 +460,7 @@ class _SplashPageState extends State<SplashPage> {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: widget.switching
-                ? Settings.majorColor.withAlpha(200)
+                ? Settings.majorColor.value.withAlpha(200)
                 : Colors.purple.shade400,
           ),
           onPressed: _onDownloadButtonPressed,
@@ -523,7 +523,7 @@ class _SplashPageState extends State<SplashPage> {
               child: Text(Translations.instance!.trans('dbalready'),
                   style: TextStyle(
                       color: widget.switching
-                          ? Settings.majorAccentColor
+                          ? Settings.majorAccentColor.value
                           : Colors.purpleAccent.shade100,
                       fontSize: 12.0)),
             ),
@@ -592,7 +592,7 @@ class _SplashPageState extends State<SplashPage> {
                     onValuePicked: (Country country) async {
                       var exc = country as ExCountry;
                       await Translations.instance!.load(exc.toString());
-                      await Settings.setLanguage(exc.toString());
+                      await Settings.language.setValue(exc.toString());
                       await Settings.resetIncludeTags();
                       setState(() {});
                     },

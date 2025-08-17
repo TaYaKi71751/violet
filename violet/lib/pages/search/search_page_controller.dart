@@ -76,7 +76,7 @@ class SearchPageController extends GetxController {
         // so we can find live elements
         if (key.value.currentContext != null) {
           final bottomPadding =
-              [8, 8, 0, 0, 0][Settings.searchResultType.index];
+              [8, 8, 0, 0, 0][Settings.searchResultType.value.index];
           _itemHeight = key.value.currentContext!.size!.height + bottomPadding;
           break;
         }
@@ -85,7 +85,7 @@ class SearchPageController extends GetxController {
 
     if (scrollController!.offset.isNaN) return;
 
-    final itemPerRow = [3, 2, 1, 1, 1][Settings.searchResultType.index];
+    final itemPerRow = [3, 2, 1, 1, 1][Settings.searchResultType.value.index];
     const searchBarHeight = 64 + 16;
     final curI =
         ((scrollController!.offset - searchBarHeight) / _itemHeight + 1)
@@ -160,7 +160,7 @@ class SearchPageController extends GetxController {
 
   loadNextQuery() async {
     final aquire = _querySem.acquire();
-    if (!Settings.ignoreTimeout) {
+    if (!Settings.ignoreTimeout.value) {
       aquire.timeout(
         const Duration(seconds: 5),
         onTimeout: () {
@@ -183,7 +183,7 @@ class SearchPageController extends GetxController {
         latestQuery!.$1 == null ? 0 : latestQuery!.$1!.offset,
         latestQuery!.$1 == null ? 0 : latestQuery!.$1!.next ?? 0,
       );
-      if (!Settings.ignoreTimeout) {
+      if (!Settings.ignoreTimeout.value) {
         search.timeout(const Duration(seconds: 10), onTimeout: () {
           Logger.error('[Search_loadNextQuery] Search Timeout');
 

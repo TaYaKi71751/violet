@@ -11,7 +11,6 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:violet/component/hitomi/shielder.dart';
 import 'package:violet/database/user/download.dart';
 import 'package:violet/log/log.dart';
 import 'package:violet/platform/android_external_storage_directory.dart';
@@ -21,32 +20,49 @@ class Settings {
   static late final SharedPreferences prefs;
 
   // Bookmark Git Settings
-  static late String bookmarkRepository; // default 'example/bookmark'
-  static late String bookmarkHost; // default 'gitee.com'
+  static final bookmarkRepository =
+      SettingItem<String>('bookmarkRepository', 'example/bookmark');
+  static final bookmarkHost = SettingItem<String>('bookmarkHost', 'gitee.com');
 
   // Timeout Settings
-  static late bool ignoreTimeout; // default false
+  static final ignoreTimeout = SettingItem<bool>('ignoreTimeout', false);
 
   // Color Settings
-  static late Color themeColor; // default light
-  static late bool themeWhat; // default false == light
-  static late Color majorColor; // default purple
-  static late Color majorAccentColor;
-  static late SearchResultType searchResultType;
-  static late DownloadResultType downloadResultType;
-  static late int downloadAlignType;
-  static late bool themeFlat;
-  static late bool themeBlack; // default false
-  static late bool useTabletMode;
+  static Color get themeColor => themeWhat.value ? Colors.white : Colors.black;
+  static final themeWhat = SettingItem<bool>('themeColor', false);
+  static final majorColor = SettingItem<Color>('majorColor', Colors.purple);
+  static final majorAccentColor =
+      SettingItem<Color>('majorAccentColor', Colors.purpleAccent);
+  static final searchResultType = EnumSettingItem<SearchResultType>(
+      'searchResultType', SearchResultType.values, SearchResultType.ultra);
+  static final downloadResultType = EnumSettingItem<DownloadResultType>(
+      'downloadResultType',
+      DownloadResultType.values,
+      DownloadResultType.detail);
+  static final downloadAlignType = SettingItem<int>('downloadAlignType', 0);
+  static final themeFlat = SettingItem<bool>('themeFlat', false);
+  static final themeBlack = SettingItem<bool>('themeBlack', false);
+  static final useTabletMode = SettingItem<bool>('usetabletmode', false);
 
   // Tag Settings
-  static late String includeTags;
-  static late List<String> excludeTags;
-  static late List<String> blurredTags;
-  static late String? language; // System Language
-  static late bool translateTags;
+  static final includeTags = SettingItem<String>('includetags', () {
+    final langcode = Platform.localeName.split('_')[0];
+    var language = 'lang:english';
+    if (langcode == 'ko') {
+      language = 'lang:korean';
+    } else if (langcode == 'ja') {
+      language = 'lang:japanese';
+    } else if (langcode.startsWith('zh')) {
+      language = 'lang:chinese';
+    }
+    return '($language)';
+  }());
+  static final excludeTags = SettingItem<List<String>>('excludetags', []);
+  static final blurredTags = SettingItem<List<String>>('blurredtags', []);
+  static final language = SettingItem<String>('language', '');
+  static final translateTags = SettingItem<bool>('translatetags', false);
 
-  static String get serializedExcludeTags => Settings.excludeTags
+  static String get serializedExcludeTags => Settings.excludeTags.value
       .where((e) => e.trim() != '')
       .map((e) => '-$e')
       .join(' ')
@@ -55,236 +71,81 @@ class Settings {
   // Like this Hitomi.la => e-hentai => exhentai => nhentai
   static late List<String> routingRule; // image routing rule
   static late List<String> searchRule;
-  static late bool searchNetwork;
-  static late bool includeTagNetwork;
-  static late bool excludeTagNetwork;
-  static late bool searchExpunged;
-  static late int searchCategory;
+  static final searchNetwork = SettingItem<bool>('searchNetwork', false);
+  static final includeTagNetwork =
+      SettingItem<bool>('includeTagNetwork', false);
+  static final excludeTagNetwork =
+      SettingItem<bool>('excludeTagNetwork', false);
+  static final searchExpunged = SettingItem<bool>('searchExpunged', false);
+  static final searchCategory = SettingItem<int>('searchCategory', 993);
 
   // Global? English? Korean?
-  static late String databaseType;
+  static final databaseType = SettingItem<String>('databasetype', () {
+    final langcode = Platform.localeName.split('_')[0];
+    final acclc = ['ko', 'ja', 'en', 'ru', 'zh'];
+
+    if (!acclc.contains(langcode)) return 'global';
+
+    return langcode;
+  }());
 
   // Reader Option
-  static late bool rightToLeft;
-  static late bool isHorizontal;
-  static late bool scrollVertical;
-  static late bool animation;
-  static late bool padding;
-  static late bool disableOverlayButton;
-  static late bool disableFullScreen;
-  static late bool enableTimer;
-  static late double timerTick;
-  static late bool disableTwoPageView;
-  static late bool secondPageToSecondPage;
-  static late bool moveToAppBarToBottom;
-  static late bool showSlider;
-  static late int imageQuality;
-  static late int thumbSize;
-  static late bool enableThumbSlider;
-  static late bool showPageNumberIndicator;
-  static late bool showRecordJumpMessage;
+  static final rightToLeft = SettingItem<bool>('rightToLeft', true);
+  static final isHorizontal = SettingItem<bool>('ishorizontal', false);
+  static final scrollVertical = SettingItem<bool>('scrollvertical', false);
+  static final animation = SettingItem<bool>('animation', false);
+  static final padding = SettingItem<bool>('padding', false);
+  static final disableOverlayButton =
+      SettingItem<bool>('disableoverlaybutton', false);
+  static final disableFullScreen =
+      SettingItem<bool>('disablefullscreen', false);
+  static final enableTimer = SettingItem<bool>('enabletimer', false);
+  static final timerTick = SettingItem<double>('timertick', 1.0);
+  static final disableTwoPageView =
+      SettingItem<bool>('disableTwoPageView', false);
+  static final secondPageToSecondPage =
+      SettingItem<bool>('secondPageToSecondPage', false);
+  static final moveToAppBarToBottom =
+      SettingItem<bool>('movetoappbartobottom', Platform.isIOS);
+  static final showSlider = SettingItem<bool>('showslider', false);
+  static final imageQuality = SettingItem<int>('imagequality', 3);
+  static final thumbSize = SettingItem<int>('thumbSize', 1);
+  static final enableThumbSlider =
+      SettingItem<bool>('enableThumbSlider', false);
+  static final showPageNumberIndicator =
+      SettingItem<bool>('showPageNumberIndicator', true);
+  static final showRecordJumpMessage =
+      SettingItem<bool>('showRecordJumpMessage', true);
 
   // Download Options
-  static late bool useInnerStorage;
-  static late String downloadBasePath;
-  static late String downloadRule;
+  static final threadCount = SettingItem<int>('thread_count', 4);
 
-  static late String searchMessageAPI;
-  static late bool useVioletServer;
-
-  static late bool useDrawer;
-
-  static late bool useOptimizeDatabase;
-
-  static late bool useLowPerf;
-
-  // View Option
-  static late bool showArticleProgress;
-
-  // Search Option
-  static late bool searchUseFuzzy;
-  static late bool searchTagTranslation;
-  static late bool searchUseTranslated;
-  static late bool searchShowCount;
-  static late bool searchPure;
-
-  static late String userAppId;
-
-  static late bool autobackupBookmark;
-
-  // Crop Bookmark
-  static late int cropBookmarkAlign;
-  static late bool cropBookmarkShowOverlay;
-  static late bool cropBookmarkSortDesc;
-
-  // Lab
-  static late bool simpleItemWidgetLoadingIcon;
-  static late bool showNewViewerWhenArtistArticleListItemTap;
-  static late bool enableViewerFunctionBackdropFilter;
-  static late bool usingPushReplacementOnArticleRead;
-  static late bool downloadEhRawImage;
-  static late bool bookmarkScrollbarPositionToLeft;
-  static late bool inViewerMessageSearch;
-
-  static late bool useLockScreen;
-  static late bool useSecureMode;
-
-  static Future<void> initFirst() async {
-    prefs = await SharedPreferences.getInstance();
-
-    final mc = await _getInt('majorColor', Colors.purple.value);
-    final mac = await _getInt('majorAccentColor', Colors.purpleAccent.value);
-
-    majorColor = Color(mc);
-    majorAccentColor = Color(mac);
-
-    themeWhat = await _getBool('themeColor');
-    themeColor = !themeWhat ? Colors.white : Colors.black;
-    themeFlat = await _getBool('themeFlat');
-    themeBlack = await _getBool('themeBlack');
-
-    language = prefs.getString('language');
-
-    useLockScreen = await _getBool('useLockScreen');
-    useSecureMode = await _getBool('useSecureMode');
-    await _setSecureMode();
-
-    await _getInt('thread_count', 4);
-  }
-
-  static Future<void> _setSecureMode() async {
+  static final useInnerStorage =
+      FutureSettingItem<bool>('useinnerstorage', () async {
     if (Platform.isAndroid) {
-      if (Settings.useSecureMode) {
-        await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
-      } else {
-        await FlutterWindowManager.clearFlags(FlutterWindowManager.FLAG_SECURE);
-      }
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      return androidInfo.version.sdkInt >= 30;
     }
-  }
-
-  static Future<void> init() async {
-    searchResultType =
-        SearchResultType.values[await _getInt('searchResultType', 4)];
-    downloadResultType =
-        DownloadResultType.values[await _getInt('downloadResultType', 3)];
-    downloadAlignType = await _getInt('downloadAlignType', 0);
-
-    var includetags = prefs.getString('includetags');
-    var excludetags = prefs.getString('excludetags');
-    var blurredtags = prefs.getString('blurredtags');
-
-    if (includetags == null) {
-      var language = 'lang:english';
-      var langcode = Platform.localeName.split('_')[0];
-      if (langcode == 'ko') {
-        language = 'lang:korean';
-      } else if (langcode == 'ja') {
-        language = 'lang:japanese';
-      } else if (langcode.startsWith('zh')) {
-        language = 'lang:chinese';
-      }
-      includetags = '($language)';
-      await prefs.setString('includetags', includetags);
-    }
-    if (excludetags == null ||
-        excludetags == MinorShielderFilter.tags.join('|')) {
-      excludetags = '';
-      await prefs.setString('excludetags', excludetags);
-    }
-    includeTags = includetags;
-    excludeTags = excludetags.split('|').toList();
-    blurredTags = blurredtags != null ? blurredtags.split(' ').toList() : [];
-    translateTags = await _getBool('translatetags');
-
-    routingRule = (await _getString(
-            'routingrule', 'Hitomi|EHentai|ExHentai|Hiyobi|NHentai'))
-        .split('|');
-    searchRule =
-        (await _getString('searchrule', 'Hitomi|EHentai|ExHentai|NHentai'))
-            .split('|');
-    searchNetwork = await _getBool('searchnetwork');
-    includeTagNetwork = await _getBool('includetagnetwork');
-    excludeTagNetwork = await _getBool('excludetagnetwork');
-    searchExpunged = await _getBool('searchexpunged');
-    searchCategory = await _getInt('searchcategory', 993);
-
-    if (!routingRule.contains('Hiyobi')) {
-      routingRule.add('Hiyobi');
-      await prefs.setString('routingrule', routingRule.join('|'));
-    }
-
-    var databasetype = prefs.getString('databasetype');
-    if (databasetype == null) {
-      var langcode = Platform.localeName.split('_')[0];
-      var acclc = ['ko', 'ja', 'en', 'ru', 'zh'];
-
-      if (!acclc.contains(langcode)) langcode = 'global';
-
-      databasetype = langcode;
-
-      await prefs.setString('databasetype', langcode);
-    }
-    databaseType = databasetype;
-
-    rightToLeft = await _getBool('right2left', true);
-    isHorizontal = await _getBool('ishorizontal');
-    scrollVertical = await _getBool('scrollvertical');
-    animation = await _getBool('animation');
-    padding = await _getBool('padding');
-    disableOverlayButton = await _getBool('disableoverlaybutton');
-    disableFullScreen = await _getBool('disablefullscreen');
-    enableTimer = await _getBool('enabletimer');
-    timerTick = await _getDouble('timertick', 1.0);
-    disableTwoPageView = await _getBool('disableTwoPageView');
-    secondPageToSecondPage = await _getBool('secondPageToSecondPage');
-    moveToAppBarToBottom =
-        await _getBool('movetoappbartobottom', Platform.isIOS);
-    showSlider = await _getBool('showslider');
-    imageQuality = await _getInt('imagequality', 3);
-    thumbSize = await _getInt('imageQuality', 1);
-    enableThumbSlider = await _getBool('enableThumbSlider');
-    showPageNumberIndicator = await _getBool('showPageNumberIndicator', true);
-    showRecordJumpMessage = await _getBool('showRecordJumpMessage', true);
-
-    var tUseInnerStorage = prefs.getBool('useinnerstorage');
-    if (tUseInnerStorage == null) {
-      tUseInnerStorage = Platform.isIOS;
-      if (Platform.isAndroid) {
-        var deviceInfoPlugin = DeviceInfoPlugin();
-        final androidInfo = await deviceInfoPlugin.androidInfo;
-        if (androidInfo.version.sdkInt >= 30) tUseInnerStorage = true;
-      }
-
-      await prefs.setBool('userinnerstorage', tUseInnerStorage);
-    }
-    useInnerStorage = tUseInnerStorage;
-
-    String? tDownloadBasePath;
+    return Platform.isIOS;
+  });
+  static final downloadBasePath =
+      FutureSettingItem<String>('downloadbasepath', () async {
     if (Platform.isAndroid) {
-      tDownloadBasePath = prefs.getString('downloadbasepath');
       final String path = await AndroidExternalStorageDirectory.instance
           .getExternalStorageDirectory();
+      var downloadBasePath = join(path, '.violet');
 
-      var androidInfo = await DeviceInfoPlugin().androidInfo;
-      var sdkInt = androidInfo.version.sdkInt;
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      final sdkInt = androidInfo.version.sdkInt;
 
       if (sdkInt >= 30 && prefs.getBool('android30downpath') == null) {
         await prefs.setBool('android30downpath', true);
         var ext = await getExternalStorageDirectory();
-        tDownloadBasePath = ext!.path;
-        await prefs.setString('downloadbasepath', tDownloadBasePath);
-      }
-
-      if (tDownloadBasePath == null) {
-        tDownloadBasePath = join(path, '.violet');
-        await prefs.setString('downloadbasepath', tDownloadBasePath);
-      }
-
-      if (sdkInt < 30 &&
-          tDownloadBasePath == join(path, 'Violet') &&
+        downloadBasePath = ext!.path;
+      } else if (sdkInt < 30 &&
+          downloadBasePath == join(path, 'Violet') &&
           prefs.getBool('downloadbasepathcc1') == null) {
-        tDownloadBasePath = join(path, '.violet');
-        await prefs.setString('downloadbasepath', tDownloadBasePath);
+        downloadBasePath = join(path, '.violet');
         await prefs.setBool('downloadbasepathcc1', true);
 
         try {
@@ -317,36 +178,104 @@ class Settings {
           FirebaseCrashlytics.instance.recordError(e, st);
         }
       }
+      return downloadBasePath;
     } else if (Platform.isIOS) {
-      tDownloadBasePath = await _getString('downloadbasepath', 'not supported');
+      return 'not supported';
     } else {
       // Desktop
-      tDownloadBasePath =
-          join(dirname(Platform.resolvedExecutable), 'download');
+      return join(dirname(Platform.resolvedExecutable), 'download');
     }
-    downloadBasePath = tDownloadBasePath;
+  });
+  static final downloadRule = SettingItem<String>(
+      'downloadrule', '%(extractor)s/%(id)s/%(file)s.%(ext)s');
 
-    downloadRule = await _getString(
-        'downloadrule', '%(extractor)s/%(id)s/%(file)s.%(ext)s');
-    searchMessageAPI = await _getString(
-        'searchmessageapi', 'https://koromo.xyz/api/search/msg');
+  static final searchMessageAPI = SettingItem<String>(
+      'searchmessageapi', 'https://koromo.xyz/api/search/msg');
+  static final useVioletServer = SettingItem<bool>('usevioletserver', false);
 
-    bookmarkRepository =
-        await _getString('bookmarkRepository', 'example/bookmark');
-    bookmarkHost = await _getString('bookmarkHost', 'gitee.com');
-    ignoreTimeout = await _getBool('ignoretimeout');
-    useVioletServer = await _getBool('usevioletserver');
-    useDrawer = await _getBool('usedrawer');
-    showArticleProgress = await _getBool('showarticleprogress');
-    useOptimizeDatabase = await _getBool('useoptimizedatabase', true);
+  static final useDrawer = SettingItem<bool>('usedrawer', false);
 
-    useLowPerf = await _getBool('uselowperf', true);
+  static final useOptimizeDatabase =
+      SettingItem<bool>('useoptimizedatabase', true);
 
-    searchUseFuzzy = await _getBool('searchusefuzzy');
-    searchTagTranslation = await _getBool('searchtagtranslation');
-    searchUseTranslated = await _getBool('searchusetranslated');
-    searchShowCount = await _getBool('searchshowcount', true);
-    searchPure = await _getBool('searchPure');
+  static final useLowPerf = SettingItem<bool>('uselowperf', true);
+
+  // View Option
+  static final showArticleProgress =
+      SettingItem<bool>('showarticleprogress', false);
+
+  // Search Option
+  static final searchUseFuzzy = SettingItem<bool>('searchusefuzzy', false);
+  static final searchTagTranslation =
+      SettingItem<bool>('searchtagtranslation', false);
+  static final searchUseTranslated =
+      SettingItem<bool>('searchusetranslated', false);
+  static final searchShowCount = SettingItem<bool>('searchshowcount', true);
+  static final searchPure = SettingItem<bool>('searchPure', false);
+
+  static late String userAppId;
+
+  static final autobackupBookmark =
+      SettingItem<bool>('autobackupbookmark', false);
+
+  // Crop Bookmark
+  static final cropBookmarkAlign =
+      SettingItem<int>('cropBookmarkAlign', Device.get().isTablet ? 3 : 2);
+  static final cropBookmarkShowOverlay =
+      SettingItem<bool>('cropBookmarkShowOverlay', true);
+  static final cropBookmarkSortDesc =
+      SettingItem<bool>('cropBookmarkSortDesc', false);
+
+  // Lab
+  static final simpleItemWidgetLoadingIcon =
+      SettingItem<bool>('simpleItemWidgetLoadingIcon', true);
+  static final showNewViewerWhenArtistArticleListItemTap =
+      SettingItem<bool>('showNewViewerWhenArtistArticleListItemTap', true);
+  static final enableViewerFunctionBackdropFilter =
+      SettingItem<bool>('enableViewerFunctionBackdropFilter', true);
+  static final usingPushReplacementOnArticleRead =
+      SettingItem<bool>('usingPushReplacementOnArticleRead', true);
+  static final downloadEhRawImage =
+      SettingItem<bool>('downloadEhRawImage', false);
+  static final bookmarkScrollbarPositionToLeft =
+      SettingItem<bool>('bookmarkScrollbarPositionToLeft', false);
+  static final inViewerMessageSearch =
+      SettingItem<bool>('inViewerMessageSearch', false);
+
+  static final useLockScreen = SettingItem<bool>('useLockScreen', false);
+  static final useSecureMode = SettingItem<bool>('useSecureMode', false);
+
+  static Future<void> initFirst() async {
+    prefs = await SharedPreferences.getInstance();
+
+    await setSecureMode();
+  }
+
+  static Future<void> setSecureMode() async {
+    if (Platform.isAndroid) {
+      if (Settings.useSecureMode.value) {
+        await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
+      } else {
+        await FlutterWindowManager.clearFlags(FlutterWindowManager.FLAG_SECURE);
+      }
+    }
+  }
+
+  static Future<void> init() async {
+    routingRule = (await _getString(
+            'routingrule', 'Hitomi|EHentai|ExHentai|Hiyobi|NHentai'))
+        .split('|');
+    searchRule =
+        (await _getString('searchrule', 'Hitomi|EHentai|ExHentai|NHentai'))
+            .split('|');
+
+    if (!routingRule.contains('Hiyobi')) {
+      routingRule.add('Hiyobi');
+      await prefs.setString('routingrule', routingRule.join('|'));
+    }
+
+    await useInnerStorage.load();
+    await downloadBasePath.load();
 
     // main에서 셋팅됨
     if (Platform.isAndroid || Platform.isIOS) {
@@ -355,36 +284,12 @@ class Settings {
       userAppId = 'null';
     }
 
-    autobackupBookmark = await _getBool('autobackupbookmark', false);
-
-    useTabletMode = await _getBool('usetabletmode', Device.get().isTablet);
-
-    cropBookmarkAlign =
-        await _getInt('cropBookmarkAlign', useTabletMode ? 3 : 2);
-    cropBookmarkShowOverlay = await _getBool('cropBookmarkShowOverlay', true);
-    cropBookmarkSortDesc = await _getBool('cropBookmarkSortDesc', false);
-
-    simpleItemWidgetLoadingIcon =
-        await _getBool('simpleItemWidgetLoadingIcon', true);
-    showNewViewerWhenArtistArticleListItemTap =
-        await _getBool('showNewViewerWhenArtistArticleListItemTap', true);
-    enableViewerFunctionBackdropFilter =
-        await _getBool('enableViewerFunctionBackdropFilter');
-    usingPushReplacementOnArticleRead =
-        await _getBool('usingPushReplacementOnArticleRead', true);
-    downloadEhRawImage = await _getBool('downloadEhRawImage');
-    bookmarkScrollbarPositionToLeft =
-        await _getBool('bookmarkScrollbarPositionToLeft');
-    inViewerMessageSearch = await _getBool('inViewerMessageSearch');
-
     await regacy1_20_2();
   }
 
   static Future resetIncludeTags() async {
-    var includetags = prefs.getString('includetags');
-
     var language = 'lang:english';
-    var langcode = Settings.language!;
+    var langcode = Settings.language.value;
     if (langcode == 'ko') {
       language = 'lang:korean';
     } else if (langcode == 'ja') {
@@ -392,20 +297,17 @@ class Settings {
     } else if (langcode.startsWith('zh')) {
       language = 'lang:chinese';
     }
-    includetags = '($language)';
-    await prefs.setString('includetags', includetags);
-
-    includeTags = includetags;
+    await includeTags.setValue('($language)');
   }
 
   static Future regacy1_20_2() async {
     if (await _checkLegacyExists('regacy1_20_2')) return;
 
-    if (!simpleItemWidgetLoadingIcon) {
-      await setSimpleItemWidgetLoadingIcon(true);
+    if (!simpleItemWidgetLoadingIcon.value) {
+      await simpleItemWidgetLoadingIcon.setValue(true);
     }
-    if (!showNewViewerWhenArtistArticleListItemTap) {
-      await setShowNewViewerWhenArtistArticleListItemTap(true);
+    if (!showNewViewerWhenArtistArticleListItemTap.value) {
+      await showNewViewerWhenArtistArticleListItemTap.setValue(true);
     }
   }
 
@@ -418,24 +320,6 @@ class Settings {
     return true;
   }
 
-  static Future<bool> _getBool(String key, [bool defaultValue = false]) async {
-    var nn = prefs.getBool(key);
-    if (nn == null) {
-      nn = defaultValue;
-      await prefs.setBool(key, nn);
-    }
-    return nn;
-  }
-
-  static Future<int> _getInt(String key, [int defaultValue = 0]) async {
-    var nn = prefs.getInt(key);
-    if (nn == null) {
-      nn = defaultValue;
-      await prefs.setInt(key, nn);
-    }
-    return nn;
-  }
-
   static Future<String> _getString(String key,
       [String defaultValue = '']) async {
     var nn = prefs.getString(key);
@@ -446,63 +330,22 @@ class Settings {
     return nn;
   }
 
-  static Future<double> _getDouble(String key,
-      [double defaultValue = 0.0]) async {
-    var nn = prefs.getDouble(key);
-    if (nn == null) {
-      nn = defaultValue;
-      await prefs.setDouble(key, nn);
-    }
-    return nn;
-  }
-
   static Future<String> getDefaultDownloadPath() async {
     var androidInfo = await DeviceInfoPlugin().androidInfo;
     var sdkInt = androidInfo.version.sdkInt;
 
     if (sdkInt >= 30) {
       var ext = await getExternalStorageDirectory();
-      downloadBasePath = ext!.path;
+      return ext!.path;
     }
 
-    /*
-    if (downloadBasePath == null) {
-      final String path = await ExtStorage.getExternalStorageDirectory();
-      downloadBasePath = join(path, '.violet');
-    }
-     */
-
-    return downloadBasePath;
-  }
-
-  static Future<void> setThemeWhat(bool wh) async {
-    themeWhat = wh;
-    if (!themeWhat) {
-      themeColor = Colors.white;
-    } else {
-      themeColor = Colors.black;
-    }
-
-    await prefs.setBool('themeColor', themeWhat);
-  }
-
-  static Future<void> setThemeBlack(bool wh) async {
-    themeBlack = wh;
-
-    await prefs.setBool('themeBlack', themeBlack);
-  }
-
-  static Future<void> setThemeFlat(bool nn) async {
-    themeFlat = nn;
-
-    await prefs.setBool('themeFlat', nn);
+    return downloadBasePath.value;
   }
 
   static Future<void> setMajorColor(Color color) async {
-    if (majorColor == color) return;
+    if (majorColor.value == color) return;
 
-    await prefs.setInt('majorColor', color.value);
-    majorColor = color;
+    await majorColor.setValue(color);
 
     Color? accent;
     for (int i = 0; i < Colors.primaries.length - 2; i++) {
@@ -524,381 +367,130 @@ class Settings {
       }
     }
 
-    await prefs.setInt('majorAccentColor', accent!.value);
-    majorAccentColor = accent;
+    await majorAccentColor.setValue(accent!);
+  }
+}
+
+class SettingItem<T> {
+  final String key;
+  final T defaultValue;
+  T? _value;
+
+  SettingItem(this.key, this.defaultValue) {
+    load();
   }
 
-  static Future<void> setBookmarkRepository(String value) async {
-    bookmarkRepository = value;
-
-    await prefs.setString('bookmarkRepository', bookmarkRepository);
+  T get value => _value!;
+  Future<void> setValue(T v) async {
+    _value = v;
+    if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+      await saveToPrefs(key, v);
+    }
   }
 
-  static Future<void> setBookmarkHost(String value) async {
-    bookmarkHost = value;
-
-    await prefs.setString('bookmarkHost', bookmarkHost);
+  void load() {
+    if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+      _value = loadFromPrefs<T>(key, defaultValue);
+    }
   }
 
-  static Future<void> setSearchResultType(SearchResultType wh) async {
-    searchResultType = wh;
+  @override
+  String toString() {
+    throw UnsupportedError('donot support toString()');
+  }
+}
 
-    await prefs.setInt('searchResultType', searchResultType.index);
+class FutureSettingItem<T> {
+  final String key;
+  final Future<T> Function() computeDefault;
+  T? _value;
+  bool _initialized = false;
+
+  FutureSettingItem(this.key, this.computeDefault);
+
+  T get value {
+    if (!_initialized) {
+      throw StateError(
+          'FutureSettingItem<$T> not initialized. Call `load()` first.');
+    }
+    return _value!;
   }
 
-  static Future<void> setDownloadResultType(DownloadResultType wh) async {
-    downloadResultType = wh;
-
-    await prefs.setInt('downloadResultType', downloadResultType.index);
+  Future<void> setValue(T v) async {
+    _value = v;
+    await saveToPrefs(key, v);
   }
 
-  static Future<void> setDownloadAlignType(int wh) async {
-    downloadAlignType = wh;
-
-    await prefs.setInt('downloadAlignType', downloadAlignType);
+  Future<void> load() async {
+    _value = loadFromPrefs<T>(key, null);
+    if (_value == null) {
+      _value = await computeDefault();
+      await saveToPrefs<T>(key, _value! as T);
+    }
+    _initialized = true;
   }
 
-  static Future<void> setLanguage(String lang) async {
-    language = lang;
+  @override
+  String toString() {
+    throw UnsupportedError('donot support toString()');
+  }
+}
 
-    await prefs.setString('language', lang);
+T? loadFromPrefs<T>(String key, T? fallback) {
+  final prefs = Settings.prefs;
+  if (T == bool) return prefs.getBool(key) as T? ?? fallback;
+  if (T == int) return prefs.getInt(key) as T? ?? fallback;
+  if (T == double) return prefs.getDouble(key) as T? ?? fallback;
+  if (T == String) return prefs.getString(key) as T? ?? fallback;
+  if (T == Color) {
+    final val = prefs.getInt(key);
+    return (val != null ? Color(val) : fallback) as T?;
+  }
+  if (T == List<String>) {
+    final val = prefs.getString(key);
+    return (val != null ? val.split('|') : fallback) as T?;
+  }
+  throw Exception('Unsupported type');
+}
+
+Future<void> saveToPrefs<T>(String key, T value) async {
+  final prefs = Settings.prefs;
+  if (value is bool) {
+    await prefs.setBool(key, value);
+  } else if (value is int) {
+    await prefs.setInt(key, value);
+  } else if (value is double) {
+    await prefs.setDouble(key, value);
+  } else if (value is String) {
+    await prefs.setString(key, value);
+  } else if (value is Color) {
+    await prefs.setInt(key, value.value);
+  } else if (value is List<String>) {
+    await prefs.setString(key, value.join('|'));
+  } else {
+    throw Exception('Unsupported type');
+  }
+}
+
+class EnumSettingItem<T extends Enum> {
+  final String key;
+  final List<T> values;
+  final T defaultValue;
+  T? _value;
+
+  EnumSettingItem(this.key, this.values, this.defaultValue) {
+    load();
   }
 
-  static Future<void> setIncludeTags(String nn) async {
-    includeTags = nn;
-
-    await prefs.setString('includetags', includeTags);
+  T get value => _value ?? defaultValue;
+  Future<void> setValue(T v) async {
+    _value = v;
+    await Settings.prefs.setInt(key, values.indexOf(v));
   }
 
-  static Future<void> setExcludeTags(String nn) async {
-    excludeTags = nn.split(' ').toList();
-
-    await prefs.setString('excludetags', excludeTags.join('|'));
-  }
-
-  static Future<void> setBlurredTags(String nn) async {
-    blurredTags = nn.split(' ').toList();
-
-    await prefs.setString('blurredtags', blurredTags.join('|'));
-  }
-
-  static Future<void> setTranslateTags(bool nn) async {
-    translateTags = nn;
-
-    await prefs.setBool('translatetags', translateTags);
-  }
-
-  static Future<void> setRightToLeft(bool nn) async {
-    rightToLeft = nn;
-
-    await prefs.setBool('right2left', rightToLeft);
-  }
-
-  static Future<void> setIsHorizontal(bool nn) async {
-    isHorizontal = nn;
-
-    await prefs.setBool('ishorizontal', isHorizontal);
-  }
-
-  static Future<void> setScrollVertical(bool nn) async {
-    scrollVertical = nn;
-
-    await prefs.setBool('scrollvertical', scrollVertical);
-  }
-
-  static Future<void> setAnimation(bool nn) async {
-    animation = nn;
-
-    await prefs.setBool('animation', animation);
-  }
-
-  static Future<void> setPadding(bool nn) async {
-    padding = nn;
-
-    await prefs.setBool('padding', padding);
-  }
-
-  static Future<void> setDisableOverlayButton(bool nn) async {
-    disableOverlayButton = nn;
-
-    await prefs.setBool('disableoverlaybutton', disableOverlayButton);
-  }
-
-  static Future<void> setDisableFullScreen(bool nn) async {
-    disableFullScreen = nn;
-
-    await prefs.setBool('disablefullscreen', disableFullScreen);
-  }
-
-  static Future<void> setEnableTimer(bool nn) async {
-    enableTimer = nn;
-
-    await prefs.setBool('enabletimer', enableTimer);
-  }
-
-  static Future<void> setTimerTick(double nn) async {
-    timerTick = nn;
-
-    await prefs.setDouble('timertick', timerTick);
-  }
-
-  static Future<void> setDisableTwoPageView(bool nn) async {
-    disableTwoPageView = nn;
-
-    await prefs.setBool('onTwoPageView', disableTwoPageView);
-  }
-
-  static Future<void> setSecondPageToSecondPage(bool nn) async {
-    secondPageToSecondPage = nn;
-
-    await prefs.setBool('secondPageToSecondPage', secondPageToSecondPage);
-  }
-
-  static Future<void> setMoveToAppBarToBottom(bool nn) async {
-    moveToAppBarToBottom = nn;
-
-    await prefs.setBool('movetoappbartobottom', nn);
-  }
-
-  static Future<void> setImageQuality(int nn) async {
-    imageQuality = nn;
-
-    await prefs.setInt('imagequality', imageQuality);
-  }
-
-  static Future<void> setThumbSize(int nn) async {
-    thumbSize = nn;
-
-    await prefs.setInt('thumbSize', thumbSize);
-  }
-
-  static Future<void> setEnableThumbSlider(bool nn) async {
-    enableThumbSlider = nn;
-
-    await prefs.setBool('enableThumbSlider', enableThumbSlider);
-  }
-
-  static Future<void> setShowPageNumberIndicator(bool nn) async {
-    showPageNumberIndicator = nn;
-
-    await prefs.setBool('showPageNumberIndicator', showPageNumberIndicator);
-  }
-
-  static Future<void> setShowRecordJumpMessage(bool nn) async {
-    showRecordJumpMessage = nn;
-
-    await prefs.setBool('showRecordJumpMessage', showRecordJumpMessage);
-  }
-
-  static Future<void> setShowSlider(bool nn) async {
-    showSlider = nn;
-
-    await prefs.setBool('showslider', nn);
-  }
-
-  static Future<void> setSearchOnWeb(bool nn) async {
-    searchNetwork = nn;
-
-    await prefs.setBool('searchnetwork', nn);
-  }
-
-  static Future<void> setIncludeTagOnWeb(bool nn) async {
-    includeTagNetwork = nn;
-
-    await prefs.setBool('includetagnetwork', nn);
-  }
-
-  static Future<void> setExcludeTagOnWeb(bool nn) async {
-    excludeTagNetwork = nn;
-
-    await prefs.setBool('excludetagnetwork', nn);
-  }
-
-  static Future<void> setSearchExpunged(bool nn) async {
-    searchExpunged = nn;
-
-    await prefs.setBool('searchexpunged', nn);
-  }
-
-  static Future<void> setSearchCategory(int nn) async {
-    searchCategory = nn;
-
-    await prefs.setInt('searchcategory', nn);
-  }
-
-  static Future<void> setSearchPure(bool nn) async {
-    searchPure = nn;
-
-    await prefs.setBool('searchPure', nn);
-  }
-
-  static Future<void> setIgnoreTimeout(bool nn) async {
-    ignoreTimeout = nn;
-
-    await prefs.setBool('ignoretimeout', nn);
-  }
-
-  static Future<void> setUseVioletServer(bool nn) async {
-    useVioletServer = nn;
-
-    await prefs.setBool('usevioletserver', nn);
-  }
-
-  static Future<void> setUseDrawer(bool nn) async {
-    useDrawer = nn;
-
-    await prefs.setBool('usedrawer', nn);
-  }
-
-  static Future<void> setBaseDownloadPath(String nn) async {
-    downloadBasePath = nn;
-
-    await prefs.setString('downloadbasepath', nn);
-  }
-
-  static Future<void> setDownloadRule(String nn) async {
-    downloadRule = nn;
-
-    await prefs.setString('downloadrule', nn);
-  }
-
-  static Future<void> setSearchMessageAPI(String nn) async {
-    searchMessageAPI = nn;
-
-    await prefs.setString('searchmessageapi', nn);
-  }
-
-  static Future<void> setUserInnerStorage(bool nn) async {
-    useInnerStorage = nn;
-
-    await prefs.setBool('useinnerstorage', nn);
-  }
-
-  static Future<void> setShowArticleProgress(bool nn) async {
-    showArticleProgress = nn;
-
-    await prefs.setBool('showarticleprogress', nn);
-  }
-
-  static Future<void> setUseOptimizeDatabase(bool nn) async {
-    useOptimizeDatabase = nn;
-
-    await prefs.setBool('useoptimizedatabase', nn);
-  }
-
-  static Future<void> setUseLowPerf(bool nn) async {
-    useLowPerf = nn;
-
-    await prefs.setBool('uselowperf', nn);
-  }
-
-  static Future<void> setSearchUseFuzzy(bool nn) async {
-    searchUseFuzzy = nn;
-
-    await prefs.setBool('searchusefuzzy', nn);
-  }
-
-  static Future<void> setSearchTagTranslation(bool nn) async {
-    searchTagTranslation = nn;
-
-    await prefs.setBool('searchtagtranslation', nn);
-  }
-
-  static Future<void> setSearchUseTranslated(bool nn) async {
-    searchUseTranslated = nn;
-
-    await prefs.setBool('searchusetranslated', nn);
-  }
-
-  static Future<void> setSearchShowCount(bool nn) async {
-    searchShowCount = nn;
-
-    await prefs.setBool('searchshowcount', nn);
-  }
-
-  static Future<void> setAutoBackupBookmark(bool nn) async {
-    autobackupBookmark = nn;
-
-    await prefs.setBool('autobackupbookmark', nn);
-  }
-
-  static Future<void> setUseTabletMode(bool nn) async {
-    useTabletMode = nn;
-
-    await prefs.setBool('usetabletmode', nn);
-  }
-
-  static Future<void> setCropBookmarkAlign(int nn) async {
-    cropBookmarkAlign = nn;
-
-    await prefs.setInt('cropBookmarkAlign', nn);
-  }
-
-  static Future<void> setCropBookmarkShowOverlay(bool nn) async {
-    cropBookmarkShowOverlay = nn;
-
-    await prefs.setBool('cropBookmarkShowOverlay', nn);
-  }
-
-  static Future<void> setCropBookmarkSortDesc(bool nn) async {
-    cropBookmarkSortDesc = nn;
-
-    await prefs.setBool('cropBookmarkSortDesc', nn);
-  }
-
-  static Future<void> setSimpleItemWidgetLoadingIcon(bool nn) async {
-    simpleItemWidgetLoadingIcon = nn;
-
-    await prefs.setBool('simpleItemWidgetLoadingIcon', nn);
-  }
-
-  static Future<void> setShowNewViewerWhenArtistArticleListItemTap(
-      bool nn) async {
-    showNewViewerWhenArtistArticleListItemTap = nn;
-
-    await prefs.setBool('showNewViewerWhenArtistArticleListItemTap', nn);
-  }
-
-  static Future<void> setEnableViewerFunctionBackdropFilter(bool nn) async {
-    enableViewerFunctionBackdropFilter = nn;
-
-    await prefs.setBool('enableViewerFunctionBackdropFilter', nn);
-  }
-
-  static Future<void> setUsingPushReplacementOnArticleRead(bool nn) async {
-    usingPushReplacementOnArticleRead = nn;
-
-    await prefs.setBool('usingPushReplacementOnArticleRead', nn);
-  }
-
-  static Future<void> setDownloadEhRawImage(bool nn) async {
-    downloadEhRawImage = nn;
-
-    await prefs.setBool('downloadEhRawImage', nn);
-  }
-
-  static Future<void> setBookmarkScrollbarPositionToLeft(bool nn) async {
-    bookmarkScrollbarPositionToLeft = nn;
-
-    await prefs.setBool('bookmarkScrollbarPositionToLeft', nn);
-  }
-
-  static Future<void> setInViewerMessageSearch(bool nn) async {
-    inViewerMessageSearch = nn;
-
-    await prefs.setBool('inViewerMessageSearch', nn);
-  }
-
-  static Future<void> setUseLockScreen(bool nn) async {
-    useLockScreen = nn;
-
-    await prefs.setBool('useLockScreen', nn);
-  }
-
-  static Future<void> setUseSecureMode(bool nn) async {
-    useSecureMode = nn;
-
-    await prefs.setBool('useSecureMode', nn);
+  void load() {
+    int index = Settings.prefs.getInt(key) ?? values.indexOf(defaultValue);
+    _value = values[index];
   }
 }
 

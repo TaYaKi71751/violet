@@ -79,7 +79,7 @@ class _ProviderImageState extends State<ProviderImage> {
       clearMemoryCacheIfFailed: true,
       handleLoadingProgress: true,
       loadStateChanged: _loadStateChanged,
-      cacheHeight: Settings.useLowPerf
+      cacheHeight: Settings.useLowPerf.value
           ? (MediaQuery.of(context).size.width * 2.0).toInt()
           : null,
     );
@@ -110,7 +110,7 @@ class _ProviderImageState extends State<ProviderImage> {
       final iconButton = IconButton(
         icon: Icon(
           Icons.refresh,
-          color: Settings.majorColor,
+          color: Settings.majorColor.value,
         ),
         onPressed: () => setState(() {
           c.imgKeys[widget.index] = GlobalKey();

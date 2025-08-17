@@ -79,8 +79,7 @@ class _GroupModifyPageState extends State<GroupModifyPage> {
               const Spacer(),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Settings.majorColor,
-                ),
+                    backgroundColor: Settings.majorColor.value),
                 child: Text(Translations.instance!.trans('ok')),
                 onPressed: () {
                   Navigator.pop(context, [
@@ -93,8 +92,7 @@ class _GroupModifyPageState extends State<GroupModifyPage> {
               const SizedBox(width: 8),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Settings.majorColor,
-                ),
+                    backgroundColor: Settings.majorColor.value),
                 child: Text(Translations.instance!.trans('cancel')),
                 onPressed: () {
                   Navigator.pop(context, [0]);
