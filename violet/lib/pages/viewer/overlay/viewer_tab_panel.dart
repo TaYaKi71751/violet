@@ -16,7 +16,6 @@ import 'package:violet/model/article_list_item.dart';
 import 'package:violet/pages/common/utils.dart';
 import 'package:violet/pages/viewer/viewer_page.dart';
 import 'package:violet/pages/viewer/viewer_page_provider.dart';
-import 'package:violet/server/violet.dart';
 import 'package:violet/server/violet_v2.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/variables.dart';
