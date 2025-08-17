@@ -283,8 +283,6 @@ class Settings {
     } else {
       userAppId = 'null';
     }
-
-    await regacy1_20_2();
   }
 
   static Future resetIncludeTags() async {
@@ -298,26 +296,6 @@ class Settings {
       language = 'lang:chinese';
     }
     await includeTags.setValue('($language)');
-  }
-
-  static Future regacy1_20_2() async {
-    if (await _checkLegacyExists('regacy1_20_2')) return;
-
-    if (!simpleItemWidgetLoadingIcon.value) {
-      await simpleItemWidgetLoadingIcon.setValue(true);
-    }
-    if (!showNewViewerWhenArtistArticleListItemTap.value) {
-      await showNewViewerWhenArtistArticleListItemTap.setValue(true);
-    }
-  }
-
-  static Future<bool> _checkLegacyExists(String name) async {
-    var nn = prefs.getBool(name);
-    if (nn == null) {
-      await prefs.setBool(name, true);
-      return false;
-    }
-    return true;
   }
 
   static Future<String> _getString(String key,
