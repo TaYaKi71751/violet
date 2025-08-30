@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MySQLConfigModule } from './config/config.module';
@@ -11,7 +12,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ViewModule } from './view/view.module';
 import { RedisModule } from './redis/redis.module';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import * as Joi from 'joi';
 import { AWSModule } from './aws/aws.module';
 import { StatsModule } from './stats/stats.module';
@@ -74,7 +75,13 @@ export const envValidationSchema = Joi.object({
     BookmarkModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 
 export class AppModule { }
