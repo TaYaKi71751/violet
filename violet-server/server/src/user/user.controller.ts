@@ -9,6 +9,7 @@ import { ListDiscordUserAppIdsResponseDto } from './dtos/list-discord.dto';
 import { CommonResponseDto } from 'src/common/dtos/common.dto';
 import { plainToClass } from 'class-transformer';
 import { User } from './entity/user.entity';
+import { AdminGuard } from 'src/auth/guards/admin.guard';
 
 @ApiTags('user')
 @Controller('user')
@@ -26,7 +27,7 @@ export class UserController {
   @Get('list')
   @ApiOperation({ summary: 'Get all users' })
   @ApiCreatedResponse({ description: 'List of users', type: [User] })
-  // @UseGuards(AccessTokenGuard)
+  @UseGuards(AdminGuard)
   async getAllUsers(): Promise<User[]> {
     return await this.userService.getAllUsers();
   }
