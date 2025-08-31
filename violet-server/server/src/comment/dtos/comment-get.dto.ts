@@ -3,11 +3,13 @@ import { Type } from 'class-transformer';
 import { Comment } from 'src/comment/entity/comment.entity';
 import {
   IsArray,
+  IsDate,
   IsInt,
   IsOptional,
   IsString,
   Matches,
 } from 'class-validator';
+import { ValidateResponse } from 'src/common/decorators/validate-response.decorator';
 
 export class CommentGetDto {
   @IsString()
@@ -34,6 +36,10 @@ export class CommentGetResponseDtoElement {
     description: 'Body',
     required: true,
   })
+  @Matches(/^\w{8}$/, {
+    message:
+      'Id must be between 4 and 20 characters long with number or alphabet',
+  })
   userAppId: string;
 
   @IsString()
@@ -43,7 +49,7 @@ export class CommentGetResponseDtoElement {
   })
   body: string;
 
-  @IsString()
+  @IsDate()
   @ApiProperty({
     description: 'Write DateTime',
     required: true,
@@ -59,10 +65,11 @@ export class CommentGetResponseDtoElement {
   })
   parent?: number;
 
+  @ValidateResponse(CommentGetResponseDtoElement)
   static from(comment: Comment): CommentGetResponseDtoElement {
     return {
       id: comment.id,
-      userAppId: comment.user.userAppId,
+      userAppId: comment.user.userAppId.slice(0, 8),
       body: comment.body,
       dateTime: comment.createdAt,
       parent: comment.parent?.id,
