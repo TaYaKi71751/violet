@@ -39,6 +39,10 @@ class VioletServerV2 {
       userAppId: userId,
     );
   }
+
+  static Future<CommentGetResponseDto> getComments(String where) async {
+    return (await VioletServerV2.instance.apiV2CommentGet(where: where)).body!;
+  }
 }
 
 class HmacInterceptor implements Interceptor {
