@@ -22,6 +22,7 @@ export class ViewPostRequestDto {
   @ApiProperty({
     description: 'ArticleId',
     required: true,
+    type: 'integer',
   })
   articleId: number;
 
@@ -32,6 +33,7 @@ export class ViewPostRequestDto {
   @ApiProperty({
     description: 'Count',
     required: true,
+    type: 'integer',
   })
   viewSeconds: number;
 

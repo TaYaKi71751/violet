@@ -33,6 +33,7 @@ export class CommentPostDto {
   @ApiProperty({
     description: 'Parent Comment',
     required: false,
+    type: 'integer',
   })
   @Type(() => Number)
   parent?: number;

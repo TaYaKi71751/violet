@@ -24,6 +24,7 @@ export class ViewGetRequestDto {
   @ApiProperty({
     description: 'Offset',
     required: true,
+    type: 'integer',
   })
   offset: number;
 
@@ -34,6 +35,7 @@ export class ViewGetRequestDto {
   @ApiProperty({
     description: 'Count',
     required: true,
+    type: 'integer',
   })
   count: number;
 
@@ -49,6 +51,7 @@ export class ViewGetResponseDtoElement {
   @ApiProperty({
     description: 'Article Id',
     required: true,
+    type: 'integer',
   })
   articleId: number;
 
@@ -56,6 +59,7 @@ export class ViewGetResponseDtoElement {
   @ApiProperty({
     description: 'Count',
     required: true,
+    type: 'integer',
   })
   count: number;
 }

@@ -25,6 +25,7 @@ export class CommentGetResponseDtoElement {
   @ApiProperty({
     description: 'Comment Id',
     required: true,
+    type: 'integer',
   })
   id: number;
 
@@ -54,6 +55,7 @@ export class CommentGetResponseDtoElement {
   @ApiProperty({
     description: 'Parent Comment',
     required: false,
+    type: 'integer',
   })
   parent?: number;
 

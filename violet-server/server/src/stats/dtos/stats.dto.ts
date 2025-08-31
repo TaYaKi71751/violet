@@ -6,6 +6,7 @@ export class StatsResponseDto {
     @ApiProperty({
         description: '총 사용자 수',
         required: true,
+        type: 'integer',
     })
     totalUsers: number;
 
@@ -13,6 +14,7 @@ export class StatsResponseDto {
     @ApiProperty({
         description: '총 댓글 수',
         required: true,
+        type: 'integer',
     })
     totalComments: number;
 
