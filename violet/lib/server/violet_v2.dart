@@ -9,8 +9,8 @@ import 'package:violet/api/api.swagger.dart';
 import 'package:violet/server/wsalt.dart';
 
 class VioletServerV2 {
-  static const protocol = 'http';
-  static const host = 'localhost:3000';
+  static const protocol = 'https';
+  static const host = 'koromo.xyz';
   static const api = '$protocol://$host';
 
   static late final Api instance;
