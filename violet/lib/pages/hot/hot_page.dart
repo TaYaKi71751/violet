@@ -215,7 +215,7 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
           // TODO: Handle qurey not found
           continue;
         }
-        result.add((qr[element.articleId.toString()]!, element.count as int));
+        result.add((qr[element.articleId.toString()]!, element.count));
       }
 
       if (reload) setState(() {});
