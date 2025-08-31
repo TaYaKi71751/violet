@@ -40,7 +40,7 @@ import 'package:violet/pages/segment/platform_navigator.dart';
 import 'package:violet/pages/viewer/viewer_page.dart';
 import 'package:violet/pages/viewer/viewer_page_provider.dart';
 import 'package:violet/script/script_manager.dart';
-import 'package:violet/server/violet.dart';
+import 'package:violet/server/violet_v2.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/style/palette.dart';
 import 'package:violet/variables.dart';
@@ -265,7 +265,7 @@ class ArticleInfoPage extends StatelessWidget {
   readButtonEvent(BuildContext context, ArticleInfo data, [int? page]) async {
     if (Settings.useVioletServer.value) {
       Future.delayed(const Duration(milliseconds: 100)).then((value) async {
-        await VioletServer.view(data.queryResult.id());
+        await VioletServerV2.view(data.queryResult.id());
       });
     }
     await (await User.getInstance()).insertUserLog(data.queryResult.id(), 0);

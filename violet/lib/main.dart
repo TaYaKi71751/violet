@@ -46,6 +46,7 @@ Future<void> main() async {
     FlareCache.doesPrune = false;
     FlutterError.onError = recordFlutterError;
 
+    await initUserId();
     if (Platform.isAndroid || Platform.isIOS) {
       await initFirebase();
     }
@@ -88,16 +89,21 @@ Future<void> recordFlutterError(FlutterErrorDetails flutterErrorDetails) async {
 Future<void> initFirebase() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // check user-id is set
+  var analytics = FirebaseAnalytics.instance;
+  await analytics.setUserId(id: await initUserId());
+}
+
+Future<String> initUserId() async {
   final prefs = await SharedPreferences.getInstance();
   var id = prefs.getString('fa_userid');
+
+  // check user-id is set
   if (id == null) {
     id = sha1.convert(utf8.encode(DateTime.now().toString())).toString();
     prefs.setString('fa_userid', id);
   }
 
-  var analytics = FirebaseAnalytics.instance;
-  await analytics.setUserId(id: id);
+  return id;
 }
 
 class MyApp extends StatelessWidget {

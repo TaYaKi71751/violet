@@ -1,18 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsArray } from 'class-validator';
+import { IsInt, IsArray } from 'class-validator';
 
 export class StatsResponseDto {
-    @IsNumber()
+    @IsInt()
     @ApiProperty({
         description: '총 사용자 수',
         required: true,
+        type: 'integer',
     })
     totalUsers: number;
 
-    @IsNumber()
+    @IsInt()
     @ApiProperty({
         description: '총 댓글 수',
         required: true,
+        type: 'integer',
     })
     totalComments: number;
 

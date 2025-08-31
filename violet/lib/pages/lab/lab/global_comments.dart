@@ -11,6 +11,7 @@ import 'package:violet/pages/lab/lab/recent_user_record.dart';
 import 'package:violet/pages/segment/card_panel.dart';
 import 'package:violet/pages/segment/platform_navigator.dart';
 import 'package:violet/server/community/anon.dart';
+import 'package:violet/server/violet_v2.dart';
 import 'package:violet/settings/settings.dart';
 
 class LabGlobalComments extends StatefulWidget {
@@ -37,16 +38,15 @@ class _LabGlobalCommentsState extends State<LabGlobalComments> {
   TextEditingController text = TextEditingController();
 
   Future<void> readComments() async {
-    var tcomments = (await VioletCommunityAnonymous.getArtistComments(
-        'global_general'))['result'] as List<dynamic>;
+    var tcomments = await VioletServerV2.getComments('general');
 
-    comments = tcomments
+    comments = tcomments.elements
         .map((e) => (
-              e['Id'] as int,
-              DateTime.parse(e['TimeStamp']),
-              e['UserAppId'] as String,
-              e['Body'] as String,
-              e['Parent'] as int?,
+              e.id,
+              e.dateTime,
+              e.userAppId,
+              e.body,
+              e.parent,
             ))
         .toList();
 

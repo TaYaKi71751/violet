@@ -16,7 +16,7 @@ import 'package:violet/model/article_list_item.dart';
 import 'package:violet/pages/common/utils.dart';
 import 'package:violet/pages/viewer/viewer_page.dart';
 import 'package:violet/pages/viewer/viewer_page_provider.dart';
-import 'package:violet/server/violet.dart';
+import 'package:violet/server/violet_v2.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/variables.dart';
 import 'package:violet/widgets/article_item/article_list_item_widget.dart';
@@ -419,7 +419,7 @@ class __ArtistsArticleTabListState extends State<_ArtistsArticleTabList>
   Future<void> _showViewer(QueryResult e) async {
     if (Settings.useVioletServer.value) {
       Future.delayed(const Duration(milliseconds: 100)).then((value) async {
-        await VioletServer.view(e.id());
+        await VioletServerV2.view(e.id());
       });
     }
 
