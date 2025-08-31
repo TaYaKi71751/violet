@@ -219,8 +219,8 @@ abstract class Api extends ChopperService {
   ///@param count Count
   ///@param type Type
   Future<chopper.Response<ViewGetResponseDto>> apiV2ViewGet({
-    required num? offset,
-    required num? count,
+    required int? offset,
+    required int? count,
     String? type,
   }) {
     generatedMapping.putIfAbsent(
@@ -235,8 +235,8 @@ abstract class Api extends ChopperService {
   ///@param type Type
   @Get(path: '/api/v2/view')
   Future<chopper.Response<ViewGetResponseDto>> _apiV2ViewGet({
-    @Query('offset') required num? offset,
-    @Query('count') required num? count,
+    @Query('offset') required int? offset,
+    @Query('count') required int? count,
     @Query('type') String? type,
   });
 
@@ -245,8 +245,8 @@ abstract class Api extends ChopperService {
   ///@param viewSeconds Count
   ///@param userAppId User App Id
   Future<chopper.Response> apiV2ViewPost({
-    required num? articleId,
-    required num? viewSeconds,
+    required int? articleId,
+    required int? viewSeconds,
     required String? userAppId,
   }) {
     return _apiV2ViewPost(
@@ -262,8 +262,8 @@ abstract class Api extends ChopperService {
     optionalBody: true,
   )
   Future<chopper.Response> _apiV2ViewPost({
-    @Query('articleId') required num? articleId,
-    @Query('viewSeconds') required num? viewSeconds,
+    @Query('articleId') required int? articleId,
+    @Query('viewSeconds') required int? viewSeconds,
     @Query('userAppId') required String? userAppId,
   });
 
@@ -272,8 +272,8 @@ abstract class Api extends ChopperService {
   ///@param viewSeconds Count
   ///@param userAppId User App Id
   Future<chopper.Response> apiV2ViewLoginedPost({
-    required num? articleId,
-    required num? viewSeconds,
+    required int? articleId,
+    required int? viewSeconds,
     required String? userAppId,
   }) {
     return _apiV2ViewLoginedPost(
@@ -289,8 +289,8 @@ abstract class Api extends ChopperService {
     optionalBody: true,
   )
   Future<chopper.Response> _apiV2ViewLoginedPost({
-    @Query('articleId') required num? articleId,
-    @Query('viewSeconds') required num? viewSeconds,
+    @Query('articleId') required int? articleId,
+    @Query('viewSeconds') required int? viewSeconds,
     @Query('userAppId') required String? userAppId,
   });
 
@@ -345,7 +345,7 @@ class CommentGetResponseDtoElement {
   Map<String, dynamic> toJson() => _$CommentGetResponseDtoElementToJson(this);
 
   @JsonKey(name: 'id')
-  final double id;
+  final int id;
   @JsonKey(name: 'userAppId')
   final String userAppId;
   @JsonKey(name: 'body')
@@ -353,7 +353,7 @@ class CommentGetResponseDtoElement {
   @JsonKey(name: 'dateTime')
   final DateTime dateTime;
   @JsonKey(name: 'parent')
-  final double? parent;
+  final int? parent;
   static const fromJsonFactory = _$CommentGetResponseDtoElementFromJson;
 
   @override
@@ -390,11 +390,11 @@ class CommentGetResponseDtoElement {
 extension $CommentGetResponseDtoElementExtension
     on CommentGetResponseDtoElement {
   CommentGetResponseDtoElement copyWith(
-      {double? id,
+      {int? id,
       String? userAppId,
       String? body,
       DateTime? dateTime,
-      double? parent}) {
+      int? parent}) {
     return CommentGetResponseDtoElement(
         id: id ?? this.id,
         userAppId: userAppId ?? this.userAppId,
@@ -404,11 +404,11 @@ extension $CommentGetResponseDtoElementExtension
   }
 
   CommentGetResponseDtoElement copyWithWrapped(
-      {Wrapped<double>? id,
+      {Wrapped<int>? id,
       Wrapped<String>? userAppId,
       Wrapped<String>? body,
       Wrapped<DateTime>? dateTime,
-      Wrapped<double?>? parent}) {
+      Wrapped<int?>? parent}) {
     return CommentGetResponseDtoElement(
         id: (id != null ? id.value : this.id),
         userAppId: (userAppId != null ? userAppId.value : this.userAppId),
@@ -483,7 +483,7 @@ class CommentPostDto {
   @JsonKey(name: 'body')
   final String body;
   @JsonKey(name: 'parent')
-  final double? parent;
+  final int? parent;
   static const fromJsonFactory = _$CommentPostDtoFromJson;
 
   @override
@@ -510,7 +510,7 @@ class CommentPostDto {
 }
 
 extension $CommentPostDtoExtension on CommentPostDto {
-  CommentPostDto copyWith({String? where, String? body, double? parent}) {
+  CommentPostDto copyWith({String? where, String? body, int? parent}) {
     return CommentPostDto(
         where: where ?? this.where,
         body: body ?? this.body,
@@ -518,9 +518,7 @@ extension $CommentPostDtoExtension on CommentPostDto {
   }
 
   CommentPostDto copyWithWrapped(
-      {Wrapped<String>? where,
-      Wrapped<String>? body,
-      Wrapped<double?>? parent}) {
+      {Wrapped<String>? where, Wrapped<String>? body, Wrapped<int?>? parent}) {
     return CommentPostDto(
         where: (where != null ? where.value : this.where),
         body: (body != null ? body.value : this.body),
@@ -839,9 +837,9 @@ class ViewGetResponseDtoElement {
   Map<String, dynamic> toJson() => _$ViewGetResponseDtoElementToJson(this);
 
   @JsonKey(name: 'articleId')
-  final double articleId;
+  final int articleId;
   @JsonKey(name: 'count')
-  final double count;
+  final int count;
   static const fromJsonFactory = _$ViewGetResponseDtoElementFromJson;
 
   @override
@@ -866,13 +864,13 @@ class ViewGetResponseDtoElement {
 }
 
 extension $ViewGetResponseDtoElementExtension on ViewGetResponseDtoElement {
-  ViewGetResponseDtoElement copyWith({double? articleId, double? count}) {
+  ViewGetResponseDtoElement copyWith({int? articleId, int? count}) {
     return ViewGetResponseDtoElement(
         articleId: articleId ?? this.articleId, count: count ?? this.count);
   }
 
   ViewGetResponseDtoElement copyWithWrapped(
-      {Wrapped<double>? articleId, Wrapped<double>? count}) {
+      {Wrapped<int>? articleId, Wrapped<int>? count}) {
     return ViewGetResponseDtoElement(
         articleId: (articleId != null ? articleId.value : this.articleId),
         count: (count != null ? count.value : this.count));
@@ -940,9 +938,9 @@ class StatsResponseDto {
   Map<String, dynamic> toJson() => _$StatsResponseDtoToJson(this);
 
   @JsonKey(name: 'totalUsers')
-  final double totalUsers;
+  final int totalUsers;
   @JsonKey(name: 'totalComments')
-  final double totalComments;
+  final int totalComments;
   @JsonKey(name: 'userGrowth')
   final Object userGrowth;
   @JsonKey(name: 'commentGrowth')
@@ -981,8 +979,8 @@ class StatsResponseDto {
 
 extension $StatsResponseDtoExtension on StatsResponseDto {
   StatsResponseDto copyWith(
-      {double? totalUsers,
-      double? totalComments,
+      {int? totalUsers,
+      int? totalComments,
       Object? userGrowth,
       Object? commentGrowth}) {
     return StatsResponseDto(
@@ -993,8 +991,8 @@ extension $StatsResponseDtoExtension on StatsResponseDto {
   }
 
   StatsResponseDto copyWithWrapped(
-      {Wrapped<double>? totalUsers,
-      Wrapped<double>? totalComments,
+      {Wrapped<int>? totalUsers,
+      Wrapped<int>? totalComments,
       Wrapped<Object>? userGrowth,
       Wrapped<Object>? commentGrowth}) {
     return StatsResponseDto(

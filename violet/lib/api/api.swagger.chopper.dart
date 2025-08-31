@@ -184,8 +184,8 @@ final class _$Api extends Api {
 
   @override
   Future<Response<ViewGetResponseDto>> _apiV2ViewGet({
-    required num? offset,
-    required num? count,
+    required int? offset,
+    required int? count,
     String? type,
   }) {
     final Uri $url = Uri.parse('/api/v2/view');
@@ -205,8 +205,8 @@ final class _$Api extends Api {
 
   @override
   Future<Response<dynamic>> _apiV2ViewPost({
-    required num? articleId,
-    required num? viewSeconds,
+    required int? articleId,
+    required int? viewSeconds,
     required String? userAppId,
   }) {
     final Uri $url = Uri.parse('/api/v2/view');
@@ -226,8 +226,8 @@ final class _$Api extends Api {
 
   @override
   Future<Response<dynamic>> _apiV2ViewLoginedPost({
-    required num? articleId,
-    required num? viewSeconds,
+    required int? articleId,
+    required int? viewSeconds,
     required String? userAppId,
   }) {
     final Uri $url = Uri.parse('/api/v2/view/logined');

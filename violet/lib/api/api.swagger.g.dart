@@ -9,11 +9,11 @@ part of 'api.swagger.dart';
 CommentGetResponseDtoElement _$CommentGetResponseDtoElementFromJson(
         Map<String, dynamic> json) =>
     CommentGetResponseDtoElement(
-      id: (json['id'] as num).toDouble(),
+      id: (json['id'] as num).toInt(),
       userAppId: json['userAppId'] as String,
       body: json['body'] as String,
       dateTime: DateTime.parse(json['dateTime'] as String),
-      parent: (json['parent'] as num?)?.toDouble(),
+      parent: (json['parent'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$CommentGetResponseDtoElementToJson(
@@ -46,7 +46,7 @@ CommentPostDto _$CommentPostDtoFromJson(Map<String, dynamic> json) =>
     CommentPostDto(
       where: json['where'] as String,
       body: json['body'] as String,
-      parent: (json['parent'] as num?)?.toDouble(),
+      parent: (json['parent'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$CommentPostDtoToJson(CommentPostDto instance) =>
@@ -122,8 +122,8 @@ Map<String, dynamic> _$ResLoginUserToJson(ResLoginUser instance) =>
 ViewGetResponseDtoElement _$ViewGetResponseDtoElementFromJson(
         Map<String, dynamic> json) =>
     ViewGetResponseDtoElement(
-      articleId: (json['articleId'] as num).toDouble(),
-      count: (json['count'] as num).toDouble(),
+      articleId: (json['articleId'] as num).toInt(),
+      count: (json['count'] as num).toInt(),
     );
 
 Map<String, dynamic> _$ViewGetResponseDtoElementToJson(
@@ -149,8 +149,8 @@ Map<String, dynamic> _$ViewGetResponseDtoToJson(ViewGetResponseDto instance) =>
 
 StatsResponseDto _$StatsResponseDtoFromJson(Map<String, dynamic> json) =>
     StatsResponseDto(
-      totalUsers: (json['totalUsers'] as num).toDouble(),
-      totalComments: (json['totalComments'] as num).toDouble(),
+      totalUsers: (json['totalUsers'] as num).toInt(),
+      totalComments: (json['totalComments'] as num).toInt(),
       userGrowth: json['userGrowth'] as Object,
       commentGrowth: json['commentGrowth'] as Object,
     );
