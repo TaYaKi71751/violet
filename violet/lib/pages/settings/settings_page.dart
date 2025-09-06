@@ -1401,7 +1401,7 @@ class _SettingsPageState extends State<SettingsPage>
                 onPressed: () {
                   _shouldReload = true;
                   setState(
-                      () => text.text = 'https://koromo.xyz/api/search/msg');
+                      () => text.text = 'https://koromo.cc/api/search/msg');
                 },
               );
               var dialog = await showDialog(

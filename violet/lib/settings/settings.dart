@@ -190,7 +190,7 @@ class Settings {
       'downloadrule', '%(extractor)s/%(id)s/%(file)s.%(ext)s');
 
   static final searchMessageAPI = SettingItem<String>(
-      'searchmessageapi', 'https://koromo.xyz/api/search/msg');
+      'searchmessageapi', 'https://koromo.cc/api/search/msg');
   static final useVioletServer = SettingItem<bool>('usevioletserver', false);
 
   static final useDrawer = SettingItem<bool>('usedrawer', false);
