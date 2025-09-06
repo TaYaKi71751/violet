@@ -18,7 +18,7 @@ import 'package:violet/settings/settings.dart';
 
 class VioletServer {
   static const protocol = 'https';
-  static const host = 'koromo.xyz/api';
+  static const host = 'koromo.cc/api';
   static const api = '$protocol://$host';
 
   static Future<dynamic> top(int offset, int count, String type) async {
@@ -283,7 +283,7 @@ class VioletServer {
     return _userId!;
   }
 
-  // https://koromo.xyz/api/record/recent?count=10&limit=180
+  // https://koromo.cc/api/record/recent?count=10&limit=180
   static Future<dynamic> record(
       [int offset = 0, int count = 10, int limit = 0]) async {
     final gg = await http

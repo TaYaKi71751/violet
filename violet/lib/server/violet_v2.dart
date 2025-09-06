@@ -10,7 +10,7 @@ import 'package:violet/server/wsalt.dart';
 
 class VioletServerV2 {
   static const protocol = 'https';
-  static const host = 'koromo.xyz';
+  static const host = 'koromo.cc';
   static const api = '$protocol://$host';
 
   static late final Api instance;
