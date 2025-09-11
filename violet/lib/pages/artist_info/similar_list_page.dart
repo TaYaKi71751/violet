@@ -74,6 +74,10 @@ Future<List<QueryResult>> queryDedupedArtistArticles(
   final qm = QueryManager.queryPagination(queryString, 10);
   final quries = await qm.next();
 
+  if (quries.isEmpty) {
+    return [];
+  }
+
   final titles = [removeChapter(quries[0].title() as String)];
   final results = [quries[0]];
 
