@@ -22,6 +22,14 @@ class PatchModel {
 
 final patches = [
   PatchModel(
+    dateTime: DateTime(2025, 9, 13),
+    version: '1.34.1 Patch',
+    contents: [
+      'fix series/character view',
+      'fix real time ranking',
+    ],
+  ),
+  PatchModel(
     dateTime: DateTime(2025, 8, 31),
     version: '1.34.0 Minor',
     isMinor: true,
