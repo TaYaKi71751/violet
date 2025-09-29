@@ -68,7 +68,8 @@ class DownloadItemModel {
   List<String> filesWithoutThumbnail() {
     var rfiles = rawFiles();
     rfiles.removeWhere(
-        (element) => element.split('/').last.startsWith('thumbnail'));
+      (element) => element.split('/').last.startsWith('thumbnail'),
+    );
     return rfiles;
   }
 
@@ -81,7 +82,8 @@ class DownloadItemModel {
           .where((e) => e.split('/').last.startsWith('thumbnail'))
           .isNotEmpty) {
         return rfiles.firstWhere(
-            (element) => element.split('/').last.startsWith('thumbnail'));
+          (element) => element.split('/').last.startsWith('thumbnail'),
+        );
       }
     }
     return null;
@@ -96,7 +98,8 @@ class Download {
       if (_instance == null) {
         final db = await CommonUserDatabase.getInstance();
         final rows = await db.query(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='DownloadItem';");
+          "SELECT name FROM sqlite_master WHERE type='table' AND name='DownloadItem';",
+        );
         if (rows.isEmpty || rows[0].isEmpty) {
           try {
             await db.execute('''CREATE TABLE DownloadItem (
@@ -114,8 +117,10 @@ class Download {
               );
               ''');
           } catch (e, st) {
-            Logger.error('[Download-Instance] E: $e\n'
-                '$st');
+            Logger.error(
+              '[Download-Instance] E: $e\n'
+              '$st',
+            );
           }
         }
         _instance = Download();
@@ -177,18 +182,18 @@ class Download {
   DownloadItemModel? getDownloadedArticle(int id) => _downloadedItems[id];
 
   Future<List<DownloadItemModel>> getDownloadItems() async {
-    return (await (await CommonUserDatabase.getInstance())
-            .query('SELECT * FROM DownloadItem'))
-        .map((x) => DownloadItemModel(result: x))
-        .toList();
+    return (await (await CommonUserDatabase.getInstance()).query(
+      'SELECT * FROM DownloadItem',
+    )).map((x) => DownloadItemModel(result: x)).toList();
   }
 
   Future<DownloadItemModel> createNew(String url) async {
     var rr = {'URL': url, 'State': 1, 'DateTime': DateTime.now().toString()};
     var db = await CommonUserDatabase.getInstance();
     await db.insert('DownloadItem', rr);
-    var ll = (await db
-        .query('SELECT * FROM DownloadItem ORDER BY Id DESC LIMIT 1'))[0];
+    var ll = (await db.query(
+      'SELECT * FROM DownloadItem ORDER BY Id DESC LIMIT 1',
+    ))[0];
     return DownloadItemModel(result: ll);
   }
 

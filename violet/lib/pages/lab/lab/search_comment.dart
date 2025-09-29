@@ -28,8 +28,9 @@ class _LabSearchCommentsState extends State<LabSearchComments> {
     Future.delayed(const Duration(milliseconds: 100)).then((value) async {
       var tcomments =
           (await VioletServer.searchComment(text.text)) as List<dynamic>;
-      comments =
-          tcomments.map((e) => e as (int, DateTime, String, String)).toList();
+      comments = tcomments
+          .map((e) => e as (int, DateTime, String, String))
+          .toList();
       setState(() {});
     });
   }
@@ -66,9 +67,11 @@ class _LabSearchCommentsState extends State<LabSearchComments> {
                           child: Align(
                             alignment: Alignment.centerRight,
                             child: Text(
-                                DateFormat('yyyy-MM-dd HH:mm')
-                                    .format(e.$2.toLocal()),
-                                style: const TextStyle(fontSize: 12)),
+                              DateFormat(
+                                'yyyy-MM-dd HH:mm',
+                              ).format(e.$2.toLocal()),
+                              style: const TextStyle(fontSize: 12),
+                            ),
                           ),
                         ),
                       ],
@@ -84,8 +87,9 @@ class _LabSearchCommentsState extends State<LabSearchComments> {
             controller: text,
             // autofocus: true,
             onEditingComplete: () async {
-              var tcomments = (await VioletServer.searchComment(text.text))
-                  as List<dynamic>;
+              var tcomments =
+                  (await VioletServer.searchComment(text.text))
+                      as List<dynamic>;
               comments = tcomments
                   .map((e) => e as (int, DateTime, String, String))
                   .toList();

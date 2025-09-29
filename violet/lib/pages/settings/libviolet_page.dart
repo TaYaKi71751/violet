@@ -25,10 +25,11 @@ class LibvioletPage extends StatelessWidget {
                 child: ScrollOnExpand(
                   child: ExpandablePanel(
                     theme: ExpandableThemeData(
-                        iconColor: Settings.themeWhat.value
-                            ? Colors.white
-                            : Colors.grey,
-                        animationDuration: const Duration(milliseconds: 500)),
+                      iconColor: Settings.themeWhat.value
+                          ? Colors.white
+                          : Colors.grey,
+                      animationDuration: const Duration(milliseconds: 500),
+                    ),
                     header: const Padding(
                       padding: EdgeInsets.fromLTRB(12, 12, 0, 0),
                       child: Text('What is libviolet?'),
@@ -38,9 +39,10 @@ class LibvioletPage extends StatelessWidget {
                       child: Column(
                         children: [
                           Text(
-                              'Libviolet is a very fast download library implemented based on Rust. '
-                              'This download library allows downloads up to the network maximum download speed.',
-                              style: TextStyle(fontSize: 12)),
+                            'Libviolet is a very fast download library implemented based on Rust. '
+                            'This download library allows downloads up to the network maximum download speed.',
+                            style: TextStyle(fontSize: 12),
+                          ),
                         ],
                       ),
                     ),
@@ -60,8 +62,9 @@ class LibvioletPage extends StatelessWidget {
               title: const Text('openssl'),
               trailing: const Icon(Icons.open_in_new),
               onTap: () async {
-                final url =
-                    Uri.parse('https://github.com/sfackler/rust-openssl');
+                final url = Uri.parse(
+                  'https://github.com/sfackler/rust-openssl',
+                );
                 if (await canLaunchUrl(url)) {
                   await launchUrl(url);
                 }
@@ -78,8 +81,9 @@ class LibvioletPage extends StatelessWidget {
               title: const Text('futures-rs'),
               trailing: const Icon(Icons.open_in_new),
               onTap: () async {
-                final url =
-                    Uri.parse('https://github.com/rust-lang/futures-rs');
+                final url = Uri.parse(
+                  'https://github.com/rust-lang/futures-rs',
+                );
                 if (await canLaunchUrl(url)) {
                   await launchUrl(url);
                 }
@@ -96,8 +100,9 @@ class LibvioletPage extends StatelessWidget {
               title: const Text('hyper-native-tls'),
               trailing: const Icon(Icons.open_in_new),
               onTap: () async {
-                final url =
-                    Uri.parse('https://github.com/sfackler/hyper-native-tls');
+                final url = Uri.parse(
+                  'https://github.com/sfackler/hyper-native-tls',
+                );
                 if (await canLaunchUrl(url)) {
                   await launchUrl(url);
                 }
@@ -183,8 +188,9 @@ class LibvioletPage extends StatelessWidget {
               title: const Text('concurrent-queue'),
               trailing: const Icon(Icons.open_in_new),
               onTap: () async {
-                final url =
-                    Uri.parse('https://github.com/stjepang/concurrent-queue');
+                final url = Uri.parse(
+                  'https://github.com/stjepang/concurrent-queue',
+                );
                 if (await canLaunchUrl(url)) {
                   await launchUrl(url);
                 }
@@ -202,7 +208,8 @@ class LibvioletPage extends StatelessWidget {
               trailing: const Icon(Icons.open_in_new),
               onTap: () async {
                 final url = Uri.parse(
-                    'https://github.com/rust-lang-nursery/lazy-static.rs');
+                  'https://github.com/rust-lang-nursery/lazy-static.rs',
+                );
                 if (await canLaunchUrl(url)) {
                   await launchUrl(url);
                 }

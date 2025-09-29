@@ -52,8 +52,9 @@ class _UserStatusCardState extends State<UserStatusCard>
         sess = VioletCommunitySession.lastSession != null
             ? VioletCommunitySession.lastSession!
             : (await VioletCommunitySession.signIn(id, pw));
-        _userNickName =
-            (await VioletCommunitySession.getUserInfo(id))['NickName'];
+        _userNickName = (await VioletCommunitySession.getUserInfo(
+          id,
+        ))['NickName'];
         setState(() {
           _logining = false;
         });
@@ -92,13 +93,15 @@ class _UserStatusCardState extends State<UserStatusCard>
           decoration: !Settings.themeFlat.value
               ? BoxDecoration(
                   // color: Colors.white,
-                  color:
-                      Settings.themeWhat.value ? Colors.black26 : Colors.white,
+                  color: Settings.themeWhat.value
+                      ? Colors.black26
+                      : Colors.white,
                   borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      topRight: Radius.circular(8),
-                      bottomLeft: Radius.circular(8),
-                      bottomRight: Radius.circular(8)),
+                    topLeft: Radius.circular(8),
+                    topRight: Radius.circular(8),
+                    bottomLeft: Radius.circular(8),
+                    bottomRight: Radius.circular(8),
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Settings.themeWhat.value
@@ -114,8 +117,8 @@ class _UserStatusCardState extends State<UserStatusCard>
           color: !Settings.themeFlat.value
               ? null
               : Settings.themeWhat.value
-                  ? Colors.black26
-                  : Colors.white,
+              ? Colors.black26
+              : Colors.white,
           // decoration:
           child: Ink(
             child: !Settings.themeFlat.value
@@ -126,7 +129,8 @@ class _UserStatusCardState extends State<UserStatusCard>
                           ? Colors.black38
                           : Colors.white,
                       child: _statusCardContent(),
-                    ))
+                    ),
+                  )
                 : _statusCardContent(),
           ),
         ),
@@ -141,8 +145,9 @@ class _UserStatusCardState extends State<UserStatusCard>
           child: InkWell(
             customBorder: const RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10.0),
-                  bottomLeft: Radius.circular(10.0)),
+                topLeft: Radius.circular(10.0),
+                bottomLeft: Radius.circular(10.0),
+              ),
             ),
             child: Container(
               padding: const EdgeInsets.all(20.0),
@@ -185,9 +190,10 @@ class _UserStatusCardState extends State<UserStatusCard>
             ),
             onTap: () async {
               await showOkDialog(
-                  context,
-                  '$_userAppId\n\nThis user app id has a unique value on a per app session. If you have any problems using the app, please contact us with above user app id.',
-                  'Your User App Id');
+                context,
+                '$_userAppId\n\nThis user app id has a unique value on a per app session. If you have any problems using the app, please contact us with above user app id.',
+                'Your User App Id',
+              );
             },
           ),
         ),
@@ -199,34 +205,43 @@ class _UserStatusCardState extends State<UserStatusCard>
               ? const SizedBox(
                   height: 48,
                   width: 48,
-                  child: Stack(alignment: Alignment.center, children: <Widget>[
-                    SizedBox(
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: <Widget>[
+                      SizedBox(
                         height: 30,
                         width: 30,
                         child: CircularProgressIndicator(
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.grey),
-                        ))
-                  ]))
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.grey,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
               : InkWell(
                   customBorder: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(10.0),
-                        bottomRight: Radius.circular(10.0)),
+                      topRight: Radius.circular(10.0),
+                      bottomRight: Radius.circular(10.0),
+                    ),
                   ),
                   child: Align(
                     alignment: Alignment.center,
                     child: badges.Badge(
                       showBadge: false,
-                      badgeContent: const Text('N',
-                          style:
-                              TextStyle(color: Colors.white, fontSize: 12.0)),
+                      badgeContent: const Text(
+                        'N',
+                        style: TextStyle(color: Colors.white, fontSize: 12.0),
+                      ),
                       // badgeColor: Settings.majorAccentColor.value,
                       child: Icon(
-                          sess == null
-                              ? MdiIcons.accountCancel
-                              : MdiIcons.cloudUpload,
-                          size: 30),
+                        sess == null
+                            ? MdiIcons.accountCancel
+                            : MdiIcons.cloudUpload,
+                        size: 30,
+                      ),
                     ),
                   ),
                   onTap: () async {
@@ -257,11 +272,12 @@ class _UserStatusCardState extends State<UserStatusCard>
                     }
 
                     var ync = await showYesNoCancelDialog(
-                        context,
-                        'You need to log in to use the community feature. '
-                            'If you have an existing id, press "YES" to log in. '
-                            'If you do not have an existing id, press "NO" to register for a new one.',
-                        'Sign In/Up');
+                      context,
+                      'You need to log in to use the community feature. '
+                          'If you have an existing id, press "YES" to log in. '
+                          'If you do not have an existing id, press "NO" to register for a new one.',
+                      'Sign In/Up',
+                    );
 
                     if (ync == null) return;
 
@@ -271,40 +287,54 @@ class _UserStatusCardState extends State<UserStatusCard>
                       // signin
                       if (!mounted) return;
                       var r = await showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return const SignInDialog();
-                          });
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const SignInDialog();
+                        },
+                      );
                       if (r == null) return;
                       id = r[0];
                       pw = r[1];
                     } else {
                       // signup
                       if (await VioletCommunitySession.checkUserAppId(
-                              _userAppId) !=
+                            _userAppId,
+                          ) !=
                           'success') {
                         if (!mounted) return;
                         await showOkDialog(
-                            context,
-                            'You cannot continue, there is an account registered with your UserAppId.'
-                            ' If you have already registered as a member, please sign in with your existing id.'
-                            ' If you forgot your login information, please contact developer.');
+                          context,
+                          'You cannot continue, there is an account registered with your UserAppId.'
+                          ' If you have already registered as a member, please sign in with your existing id.'
+                          ' If you forgot your login information, please contact developer.',
+                        );
                         return;
                       }
                       if (!mounted) return;
                       var r = await showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return const SignUpDialog();
-                          });
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const SignUpDialog();
+                        },
+                      );
 
                       if (r == null) return;
 
-                      print(await VioletCommunitySession.signUp(
-                          r[0], r[1], _userAppId, r[2]));
+                      print(
+                        await VioletCommunitySession.signUp(
+                          r[0],
+                          r[1],
+                          _userAppId,
+                          r[2],
+                        ),
+                      );
 
                       if (await VioletCommunitySession.signUp(
-                              r[0], r[1], _userAppId, r[2]) ==
+                            r[0],
+                            r[1],
+                            _userAppId,
+                            r[2],
+                          ) ==
                           'success') {
                         if (!mounted) return;
                         await showOkDialog(context, 'Sign up is complete!');
@@ -313,7 +343,9 @@ class _UserStatusCardState extends State<UserStatusCard>
                       } else {
                         if (!mounted) return;
                         await showOkDialog(
-                            context, 'Registration has been declined!');
+                          context,
+                          'Registration has been declined!',
+                        );
                         return;
                       }
                     }

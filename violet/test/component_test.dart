@@ -15,7 +15,7 @@ void main() {
     WidgetsFlutterBinding.ensureInitialized();
     SharedPreferences.setMockInitialValues({
       'eh_cookies':
-          'ipb_member_id=2742770; ipb_pass_hash=622fcc2be82c922135bb0516e0ee497d; sk=t8inbzaqn45ttyn9f78eanzuqizh; igneous=rcrmcztqgf1v8p1e0'
+          'ipb_member_id=2742770; ipb_pass_hash=622fcc2be82c922135bb0516e0ee497d; sk=t8inbzaqn45ttyn9f78eanzuqizh; igneous=rcrmcztqgf1v8p1e0',
     });
 
     Settings.searchCategory.setValue(1);
@@ -26,14 +26,20 @@ void main() {
   });
 
   test('EHentai Gallery Parse', () async {
-    final result =
-        await HentaiManager.searchEHentai('"female:big breasts"', 0, false);
+    final result = await HentaiManager.searchEHentai(
+      '"female:big breasts"',
+      0,
+      false,
+    );
     expect(result.length >= 25, true);
   });
 
   test('ExHentai Gallery Parse', () async {
-    final result =
-        await HentaiManager.searchEHentai('"female:big breasts"', 0, true);
+    final result = await HentaiManager.searchEHentai(
+      '"female:big breasts"',
+      0,
+      true,
+    );
     expect(result.length >= 25, true);
   });
 
@@ -65,14 +71,16 @@ Page 20: 020.jpg" src="https://exhentai.org/t/66/55/6655fb520e13eff74ebf9aa49c21
 
   test('EHentai Parse Article Data', () async {
     final html = await EHSession.requestString(
-        'https://exhentai.org/g/2504057/6757b3c4b8/');
+      'https://exhentai.org/g/2504057/6757b3c4b8/',
+    );
     final article = EHParser.parseArticleData(html);
     expect(article.comment!.isNotEmpty, true);
   });
 
   test('EHentai Get Images Url', () async {
     final html = await EHSession.requestString(
-        'https://exhentai.org/g/3176408/87646440e1/?p=0&inline_set=ts_m');
+      'https://exhentai.org/g/3176408/87646440e1/?p=0&inline_set=ts_m',
+    );
     final urls = EHParser.getImagesUrl(html);
     expect(urls.length, 20);
   });

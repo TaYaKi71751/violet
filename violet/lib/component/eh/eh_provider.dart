@@ -71,8 +71,9 @@ class EHentaiImageProvider extends VioletImageProvider {
     if (urls[page] == null) {
       // 40item per page
       var ppage = page ~/ imagesPerPage;
-      var phtml =
-          await EHSession.requestString('${pagesUrl[ppage]}&inline_set=ts_m');
+      var phtml = await EHSession.requestString(
+        '${pagesUrl[ppage]}&inline_set=ts_m',
+      );
       var pages = EHParser.getImagesUrl(phtml);
 
       for (int i = 0; i < pages.length; i++) {
@@ -86,8 +87,9 @@ class EHentaiImageProvider extends VioletImageProvider {
 
     if (Settings.downloadEhRawImage.value) {
       var unescape = HtmlUnescape();
-      return imgUrls[page] =
-          unescape.convert(EHParser.getOriginalImageAddress(img));
+      return imgUrls[page] = unescape.convert(
+        EHParser.getOriginalImageAddress(img),
+      );
     }
     return imgUrls[page] = EHParser.getImageAddress(img);
   }

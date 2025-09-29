@@ -51,8 +51,9 @@ class _ArticleListPageState extends State<ArticleListPage> {
       child: Padding(
         // padding: EdgeInsets.all(0),
         padding: EdgeInsets.only(
-            top: MediaQuery.of(context).padding.top,
-            bottom: (mediaQuery.padding + mediaQuery.viewInsets).bottom),
+          top: MediaQuery.of(context).padding.top,
+          bottom: (mediaQuery.padding + mediaQuery.viewInsets).bottom,
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -62,7 +63,8 @@ class _ArticleListPageState extends State<ArticleListPage> {
               color: Palette.themeColor,
               child: SizedBox(
                 width: width - 16,
-                height: height -
+                height:
+                    height -
                     16 -
                     (mediaQuery.padding + mediaQuery.viewInsets).bottom,
                 child: Padding(
@@ -74,18 +76,16 @@ class _ArticleListPageState extends State<ArticleListPage> {
                         floating: true,
                         delegate: AnimatedOpacitySliver(
                           searchBar: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
                             child: Stack(
-                              children: <Widget>[
-                                _align(),
-                                _title(),
-                              ],
+                              children: <Widget>[_align(), _title()],
                             ),
                           ),
                         ),
                       ),
-                      _cachedList!
+                      _cachedList!,
                     ],
                   ),
                 ),
@@ -105,9 +105,7 @@ class _ArticleListPageState extends State<ArticleListPage> {
         child: Card(
           color: Palette.themeColor,
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(8.0),
-            ),
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
           ),
           elevation: 100,
           clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -118,19 +116,14 @@ class _ArticleListPageState extends State<ArticleListPage> {
               child: Stack(
                 alignment: Alignment.center,
                 children: <Widget>[
-                  Icon(
-                    MdiIcons.formatListText,
-                    color: Colors.grey,
-                  ),
+                  Icon(MdiIcons.formatListText, color: Colors.grey),
                 ],
               ),
             ),
             onTap: () async {
               PlatformNavigator.navigateOption(
                 context,
-                SearchType2(
-                  nowType: nowType,
-                ),
+                SearchType2(nowType: nowType),
               ).then((value) async {
                 if (value == null) return;
                 nowType = value;
@@ -148,9 +141,7 @@ class _ArticleListPageState extends State<ArticleListPage> {
                 context,
                 Provider<FilterController>.value(
                   value: _filterController,
-                  child: FilterPage(
-                    queryResult: widget.cc,
-                  ),
+                  child: FilterPage(queryResult: widget.cc),
                 ),
               ).then((value) async {
                 _applyFilter();
@@ -170,15 +161,18 @@ class _ArticleListPageState extends State<ArticleListPage> {
   Widget _title() {
     return Padding(
       padding: const EdgeInsets.only(top: 24, left: 12),
-      child: Text(widget.name,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      child: Text(
+        widget.name,
+        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
     );
   }
 
   ObjectKey key = ObjectKey(const Uuid().v4());
 
-  final FilterController _filterController =
-      FilterController(heroKey: 'searchtype2');
+  final FilterController _filterController = FilterController(
+    heroKey: 'searchtype2',
+  );
   List<QueryResult> filterResult = [];
 
   bool isFilterUsed = false;
@@ -215,7 +209,6 @@ class _ArticleListPageState extends State<ArticleListPage> {
             succ = isOr;
           }
         }
-
         // If Multitag
         else if ((element.result[dbColumn] as String == split[1]) == isOr) {
           succ = isOr;
@@ -284,8 +277,10 @@ class _ArticleListPageState extends State<ArticleListPage> {
 
   int nowType = 0;
 
-  final List<ScrollController> _scrollControllers =
-      Iterable.generate(5, (i) => ScrollController()).toList();
+  final List<ScrollController> _scrollControllers = Iterable.generate(
+    5,
+    (i) => ScrollController(),
+  ).toList();
 
   Widget buildList() {
     final columnCount =
@@ -312,10 +307,7 @@ class _ArticleListPageState extends State<ArticleListPage> {
             ),
             itemBuilder: (context, index, animation) {
               return FadeTransition(
-                opacity: Tween<double>(
-                  begin: 0,
-                  end: 1,
-                ).animate(animation),
+                opacity: Tween<double>(begin: 0, end: 1).animate(animation),
                 child: SlideTransition(
                   position: Tween<Offset>(
                     begin: const Offset(0, -0.1),
@@ -376,9 +368,7 @@ class _ArticleListPageState extends State<ArticleListPage> {
         );
 
       default:
-        return const Center(
-          child: Text('Error :('),
-        );
+        return const Center(child: Text('Error :('));
     }
   }
 }

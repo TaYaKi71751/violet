@@ -77,10 +77,7 @@ class _ArticleListItemWidgetState extends State<ArticleListItemWidget>
   initAfterProvider() {
     data = Provider.of<ArticleListItem>(context);
     getxId = const Uuid().v4();
-    c = Get.put(
-      ArticleListItemWidgetController(data),
-      tag: getxId,
-    );
+    c = Get.put(ArticleListItemWidgetController(data), tag: getxId);
     updateIdOnlyArticle();
   }
 
@@ -91,11 +88,14 @@ class _ArticleListItemWidgetState extends State<ArticleListItemWidget>
     if (c.articleListItem.queryResult.result.keys.length == 1 &&
         c.articleListItem.queryResult.result.keys.lastOrNull == 'Id') {
       final query = await HentaiManager.idQueryWeb(
-          '${c.articleListItem.queryResult.id()}');
+        '${c.articleListItem.queryResult.id()}',
+      );
 
       // Update ArticleListItem to new
-      data = ArticleListItem.fromJson(
-          {...c.articleListItem.toJson(), 'queryResult': query});
+      data = ArticleListItem.fromJson({
+        ...c.articleListItem.toJson(),
+        'queryResult': query,
+      });
 
       // Swap data of new
       c.dispose();
@@ -148,10 +148,7 @@ class _ArticleListItemWidgetState extends State<ArticleListItemWidget>
         _shouldReload = false;
 
         // https://stackoverflow.com/a/52249579
-        final body = BodyWidget(
-          key: c.bodyKey,
-          getxId: getxId,
-        );
+        final body = BodyWidget(key: c.bodyKey, getxId: getxId);
 
         _body = body;
       }
@@ -181,9 +178,9 @@ class _ArticleListItemWidgetState extends State<ArticleListItemWidget>
                       transform: c.thisHeight.value.isNaN
                           ? null
                           : (Matrix4.identity()
-                            ..translate(c.thisWidth / 2, c.thisHeight / 2)
-                            ..scale(c.scale.value)
-                            ..translate(-c.thisWidth / 2, -c.thisHeight / 2)),
+                              ..translate(c.thisWidth / 2, c.thisHeight / 2)
+                              ..scale(c.scale.value)
+                              ..translate(-c.thisWidth / 2, -c.thisHeight / 2)),
                       child: _body!,
                     ),
                   ),
@@ -287,8 +284,10 @@ class _ArticleListItemWidgetState extends State<ArticleListItemWidget>
         },
       ),
     ).then((value) async {
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-          overlays: SystemUiOverlay.values);
+      SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.manual,
+        overlays: SystemUiOverlay.values,
+      );
     });
   }
 
@@ -379,27 +378,35 @@ class _ArticleListItemWidgetState extends State<ArticleListItemWidget>
     c.onScaling = false;
 
     if (data.doubleTapCallback == null) {
-      Navigator.of(context).push(PageRouteBuilder(
-        opaque: false,
-        transitionDuration: const Duration(milliseconds: 500),
-        transitionsBuilder: (BuildContext context, Animation<double> animation,
-            Animation<double> secondaryAnimation, Widget wi) {
-          return FadeTransition(opacity: animation, child: wi);
-        },
-        pageBuilder: (_, __, ___) => ThumbnailViewPage(
-          thumbnail: c.thumbnail.value,
-          headers: c.headers,
-          heroKey: data.thumbnailTag,
-          showUltra: data.showUltra,
+      Navigator.of(context).push(
+        PageRouteBuilder(
+          opaque: false,
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder:
+              (
+                BuildContext context,
+                Animation<double> animation,
+                Animation<double> secondaryAnimation,
+                Widget wi,
+              ) {
+                return FadeTransition(opacity: animation, child: wi);
+              },
+          pageBuilder: (_, __, ___) => ThumbnailViewPage(
+            thumbnail: c.thumbnail.value,
+            headers: c.headers,
+            heroKey: data.thumbnailTag,
+            showUltra: data.showUltra,
+          ),
         ),
-      ));
+      );
     } else {
       data.doubleTapCallback!();
     }
 
     _shouldReloadCachedBuildWidget = true;
-    Future.delayed(const Duration(milliseconds: 500))
-        .then((value) => _shouldReloadCachedBuildWidget = false);
+    Future.delayed(
+      const Duration(milliseconds: 500),
+    ).then((value) => _shouldReloadCachedBuildWidget = false);
     setState(() {
       c.pad.value = 0;
     });
@@ -411,10 +418,7 @@ class BodyWidget extends StatelessWidget {
 
   final String getxId;
 
-  BodyWidget({
-    super.key,
-    required this.getxId,
-  }) {
+  BodyWidget({super.key, required this.getxId}) {
     c = Get.find(tag: getxId);
   }
 
@@ -423,17 +427,17 @@ class BodyWidget extends StatelessWidget {
     return Container(
       margin: c.articleListItem.addBottomPadding
           ? c.articleListItem.showDetail
-              ? const EdgeInsets.only(bottom: 6)
-              : const EdgeInsets.only(bottom: 50)
+                ? const EdgeInsets.only(bottom: 6)
+                : const EdgeInsets.only(bottom: 50)
           : EdgeInsets.zero,
       decoration: !Settings.themeFlat.value
           ? BoxDecoration(
               color: c.articleListItem.showDetail
                   ? Settings.themeWhat.value
-                      ? Settings.themeBlack.value
-                          ? Palette.blackThemeBackground
-                          : Colors.grey.shade800
-                      : Colors.white70
+                        ? Settings.themeBlack.value
+                              ? Palette.blackThemeBackground
+                              : Colors.grey.shade800
+                        : Colors.white70
                   : Colors.grey.withOpacity(0.3),
               borderRadius: const BorderRadius.all(Radius.circular(3)),
               boxShadow: [
@@ -451,26 +455,18 @@ class BodyWidget extends StatelessWidget {
       color: !Settings.themeFlat.value || !c.articleListItem.showDetail
           ? null
           : Settings.themeWhat.value
-              ? Colors.black26
-              : Colors.white,
+          ? Colors.black26
+          : Colors.white,
       child: c.articleListItem.showDetail
           ? IntrinsicHeight(
               child: Row(
                 children: <Widget>[
-                  ThumbnailWidget(
-                    getxId: getxId,
-                  ),
-                  Expanded(
-                    child: _DetailWidget(
-                      getxId: getxId,
-                    ),
-                  )
+                  ThumbnailWidget(getxId: getxId),
+                  Expanded(child: _DetailWidget(getxId: getxId)),
                 ],
               ),
             )
-          : ThumbnailWidget(
-              getxId: getxId,
-            ),
+          : ThumbnailWidget(getxId: getxId),
     );
   }
 }
@@ -479,9 +475,7 @@ class BodyWidget extends StatelessWidget {
 class _DetailWidget extends StatelessWidget {
   late final ArticleListItemWidgetController c;
 
-  _DetailWidget({
-    required String getxId,
-  }) {
+  _DetailWidget({required String getxId}) {
     c = Get.find(tag: getxId);
   }
 
@@ -491,10 +485,11 @@ class _DetailWidget extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(8, 4, 4, 4),
       child: Theme(
         data: ThemeData(
-            useMaterial3: false,
-            iconTheme: IconThemeData(
-                color:
-                    !Settings.themeWhat.value ? Colors.black : Colors.white)),
+          useMaterial3: false,
+          iconTheme: IconThemeData(
+            color: !Settings.themeWhat.value ? Colors.black : Colors.white,
+          ),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
@@ -504,11 +499,7 @@ class _DetailWidget extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
-            Text(
-              c.artist,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
+            Text(c.artist, maxLines: 2, overflow: TextOverflow.ellipsis),
             if (c.articleListItem.showUltra) tagArea(),
             const Spacer(),
             Row(
@@ -517,7 +508,9 @@ class _DetailWidget extends StatelessWidget {
                 Text(
                   ' ${c.dateTime}',
                   style: const TextStyle(
-                      fontSize: 12, fontWeight: FontWeight.w500),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
@@ -529,7 +522,9 @@ class _DetailWidget extends StatelessWidget {
                   () => Text(
                     ' ${c.imageCount.value} Page',
                     style: const TextStyle(
-                        fontSize: 12, fontWeight: FontWeight.w500),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 4.0),
@@ -539,7 +534,9 @@ class _DetailWidget extends StatelessWidget {
                   Text(
                     ' ${c.articleListItem.viewed} Viewed',
                     style: const TextStyle(
-                        fontSize: 12, fontWeight: FontWeight.w500),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 if (c.articleListItem.seconds != null)
                   const Icon(MdiIcons.clockOutline, size: 18),
@@ -547,7 +544,9 @@ class _DetailWidget extends StatelessWidget {
                   Text(
                     ' ${c.articleListItem.seconds} Seconds',
                     style: const TextStyle(
-                        fontSize: 12, fontWeight: FontWeight.w500),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
               ],
             ),
@@ -565,10 +564,12 @@ class _DetailWidget extends StatelessWidget {
     final tags = (c.articleListItem.queryResult.tags() as String)
         .split('|')
         .where((element) => element != '')
-        .map((e) => (
-              e.contains(':') ? e.split(':')[0] : 'tags',
-              e.contains(':') ? e.split(':')[1] : e
-            ))
+        .map(
+          (e) => (
+            e.contains(':') ? e.split(':')[0] : 'tags',
+            e.contains(':') ? e.split(':')[1] : e,
+          ),
+        )
         .toList();
 
     if (Settings.useTabletMode.value) {
@@ -607,8 +608,9 @@ class TagChip extends StatelessWidget {
     Color color = Colors.grey;
 
     if (Settings.translateTags.value) {
-      tagDisplayed =
-          TagTranslate.ofAny(tagDisplayed).split(':').last.split('|').first;
+      tagDisplayed = TagTranslate.ofAny(
+        tagDisplayed,
+      ).split(':').last.split('|').first;
     }
 
     if (group == 'female') {
@@ -618,8 +620,10 @@ class TagChip extends StatelessWidget {
     }
 
     var mustHasMorePad = true;
-    Widget avatar = Text(group[0].toUpperCase(),
-        style: const TextStyle(color: Colors.white));
+    Widget avatar = Text(
+      group[0].toUpperCase(),
+      style: const TextStyle(color: Colors.white),
+    );
 
     if (group == 'female') {
       mustHasMorePad = false;
@@ -630,11 +634,7 @@ class TagChip extends StatelessWidget {
       );
     } else if (group == 'male') {
       mustHasMorePad = false;
-      avatar = const Icon(
-        MdiIcons.genderMale,
-        size: 18.0,
-        color: Colors.white,
-      );
+      avatar = const Icon(MdiIcons.genderMale, size: 18.0, color: Colors.white);
     }
 
     final fc = GestureDetector(
@@ -644,15 +644,14 @@ class TagChip extends StatelessWidget {
           children: [
             Padding(
               padding: EdgeInsets.only(
-                  left: 2.0 + (mustHasMorePad ? 4.0 : 0),
-                  right: (mustHasMorePad ? 4.0 : 0)),
+                left: 2.0 + (mustHasMorePad ? 4.0 : 0),
+                right: (mustHasMorePad ? 4.0 : 0),
+              ),
               child: avatar,
             ),
             Text(
               ' $tagDisplayed ',
-              style: const TextStyle(
-                color: Colors.white,
-              ),
+              style: const TextStyle(color: Colors.white),
             ),
           ],
         ),
@@ -669,8 +668,9 @@ class TagChip extends StatelessWidget {
           await CupertinoScaffold.showCupertinoModalBottomSheet(
             context: context,
             builder: (context) {
-              cached ??=
-                  CupertinoScaffold(body: SearchPage(searchKeyWord: targetTag));
+              cached ??= CupertinoScaffold(
+                body: SearchPage(searchKeyWord: targetTag),
+              );
               return cached!;
             },
           );
@@ -678,8 +678,9 @@ class TagChip extends StatelessWidget {
           await showCupertinoModalBottomSheet(
             context: context,
             builder: (context) {
-              cached ??=
-                  CupertinoScaffold(body: SearchPage(searchKeyWord: targetTag));
+              cached ??= CupertinoScaffold(
+                body: SearchPage(searchKeyWord: targetTag),
+              );
               return cached!;
             },
           );
@@ -690,8 +691,10 @@ class TagChip extends StatelessWidget {
       onLongPress: () async {
         final targetTag = '${normalize(group)}:${name.replaceAll(' ', '_')}';
         if (!Settings.excludeTags.value.contains(targetTag)) {
-          final yn =
-              await showYesNoDialog(context, '$targetTag 태그를 제외태그에 추가할까요?');
+          final yn = await showYesNoDialog(
+            context,
+            '$targetTag 태그를 제외태그에 추가할까요?',
+          );
           if (yn) {
             Settings.excludeTags.value.add(targetTag);
             await Settings.excludeTags.setValue(Settings.excludeTags.value);
@@ -705,10 +708,7 @@ class TagChip extends StatelessWidget {
       },
     );
 
-    return SizedBox(
-      height: 42,
-      child: FittedBox(child: fc),
-    );
+    return SizedBox(height: 42, child: FittedBox(child: fc));
   }
 }
 
@@ -720,32 +720,35 @@ class ModalInsideModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Material(
-            child: Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: ListView(
-          reverse: reverse,
-          shrinkWrap: true,
-          controller: ModalScrollController.of(context),
-          physics: const ClampingScrollPhysics(),
-          children: ListTile.divideTiles(
-              context: context,
-              tiles: List.generate(
-                100,
-                (index) => ListTile(
+      body: Material(
+        child: Scaffold(
+          body: SafeArea(
+            bottom: false,
+            child: ListView(
+              reverse: reverse,
+              shrinkWrap: true,
+              controller: ModalScrollController.of(context),
+              physics: const ClampingScrollPhysics(),
+              children: ListTile.divideTiles(
+                context: context,
+                tiles: List.generate(
+                  100,
+                  (index) => ListTile(
                     title: Text('Item $index'),
                     onTap: () => showCupertinoModalBottomSheet(
-                          expand: true,
-                          isDismissible: false,
-                          context: context,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) =>
-                              ModalInsideModal(reverse: reverse),
-                        )),
-              )).toList(),
+                      expand: true,
+                      isDismissible: false,
+                      context: context,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => ModalInsideModal(reverse: reverse),
+                    ),
+                  ),
+                ),
+              ).toList(),
+            ),
+          ),
         ),
       ),
-    )));
+    );
   }
 }

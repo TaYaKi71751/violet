@@ -183,8 +183,10 @@ class _SplashPageState extends State<SplashPage> {
           if (Platform.isAndroid || Platform.isIOS) {
             FirebaseCrashlytics.instance.recordError(e, st);
           }
-          Logger.error('[Splash-Navigation] E: $e\n'
-              '$st');
+          Logger.error(
+            '[Splash-Navigation] E: $e\n'
+            '$st',
+          );
         }
       }
 
@@ -280,19 +282,20 @@ class _SplashPageState extends State<SplashPage> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               if (showIndicator)
-                const Text('<< AutoSync >>',
-                    style: TextStyle(color: Colors.white)),
+                const Text(
+                  '<< AutoSync >>',
+                  style: TextStyle(color: Colors.white),
+                ),
               Text(
-                  backupBookmark
-                      ? 'Bookmark Backup...'
-                      : chunkDownloadProgress != chunkDownloadMax ||
-                              chunkDownloadMax == 0
-                          ? 'Chunk downloading...[$chunkDownloadProgress/${SyncManager.getSyncRequiredChunkCount()}]'
-                          : 'Extracting...',
-                  style: const TextStyle(color: Colors.white)),
-              Container(
-                height: 16,
+                backupBookmark
+                    ? 'Bookmark Backup...'
+                    : chunkDownloadProgress != chunkDownloadMax ||
+                          chunkDownloadMax == 0
+                    ? 'Chunk downloading...[$chunkDownloadProgress/${SyncManager.getSyncRequiredChunkCount()}]'
+                    : 'Extracting...',
+                style: const TextStyle(color: Colors.white),
               ),
+              Container(height: 16),
               SizedBox(
                 width: 30,
                 height: 30,
@@ -318,9 +321,7 @@ class _SplashPageState extends State<SplashPage> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(message, style: const TextStyle(color: Colors.white)),
-              Container(
-                height: 16,
-              ),
+              Container(height: 16),
               SizedBox(
                 width: 30,
                 height: 30,
@@ -363,9 +364,7 @@ class _SplashPageState extends State<SplashPage> {
                     duration: const Duration(milliseconds: 900),
                     childAnimationBuilder: (widget) => SlideAnimation(
                       horizontalOffset: 50.0,
-                      child: FadeInAnimation(
-                        child: widget,
-                      ),
+                      child: FadeInAnimation(child: widget),
                     ),
                     children: <Widget>[
                       _welcomeMessage(),
@@ -386,9 +385,14 @@ class _SplashPageState extends State<SplashPage> {
                         ),
                         onLongPress: () {
                           showOkDialog(
-                              context,
-                              translations.trans('dbusermsg').replaceFirst(
-                                  '%s', imgSize[translations.dbLanguageCode]!));
+                            context,
+                            translations
+                                .trans('dbusermsg')
+                                .replaceFirst(
+                                  '%s',
+                                  imgSize[translations.dbLanguageCode]!,
+                                ),
+                          );
                         },
                       ),
                       RadioTile(
@@ -405,10 +409,11 @@ class _SplashPageState extends State<SplashPage> {
                         ),
                         onLongPress: () {
                           showOkDialog(
-                              context,
-                              translations
-                                  .trans('dballmsg')
-                                  .replaceFirst('%s', imgSize['global']!));
+                            context,
+                            translations
+                                .trans('dballmsg')
+                                .replaceFirst('%s', imgSize['global']!),
+                          );
                         },
                       ),
                       _downloadButton(),
@@ -433,9 +438,7 @@ class _SplashPageState extends State<SplashPage> {
               ? Settings.majorAccentColor.value.withOpacity(0.8)
               : Colors.grey,
         ),
-        Container(
-          padding: const EdgeInsets.all(4),
-        ),
+        Container(padding: const EdgeInsets.all(4)),
         Expanded(
           child: Text(
             widget.switching
@@ -483,9 +486,10 @@ class _SplashPageState extends State<SplashPage> {
   Future<void> _onDownloadButtonPressed() async {
     if (_database == Database.all) {
       if (!await showYesNoDialog(
-          context,
-          Translations.instance!.trans('dbwarn'),
-          Translations.instance!.trans('warning'))) {
+        context,
+        Translations.instance!.trans('dbwarn'),
+        Translations.instance!.trans('warning'),
+      )) {
         return;
       }
     }
@@ -502,12 +506,15 @@ class _SplashPageState extends State<SplashPage> {
       } catch (_) {}
     }
     if (!mounted) return;
-    Navigator.of(context).pushReplacement(MaterialPageRoute(
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
         builder: (context) => DataBaseDownloadPage(
-              dbType: _database == Database.all
-                  ? 'global'
-                  : Translations.instance!.dbLanguageCode,
-            )));
+          dbType: _database == Database.all
+              ? 'global'
+              : Translations.instance!.dbLanguageCode,
+        ),
+      ),
+    );
   }
 
   _dbSelector() {
@@ -520,12 +527,15 @@ class _SplashPageState extends State<SplashPage> {
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 100),
           child: GestureDetector(
             child: SizedBox(
-              child: Text(Translations.instance!.trans('dbalready'),
-                  style: TextStyle(
-                      color: widget.switching
-                          ? Settings.majorAccentColor.value
-                          : Colors.purpleAccent.shade100,
-                      fontSize: 12.0)),
+              child: Text(
+                Translations.instance!.trans('dbalready'),
+                style: TextStyle(
+                  color: widget.switching
+                      ? Settings.majorAccentColor.value
+                      : Colors.purpleAccent.shade100,
+                  fontSize: 12.0,
+                ),
+              ),
             ),
             // onTap: () async {
             //   var path = await getFile();
@@ -556,7 +566,8 @@ class _SplashPageState extends State<SplashPage> {
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 40),
           child: InkWell(
             customBorder: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(8.0))),
+              borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            ),
             child: const SizedBox(
               width: 150,
               height: 50,
@@ -564,16 +575,15 @@ class _SplashPageState extends State<SplashPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Icon(
-                    Icons.language,
-                    size: 35,
-                    color: Colors.white70,
+                  Icon(Icons.language, size: 35, color: Colors.white70),
+                  Text(
+                    '  Language',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  Text('  Language',
-                      style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold))
                 ],
               ),
             ),
@@ -611,10 +621,7 @@ class _SplashPageState extends State<SplashPage> {
                       return Row(
                         children: <Widget>[
                           CountryPickerUtils.getDefaultFlagImage(country),
-                          const SizedBox(
-                            width: 8.0,
-                            height: 30,
-                          ),
+                          const SizedBox(width: 8.0, height: 30),
                           Text((country as ExCountry).getDisplayLanguage()),
                         ],
                       );
@@ -632,15 +639,14 @@ class _SplashPageState extends State<SplashPage> {
   Future<String> getFile() async {
     var filename = (await FilePicker.platform.pickFiles(
       type: FileType.any,
-    ))!
-        .files
-        .single
-        .path;
+    ))!.files.single.path;
 
     if (filename == null) {
       if (mounted) {
         await showOkDialog(
-            context, Translations.instance!.trans('dbalreadyerr'));
+          context,
+          Translations.instance!.trans('dbalreadyerr'),
+        );
       }
       return '';
     }

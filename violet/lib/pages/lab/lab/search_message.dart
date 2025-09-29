@@ -39,8 +39,10 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
 
       if (_height == null) {
         _height = List<double>.filled(messages.length, 0);
-        _keys =
-            List<GlobalKey>.generate(messages.length, (index) => GlobalKey());
+        _keys = List<GlobalKey>.generate(
+          messages.length,
+          (index) => GlobalKey(),
+        );
         _urls = List<String>.filled(messages.length, '');
       }
 
@@ -92,143 +94,163 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
                 return FutureBuilder(
                   future: Future.delayed(const Duration(milliseconds: 100))
                       .then((value) async {
-                    final provider = await getImageProviderFromId(e.id);
-                    final image = await provider.getImageUrl(e.page);
-                    final header = await provider.getHeader(e.page);
-                    _urls![index] = image;
+                        final provider = await getImageProviderFromId(e.id);
+                        final image = await provider.getImageUrl(e.page);
+                        final header = await provider.getHeader(e.page);
+                        _urls![index] = image;
 
-                    return (image, header);
-                  }),
-                  builder: (context,
-                      AsyncSnapshot<(String, Map<String, String>)> snapshot) {
-                    if (!snapshot.hasData) {
-                      return Column(
-                        children: [
-                          SizedBox(
-                            height:
-                                _height![index] != 0 ? _height![index] : 300,
-                            child: const Align(
-                              alignment: Alignment.center,
-                              child: SizedBox(
-                                width: 50,
-                                height: 50,
-                                child: CircularProgressIndicator(),
-                              ),
-                            ),
-                          ),
-                          ListTile(
-                            title: Text('${e.id} (${e.page + 1} Page)'),
-                            subtitle: Text('Score: ${e.matchScore}'),
-                          ),
-                        ],
-                      );
-                    }
-                    return InkWell(
-                      onTap: () async {
-                        FocusScope.of(context).unfocus();
-                        showArticleInfoById(context, e.id);
-                      },
-                      splashColor: Colors.white,
-                      child: Column(
-                        children: [
-                          Stack(
+                        return (image, header);
+                      }),
+                  builder:
+                      (
+                        context,
+                        AsyncSnapshot<(String, Map<String, String>)> snapshot,
+                      ) {
+                        if (!snapshot.hasData) {
+                          return Column(
                             children: [
-                              Container(
-                                constraints: BoxConstraints(
-                                    minHeight: _height![index] != 0
-                                        ? _height![index]
-                                        : 300),
-                                child: VCachedNetworkImage(
-                                  key: _keys![index],
-                                  fit: BoxFit.cover,
-                                  fadeInDuration:
-                                      const Duration(microseconds: 500),
-                                  fadeInCurve: Curves.easeIn,
-                                  imageUrl: snapshot.data!.$1,
-                                  httpHeaders: snapshot.data!.$2,
-                                  progressIndicatorBuilder:
-                                      (context, string, progress) {
-                                    return SizedBox(
-                                      height: 300,
-                                      child: Center(
-                                        child: SizedBox(
-                                          width: 30,
-                                          height: 30,
-                                          child: CircularProgressIndicator(
-                                              value: progress.progress),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  imageBuilder:
-                                      (context, imageProvider, child) {
-                                    if (_height![index] == 0 ||
-                                        _height![index] == 300) {
-                                      Future.delayed(
-                                              const Duration(milliseconds: 50))
-                                          .then((value) {
-                                        try {
-                                          final RenderBox renderBoxRed =
-                                              _keys![index]
-                                                      .currentContext!
-                                                      .findRenderObject()!
-                                                  as RenderBox;
-                                          final sizeRender = renderBoxRed.size;
-                                          if (sizeRender.height != 300) {
-                                            _height![index] =
-                                                width / sizeRender.aspectRatio;
-                                          }
-                                        } catch (_) {}
-                                      });
-                                    }
-                                    return child;
-                                  },
+                              SizedBox(
+                                height: _height![index] != 0
+                                    ? _height![index]
+                                    : 300,
+                                child: const Align(
+                                  alignment: Alignment.center,
+                                  child: SizedBox(
+                                    width: 50,
+                                    height: 50,
+                                    child: CircularProgressIndicator(),
+                                  ),
                                 ),
                               ),
-                              FutureBuilder(
-                                future: _calculateImageDimension(
-                                    snapshot.data!.$1, snapshot.data!.$2),
-                                builder:
-                                    (context, AsyncSnapshot<Size> snapshot2) {
-                                  if (!snapshot2.hasData) return Container();
-
-                                  var brtx = e.rect[0];
-                                  var brty = e.rect[1];
-                                  var brbx = e.rect[2];
-                                  var brby = e.rect[3];
-
-                                  var w = snapshot2.data!.width;
-
-                                  var ratio = width / w;
-
-                                  return Positioned(
-                                    top: brty * ratio - 4,
-                                    left: brtx * ratio - 4,
-                                    child: SizedBox(
-                                      width: (brbx - brtx) * ratio + 8,
-                                      height: (brby - brty) * ratio + 8,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            width: 3,
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                      ),
+                              ListTile(
+                                title: Text('${e.id} (${e.page + 1} Page)'),
+                                subtitle: Text('Score: ${e.matchScore}'),
+                              ),
+                            ],
+                          );
+                        }
+                        return InkWell(
+                          onTap: () async {
+                            FocusScope.of(context).unfocus();
+                            showArticleInfoById(context, e.id);
+                          },
+                          splashColor: Colors.white,
+                          child: Column(
+                            children: [
+                              Stack(
+                                children: [
+                                  Container(
+                                    constraints: BoxConstraints(
+                                      minHeight: _height![index] != 0
+                                          ? _height![index]
+                                          : 300,
                                     ),
-                                  );
-                                },
+                                    child: VCachedNetworkImage(
+                                      key: _keys![index],
+                                      fit: BoxFit.cover,
+                                      fadeInDuration: const Duration(
+                                        microseconds: 500,
+                                      ),
+                                      fadeInCurve: Curves.easeIn,
+                                      imageUrl: snapshot.data!.$1,
+                                      httpHeaders: snapshot.data!.$2,
+                                      progressIndicatorBuilder:
+                                          (context, string, progress) {
+                                            return SizedBox(
+                                              height: 300,
+                                              child: Center(
+                                                child: SizedBox(
+                                                  width: 30,
+                                                  height: 30,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                        value:
+                                                            progress.progress,
+                                                      ),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                      imageBuilder:
+                                          (context, imageProvider, child) {
+                                            if (_height![index] == 0 ||
+                                                _height![index] == 300) {
+                                              Future.delayed(
+                                                const Duration(
+                                                  milliseconds: 50,
+                                                ),
+                                              ).then((value) {
+                                                try {
+                                                  final RenderBox renderBoxRed =
+                                                      _keys![index]
+                                                              .currentContext!
+                                                              .findRenderObject()!
+                                                          as RenderBox;
+                                                  final sizeRender =
+                                                      renderBoxRed.size;
+                                                  if (sizeRender.height !=
+                                                      300) {
+                                                    _height![index] =
+                                                        width /
+                                                        sizeRender.aspectRatio;
+                                                  }
+                                                } catch (_) {}
+                                              });
+                                            }
+                                            return child;
+                                          },
+                                    ),
+                                  ),
+                                  FutureBuilder(
+                                    future: _calculateImageDimension(
+                                      snapshot.data!.$1,
+                                      snapshot.data!.$2,
+                                    ),
+                                    builder:
+                                        (
+                                          context,
+                                          AsyncSnapshot<Size> snapshot2,
+                                        ) {
+                                          if (!snapshot2.hasData)
+                                            return Container();
+
+                                          var brtx = e.rect[0];
+                                          var brty = e.rect[1];
+                                          var brbx = e.rect[2];
+                                          var brby = e.rect[3];
+
+                                          var w = snapshot2.data!.width;
+
+                                          var ratio = width / w;
+
+                                          return Positioned(
+                                            top: brty * ratio - 4,
+                                            left: brtx * ratio - 4,
+                                            child: SizedBox(
+                                              width: (brbx - brtx) * ratio + 8,
+                                              height: (brby - brty) * ratio + 8,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                    width: 3,
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                  ),
+                                ],
+                              ),
+                              ListTile(
+                                title: Text('${e.id} (${e.page + 1} Page)'),
+                                subtitle: Text('Score: ${e.matchScore}'),
                               ),
                             ],
                           ),
-                          ListTile(
-                            title: Text('${e.id} (${e.page + 1} Page)'),
-                            subtitle: Text('Score: ${e.matchScore}'),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                        );
+                      },
                 );
               },
             ),
@@ -265,21 +287,29 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
                     return MessageSearch.autocompleteTarget
                         .where((element) => element.$2.startsWith(ppattern))
                         .toList()
-                      ..addAll(MessageSearch.autocompleteTarget
-                          .where((element) =>
-                              !element.$2.startsWith(ppattern) &&
-                              element.$2.contains(ppattern))
-                          .toList());
+                      ..addAll(
+                        MessageSearch.autocompleteTarget
+                            .where(
+                              (element) =>
+                                  !element.$2.startsWith(ppattern) &&
+                                  element.$2.contains(ppattern),
+                            )
+                            .toList(),
+                      );
                   },
                   itemBuilder: (context, (String, String, int) suggestion) {
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(
-                          vertical: 0.0, horizontal: 16.0),
+                        vertical: 0.0,
+                        horizontal: 16.0,
+                      ),
                       title: Text(suggestion.$1),
                       trailing: Text(
                         '${suggestion.$3}회',
-                        style:
-                            const TextStyle(color: Colors.grey, fontSize: 10.0),
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 10.0,
+                        ),
                       ),
                       dense: true,
                     );
@@ -288,8 +318,9 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
                   onSelected: ((String, String, int) suggestion) {
                     text.text = suggestion.$1;
                     setState(() {});
-                    Future.delayed(const Duration(milliseconds: 100))
-                        .then((value) async {
+                    Future.delayed(const Duration(milliseconds: 100)).then((
+                      value,
+                    ) async {
                       _onModifiedText();
                     });
                   },
@@ -300,8 +331,9 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
                     return TextField(
                       controller: controller,
                       focusNode: focusNode,
-                      decoration:
-                          const InputDecoration.collapsed(hintText: '대사 입력'),
+                      decoration: const InputDecoration.collapsed(
+                        hintText: '대사 입력',
+                      ),
                       // autofocus: true,
                       onEditingComplete: _onModifiedText,
                     );
@@ -313,14 +345,17 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
                 color: Colors.grey,
                 onPressed: () async {
                   var search = await PlatformNavigator.navigateSlide<String>(
-                      context, const SearchMessageRankPage());
+                    context,
+                    const SearchMessageRankPage(),
+                  );
 
                   if (search == null || search == '') return;
 
                   text.text = search;
                   setState(() {});
-                  Future.delayed(const Duration(milliseconds: 100))
-                      .then((value) async {
+                  Future.delayed(const Duration(milliseconds: 100)).then((
+                    value,
+                  ) async {
                     _onModifiedText();
                   });
                 },
@@ -330,9 +365,10 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
                 color: Colors.grey,
                 onPressed: () async {
                   await showOkDialog(
-                      context,
-                      '대사를 검색해 작품을 찾아보세요! 현재 2023.09.30까지 업로드된 작품들을 지원됩니다.',
-                      '대사 검색기');
+                    context,
+                    '대사를 검색해 작품을 찾아보세요! 현재 2023.09.30까지 업로드된 작품들을 지원됩니다.',
+                    '대사 검색기',
+                  );
                 },
               ),
             ],
@@ -351,8 +387,10 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
   }
 
   _doSearch() async {
-    messages =
-        (await VioletServer.searchMessage(selected.toLowerCase(), text.text))!;
+    messages = (await VioletServer.searchMessage(
+      selected.toLowerCase(),
+      text.text,
+    ))!;
 
     evictImageUrls(_urls);
 
@@ -366,19 +404,25 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
   }
 
   Future<Size> _calculateImageDimension(
-      String url, Map<String, String> header) {
+    String url,
+    Map<String, String> header,
+  ) {
     Completer<Size> completer = Completer();
-    Image image =
-        Image(image: CachedNetworkImageProvider(url, headers: header));
-    image.image.resolve(const ImageConfiguration()).addListener(
-      ImageStreamListener(
-        (ImageInfo image, bool synchronousCall) {
-          var myImage = image.image;
-          Size size = Size(myImage.width.toDouble(), myImage.height.toDouble());
-          completer.complete(size);
-        },
-      ),
+    Image image = Image(
+      image: CachedNetworkImageProvider(url, headers: header),
     );
+    image.image
+        .resolve(const ImageConfiguration())
+        .addListener(
+          ImageStreamListener((ImageInfo image, bool synchronousCall) {
+            var myImage = image.image;
+            Size size = Size(
+              myImage.width.toDouble(),
+              myImage.height.toDouble(),
+            );
+            completer.complete(size);
+          }),
+        );
     return completer.future;
   }
 }

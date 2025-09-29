@@ -43,9 +43,7 @@ class LabGroupArticleListPage extends StatefulWidget {
 }
 
 class _GroupArticleListPageState extends State<LabGroupArticleListPage> {
-  final PageController _controller = PageController(
-    initialPage: 0,
-  );
+  final PageController _controller = PageController(initialPage: 0);
 
   static const _kDuration = Duration(milliseconds: 300);
   static const _kCurve = Curves.ease;
@@ -84,9 +82,9 @@ class _GroupArticleListPageState extends State<LabGroupArticleListPage> {
 
       //queryRaw += cc.map((e) => 'Id=${e.article()}').join(' OR ');
       queryRaw += 'Id IN (${cc.map((e) => e.article()).join(',')})';
-      QueryManager.query(queryRaw +
-              (!Settings.searchPure.value ? ' AND ExistOnHitomi=1' : ''))
-          .then((value) async {
+      QueryManager.query(
+        queryRaw + (!Settings.searchPure.value ? ' AND ExistOnHitomi=1' : ''),
+      ).then((value) async {
         var qr = <String, QueryResult>{};
         for (var element in value.results!) {
           qr[element.id().toString()] = element;
@@ -97,7 +95,8 @@ class _GroupArticleListPageState extends State<LabGroupArticleListPage> {
           if (qr[element.article()] == null) {
             // TODO: Handle query not found
             var headers = await ScriptManager.runHitomiGetHeaderContent(
-                element.article());
+              element.article(),
+            );
             var hh = await http.get(
               'https://ltn.gold-usergeneratedcontent.net/galleryblock/${element.article()}.html',
               headers: headers,
@@ -160,23 +159,25 @@ class _GroupArticleListPageState extends State<LabGroupArticleListPage> {
                         floating: true,
                         delegate: AnimatedOpacitySliver(
                           searchBar: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Stack(children: <Widget>[
-                                _filter(),
-                                _title(),
-                              ])),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
+                            child: Stack(
+                              children: <Widget>[_filter(), _title()],
+                            ),
+                          ),
                         ),
                       ),
-                      _cachedList!
+                      _cachedList!,
                     ],
                   ),
                 ),
               ),
               LabGroupArtistList(
-                  artists: widget.artists,
-                  name: widget.name,
-                  groupId: widget.groupId),
+                artists: widget.artists,
+                name: widget.name,
+                groupId: widget.groupId,
+              ),
             ],
           ),
           Positioned(
@@ -214,9 +215,7 @@ class _GroupArticleListPageState extends State<LabGroupArticleListPage> {
         child: Card(
           color: Palette.themeColor,
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(8.0),
-            ),
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
           ),
           elevation: !Settings.themeFlat.value ? 100 : 0,
           clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -227,38 +226,42 @@ class _GroupArticleListPageState extends State<LabGroupArticleListPage> {
               child: Stack(
                 alignment: Alignment.center,
                 children: <Widget>[
-                  Icon(
-                    MdiIcons.formatListText,
-                    color: Colors.grey,
-                  ),
+                  Icon(MdiIcons.formatListText, color: Colors.grey),
                 ],
               ),
             ),
             onTap: () async {
               Navigator.of(context)
-                  .push(PageRouteBuilder(
-                opaque: false,
-                transitionDuration: const Duration(milliseconds: 500),
-                transitionsBuilder: (BuildContext context,
-                    Animation<double> animation,
-                    Animation<double> secondaryAnimation,
-                    Widget wi) {
-                  return FadeTransition(opacity: animation, child: wi);
-                },
-                pageBuilder: (_, __, ___) => SearchType2(
-                  nowType: nowType,
-                ),
-              ))
+                  .push(
+                    PageRouteBuilder(
+                      opaque: false,
+                      transitionDuration: const Duration(milliseconds: 500),
+                      transitionsBuilder:
+                          (
+                            BuildContext context,
+                            Animation<double> animation,
+                            Animation<double> secondaryAnimation,
+                            Widget wi,
+                          ) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: wi,
+                            );
+                          },
+                      pageBuilder: (_, __, ___) =>
+                          SearchType2(nowType: nowType),
+                    ),
+                  )
                   .then((value) async {
-                if (value == null) return;
-                nowType = value;
-                await Future.delayed(const Duration(milliseconds: 50), () {
-                  _shouldRebuild = true;
-                  setState(() {
-                    _shouldRebuild = true;
+                    if (value == null) return;
+                    nowType = value;
+                    await Future.delayed(const Duration(milliseconds: 50), () {
+                      _shouldRebuild = true;
+                      setState(() {
+                        _shouldRebuild = true;
+                      });
+                    });
                   });
-                });
-              });
             },
             onLongPress: () {
               isFilterUsed = true;
@@ -267,9 +270,7 @@ class _GroupArticleListPageState extends State<LabGroupArticleListPage> {
                 context,
                 Provider<FilterController>.value(
                   value: _filterController,
-                  child: FilterPage(
-                    queryResult: queryResult,
-                  ),
+                  child: FilterPage(queryResult: queryResult),
                 ),
               ).then((value) async {
                 _applyFilter();
@@ -289,15 +290,18 @@ class _GroupArticleListPageState extends State<LabGroupArticleListPage> {
   Widget _title() {
     return Padding(
       padding: const EdgeInsets.only(top: 24, left: 12),
-      child: Text(widget.name,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      child: Text(
+        widget.name,
+        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
     );
   }
 
   ObjectKey key = ObjectKey(const Uuid().v4());
 
-  final FilterController _filterController =
-      FilterController(heroKey: 'searchtype2');
+  final FilterController _filterController = FilterController(
+    heroKey: 'searchtype2',
+  );
 
   bool isFilterUsed = false;
 
@@ -336,7 +340,6 @@ class _GroupArticleListPageState extends State<LabGroupArticleListPage> {
             succ = isOr;
           }
         }
-
         // If Multitag
         else if ((element.result[dbColumn] as String == split[1]) == isOr) {
           succ = isOr;
@@ -421,30 +424,32 @@ class _GroupArticleListPageState extends State<LabGroupArticleListPage> {
               mainAxisSpacing: 8,
               childAspectRatio: 3 / 4,
             ),
-            delegate: SliverChildListDelegate(filterResult.map((e) {
-              return Padding(
-                key: Key('group${widget.groupId}/$nowType/${e.id()}'),
-                padding: EdgeInsets.zero,
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: SizedBox(
-                    child: Provider<ArticleListItem>.value(
-                      value: ArticleListItem.fromArticleListItem(
-                        queryResult: e,
-                        showDetail: false,
-                        addBottomPadding: false,
-                        width: (windowWidth - 4.0) / mm,
-                        thumbnailTag: const Uuid().v4(),
-                        usableTabList: filterResult,
-                        // isCheckMode: checkMode,
-                        // isChecked: checked.contains(e.id()),
+            delegate: SliverChildListDelegate(
+              filterResult.map((e) {
+                return Padding(
+                  key: Key('group${widget.groupId}/$nowType/${e.id()}'),
+                  padding: EdgeInsets.zero,
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: SizedBox(
+                      child: Provider<ArticleListItem>.value(
+                        value: ArticleListItem.fromArticleListItem(
+                          queryResult: e,
+                          showDetail: false,
+                          addBottomPadding: false,
+                          width: (windowWidth - 4.0) / mm,
+                          thumbnailTag: const Uuid().v4(),
+                          usableTabList: filterResult,
+                          // isCheckMode: checkMode,
+                          // isChecked: checked.contains(e.id()),
+                        ),
+                        child: const ArticleListItemWidget(),
                       ),
-                      child: const ArticleListItemWidget(),
                     ),
                   ),
-                ),
-              );
-            }).toList()),
+                );
+              }).toList(),
+            ),
           ),
         );
 
@@ -455,33 +460,33 @@ class _GroupArticleListPageState extends State<LabGroupArticleListPage> {
           padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
           sliver: SliverList(
             key: key,
-            delegate: SliverChildListDelegate(filterResult.map((x) {
-              return Align(
-                key: Key('group${widget.groupId}/$nowType/${x.id()}'),
-                alignment: Alignment.center,
-                child: Provider<ArticleListItem>.value(
-                  value: ArticleListItem.fromArticleListItem(
-                    queryResult: x,
-                    showDetail: nowType >= 3,
-                    showUltra: nowType == 4,
-                    addBottomPadding: true,
-                    width: (windowWidth - 4.0),
-                    thumbnailTag: const Uuid().v4(),
-                    usableTabList: filterResult,
-                    // isCheckMode: checkMode,
-                    // isChecked: checked.contains(x.id()),
+            delegate: SliverChildListDelegate(
+              filterResult.map((x) {
+                return Align(
+                  key: Key('group${widget.groupId}/$nowType/${x.id()}'),
+                  alignment: Alignment.center,
+                  child: Provider<ArticleListItem>.value(
+                    value: ArticleListItem.fromArticleListItem(
+                      queryResult: x,
+                      showDetail: nowType >= 3,
+                      showUltra: nowType == 4,
+                      addBottomPadding: true,
+                      width: (windowWidth - 4.0),
+                      thumbnailTag: const Uuid().v4(),
+                      usableTabList: filterResult,
+                      // isCheckMode: checkMode,
+                      // isChecked: checked.contains(x.id()),
+                    ),
+                    child: const ArticleListItemWidget(),
                   ),
-                  child: const ArticleListItemWidget(),
-                ),
-              );
-            }).toList()),
+                );
+              }).toList(),
+            ),
           ),
         );
 
       default:
-        return const Center(
-          child: Text('Error :('),
-        );
+        return const Center(child: Text('Error :('));
     }
   }
 }

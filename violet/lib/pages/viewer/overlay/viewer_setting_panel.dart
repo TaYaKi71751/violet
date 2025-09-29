@@ -49,9 +49,10 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
           title: Row(
             children: [
               Text(
-                  '${locale.Translations.instance!.trans('timersetting')} '
-                  '(${Settings.timerTick.value.toStringAsFixed(1)}${locale.Translations.instance!.trans('second')})',
-                  style: const TextStyle(color: Colors.white)),
+                '${locale.Translations.instance!.trans('timersetting')} '
+                '(${Settings.timerTick.value.toStringAsFixed(1)}${locale.Translations.instance!.trans('second')})',
+                style: const TextStyle(color: Colors.white),
+              ),
               Expanded(
                 child: Align(
                   child: SliderTheme(
@@ -59,8 +60,9 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
                       activeTrackColor: Colors.blue,
                       inactiveTrackColor: Color(0xffd0d2d3),
                       trackHeight: 3,
-                      thumbShape:
-                          RoundSliderThumbShape(enabledThumbRadius: 6.0),
+                      thumbShape: RoundSliderThumbShape(
+                        enabledThumbRadius: 6.0,
+                      ),
                     ),
                     child: Slider(
                       value: Settings.timerTick.value,
@@ -103,8 +105,9 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
           value: Settings.scrollVertical.value,
           enabled: Settings.isHorizontal.value,
           onChanged: (value) async {
-            await Settings.scrollVertical
-                .setValue(!Settings.scrollVertical.value);
+            await Settings.scrollVertical.setValue(
+              !Settings.scrollVertical.value,
+            );
 
             c.viewScrollType.value = Settings.scrollVertical.value
                 ? ViewType.vertical
@@ -150,8 +153,9 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
           title: locale.Translations.instance!.trans('disableoverlaybuttons'),
           value: !Settings.disableOverlayButton.value,
           onChanged: (value) async {
-            await Settings.disableOverlayButton
-                .setValue(!Settings.disableOverlayButton.value);
+            await Settings.disableOverlayButton.setValue(
+              !Settings.disableOverlayButton.value,
+            );
 
             c.overlayButton.value = !Settings.disableOverlayButton.value;
 
@@ -163,8 +167,9 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
             value: Settings.moveToAppBarToBottom.value,
             title: locale.Translations.instance!.trans('movetoappbartobottom'),
             onChanged: (value) async {
-              await Settings.moveToAppBarToBottom
-                  .setValue(!Settings.moveToAppBarToBottom.value);
+              await Settings.moveToAppBarToBottom.setValue(
+                !Settings.moveToAppBarToBottom.value,
+              );
 
               c.appBarToBottom.value = Settings.moveToAppBarToBottom.value;
 
@@ -187,8 +192,9 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
           value: Settings.showPageNumberIndicator.value,
           title: locale.Translations.instance!.trans('showpagenumberindicator'),
           onChanged: (value) async {
-            await Settings.showPageNumberIndicator
-                .setValue(!Settings.showPageNumberIndicator.value);
+            await Settings.showPageNumberIndicator.setValue(
+              !Settings.showPageNumberIndicator.value,
+            );
 
             c.indicator.value = Settings.showPageNumberIndicator.value;
 
@@ -200,8 +206,9 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
             title: locale.Translations.instance!.trans('disablefullscreen'),
             value: !Settings.disableFullScreen.value,
             onChanged: (value) async {
-              await Settings.disableFullScreen
-                  .setValue(!Settings.disableFullScreen.value);
+              await Settings.disableFullScreen.setValue(
+                !Settings.disableFullScreen.value,
+              );
 
               c.fullscreen.value = Settings.disableFullScreen.value;
 
@@ -225,10 +232,7 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
             });
           },
           itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
-            const PopupMenuItem<int>(
-              value: 0,
-              child: Text('None'),
-            ),
+            const PopupMenuItem<int>(value: 0, child: Text('None')),
             PopupMenuItem<int>(
               value: 1,
               child: Text(locale.Translations.instance!.trans('high')),
@@ -253,7 +257,7 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
                 'None',
                 locale.Translations.instance!.trans('high'),
                 locale.Translations.instance!.trans('middle'),
-                locale.Translations.instance!.trans('low')
+                locale.Translations.instance!.trans('low'),
               ][imgqualityOption],
               style: const TextStyle(color: Colors.white),
             ),
@@ -293,7 +297,7 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
                 locale.Translations.instance!.trans('verylarge'),
                 locale.Translations.instance!.trans('large'),
                 locale.Translations.instance!.trans('middle'),
-                locale.Translations.instance!.trans('small')
+                locale.Translations.instance!.trans('small'),
               ][Settings.thumbSize.value],
               style: const TextStyle(color: Colors.white),
             ),
@@ -303,8 +307,9 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
           value: Settings.showRecordJumpMessage.value,
           title: locale.Translations.instance!.trans('showrecordjumpmessage'),
           onChanged: (value) async {
-            await Settings.showRecordJumpMessage
-                .setValue(!Settings.showRecordJumpMessage.value);
+            await Settings.showRecordJumpMessage.setValue(
+              !Settings.showRecordJumpMessage.value,
+            );
             setState(() {});
           },
         ),

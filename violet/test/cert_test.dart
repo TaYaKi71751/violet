@@ -17,19 +17,23 @@ void main() {
   test('Create Cert', () async {
     var pair = CertUtil.createRSAKeyPair();
 
-    var rootCA = RootCert(data: {
-      'PubKey': CertUtil.exportRSAPublicKey(pair.$1),
-      'AuthStarts': DateTime.now().toUtc().toString(),
-      'AuthEnds': DateTime.now()
-          .add(const Duration(days: 365 * 20 + 4))
-          .toUtc()
-          .toString(),
-      'AuthVersion': '1.0',
-      'Owner': 'koromo the violet project leader',
-    });
+    var rootCA = RootCert(
+      data: {
+        'PubKey': CertUtil.exportRSAPublicKey(pair.$1),
+        'AuthStarts': DateTime.now().toUtc().toString(),
+        'AuthEnds': DateTime.now()
+            .add(const Duration(days: 365 * 20 + 4))
+            .toUtc()
+            .toString(),
+        'AuthVersion': '1.0',
+        'Owner': 'koromo the violet project leader',
+      },
+    );
 
     var signedData = CertUtil.sign(
-        pair.$2, Uint8List.fromList(rootCA.getRawData().codeUnits));
+      pair.$2,
+      Uint8List.fromList(rootCA.getRawData().codeUnits),
+    );
 
     rootCA.data['SignedData'] = CertUtil.l8ToStr(signedData);
 
@@ -48,19 +52,23 @@ void main() {
     var priKey = pair.$2;
     var pubKey = pair.$1;
 
-    var testCert = CertData(data: {
-      'PubKey': CertUtil.exportRSAPublicKey(pubKey),
-      'AuthStarts': DateTime.now().toUtc().toString(),
-      'AuthEnds': DateTime.now()
-          .add(const Duration(days: 365 * 10 + 4))
-          .toUtc()
-          .toString(),
-      'AuthVersion': '1.0',
-      'Owner': 'test user',
-    });
+    var testCert = CertData(
+      data: {
+        'PubKey': CertUtil.exportRSAPublicKey(pubKey),
+        'AuthStarts': DateTime.now().toUtc().toString(),
+        'AuthEnds': DateTime.now()
+            .add(const Duration(days: 365 * 10 + 4))
+            .toUtc()
+            .toString(),
+        'AuthVersion': '1.0',
+        'Owner': 'test user',
+      },
+    );
 
     var testSignedData = CertUtil.sign(
-        priKey, Uint8List.fromList(testCert.getRawData().codeUnits));
+      priKey,
+      Uint8List.fromList(testCert.getRawData().codeUnits),
+    );
 
     testCert.data['SignedData'] = CertUtil.l8ToStr(testSignedData);
 

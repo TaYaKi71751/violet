@@ -69,8 +69,10 @@ class _ArtistSearchState extends State<ArtistSearch> {
 
     print(tagGroup);
 
-    similarsAll =
-        HentaiIndex.caclulateSimilarsManual(tagSrcs[selectedType]!, tagGroup);
+    similarsAll = HentaiIndex.caclulateSimilarsManual(
+      tagSrcs[selectedType]!,
+      tagGroup,
+    );
 
     setState(() {});
   }
@@ -90,20 +92,12 @@ class _ArtistSearchState extends State<ArtistSearch> {
       enableBackgroundColor: true,
       child: Column(
         children: [
-          Container(
-            height: 16,
-          ),
+          Container(height: 16),
           titleArea(),
-          Container(
-            padding: const EdgeInsets.all(2),
-          ),
+          Container(padding: const EdgeInsets.all(2)),
           tagGroupArea(),
-          Container(
-            padding: const EdgeInsets.all(2),
-          ),
-          Expanded(
-            child: artistListArea(),
-          ),
+          Container(padding: const EdgeInsets.all(2)),
+          Expanded(child: artistListArea()),
         ],
       ),
     );
@@ -113,8 +107,10 @@ class _ArtistSearchState extends State<ArtistSearch> {
     return const Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('Artist Search',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        Text(
+          'Artist Search',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
       ],
     );
   }
@@ -125,9 +121,7 @@ class _ArtistSearchState extends State<ArtistSearch> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: tagChart(),
-          ),
+          Expanded(child: tagChart()),
           typeSelector(),
         ],
       ),
@@ -138,7 +132,9 @@ class _ArtistSearchState extends State<ArtistSearch> {
     const axis1 = charts.AxisSpec<String>(
       renderSpec: charts.GridlineRendererSpec(
         labelStyle: charts.TextStyleSpec(
-            fontSize: 14, color: charts.MaterialPalette.white),
+          fontSize: 14,
+          color: charts.MaterialPalette.white,
+        ),
         lineStyle: charts.LineStyleSpec(
           color: charts.MaterialPalette.transparent,
         ),
@@ -197,7 +193,9 @@ class _ArtistSearchState extends State<ArtistSearch> {
       onTap: () {},
       onTapCancel: () async {
         final tags = await PlatformNavigator.navigateSlide<Map<String, int>>(
-            context, TagGroupModify(tagGroup: tagGroup));
+          context,
+          TagGroupModify(tagGroup: tagGroup),
+        );
 
         if (tags != null) {
           similarsAll = [];
@@ -217,8 +215,9 @@ class _ArtistSearchState extends State<ArtistSearch> {
   typeSelector() {
     final dropDown = DropdownButton<ArtistType>(
       value: selectedType,
-      items: ArtistType.values
-          .map<DropdownMenuItem<ArtistType>>((ArtistType value) {
+      items: ArtistType.values.map<DropdownMenuItem<ArtistType>>((
+        ArtistType value,
+      ) {
         return DropdownMenuItem<ArtistType>(
           value: value,
           child: Text(
@@ -253,19 +252,13 @@ class _ArtistSearchState extends State<ArtistSearch> {
         final e = similarsAll[index];
         return FutureBuilder<List<QueryResult>>(
           future: queryDedupedArtistArticles(selectedType, e.$1),
-          builder: (BuildContext context,
-              AsyncSnapshot<List<QueryResult>> snapshot) {
+          builder: (BuildContext context, AsyncSnapshot<List<QueryResult>> snapshot) {
             if (!snapshot.hasData) {
-              return Container(
-                height: 195,
-              );
+              return Container(height: 195);
             }
 
             return ThreeArticlePanel(
-              tappedRoute: () => ArtistInfoPage(
-                type: selectedType,
-                name: e.$1,
-              ),
+              tappedRoute: () => ArtistInfoPage(type: selectedType, name: e.$1),
               title:
                   ' ${e.$1} (${HentaiIndex.getArticleCount(selectedType.name, e.$1)})',
               count:

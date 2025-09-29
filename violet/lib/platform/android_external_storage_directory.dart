@@ -7,16 +7,18 @@ class AndroidExternalStorageDirectory {
 
   static const instance = AndroidExternalStorageDirectory._();
 
-  final _methodChannel =
-      const MethodChannel('xyz.project.violet/externalStorageDirectory');
+  final _methodChannel = const MethodChannel(
+    'xyz.project.violet/externalStorageDirectory',
+  );
 
   Future<String> getExternalStorageDirectory() async {
     if (!Platform.isAndroid) {
       throw UnsupportedError('Android only');
     }
 
-    final path = await _methodChannel
-        .invokeMethod<String>('getExternalStorageDirectory');
+    final path = await _methodChannel.invokeMethod<String>(
+      'getExternalStorageDirectory',
+    );
 
     return path!;
   }
@@ -26,8 +28,9 @@ class AndroidExternalStorageDirectory {
       throw UnsupportedError('Android only');
     }
 
-    final path = await _methodChannel
-        .invokeMethod<String>('getExternalStorageDownloadsDirectory');
+    final path = await _methodChannel.invokeMethod<String>(
+      'getExternalStorageDownloadsDirectory',
+    );
 
     return path!;
   }

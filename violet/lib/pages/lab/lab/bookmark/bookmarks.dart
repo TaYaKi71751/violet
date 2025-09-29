@@ -18,11 +18,7 @@ class LabBookmarkPage extends StatefulWidget {
   final String userAppId;
   final String? version;
 
-  const LabBookmarkPage({
-    super.key,
-    required this.userAppId,
-    this.version,
-  });
+  const LabBookmarkPage({super.key, required this.userAppId, this.version});
 
   @override
   State<LabBookmarkPage> createState() => _BookmarkPageState();
@@ -48,15 +44,11 @@ class _BookmarkPageState extends State<LabBookmarkPage> {
               ),
         builder: (context, AsyncSnapshot<dynamic> snapshot) {
           if (!snapshot.hasData) {
-            return const Center(
-              child: Text('Loading ...'),
-            );
+            return const Center(child: Text('Loading ...'));
           }
 
           if (snapshot.data == null) {
-            return const Center(
-              child: Text('Error Occured!'),
-            );
+            return const Center(child: Text('Error Occured!'));
           }
 
           articles = (snapshot.data['article'] as List<dynamic>)
@@ -73,13 +65,14 @@ class _BookmarkPageState extends State<LabBookmarkPage> {
           ScrollController scrollController = ScrollController();
 
           return ListView.builder(
-              padding: EdgeInsets.fromLTRB(4, statusBarHeight + 16, 4, 8),
-              physics: const BouncingScrollPhysics(),
-              controller: scrollController,
-              itemCount: groups.length + 1,
-              itemBuilder: (BuildContext ctxt, int index) {
-                return _buildItem(index, index == 0 ? null : groups[index - 1]);
-              });
+            padding: EdgeInsets.fromLTRB(4, statusBarHeight + 16, 4, 8),
+            physics: const BouncingScrollPhysics(),
+            controller: scrollController,
+            itemCount: groups.length + 1,
+            itemBuilder: (BuildContext ctxt, int index) {
+              return _buildItem(index, index == 0 ? null : groups[index - 1]);
+            },
+          );
         },
       ),
     );
@@ -117,10 +110,11 @@ class _BookmarkPageState extends State<LabBookmarkPage> {
         decoration: BoxDecoration(
           color: Settings.themeWhat.value ? Colors.black26 : Colors.white,
           borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(8),
-              topRight: Radius.circular(8),
-              bottomLeft: Radius.circular(8),
-              bottomRight: Radius.circular(8)),
+            topLeft: Radius.circular(8),
+            topRight: Radius.circular(8),
+            bottomLeft: Radius.circular(8),
+            bottomRight: Radius.circular(8),
+          ),
           boxShadow: [
             BoxShadow(
               color: Settings.themeWhat.value
@@ -137,27 +131,31 @@ class _BookmarkPageState extends State<LabBookmarkPage> {
           child: Material(
             color: Settings.themeWhat.value
                 ? Settings.themeBlack.value
-                    ? Palette.blackThemeBackground
-                    : Colors.black38
+                      ? Palette.blackThemeBackground
+                      : Colors.black38
                 : Colors.white,
             child: ListTile(
               onTap: () {
                 PlatformNavigator.navigateSlide(
-                    context,
-                    id == -1
-                        ? LabRecordViewPage(records: records)
-                        : LabGroupArticleListPage(
-                            articles: articles,
-                            artists: artists,
-                            groupId: id,
-                            name: name,
-                          ));
+                  context,
+                  id == -1
+                      ? LabRecordViewPage(records: records)
+                      : LabGroupArticleListPage(
+                          articles: articles,
+                          artists: artists,
+                          groupId: id,
+                          name: name,
+                        ),
+                );
               },
               onLongPress: () async {
                 if (index == -1) return;
 
                 var yn = await showYesNoDialog(
-                    context, '이 북마크 그룹을 끌어올까요?', 'Bookmark Spy');
+                  context,
+                  '이 북마크 그룹을 끌어올까요?',
+                  'Bookmark Spy',
+                );
                 if (yn) {
                   // 북마크 그룹 생성
                   var groupName =
@@ -165,10 +163,11 @@ class _BookmarkPageState extends State<LabBookmarkPage> {
 
                   var bookmark = await Bookmark.getInstance();
                   var gid = await bookmark.createGroup(
-                      groupName,
-                      data.description(),
-                      Colors.black,
-                      DateTime.parse(data.datetime()));
+                    groupName,
+                    data.description(),
+                    Colors.black,
+                    DateTime.parse(data.datetime()),
+                  );
 
                   var dir = await getApplicationDocumentsDirectory();
                   var dbraw = await openDatabase('${dir.path}/user.db');
@@ -178,13 +177,14 @@ class _BookmarkPageState extends State<LabBookmarkPage> {
                       if (article.group() != data.id()) continue;
                       var ref = article;
                       batch.insert(
-                          'BookmarkArticle',
-                          {
-                            'Article': ref.article(),
-                            'DateTime': ref.datetime(),
-                            'GroupId': gid,
-                          },
-                          conflictAlgorithm: ConflictAlgorithm.fail);
+                        'BookmarkArticle',
+                        {
+                          'Article': ref.article(),
+                          'DateTime': ref.datetime(),
+                          'GroupId': gid,
+                        },
+                        conflictAlgorithm: ConflictAlgorithm.fail,
+                      );
                     }
                     await batch.commit();
                   });
@@ -194,14 +194,15 @@ class _BookmarkPageState extends State<LabBookmarkPage> {
                       if (artist.group() != data.id()) continue;
                       var ref = artist;
                       batch.insert(
-                          'BookmarkArtist',
-                          {
-                            'Artist': ref.artist(),
-                            'IsGroup': ref.type(),
-                            'DateTime': ref.datetime(),
-                            'GroupId': gid,
-                          },
-                          conflictAlgorithm: ConflictAlgorithm.fail);
+                        'BookmarkArtist',
+                        {
+                          'Artist': ref.artist(),
+                          'IsGroup': ref.type(),
+                          'DateTime': ref.datetime(),
+                          'GroupId': gid,
+                        },
+                        conflictAlgorithm: ConflictAlgorithm.fail,
+                      );
                     }
                     await batch.commit();
                   });
@@ -209,7 +210,10 @@ class _BookmarkPageState extends State<LabBookmarkPage> {
 
                   if (!mounted) return;
                   await showOkDialog(
-                      context, '북마크 그룹을 성공적으로 끌어왔습니다!', 'Bookmark Spy');
+                    context,
+                    '북마크 그룹을 성공적으로 끌어왔습니다!',
+                    'Bookmark Spy',
+                  );
                 }
               },
               title: Text(name, style: const TextStyle(fontSize: 16.0)),

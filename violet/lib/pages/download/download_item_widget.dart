@@ -39,8 +39,8 @@ class DownloadListItem {
 }
 
 typedef DownloadListItemCallback = void Function(DownloadListItem);
-typedef DownloadListItemCallbackCallback = void Function(
-    DownloadListItemCallback);
+typedef DownloadListItemCallbackCallback =
+    void Function(DownloadListItemCallback);
 
 class DownloadItemWidget extends StatefulWidget {
   // final double width;
@@ -98,25 +98,29 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
   }
 
   _checkLastRead() {
-    User.getInstance().then((value) => value.getUserLog().then((value) async {
-          final x = value.where((e) =>
+    User.getInstance().then(
+      (value) => value.getUserLog().then((value) async {
+        final x = value.where(
+          (e) =>
               e.articleId() == widget.item.url() &&
               e.lastPage() != null &&
               e.lastPage()! > 1 &&
-              DateTime.parse(e.datetimeStart())
-                      .difference(DateTime.now())
-                      .inDays <
-                  31);
-          if (x.isEmpty) return;
-          _shouldReload = true;
+              DateTime.parse(
+                    e.datetimeStart(),
+                  ).difference(DateTime.now()).inDays <
+                  31,
+        );
+        if (x.isEmpty) return;
+        _shouldReload = true;
 
-          if (!disposed) {
-            setState(() {
-              isLastestRead = true;
-              latestReadPage = x.first.lastPage()!;
-            });
-          }
-        }));
+        if (!disposed) {
+          setState(() {
+            isLastestRead = true;
+            latestReadPage = x.first.lastPage()!;
+          });
+        }
+      }),
+    );
   }
 
   _styleCallback(DownloadListItem item) {
@@ -128,8 +132,8 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
     thisHeight = item.showDetail
         ? 130.0
         : item.addBottomPadding
-            ? 500.0
-            : item.width * 4 / 3;
+        ? 500.0
+        : item.width * 4 / 3;
 
     setState(() {});
   }
@@ -140,11 +144,12 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
       once = true;
 
       final routine = DownloadRoutine(
-          widget.item,
-          () => setState(() {}),
-          () => setState(() {
-                _shouldReload = true;
-              }));
+        widget.item,
+        () => setState(() {}),
+        () => setState(() {
+          _shouldReload = true;
+        }),
+      );
 
       if (!await routine.checkValidState()) {
         return;
@@ -171,8 +176,9 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
 
       await routine.extractFilePath();
 
-      final timer =
-          Timer.periodic(const Duration(milliseconds: 100), (Timer timer) {
+      final timer = Timer.periodic(const Duration(milliseconds: 100), (
+        Timer timer,
+      ) {
         setState(() {
           if (downloadSec / 1024 < 500.0) {
             downloadSpeed = '${(downloadSec / 1024).toStringAsFixed(1)} KB/S';
@@ -309,10 +315,7 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
         } else if (v == 2) {
           // Copy Url
           Clipboard.setData(ClipboardData(text: widget.item.url()));
-          showToast(
-            level: ToastLevel.check,
-            message: 'URL Copied!',
-          );
+          showToast(level: ToastLevel.check, message: 'URL Copied!');
         } else if (v == 1) {
           _retry();
         } else if (v == 3) {
@@ -321,8 +324,10 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
       },
       onTap: () async {
         if (widget.item.state() == 0 && widget.item.files() != null) {
-          await (await User.getInstance())
-              .insertUserLog(int.tryParse(widget.item.url()) ?? -1, 0);
+          await (await User.getInstance()).insertUserLog(
+            int.tryParse(widget.item.url()) ?? -1,
+            0,
+          );
 
           if (!context.mounted) return;
           Navigator.push(
@@ -331,13 +336,14 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
               fullscreenDialog: true,
               builder: (context) {
                 return Provider<ViewerPageProvider>.value(
-                    value: ViewerPageProvider(
-                      uris: widget.item.filesWithoutThumbnail(),
-                      useFileSystem: true,
-                      id: int.tryParse(widget.item.url()) ?? -1,
-                      title: widget.item.info()!,
-                    ),
-                    child: const ViewerPage());
+                  value: ViewerPageProvider(
+                    uris: widget.item.filesWithoutThumbnail(),
+                    useFileSystem: true,
+                    id: int.tryParse(widget.item.url()) ?? -1,
+                    title: widget.item.info()!,
+                  ),
+                  child: const ViewerPage(),
+                );
               },
             ),
           );
@@ -414,17 +420,17 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
       // margin: const EdgeInsets.only(bottom: 6),
       margin: style.addBottomPadding
           ? style.showDetail
-              ? const EdgeInsets.only(bottom: 6)
-              : const EdgeInsets.only(bottom: 50)
+                ? const EdgeInsets.only(bottom: 6)
+                : const EdgeInsets.only(bottom: 50)
           : EdgeInsets.zero,
       decoration: !Settings.themeFlat.value
           ? BoxDecoration(
               color: style.showDetail
                   ? Settings.themeWhat.value
-                      ? Settings.themeBlack.value
-                          ? Palette.blackThemeBackground
-                          : Colors.grey.shade800
-                      : Colors.white70
+                        ? Settings.themeBlack.value
+                              ? Palette.blackThemeBackground
+                              : Colors.grey.shade800
+                        : Colors.white70
                   : Colors.grey.withOpacity(0.3),
               borderRadius: const BorderRadius.all(Radius.circular(5)),
               boxShadow: [
@@ -442,15 +448,13 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
       color: !Settings.themeFlat.value || !style.showDetail
           ? null
           : Settings.themeWhat.value
-              ? Colors.black26
-              : Colors.white,
+          ? Colors.black26
+          : Colors.white,
       child: style.showDetail
           ? Row(
               children: <Widget>[
                 buildThumbnail(),
-                Expanded(
-                  child: buildDetail(),
-                ),
+                Expanded(child: buildDetail()),
               ],
             )
           : buildThumbnail(),
@@ -470,13 +474,15 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
 
     if (_cachedThumbnail == null || _shouldReload) {
       _shouldReload = false;
-      _cachedThumbnail = widget.item.state() == 0 &&
+      _cachedThumbnail =
+          widget.item.state() == 0 &&
               widget.item.rawFiles().isNotEmpty &&
               File(widget.item.rawFiles().first).existsSync()
           ? _FileThumbnailWidget(
               showDetail: style.showDetail,
               thumbnailPath: widget.item.rawFiles().first,
-              thumbnailTag: (widget.item.thumbnail() ?? '') +
+              thumbnailTag:
+                  (widget.item.thumbnail() ?? '') +
                   widget.item.dateTime().toString(),
               usingRawImage: true,
               height: height,
@@ -485,7 +491,8 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
               showDetail: style.showDetail,
               id: int.tryParse(widget.item.url()) ?? -1,
               thumbnail: widget.item.thumbnail(),
-              thumbnailTag: (widget.item.thumbnail() ?? '') +
+              thumbnailTag:
+                  (widget.item.thumbnail() ?? '') +
                   widget.item.dateTime().toString(),
               thumbnailHeader: widget.item.thumbnailHeader(),
             );
@@ -494,7 +501,8 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
     return Visibility(
       visible: widget.item.thumbnail() != null,
       child: Container(
-        foregroundDecoration: isLastestRead &&
+        foregroundDecoration:
+            isLastestRead &&
                 length > 0 &&
                 length - latestReadPage <= 2 &&
                 Settings.showArticleProgress.value
@@ -505,19 +513,21 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
                 backgroundBlendMode: BlendMode.saturation,
               )
             : null,
-        child: Stack(children: [
-          _cachedThumbnail!,
-          ReadProgressOverlayWidget(
-            imageCount: widget.item.filesWithoutThumbnail().length,
-            latestReadPage: latestReadPage,
-            isLastestRead: isLastestRead,
-            greyScale: false,
-          ),
-          PagesOverlayWidget(
-            imageCount: widget.item.filesWithoutThumbnail().length,
-            showDetail: style.showDetail,
-          ),
-        ]),
+        child: Stack(
+          children: [
+            _cachedThumbnail!,
+            ReadProgressOverlayWidget(
+              imageCount: widget.item.filesWithoutThumbnail().length,
+              latestReadPage: latestReadPage,
+              isLastestRead: isLastestRead,
+              greyScale: false,
+            ),
+            PagesOverlayWidget(
+              imageCount: widget.item.filesWithoutThumbnail().length,
+              showDetail: style.showDetail,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -601,34 +611,40 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Text('${Translations.instance!.trans('dinfo')}: $title',
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style:
-                  const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-          Container(
-            height: 2,
+          Text(
+            '${Translations.instance!.trans('dinfo')}: $title',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
           ),
-          Text('${Translations.instance!.trans('state')}: $state',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                  fontSize: 15, color: statecolor, fontWeight: statebold)),
-          Container(
-            height: 2,
+          Container(height: 2),
+          Text(
+            '${Translations.instance!.trans('state')}: $state',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 15,
+              color: statecolor,
+              fontWeight: statebold,
+            ),
           ),
+          Container(height: 2),
           widget.item.state() != 3
-              ? Text(pp,
+              ? Text(
+                  pp,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 15))
+                  style: const TextStyle(fontSize: 15),
+                )
               : Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(pp,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 15)),
+                    Text(
+                      pp,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 15),
+                    ),
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.only(right: 16),
@@ -647,12 +663,14 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Row(children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 4),
-                      child: Container(),
-                    ),
-                  ]),
+                  Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 4),
+                        child: Container(),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -722,35 +740,38 @@ class _ThumbnailWidget extends StatelessWidget {
     } else {
       return FutureBuilder(
         future: HitomiManager.getImageList(id.toString()).then((value) async {
-          var header =
-              await ScriptManager.runHitomiGetHeaderContent(id.toString());
+          var header = await ScriptManager.runHitomiGetHeaderContent(
+            id.toString(),
+          );
           return (value.urls[0], header);
         }),
         builder:
             (context, AsyncSnapshot<(String, Map<String, String>)> snapshot) {
-          if (!snapshot.hasData || snapshot.data == null) {
-            return _getLoadingAnimation();
-          }
-
-          return Hero(
-            tag: thumbnailTag!,
-            child: CachedNetworkImage(
-              imageUrl: snapshot.data!.$1,
-              fit: BoxFit.cover,
-              httpHeaders: snapshot.data!.$2,
-              imageBuilder: (context, imageProvider) => Container(
-                decoration: BoxDecoration(
-                  image:
-                      DecorationImage(image: imageProvider, fit: BoxFit.cover),
-                ),
-                child: Container(),
-              ),
-              placeholder: (b, c) {
+              if (!snapshot.hasData || snapshot.data == null) {
                 return _getLoadingAnimation();
-              },
-            ),
-          );
-        },
+              }
+
+              return Hero(
+                tag: thumbnailTag!,
+                child: CachedNetworkImage(
+                  imageUrl: snapshot.data!.$1,
+                  fit: BoxFit.cover,
+                  httpHeaders: snapshot.data!.$2,
+                  imageBuilder: (context, imageProvider) => Container(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: imageProvider,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    child: Container(),
+                  ),
+                  placeholder: (b, c) {
+                    return _getLoadingAnimation();
+                  },
+                ),
+              );
+            },
       );
     }
   }
@@ -821,7 +842,9 @@ class _FileThumbnailWidget extends StatelessWidget {
           return Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                  image: state.imageProvider, fit: BoxFit.cover),
+                image: state.imageProvider,
+                fit: BoxFit.cover,
+              ),
             ),
             child: Container(),
           );

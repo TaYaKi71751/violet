@@ -52,10 +52,7 @@ class _TagGroupModifyState extends State<TagGroupModify> {
                 () => ListView.builder(
                   itemCount: c.items.length,
                   itemBuilder: (context, index) {
-                    return _TagGroupItem(
-                      getxId: getxId,
-                      index: index,
-                    );
+                    return _TagGroupItem(getxId: getxId, index: index);
                   },
                 ),
               ),
@@ -74,7 +71,8 @@ class _TagGroupModifyState extends State<TagGroupModify> {
         Expanded(
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-                backgroundColor: Settings.majorColor.value),
+              backgroundColor: Settings.majorColor.value,
+            ),
             child: const Text('Add'),
             onPressed: () => showAddTagDialog(context),
           ),
@@ -83,7 +81,8 @@ class _TagGroupModifyState extends State<TagGroupModify> {
         Expanded(
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-                backgroundColor: Settings.majorColor.value),
+              backgroundColor: Settings.majorColor.value,
+            ),
             child: const Text('Remove All'),
             onPressed: () => c.removeAll(),
           ),
@@ -92,7 +91,8 @@ class _TagGroupModifyState extends State<TagGroupModify> {
         Expanded(
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-                backgroundColor: Settings.majorColor.value),
+              backgroundColor: Settings.majorColor.value,
+            ),
             child: const Text('Apply'),
             onPressed: () => apply(context),
           ),
@@ -114,17 +114,17 @@ class _TagGroupModifyState extends State<TagGroupModify> {
   showAddTagDialog(BuildContext context) async {
     final vv = await showDialog(
       context: context,
-      builder: (BuildContext context) => const TagSelectorDialog(
-        what: 'addtag',
-        onlyFMT: true,
-      ),
+      builder: (BuildContext context) =>
+          const TagSelectorDialog(what: 'addtag', onlyFMT: true),
     );
 
     if (vv != null && vv.$1 == 1) {
-      c.addItems((vv.$2 as String)
-          .split(' ')
-          .where((element) => element.trim().isNotEmpty)
-          .toList());
+      c.addItems(
+        (vv.$2 as String)
+            .split(' ')
+            .where((element) => element.trim().isNotEmpty)
+            .toList(),
+      );
     }
   }
 }
@@ -155,7 +155,9 @@ class _TagGroupItem extends StatelessWidget {
   }
 
   showCountModifyDialog(
-      BuildContext context, MapEntry<String, int> item) async {
+    BuildContext context,
+    MapEntry<String, int> item,
+  ) async {
     final countController = TextEditingController(text: item.value.toString());
 
     Widget okButton = TextButton(
@@ -191,7 +193,7 @@ class _TagGroupItem extends StatelessWidget {
                     controller: countController,
                     keyboardType: TextInputType.number,
                     inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly
+                      FilteringTextInputFormatter.digitsOnly,
                     ], // Only numbers can be entered
                   ),
                 ),

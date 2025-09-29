@@ -50,8 +50,8 @@ class ScrollablePositionedList extends StatefulWidget {
     this.addAutomaticKeepAlives = true,
     this.addRepaintBoundaries = true,
     this.minCacheExtent,
-  })  : itemPositionsNotifier = itemPositionsListener as ItemPositionsNotifier?,
-        separatorBuilder = null;
+  }) : itemPositionsNotifier = itemPositionsListener as ItemPositionsNotifier?,
+       separatorBuilder = null;
 
   /// Create a [ScrollablePositionedList] whose items are provided by
   /// [itemBuilder] and separators provided by [separatorBuilder].
@@ -74,8 +74,8 @@ class ScrollablePositionedList extends StatefulWidget {
     this.addAutomaticKeepAlives = true,
     this.addRepaintBoundaries = true,
     this.minCacheExtent,
-  })  : assert(separatorBuilder != null),
-        itemPositionsNotifier = itemPositionsListener as ItemPositionsNotifier?;
+  }) : assert(separatorBuilder != null),
+       itemPositionsNotifier = itemPositionsListener as ItemPositionsNotifier?;
 
   /// Number of items the [itemBuilder] can produce.
   final int itemCount;
@@ -285,10 +285,12 @@ class _ScrollablePositionedListState extends State<ScrollablePositionedList>
 
   @override
   void dispose() {
-    primary.itemPositionsNotifier.itemPositions
-        .removeListener(_updatePositions);
-    secondary.itemPositionsNotifier.itemPositions
-        .removeListener(_updatePositions);
+    primary.itemPositionsNotifier.itemPositions.removeListener(
+      _updatePositions,
+    );
+    secondary.itemPositionsNotifier.itemPositions.removeListener(
+      _updatePositions,
+    );
     super.dispose();
   }
 
@@ -395,9 +397,9 @@ class _ScrollablePositionedListState extends State<ScrollablePositionedList>
   }
 
   double _cacheExtent(BoxConstraints constraints) => max(
-        constraints.maxHeight * _screenScrollCount,
-        widget.minCacheExtent ?? 0,
-      );
+    constraints.maxHeight * _screenScrollCount,
+    widget.minCacheExtent ?? 0,
+  );
 
   void _jumpTo({required int index, required double alignment}) {
     _stopScroll(canceled: true);
@@ -453,19 +455,23 @@ class _ScrollablePositionedListState extends State<ScrollablePositionedList>
     final direction = index > primary.target ? 1 : -1;
     final itemPosition = primary.itemPositionsNotifier.itemPositions.value
         .firstWhereOrNull(
-            (ItemPosition itemPosition) => itemPosition.index == index);
+          (ItemPosition itemPosition) => itemPosition.index == index,
+        );
     if (itemPosition != null) {
       // Scroll directly.
-      final localScrollAmount = itemPosition.itemLeadingEdge *
+      final localScrollAmount =
+          itemPosition.itemLeadingEdge *
           primary.scrollController.position.viewportDimension;
       await primary.scrollController.animateTo(
-          primary.scrollController.offset +
-              localScrollAmount -
-              alignment * primary.scrollController.position.viewportDimension,
-          duration: duration,
-          curve: curve);
+        primary.scrollController.offset +
+            localScrollAmount -
+            alignment * primary.scrollController.position.viewportDimension,
+        duration: duration,
+        curve: curve,
+      );
     } else {
-      final scrollAmount = _screenScrollCount *
+      final scrollAmount =
+          _screenScrollCount *
           primary.scrollController.position.viewportDimension;
       final startCompleter = Completer<void>();
       final endCompleter = Completer<void>();
@@ -474,19 +480,30 @@ class _ScrollablePositionedListState extends State<ScrollablePositionedList>
           startAnimationCallback = () {};
 
           opacity.parent = _opacityAnimation(opacityAnimationWeights).animate(
-              AnimationController(vsync: this, duration: duration)..forward());
-          secondary.scrollController.jumpTo(-direction *
-              (_screenScrollCount *
-                      primary.scrollController.position.viewportDimension -
-                  alignment *
-                      secondary.scrollController.position.viewportDimension));
+            AnimationController(vsync: this, duration: duration)..forward(),
+          );
+          secondary.scrollController.jumpTo(
+            -direction *
+                (_screenScrollCount *
+                        primary.scrollController.position.viewportDimension -
+                    alignment *
+                        secondary.scrollController.position.viewportDimension),
+          );
 
-          startCompleter.complete(primary.scrollController.animateTo(
+          startCompleter.complete(
+            primary.scrollController.animateTo(
               primary.scrollController.offset + direction * scrollAmount,
               duration: duration,
-              curve: curve));
-          endCompleter.complete(secondary.scrollController
-              .animateTo(0, duration: duration, curve: curve));
+              curve: curve,
+            ),
+          );
+          endCompleter.complete(
+            secondary.scrollController.animateTo(
+              0,
+              duration: duration,
+              curve: curve,
+            ),
+          );
         });
       };
       setState(() {
@@ -533,28 +550,34 @@ class _ScrollablePositionedListState extends State<ScrollablePositionedList>
     const endOpacity = 1.0;
     return TweenSequence<double>(<TweenSequenceItem<double>>[
       TweenSequenceItem<double>(
-          tween: ConstantTween<double>(startOpacity),
-          weight: opacityAnimationWeights[0]),
+        tween: ConstantTween<double>(startOpacity),
+        weight: opacityAnimationWeights[0],
+      ),
       TweenSequenceItem<double>(
-          tween: Tween<double>(begin: startOpacity, end: endOpacity),
-          weight: opacityAnimationWeights[1]),
+        tween: Tween<double>(begin: startOpacity, end: endOpacity),
+        weight: opacityAnimationWeights[1],
+      ),
       TweenSequenceItem<double>(
-          tween: ConstantTween<double>(endOpacity),
-          weight: opacityAnimationWeights[2]),
+        tween: ConstantTween<double>(endOpacity),
+        weight: opacityAnimationWeights[2],
+      ),
     ]);
   }
 
   void _updatePositions() {
     final itemPositions = primary.itemPositionsNotifier.itemPositions.value
-        .where((ItemPosition position) =>
-            position.itemLeadingEdge < 1 && position.itemTrailingEdge > 0);
+        .where(
+          (ItemPosition position) =>
+              position.itemLeadingEdge < 1 && position.itemTrailingEdge > 0,
+        );
     if (itemPositions.isNotEmpty) {
       PageStorage.of(context).writeState(
-          context,
-          itemPositions.reduce((value, element) =>
-              value.itemLeadingEdge < element.itemLeadingEdge
-                  ? value
-                  : element));
+        context,
+        itemPositions.reduce(
+          (value, element) =>
+              value.itemLeadingEdge < element.itemLeadingEdge ? value : element,
+        ),
+      );
     }
     widget.itemPositionsNotifier?.itemPositions.value = itemPositions;
   }

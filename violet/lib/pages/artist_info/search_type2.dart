@@ -11,11 +11,11 @@ class SearchType2 extends StatelessWidget {
   Color getColor(int i) {
     return Settings.themeWhat.value
         ? nowType == i
-            ? Colors.grey.shade200
-            : Colors.grey.shade400
+              ? Colors.grey.shade200
+              : Colors.grey.shade400
         : nowType == i
-            ? Colors.grey.shade900
-            : Colors.grey.shade400;
+        ? Colors.grey.shade900
+        : Colors.grey.shade400;
   }
 
   final int nowType;
@@ -56,23 +56,29 @@ class SearchType2 extends StatelessWidget {
                       children: <Widget>[
                         ListTile(
                           leading: Icon(Icons.grid_on, color: getColor(0)),
-                          title: Text(Translations.instance!.trans('srt0'),
-                              style: TextStyle(color: getColor(0))),
+                          title: Text(
+                            Translations.instance!.trans('srt0'),
+                            style: TextStyle(color: getColor(0)),
+                          ),
                           onTap: () async {
                             Navigator.pop(context, 0);
                           },
                         ),
                         ListTile(
                           leading: Icon(MdiIcons.gridLarge, color: getColor(1)),
-                          title: Text(Translations.instance!.trans('srt1'),
-                              style: TextStyle(color: getColor(1))),
+                          title: Text(
+                            Translations.instance!.trans('srt1'),
+                            style: TextStyle(color: getColor(1)),
+                          ),
                           onTap: () async {
                             Navigator.pop(context, 1);
                           },
                         ),
                         ListTile(
-                          leading: Icon(MdiIcons.viewAgendaOutline,
-                              color: getColor(2)),
+                          leading: Icon(
+                            MdiIcons.viewAgendaOutline,
+                            color: getColor(2),
+                          ),
                           title: Text(
                             Translations.instance!.trans('srt2'),
                             style: TextStyle(color: getColor(2)),
@@ -82,8 +88,10 @@ class SearchType2 extends StatelessWidget {
                           },
                         ),
                         ListTile(
-                          leading:
-                              Icon(MdiIcons.formatListText, color: getColor(3)),
+                          leading: Icon(
+                            MdiIcons.formatListText,
+                            color: getColor(3),
+                          ),
                           title: Text(
                             Translations.instance!.trans('srt3'),
                             style: TextStyle(color: getColor(3)),
@@ -94,9 +102,12 @@ class SearchType2 extends StatelessWidget {
                         ),
                         ListTile(
                           leading: Transform.scale(
-                              scaleX: -1,
-                              child: Icon(MdiIcons.viewSplitVertical,
-                                  color: getColor(4))),
+                            scaleX: -1,
+                            child: Icon(
+                              MdiIcons.viewSplitVertical,
+                              color: getColor(4),
+                            ),
+                          ),
                           title: Text(
                             Translations.instance!.trans('srt4'),
                             style: TextStyle(color: getColor(4)),
@@ -105,9 +116,7 @@ class SearchType2 extends StatelessWidget {
                             Navigator.pop(context, 4);
                           },
                         ),
-                        Expanded(
-                          child: Container(),
-                        )
+                        Expanded(child: Container()),
                       ],
                     ),
                   ),

@@ -26,10 +26,12 @@ class _LabSearchCommentsAuthorState extends State<LabSearchCommentsAuthor> {
     super.initState();
 
     Future.delayed(const Duration(milliseconds: 100)).then((value) async {
-      var tcomments = (await VioletServer.searchCommentAuthor(widget.author))
-          as List<dynamic>;
-      comments =
-          tcomments.map((e) => e as (int, DateTime, String, String)).toList();
+      var tcomments =
+          (await VioletServer.searchCommentAuthor(widget.author))
+              as List<dynamic>;
+      comments = tcomments
+          .map((e) => e as (int, DateTime, String, String))
+          .toList();
       setState(() {});
     });
   }
@@ -59,8 +61,9 @@ class _LabSearchCommentsAuthorState extends State<LabSearchCommentsAuthor> {
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Text(
-                          DateFormat('yyyy-MM-dd HH:mm').format(e.$2.toLocal()),
-                          style: const TextStyle(fontSize: 12)),
+                        DateFormat('yyyy-MM-dd HH:mm').format(e.$2.toLocal()),
+                        style: const TextStyle(fontSize: 12),
+                      ),
                     ),
                   ),
                 ],

@@ -70,25 +70,19 @@ class _ImportFromEHPageState extends State<ImportFromEHPage> {
                     // ),
                     child: Stack(
                       children: [
-                        Center(
-                          child: CircularProgressIndicator(),
-                        ),
+                        Center(child: CircularProgressIndicator()),
                         Align(
                           alignment: Alignment.bottomCenter,
                           child: Padding(
                             padding: EdgeInsets.only(bottom: 33),
-                            child: Text(
-                              '가져오는 중',
-                            ),
+                            child: Text('가져오는 중'),
                           ),
                         ),
                         Align(
                           alignment: Alignment.bottomCenter,
                           child: Padding(
                             padding: EdgeInsets.only(bottom: 15),
-                            child: Text(
-                              '잠시만 기다려주세요...',
-                            ),
+                            child: Text('잠시만 기다려주세요...'),
                           ),
                         ),
                       ],

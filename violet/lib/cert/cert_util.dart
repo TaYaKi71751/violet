@@ -11,12 +11,20 @@ import 'package:pointycastle/export.dart';
 class CertUtil {
   static (RSAPublicKey, RSAPrivateKey) createRSAKeyPair() {
     final secureRandom = SecureRandom('Fortuna')
-      ..seed(KeyParameter(Uint8List.fromList(
-          List.generate(32, (index) => Random().nextInt(256)))));
+      ..seed(
+        KeyParameter(
+          Uint8List.fromList(
+            List.generate(32, (index) => Random().nextInt(256)),
+          ),
+        ),
+      );
     final keyGen = RSAKeyGenerator()
-      ..init(ParametersWithRandom(
+      ..init(
+        ParametersWithRandom(
           RSAKeyGeneratorParameters(BigInt.parse('65537'), 2048, 64),
-          secureRandom));
+          secureRandom,
+        ),
+      );
     final pair = keyGen.generateKeyPair();
 
     return (pair.publicKey as RSAPublicKey, pair.privateKey as RSAPrivateKey);
@@ -25,18 +33,25 @@ class CertUtil {
   static Uint8List sign(RSAPrivateKey privateKey, Uint8List dataToSign) {
     final signer = RSASigner(SHA256Digest(), '0609608648016503040201');
     signer.init(
-        true, PrivateKeyParameter<RSAPrivateKey>(privateKey)); // true=sign
+      true,
+      PrivateKeyParameter<RSAPrivateKey>(privateKey),
+    ); // true=sign
     final sig = signer.generateSignature(dataToSign);
     return sig.bytes;
   }
 
   static bool verify(
-      RSAPublicKey publicKey, Uint8List signedData, Uint8List signature) {
+    RSAPublicKey publicKey,
+    Uint8List signedData,
+    Uint8List signature,
+  ) {
     final sig = RSASignature(signature);
     final verifier = RSASigner(SHA256Digest(), '0609608648016503040201');
 
     verifier.init(
-        false, PublicKeyParameter<RSAPublicKey>(publicKey)); // false=verify
+      false,
+      PublicKeyParameter<RSAPublicKey>(publicKey),
+    ); // false=verify
 
     try {
       return verifier.verifySignature(signedData, sig);
@@ -52,10 +67,14 @@ class CertUtil {
   static String l8ToStr(Uint8List value) => base64.encode(value);
 
   static String exportRSAPublicKey(RSAPublicKey publicKey) {
-    return utf8.fuse(base64).encode(jsonEncode({
-          'exponent': publicKey.exponent.toString(),
-          'modulus': publicKey.modulus.toString(),
-        }));
+    return utf8
+        .fuse(base64)
+        .encode(
+          jsonEncode({
+            'exponent': publicKey.exponent.toString(),
+            'modulus': publicKey.modulus.toString(),
+          }),
+        );
   }
 
   static RSAPublicKey importRSAPublicKey(String key) {
@@ -68,12 +87,16 @@ class CertUtil {
   }
 
   static String exportRSAPrivateKey(RSAPrivateKey privateKey) {
-    return utf8.fuse(base64).encode(jsonEncode({
-          'p': privateKey.p.toString(),
-          'q': privateKey.q.toString(),
-          'exponent': privateKey.privateExponent.toString(),
-          'modulus': privateKey.modulus.toString(),
-        }));
+    return utf8
+        .fuse(base64)
+        .encode(
+          jsonEncode({
+            'p': privateKey.p.toString(),
+            'q': privateKey.q.toString(),
+            'exponent': privateKey.privateExponent.toString(),
+            'modulus': privateKey.modulus.toString(),
+          }),
+        );
   }
 
   static RSAPrivateKey importRSAPrivateKey(String key) {

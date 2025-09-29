@@ -76,8 +76,9 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
   Map<int, DownloadItemModel> itemsMap = <int, DownloadItemModel>{};
   List<DownloadItemModel> filterResult = [];
   Map<int, QueryResult> queryResults = <int, QueryResult>{};
-  final FilterController _filterController =
-      FilterController(heroKey: 'downloadtype');
+  final FilterController _filterController = FilterController(
+    heroKey: 'downloadtype',
+  );
   ObjectKey _listKey = ObjectKey(const Uuid().v4());
 
   @override
@@ -189,8 +190,9 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
       for (final element in articles) {
         if (qr[element] == null) {
           await catchUnwind(() async {
-            final headers =
-                await ScriptManager.runHitomiGetHeaderContent('$element');
+            final headers = await ScriptManager.runHitomiGetHeaderContent(
+              '$element',
+            );
             final res = await http.get(
               'https://ltn.gold-usergeneratedcontent.net/galleryblock/$element.html',
               headers: headers,
@@ -244,11 +246,7 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
                   floating: true,
                   delegate: AnimatedOpacitySliver(
                     searchBar: Stack(
-                      children: <Widget>[
-                        _urlBar(),
-                        _features(),
-                        _align(),
-                      ],
+                      children: <Widget>[_urlBar(), _features(), _align()],
                     ),
                   ),
                 ),
@@ -305,44 +303,46 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
 
       var mm = Settings.downloadResultType.value.isThreeGrid ? 3 : 2;
       return SliverPadding(
-          padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
-          sliver: SliverGrid(
-            key: _listKey,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: Settings.useTabletMode.value ? mm * 2 : mm,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
-              childAspectRatio: 3 / 4,
-            ),
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                var e = filterResult[filterResult.length - index - 1];
-                if (!downloadItemWidgetKeys1
-                    .containsKey(filterResult[index].id())) {
-                  downloadItemWidgetKeys1[filterResult[index].id()] =
-                      GlobalKey<DownloadItemWidgetState>();
-                }
-                return DebounceWidget(
-                  child: Align(
-                    key: Key('dp${e.id()}${e.url()}'),
-                    alignment: Alignment.bottomCenter,
-                    child: DownloadItemWidget(
-                      key: downloadItemWidgetKeys1[filterResult[index].id()],
-                      initialStyle: DownloadListItem(
-                        showDetail: false,
-                        addBottomPadding: false,
-                        width: (windowWidth - 4.0) / mm,
-                      ),
-                      item: e,
-                      download: e.download,
-                      refeshCallback: refresh,
-                    ),
+        padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
+        sliver: SliverGrid(
+          key: _listKey,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: Settings.useTabletMode.value ? mm * 2 : mm,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+            childAspectRatio: 3 / 4,
+          ),
+          delegate: SliverChildBuilderDelegate((
+            BuildContext context,
+            int index,
+          ) {
+            var e = filterResult[filterResult.length - index - 1];
+            if (!downloadItemWidgetKeys1.containsKey(
+              filterResult[index].id(),
+            )) {
+              downloadItemWidgetKeys1[filterResult[index].id()] =
+                  GlobalKey<DownloadItemWidgetState>();
+            }
+            return DebounceWidget(
+              child: Align(
+                key: Key('dp${e.id()}${e.url()}'),
+                alignment: Alignment.bottomCenter,
+                child: DownloadItemWidget(
+                  key: downloadItemWidgetKeys1[filterResult[index].id()],
+                  initialStyle: DownloadListItem(
+                    showDetail: false,
+                    addBottomPadding: false,
+                    width: (windowWidth - 4.0) / mm,
                   ),
-                );
-              },
-              childCount: filterResult.length,
-            ),
-          ));
+                  item: e,
+                  download: e.download,
+                  refeshCallback: refresh,
+                ),
+              ),
+            );
+          }, childCount: filterResult.length),
+        ),
+      );
     } else {
       if (Settings.useTabletMode.value ||
           MediaQuery.of(context).orientation == Orientation.landscape) {
@@ -363,8 +363,9 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
             ),
             itemBuilder: (context, index, animation) {
               var e = filterResult[filterResult.length - index - 1];
-              if (!downloadItemWidgetKeys2
-                  .containsKey(filterResult[index].id())) {
+              if (!downloadItemWidgetKeys2.containsKey(
+                filterResult[index].id(),
+              )) {
                 downloadItemWidgetKeys2[filterResult[index].id()] =
                     GlobalKey<DownloadItemWidgetState>();
               }
@@ -426,7 +427,8 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
       final id = int.tryParse(element.articleId());
       if (id == null) {
         Logger.warning(
-            '[download-_applyFilter] articleId is not int type: ${element.articleId()}');
+          '[download-_applyFilter] articleId is not int type: ${element.articleId()}',
+        );
         continue;
       }
       if (!articlereadlog.containsKey(id)) {
@@ -435,7 +437,8 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
           articlereadlog[id] = dt;
         } else {
           Logger.warning(
-              '[download-_applyFilter] datetimeStart is not DateTime type: ${element.datetimeStart()}');
+            '[download-_applyFilter] datetimeStart is not DateTime type: ${element.datetimeStart()}',
+          );
         }
       }
     }
@@ -476,7 +479,8 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
     var groupsSorted = groups.entries.map((e) => (e.key, e.value)).toList()
       ..sortBy((e) => e.$1);
 
-    final reverseOrder = Settings.downloadAlignType.value == 3 ||
+    final reverseOrder =
+        Settings.downloadAlignType.value == 3 ||
         Settings.downloadAlignType.value == 4;
     if (reverseOrder) {
       groupsSorted = groupsSorted.reversed.toList();
@@ -531,16 +535,19 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
       final groupBy = await getGroupBy();
 
       // TODO: More optimize
-      final headerCount =
-          groupBy.indexWhere((e) => e.$1[0].toUpperCase() == tag);
+      final headerCount = groupBy.indexWhere(
+        (e) => e.$1[0].toUpperCase() == tag,
+      );
 
       const maxItemCount = 12;
       const itemPerRow = 3;
 
       final articleLineCount = groupBy
           .take(headerCount)
-          .map((e) =>
-              (min(e.$2.length, maxItemCount) + itemPerRow - 1) ~/ itemPerRow)
+          .map(
+            (e) =>
+                (min(e.$2.length, maxItemCount) + itemPerRow - 1) ~/ itemPerRow,
+          )
           .sum;
       final articleLineSpacingCount = groupBy
           .take(headerCount)
@@ -553,9 +560,10 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
       updateHeights();
 
       doubleTapToTopScrollController!.jumpTo(
-          (cachedHeaderHeight! + headerTopBottomPaddingSize) * headerCount +
-              articleLineSpacingCount * articleSpacingSize +
-              articleLineCount * cachedArticleHeight!);
+        (cachedHeaderHeight! + headerTopBottomPaddingSize) * headerCount +
+            articleLineSpacingCount * articleSpacingSize +
+            articleLineCount * cachedArticleHeight!,
+      );
     }
   }
 
@@ -576,11 +584,14 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
             options: const IndexBarOptions(
               needRebuild: true,
               selectTextStyle: TextStyle(
-                  fontSize: 12,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500),
+                fontSize: 12,
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
               selectItemDecoration: BoxDecoration(
-                  shape: BoxShape.circle, color: Color(0xFF333333)),
+                shape: BoxShape.circle,
+                color: Color(0xFF333333),
+              ),
             ),
           );
         },
@@ -591,8 +602,9 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
   Widget _panelGroupBy(List<(String, List<DownloadItemModel>)> groupBy) {
     final windowWidth = lastWindowWidth = MediaQuery.of(context).size.width;
     final columnCount = Settings.downloadResultType.value.isThreeGrid ? 3 : 2;
-    final effectiveColumnCount =
-        Settings.useTabletMode.value ? columnCount * 2 : columnCount;
+    final effectiveColumnCount = Settings.useTabletMode.value
+        ? columnCount * 2
+        : columnCount;
 
     heightRefHeader = null;
     heightRefArticle = null;
@@ -604,8 +616,9 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
         child: Container(
           decoration: !Settings.themeFlat.value
               ? BoxDecoration(
-                  color:
-                      Settings.themeWhat.value ? Colors.black26 : Colors.white,
+                  color: Settings.themeWhat.value
+                      ? Colors.black26
+                      : Colors.white,
                   borderRadius: BorderRadius.circular(8.0),
                   boxShadow: [
                     BoxShadow(
@@ -622,25 +635,28 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
           color: !Settings.themeFlat.value
               ? null
               : Settings.themeWhat.value
-                  ? Colors.black26
-                  : Colors.white,
+              ? Colors.black26
+              : Colors.white,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
             child: Material(
               color: Settings.themeWhat.value
                   ? Settings.themeBlack.value
-                      ? Palette.blackThemeBackground
-                      : Colors.black38
+                        ? Palette.blackThemeBackground
+                        : Colors.black38
                   : Colors.white,
               child: InkWell(
                 customBorder: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(8.0))),
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                ),
                 child: Container(
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
                   child: Text(
                     e.$1.split(' ').map((e) => e.titlecase()).join(' '),
                     style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 20.0),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.0,
+                    ),
                   ),
                 ),
                 onTap: () {
@@ -664,7 +680,8 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
           childAspectRatio: 3 / 4,
         ),
         children: e.$2
-            .map((e) => SizedBox(
+            .map(
+              (e) => SizedBox(
                 key: heightRefArticle == null
                     ? heightRefArticle ??= GlobalKey()
                     : null,
@@ -684,7 +701,9 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
                       refeshCallback: refresh,
                     ),
                   ),
-                )))
+                ),
+              ),
+            )
             .take(12)
             .toList(),
       );
@@ -699,9 +718,7 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
       padding: EdgeInsets.zero,
       sliver: SliverList(
         key: _listKey,
-        delegate: SliverChildListDelegate(
-          groupsWidget,
-        ),
+        delegate: SliverChildListDelegate(groupsWidget),
       ),
     );
   }
@@ -713,9 +730,7 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
         height: 64,
         child: Card(
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(4.0),
-            ),
+            borderRadius: BorderRadius.all(Radius.circular(4.0)),
           ),
           elevation: !Settings.themeFlat.value ? 100 : 0,
           clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -726,21 +741,26 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
                   Material(
                     color: Settings.themeWhat.value
                         ? Settings.themeBlack.value
-                            ? Palette.blackThemeBackground
-                            : Colors.grey.shade900.withOpacity(0.4)
+                              ? Palette.blackThemeBackground
+                              : Colors.grey.shade900.withOpacity(0.4)
                         : Colors.grey.shade200.withOpacity(0.4),
                     child: ListTile(
                       title: TextFormField(
                         cursorColor: Colors.black,
                         decoration: InputDecoration(
-                            border: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            errorBorder: InputBorder.none,
-                            disabledBorder: InputBorder.none,
-                            contentPadding: const EdgeInsets.only(
-                                left: 15, bottom: 11, top: 11, right: 15),
-                            hintText: Translations.instance!.trans('addurl')),
+                          border: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                          contentPadding: const EdgeInsets.only(
+                            left: 15,
+                            bottom: 11,
+                            top: 11,
+                            right: 15,
+                          ),
+                          hintText: Translations.instance!.trans('addurl'),
+                        ),
                       ),
                       leading: const SizedBox(
                         width: 25,
@@ -748,7 +768,7 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
                         child: Icon(MdiIcons.instagram),
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
               Positioned(
@@ -766,14 +786,17 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
                         await prefs.setBool('checkauthalready', true);
                         if (await Permission.manageExternalStorage.request() ==
                             PermissionStatus.denied) {
-                          await showOkDialog(context,
-                              'You cannot use downloader, if you not allow external storage permission.');
+                          await showOkDialog(
+                            context,
+                            'You cannot use downloader, if you not allow external storage permission.',
+                          );
                           return;
                         }
                       }
                       Widget yesButton = TextButton(
                         style: TextButton.styleFrom(
-                            foregroundColor: Settings.majorColor.value),
+                          foregroundColor: Settings.majorColor.value,
+                        ),
                         child: Text(Translations.instance!.trans('ok')),
                         onPressed: () {
                           Navigator.pop(context, true);
@@ -781,7 +804,8 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
                       );
                       Widget noButton = TextButton(
                         style: TextButton.styleFrom(
-                            foregroundColor: Settings.majorColor.value),
+                          foregroundColor: Settings.majorColor.value,
+                        ),
                         child: Text(Translations.instance!.trans('cancel')),
                         onPressed: () {
                           Navigator.pop(context, false);
@@ -792,20 +816,22 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
                         useRootNavigator: false,
                         context: context,
                         builder: (BuildContext context) => AlertDialog(
-                          contentPadding:
-                              const EdgeInsets.fromLTRB(12, 0, 12, 0),
-                          title: Text(Translations.instance!.trans('writeurl')),
-                          content: TextField(
-                            controller: text,
-                            autofocus: true,
+                          contentPadding: const EdgeInsets.fromLTRB(
+                            12,
+                            0,
+                            12,
+                            0,
                           ),
+                          title: Text(Translations.instance!.trans('writeurl')),
+                          content: TextField(controller: text, autofocus: true),
                           actions: [yesButton, noButton],
                         ),
                       );
                       if (text.text.contains(',')) {
                         final ids = text.text.split(',').map((e) => e.trim());
-                        if (ids
-                            .any((element) => int.tryParse(element) == null)) {
+                        if (ids.any(
+                          (element) => int.tryParse(element) == null,
+                        )) {
                           await showOkDialog(context, '콤마로 구분된 숫자만 입력해야 합니다!');
                           return;
                         }
@@ -845,9 +871,7 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
           child: Card(
             color: Palette.themeColor,
             shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(4.0),
-              ),
+              borderRadius: BorderRadius.all(Radius.circular(4.0)),
             ),
             elevation: !Settings.themeFlat.value ? 100 : 0,
             clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -859,10 +883,7 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
                 child: Stack(
                   alignment: Alignment.center,
                   children: <Widget>[
-                    Icon(
-                      MdiIcons.hammerWrench,
-                      color: Colors.grey,
-                    ),
+                    Icon(MdiIcons.hammerWrench, color: Colors.grey),
                   ],
                 ),
               ),
@@ -875,36 +896,45 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
 
   Future<void> _featuresOnTap() async {
     Navigator.of(context)
-        .push(PageRouteBuilder(
-      opaque: false,
-      transitionDuration: const Duration(milliseconds: 500),
-      transitionsBuilder: (BuildContext context, Animation<double> animation,
-          Animation<double> secondaryAnimation, Widget wi) {
-        return FadeTransition(opacity: animation, child: wi);
-      },
-      pageBuilder: (_, __, ___) => const DownloadFeaturesMenu(),
-      barrierColor: Colors.black12,
-      barrierDismissible: true,
-    ))
+        .push(
+          PageRouteBuilder(
+            opaque: false,
+            transitionDuration: const Duration(milliseconds: 500),
+            transitionsBuilder:
+                (
+                  BuildContext context,
+                  Animation<double> animation,
+                  Animation<double> secondaryAnimation,
+                  Widget wi,
+                ) {
+                  return FadeTransition(opacity: animation, child: wi);
+                },
+            pageBuilder: (_, __, ___) => const DownloadFeaturesMenu(),
+            barrierColor: Colors.black12,
+            barrierDismissible: true,
+          ),
+        )
         .then((value) async {
-      if (value == null) return;
+          if (value == null) return;
 
-      if (value == 0) {
-        _getDownloadWidgetKey()
-            .forEach((key, value) => value.currentState.retryWhenRequired());
-      } else if (value == 1) {
-        _getDownloadWidgetKey()
-            .forEach((key, value) => value.currentState.recovery());
-      } else if (value == 2) {
-        Clipboard.setData(ClipboardData(
-            text: filterResult.map((e) => int.tryParse(e.url())).join(', ')));
+          if (value == 0) {
+            _getDownloadWidgetKey().forEach(
+              (key, value) => value.currentState.retryWhenRequired(),
+            );
+          } else if (value == 1) {
+            _getDownloadWidgetKey().forEach(
+              (key, value) => value.currentState.recovery(),
+            );
+          } else if (value == 2) {
+            Clipboard.setData(
+              ClipboardData(
+                text: filterResult.map((e) => int.tryParse(e.url())).join(', '),
+              ),
+            );
 
-        showToast(
-          level: ToastLevel.check,
-          message: 'Ids Copied!',
-        );
-      }
-    });
+            showToast(level: ToastLevel.check, message: 'Ids Copied!');
+          }
+        });
   }
 
   Widget _align() {
@@ -918,9 +948,7 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
           child: Card(
             color: Palette.themeColor,
             shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(4.0),
-              ),
+              borderRadius: BorderRadius.all(Radius.circular(4.0)),
             ),
             elevation: !Settings.themeFlat.value ? 100 : 0,
             clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -934,10 +962,7 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
                 child: Stack(
                   alignment: Alignment.center,
                   children: <Widget>[
-                    Icon(
-                      MdiIcons.formatListText,
-                      color: Colors.grey,
-                    ),
+                    Icon(MdiIcons.formatListText, color: Colors.grey),
                   ],
                 ),
               ),
@@ -951,51 +976,68 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
   Future<void> _alignOnTap() async {
     var rtype = Settings.downloadResultType.value;
     Navigator.of(context)
-        .push(PageRouteBuilder(
-      opaque: false,
-      transitionDuration: const Duration(milliseconds: 500),
-      transitionsBuilder: (BuildContext context, Animation<double> animation,
-          Animation<double> secondaryAnimation, Widget wi) {
-        return FadeTransition(opacity: animation, child: wi);
-      },
-      pageBuilder: (_, __, ___) => const DownloadViewType(),
-      barrierColor: Colors.black12,
-      barrierDismissible: true,
-    ))
+        .push(
+          PageRouteBuilder(
+            opaque: false,
+            transitionDuration: const Duration(milliseconds: 500),
+            transitionsBuilder:
+                (
+                  BuildContext context,
+                  Animation<double> animation,
+                  Animation<double> secondaryAnimation,
+                  Widget wi,
+                ) {
+                  return FadeTransition(opacity: animation, child: wi);
+                },
+            pageBuilder: (_, __, ___) => const DownloadViewType(),
+            barrierColor: Colors.black12,
+            barrierDismissible: true,
+          ),
+        )
         .then((value) async {
-      if (rtype != Settings.downloadResultType.value) {
-        var downloadWidgetKey = _getDownloadWidgetKey();
-        downloadWidgetKey.forEach((key, value) =>
-            downloadWidgetKey[key] = GlobalKey<DownloadItemWidgetState>());
-        await Future.delayed(const Duration(milliseconds: 50), () {
-          setState(() {});
+          if (rtype != Settings.downloadResultType.value) {
+            var downloadWidgetKey = _getDownloadWidgetKey();
+            downloadWidgetKey.forEach(
+              (key, value) =>
+                  downloadWidgetKey[key] = GlobalKey<DownloadItemWidgetState>(),
+            );
+            await Future.delayed(const Duration(milliseconds: 50), () {
+              setState(() {});
+            });
+          }
         });
-      }
-    });
   }
 
   Future<void> _alignDoubleTap() async {
     var rtype = Settings.downloadAlignType.value;
     Navigator.of(context)
-        .push(PageRouteBuilder(
-      opaque: false,
-      transitionDuration: const Duration(milliseconds: 500),
-      transitionsBuilder: (BuildContext context, Animation<double> animation,
-          Animation<double> secondaryAnimation, Widget wi) {
-        return FadeTransition(opacity: animation, child: wi);
-      },
-      pageBuilder: (_, __, ___) => const DownloadAlignType(),
-      barrierColor: Colors.black12,
-      barrierDismissible: true,
-    ))
+        .push(
+          PageRouteBuilder(
+            opaque: false,
+            transitionDuration: const Duration(milliseconds: 500),
+            transitionsBuilder:
+                (
+                  BuildContext context,
+                  Animation<double> animation,
+                  Animation<double> secondaryAnimation,
+                  Widget wi,
+                ) {
+                  return FadeTransition(opacity: animation, child: wi);
+                },
+            pageBuilder: (_, __, ___) => const DownloadAlignType(),
+            barrierColor: Colors.black12,
+            barrierDismissible: true,
+          ),
+        )
         .then((value) async {
-      if (rtype != Settings.downloadAlignType.value) {
-        _getDownloadWidgetKey().forEach((key, value) {
-          if (value.currentState != null) value.currentState.thubmanilReload();
+          if (rtype != Settings.downloadAlignType.value) {
+            _getDownloadWidgetKey().forEach((key, value) {
+              if (value.currentState != null)
+                value.currentState.thubmanilReload();
+            });
+            _applyFilter();
+          }
         });
-        _applyFilter();
-      }
-    });
   }
 
   Future<void> _alignLongPress() async {
@@ -1061,7 +1103,6 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
             succ = isOr;
           }
         }
-
         // If Multitag
         else if ((qr.result[dbColumn] as String == split[1]) == isOr) {
           succ = isOr;
@@ -1089,7 +1130,8 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
         final id = int.tryParse(element.articleId());
         if (id == null) {
           Logger.warning(
-              '[download-_applyFilter] articleId is not int type: ${element.articleId()}');
+            '[download-_applyFilter] articleId is not int type: ${element.articleId()}',
+          );
           continue;
         }
         if (!articlereadlog.containsKey(id)) {
@@ -1098,7 +1140,8 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
             articlereadlog[id] = dt;
           } else {
             Logger.warning(
-                '[download-_applyFilter] datetimeStart is not DateTime type: ${element.datetimeStart()}');
+              '[download-_applyFilter] datetimeStart is not DateTime type: ${element.datetimeStart()}',
+            );
           }
         }
       }
@@ -1111,10 +1154,9 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
         var yy = int.tryParse(y.url());
 
         if (Settings.downloadAlignType.value == 3) {
-          return y
-              .filesWithoutThumbnail()
-              .length
-              .compareTo(x.filesWithoutThumbnail().length);
+          return y.filesWithoutThumbnail().length.compareTo(
+            x.filesWithoutThumbnail().length,
+          );
         } else if (Settings.downloadAlignType.value == 2) {
           if (!queryResults.containsKey(xx)) return 1;
           if (!queryResults.containsKey(yy)) return -1;
@@ -1125,10 +1167,12 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
           if (a1 == null || a1 == '' || a1 == '|N/A|') return 1;
           if (a2 == null || a2 == '' || a2 == '|N/A|') return -1;
 
-          final aa1 =
-              (a1 as String).split('|').firstWhere((element) => element != '');
-          final aa2 =
-              (a2 as String).split('|').firstWhere((element) => element != '');
+          final aa1 = (a1 as String)
+              .split('|')
+              .firstWhere((element) => element != '');
+          final aa2 = (a2 as String)
+              .split('|')
+              .firstWhere((element) => element != '');
 
           return aa1.compareTo(aa2);
         } else if (Settings.downloadAlignType.value == 1) {
@@ -1141,10 +1185,12 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
           if (a1 == null || a1 == '' || a1 == '|N/A|') return 1;
           if (a2 == null || a2 == '' || a2 == '|N/A|') return -1;
 
-          final aa1 =
-              (a1 as String).split('|').firstWhere((element) => element != '');
-          final aa2 =
-              (a2 as String).split('|').firstWhere((element) => element != '');
+          final aa1 = (a1 as String)
+              .split('|')
+              .firstWhere((element) => element != '');
+          final aa2 = (a2 as String)
+              .split('|')
+              .firstWhere((element) => element != '');
 
           return aa1.compareTo(aa2);
         } else if (Settings.downloadAlignType.value == 4) {
@@ -1221,8 +1267,9 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
   }
 
   Future<void> appendTaskFromQueryResult(QueryResult qr) async {
-    final item =
-        await (await Download.getInstance()).createNew(qr.id().toString());
+    final item = await (await Download.getInstance()).createNew(
+      qr.id().toString(),
+    );
     item.download = true;
     item.queryResult = qr;
     items.add(item);

@@ -22,8 +22,9 @@ class SearchMessageRankPage extends StatefulWidget {
 
 class _SearchMessageRankPageState extends State<SearchMessageRankPage> {
   List<(String, String, int)> searchLists = <(String, String, int)>[];
-  TextEditingController text =
-      TextEditingController(text: SearchMessageRankPageMemory.latestSearch);
+  TextEditingController text = TextEditingController(
+    text: SearchMessageRankPageMemory.latestSearch,
+  );
 
   @override
   void initState() {
@@ -38,14 +39,17 @@ class _SearchMessageRankPageState extends State<SearchMessageRankPage> {
 
         SearchMessageRankPageMemory.rawSearchLists = m.entries
             .map(
-                (e) => (e.key, TagTranslate.disassembly(e.key), e.value as int))
+              (e) => (e.key, TagTranslate.disassembly(e.key), e.value as int),
+            )
             .toList();
       }
 
       if (text.text != '') {
         searchLists = SearchMessageRankPageMemory.rawSearchLists
-            .where((element) =>
-                element.$2.contains(TagTranslate.disassembly(text.text)))
+            .where(
+              (element) =>
+                  element.$2.contains(TagTranslate.disassembly(text.text)),
+            )
             .toList();
         searchLists.sort((x, y) => y.$1.length.compareTo(x.$1.length));
       } else {
@@ -89,11 +93,15 @@ class _SearchMessageRankPageState extends State<SearchMessageRankPage> {
                   SearchMessageRankPageMemory.latestSearch = text.text;
 
                   searchLists = SearchMessageRankPageMemory.rawSearchLists
-                      .where((element) => element.$2
-                          .contains(TagTranslate.disassembly(text.text)))
+                      .where(
+                        (element) => element.$2.contains(
+                          TagTranslate.disassembly(text.text),
+                        ),
+                      )
                       .toList();
-                  searchLists
-                      .sort((x, y) => y.$1.length.compareTo(x.$1.length));
+                  searchLists.sort(
+                    (x, y) => y.$1.length.compareTo(x.$1.length),
+                  );
 
                   setState(() {});
                 },

@@ -69,16 +69,12 @@ class _TagRebuildPageState extends State<TagRebuildPage> {
                     padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
                     child: Stack(
                       children: [
-                        const Center(
-                          child: CircularProgressIndicator(),
-                        ),
+                        const Center(child: CircularProgressIndicator()),
                         Align(
                           alignment: Alignment.bottomCenter,
                           child: Padding(
                             padding: const EdgeInsets.only(bottom: 33),
-                            child: Text(
-                              baseString,
-                            ),
+                            child: Text(baseString),
                           ),
                         ),
                       ],
@@ -119,9 +115,11 @@ class _TagRebuildPageState extends State<TagRebuildPage> {
 
   Future indexing() async {
     final qm = QueryManager.queryPagination(
-        translate2query(
-            '${Settings.includeTags.value} ${Settings.serializedExcludeTags}'),
-        50000);
+      translate2query(
+        '${Settings.includeTags.value} ${Settings.serializedExcludeTags}',
+      ),
+      50000,
+    );
 
     var tags = <String, int>{};
     var languages = <String, int>{};
@@ -220,7 +218,11 @@ class _TagRebuildPageState extends State<TagRebuildPage> {
         updateRelativeFrom(item.characters(), item.series(), seriesCharacter);
         updateRelativeFrom(item.series(), item.series(), seriesSeries, false);
         updateRelativeFrom(
-            item.characters(), item.characters(), characterCharacter, false);
+          item.characters(),
+          item.characters(),
+          characterCharacter,
+          false,
+        );
       }
 
       if (ll.isEmpty) {
@@ -268,8 +270,9 @@ class _TagRebuildPageState extends State<TagRebuildPage> {
         final path9 = File('${directory.path}$subdir/series-character.json');
         if (path9.existsSync()) path9.deleteSync();
         path9.writeAsString(jsonEncode(seriesCharacter));
-        final path10 =
-            File('${directory.path}$subdir/character-character.json');
+        final path10 = File(
+          '${directory.path}$subdir/character-character.json',
+        );
         if (path10.existsSync()) path10.deleteSync();
         path10.writeAsString(jsonEncode(characterCharacter));
         final path11 = File('${directory.path}$subdir/series-series.json');

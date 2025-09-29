@@ -42,9 +42,7 @@ class _ViewerGalleryState extends State<ViewerGallery> {
           (itemKeys[0].currentContext!.findRenderObject() as RenderBox)
               .size
               .height;
-      _scrollController.jumpTo(
-        row * (firstItemHeight + 2) - 100,
-      );
+      _scrollController.jumpTo(row * (firstItemHeight + 2) - 100);
     });
   }
 
@@ -63,8 +61,9 @@ class _ViewerGalleryState extends State<ViewerGallery> {
               searchBar: Container(
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(10.0),
-                      bottomRight: Radius.circular(10.0)),
+                    bottomLeft: Radius.circular(10.0),
+                    bottomRight: Radius.circular(10.0),
+                  ),
                   color: Palette.themeColor,
                 ),
                 child: Padding(
@@ -81,10 +80,7 @@ class _ViewerGalleryState extends State<ViewerGallery> {
               ),
             ),
           ),
-          SliverPadding(
-            padding: const EdgeInsets.all(4),
-            sliver: _delegate(),
-          ),
+          SliverPadding(padding: const EdgeInsets.all(4), sliver: _delegate()),
         ],
       ),
     );
@@ -129,12 +125,7 @@ class _ViewerGalleryState extends State<ViewerGallery> {
             viewStyle = (viewStyle + 1) % icons.length;
           });
         },
-        child: Center(
-          child: Icon(
-            icons[viewStyle],
-            size: 28,
-          ),
-        ),
+        child: Center(child: Icon(icons[viewStyle], size: 28)),
       ),
     );
   }
@@ -158,50 +149,47 @@ class _ViewerGalleryState extends State<ViewerGallery> {
         mainAxisSpacing: 2,
         childAspectRatio: 3 / 4,
       ),
-      delegate: SliverChildBuilderDelegate(
-        (BuildContext context, int index) {
-          return SizedBox.expand(
-            key: itemKeys[index],
-            child: Stack(
-              children: <Widget>[
-                Image.file(
-                  File(_pageInfo.uris[index]),
-                  fit: BoxFit.cover,
+      delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+        return SizedBox.expand(
+          key: itemKeys[index],
+          child: Stack(
+            children: <Widget>[
+              Image.file(
+                File(_pageInfo.uris[index]),
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: double.infinity,
+                isAntiAlias: true,
+                cacheWidth: width.toInt() ~/ properties[viewStyle][1],
+                filterQuality: FilterQuality.high,
+              ),
+              Align(
+                alignment: Alignment.topCenter,
+                child: Container(
+                  padding: const EdgeInsets.only(bottom: 1),
                   width: double.infinity,
-                  height: double.infinity,
-                  isAntiAlias: true,
-                  cacheWidth: width.toInt() ~/ properties[viewStyle][1],
-                  filterQuality: FilterQuality.high,
-                ),
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: Container(
-                    padding: const EdgeInsets.only(bottom: 1),
-                    width: double.infinity,
-                    color: Colors.black.withOpacity(0.7),
-                    child: Text(
-                      '${index + 1} page',
-                      textAlign: TextAlign.right,
-                      style: const TextStyle(fontSize: 11, color: Colors.white),
-                    ),
+                  color: Colors.black.withOpacity(0.7),
+                  child: Text(
+                    '${index + 1} page',
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(fontSize: 11, color: Colors.white),
                   ),
                 ),
-                Positioned.fill(
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.pop(context, index);
-                      },
-                    ),
+              ),
+              Positioned.fill(
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pop(context, index);
+                    },
                   ),
-                )
-              ],
-            ),
-          );
-        },
-        childCount: _pageInfo.uris.length,
-      ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }, childCount: _pageInfo.uris.length),
     );
   }
 
@@ -215,35 +203,30 @@ class _ViewerGalleryState extends State<ViewerGallery> {
         mainAxisSpacing: 2,
         childAspectRatio: 3 / 4,
       ),
-      delegate: SliverChildBuilderDelegate(
-        (BuildContext context, int index) {
-          return SizedBox.expand(
-            key: itemKeys[index],
-            child: Stack(
-              children: <Widget>[
-                CachedNetworkImage(
-                  imageUrl: _pageInfo.uris[index],
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: double.infinity,
-                  httpHeaders: _pageInfo.headers,
-                  memCacheWidth: width.toInt() ~/ properties[viewStyle][1],
-                  filterQuality: FilterQuality.high,
+      delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+        return SizedBox.expand(
+          key: itemKeys[index],
+          child: Stack(
+            children: <Widget>[
+              CachedNetworkImage(
+                imageUrl: _pageInfo.uris[index],
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: double.infinity,
+                httpHeaders: _pageInfo.headers,
+                memCacheWidth: width.toInt() ~/ properties[viewStyle][1],
+                filterQuality: FilterQuality.high,
+              ),
+              Positioned.fill(
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(onTap: () {}),
                 ),
-                Positioned.fill(
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {},
-                    ),
-                  ),
-                )
-              ],
-            ),
-          );
-        },
-        childCount: _pageInfo.uris.length,
-      ),
+              ),
+            ],
+          ),
+        );
+      }, childCount: _pageInfo.uris.length),
     );
   }
 
@@ -257,79 +240,86 @@ class _ViewerGalleryState extends State<ViewerGallery> {
           await _pageInfo.provider!.getHeader(0),
         );
       }),
-      builder: (context,
-          AsyncSnapshot<(List<String>, Map<String, String>)> snapshot) {
-        if (!snapshot.hasData) {
-          return SliverGrid(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: properties[viewStyle][0],
-              crossAxisSpacing: 2,
-              mainAxisSpacing: 2,
-              childAspectRatio: 3 / 4,
-            ),
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                return Container();
-              },
-            ),
-          );
-        }
-        return SliverGrid(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: properties[viewStyle][0],
-            crossAxisSpacing: 2,
-            mainAxisSpacing: 2,
-            childAspectRatio: 3 / 4,
-          ),
-          delegate: SliverChildBuilderDelegate(
-            (BuildContext context, int index) {
-              return SizedBox.expand(
-                key: itemKeys[index],
-                child: Stack(
-                  children: <Widget>[
-                    CachedNetworkImage(
-                      imageUrl: snapshot.data!.$1[index],
-                      httpHeaders: snapshot.data!.$2,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: double.infinity,
-                      memCacheWidth: width.toInt() ~/ properties[viewStyle][1],
-                      filterQuality: FilterQuality.high,
-                    ),
-                    Align(
-                      alignment: Alignment.topCenter,
-                      child: Container(
-                        padding: const EdgeInsets.only(bottom: 1),
-                        width: double.infinity,
-                        color: Colors.black.withOpacity(0.7),
-                        child: Text(
-                          '${index + 1} page',
-                          textAlign: TextAlign.right,
-                          style: const TextStyle(
-                              fontSize: 11, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    Positioned.fill(
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          splashColor: Colors.black.withOpacity(0.4),
-                          highlightColor: Colors.black.withOpacity(0.1),
-                          onTap: () {
-                            Navigator.pop(context, index);
-                          },
-                        ),
-                      ),
-                    )
-                  ],
+      builder:
+          (
+            context,
+            AsyncSnapshot<(List<String>, Map<String, String>)> snapshot,
+          ) {
+            if (!snapshot.hasData) {
+              return SliverGrid(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: properties[viewStyle][0],
+                  crossAxisSpacing: 2,
+                  mainAxisSpacing: 2,
+                  childAspectRatio: 3 / 4,
                 ),
+                delegate: SliverChildBuilderDelegate((
+                  BuildContext context,
+                  int index,
+                ) {
+                  return Container();
+                }),
               );
-            },
-            childCount: _pageInfo.provider!.length(),
-          ),
-        );
-      },
+            }
+            return SliverGrid(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: properties[viewStyle][0],
+                crossAxisSpacing: 2,
+                mainAxisSpacing: 2,
+                childAspectRatio: 3 / 4,
+              ),
+              delegate: SliverChildBuilderDelegate((
+                BuildContext context,
+                int index,
+              ) {
+                return SizedBox.expand(
+                  key: itemKeys[index],
+                  child: Stack(
+                    children: <Widget>[
+                      CachedNetworkImage(
+                        imageUrl: snapshot.data!.$1[index],
+                        httpHeaders: snapshot.data!.$2,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
+                        memCacheWidth:
+                            width.toInt() ~/ properties[viewStyle][1],
+                        filterQuality: FilterQuality.high,
+                      ),
+                      Align(
+                        alignment: Alignment.topCenter,
+                        child: Container(
+                          padding: const EdgeInsets.only(bottom: 1),
+                          width: double.infinity,
+                          color: Colors.black.withOpacity(0.7),
+                          child: Text(
+                            '${index + 1} page',
+                            textAlign: TextAlign.right,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned.fill(
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            splashColor: Colors.black.withOpacity(0.4),
+                            highlightColor: Colors.black.withOpacity(0.1),
+                            onTap: () {
+                              Navigator.pop(context, index);
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }, childCount: _pageInfo.provider!.length()),
+            );
+          },
     );
   }
 }

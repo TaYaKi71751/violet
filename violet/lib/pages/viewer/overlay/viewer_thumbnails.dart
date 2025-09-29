@@ -64,9 +64,7 @@ class _ViewerThumbnailState extends State<ViewerThumbnail> {
           (itemKeys[0].currentContext!.findRenderObject() as RenderBox)
               .size
               .height;
-      _scrollController.jumpTo(
-        row * (firstItemHeight + 8) - 100,
-      );
+      _scrollController.jumpTo(row * (firstItemHeight + 8) - 100);
     });
   }
 
@@ -118,7 +116,8 @@ class _ViewerThumbnailState extends State<ViewerThumbnail> {
       mainAxisSpacing: 8,
       children: _pageInfo.uris
           .asMap()
-          .map((i, e) => MapEntry(
+          .map(
+            (i, e) => MapEntry(
               i,
               _buildTappableItem(
                 i,
@@ -128,7 +127,9 @@ class _ViewerThumbnailState extends State<ViewerThumbnail> {
                   filterQuality: FilterQuality.high,
                   fit: BoxFit.cover,
                 ),
-              )))
+              ),
+            ),
+          )
           .values
           .toList(),
     );
@@ -146,8 +147,9 @@ class _ViewerThumbnailState extends State<ViewerThumbnail> {
               ProviderManager.insert(_pageInfo.id * 1000000, prov);
             } else {
               try {
-                var imgList =
-                    await HitomiManager.getImageList(_pageInfo.id.toString());
+                var imgList = await HitomiManager.getImageList(
+                  _pageInfo.id.toString(),
+                );
                 if (imgList.urls.isNotEmpty &&
                     imgList.bigThumbnails.isNotEmpty) {
                   prov = HitomiImageProvider(imgList, _pageInfo.id.toString());
@@ -161,39 +163,46 @@ class _ViewerThumbnailState extends State<ViewerThumbnail> {
 
           return (await prov.getSmallImagesUrl(), await prov.getHeader(0));
         }),
-        builder: (context,
-            AsyncSnapshot<(List<String>, Map<String, String>)> snapshot) {
-          if (!snapshot.hasData) {
-            return const CircularProgressIndicator();
-          }
-          Future.delayed(const Duration(milliseconds: 50))
-              .then((value) => _jumpToViewedPage());
-          return GridView.count(
-            padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-            controller: _scrollController,
-            physics: const BouncingScrollPhysics(),
-            shrinkWrap: true,
-            crossAxisCount: columnLength,
-            childAspectRatio: 3 / 4,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
-            children: snapshot.data!.$1
-                .asMap()
-                .map((i, e) => MapEntry(
-                    i,
-                    _buildTappableItem(
-                      i,
-                      CachedNetworkImage(
-                        imageUrl: e,
-                        httpHeaders: snapshot.data!.$2,
-                        filterQuality: FilterQuality.high,
-                        fit: BoxFit.cover,
+        builder:
+            (
+              context,
+              AsyncSnapshot<(List<String>, Map<String, String>)> snapshot,
+            ) {
+              if (!snapshot.hasData) {
+                return const CircularProgressIndicator();
+              }
+              Future.delayed(
+                const Duration(milliseconds: 50),
+              ).then((value) => _jumpToViewedPage());
+              return GridView.count(
+                padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                controller: _scrollController,
+                physics: const BouncingScrollPhysics(),
+                shrinkWrap: true,
+                crossAxisCount: columnLength,
+                childAspectRatio: 3 / 4,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                children: snapshot.data!.$1
+                    .asMap()
+                    .map(
+                      (i, e) => MapEntry(
+                        i,
+                        _buildTappableItem(
+                          i,
+                          CachedNetworkImage(
+                            imageUrl: e,
+                            httpHeaders: snapshot.data!.$2,
+                            filterQuality: FilterQuality.high,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                       ),
-                    )))
-                .values
-                .toList(),
-          );
-        },
+                    )
+                    .values
+                    .toList(),
+              );
+            },
       );
     }
     return const Row(
@@ -204,12 +213,9 @@ class _ViewerThumbnailState extends State<ViewerThumbnail> {
           width: 100,
           height: 100,
           child: Align(
-            child: Text(
-              'Thumbnail not found!',
-              textAlign: TextAlign.center,
-            ),
+            child: Text('Thumbnail not found!', textAlign: TextAlign.center),
           ),
-        )
+        ),
       ],
     );
   }
@@ -245,7 +251,7 @@ class _ViewerThumbnailState extends State<ViewerThumbnail> {
                 },
               ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -259,7 +265,13 @@ class _ViewerThumbnailState extends State<ViewerThumbnail> {
       infoText += 'title: ${_pageInfo.title}\n\n';
 
       infoText +=
-          'type: ${_pageInfo.useProvider ? 'provider' : _pageInfo.useFileSystem ? 'filesys' : _pageInfo.useWeb ? 'web' : 'none'}\n';
+          'type: ${_pageInfo.useProvider
+              ? 'provider'
+              : _pageInfo.useFileSystem
+              ? 'filesys'
+              : _pageInfo.useWeb
+              ? 'web'
+              : 'none'}\n';
 
       if (_pageInfo.useProvider || _pageInfo.useFileSystem) {
         File? file;
@@ -271,8 +283,10 @@ class _ViewerThumbnailState extends State<ViewerThumbnail> {
           infoText += 'url: $url\n';
           infoText += 'header: ${json.encode(headers)}\n';
 
-          file =
-              await DefaultCacheManager().getSingleFile(url, headers: headers);
+          file = await DefaultCacheManager().getSingleFile(
+            url,
+            headers: headers,
+          );
         } else if (_pageInfo.useFileSystem) {
           file = File(_pageInfo.uris[i]);
         }
@@ -290,9 +304,7 @@ class _ViewerThumbnailState extends State<ViewerThumbnail> {
         infoText += 'filename: ${file.path}';
       }
 
-      AlertDialog alert = AlertDialog(
-        content: SelectableText(infoText),
-      );
+      AlertDialog alert = AlertDialog(content: SelectableText(infoText));
 
       if (!mounted) return;
       await showDialog(
@@ -302,9 +314,11 @@ class _ViewerThumbnailState extends State<ViewerThumbnail> {
         },
       );
     } catch (e, st) {
-      await Logger.error('[Viewer_thumbnails]\n'
-          'E: $e\n'
-          '$st');
+      await Logger.error(
+        '[Viewer_thumbnails]\n'
+        'E: $e\n'
+        '$st',
+      );
     }
   }
 }

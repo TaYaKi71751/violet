@@ -36,7 +36,8 @@ class QueryResult {
 
     if (published() is! int && int.tryParse(published()) == null) {
       return DateTime.tryParse(
-          '${(published() as String).replaceAll('+00:00', '')}Z');
+        '${(published() as String).replaceAll('+00:00', '')}Z',
+      );
     }
 
     const epochTicks = 621355968000000000;
@@ -58,9 +59,9 @@ class QueryManager {
   static Future<QueryManager> query(String rawQuery) async {
     QueryManager qm = QueryManager();
     qm.queryString = rawQuery;
-    qm.results = (await (await DataBaseManager.getInstance()).query(rawQuery))
-        .map((e) => QueryResult(result: e))
-        .toList();
+    qm.results = (await (await DataBaseManager.getInstance()).query(
+      rawQuery,
+    )).map((e) => QueryResult(result: e)).toList();
     return qm;
   }
 
@@ -76,16 +77,16 @@ class QueryManager {
   Future<List<QueryResult>> next() async {
     curPage += 1;
     return (await (await DataBaseManager.getInstance()).query(
-            '$queryString ORDER BY Id DESC LIMIT $itemsPerPage OFFSET ${itemsPerPage * (curPage - 1)}'))
-        .map((e) => QueryResult(result: e))
-        .toList();
+      '$queryString ORDER BY Id DESC LIMIT $itemsPerPage OFFSET ${itemsPerPage * (curPage - 1)}',
+    )).map((e) => QueryResult(result: e)).toList();
   }
 
   static Future<List<QueryResult>> queryIds<T>(List<T> ids) async {
     var queryRaw = 'SELECT * FROM HitomiColumnModel WHERE ';
     queryRaw += 'Id IN (${ids.join(',')})';
     var qm = await QueryManager.query(
-        queryRaw + (!Settings.searchPure.value ? ' AND ExistOnHitomi=1' : ''));
+      queryRaw + (!Settings.searchPure.value ? ' AND ExistOnHitomi=1' : ''),
+    );
 
     var qr = <String, QueryResult>{};
     for (var element in qm.results!) {

@@ -46,8 +46,11 @@ class HentaiManager {
   // <Query Results, next offset>
   // if next offset == 0, then search start
   // if next offset == -1, then search end
-  static Future<SearchResult> search(String what,
-      [int offset = 0, int next = 0]) async {
+  static Future<SearchResult> search(
+    String what, [
+    int offset = 0,
+    int next = 0,
+  ]) async {
     int? no = int.tryParse(what);
     // is Id Search?
     if (no != null) {
@@ -70,10 +73,9 @@ class HentaiManager {
 
   static Future<SearchResult> idSearch(String what) async {
     final queryString = translate2query(what);
-    final queryResult = (await (await DataBaseManager.getInstance())
-            .query('$queryString ORDER BY Id DESC LIMIT 1 OFFSET 0'))
-        .map((e) => QueryResult(result: e))
-        .toList();
+    final queryResult = (await (await DataBaseManager.getInstance()).query(
+      '$queryString ORDER BY Id DESC LIMIT 1 OFFSET 0',
+    )).map((e) => QueryResult(result: e)).toList();
 
     if (queryResult.isNotEmpty) {
       return SearchResult(results: queryResult, offset: -1);
@@ -82,18 +84,24 @@ class HentaiManager {
     try {
       return await idSearchHitomi(what);
     } catch (e, st) {
-      Logger.error('[hentai-idSearch] E: $e\n'
-          '$st');
+      Logger.error(
+        '[hentai-idSearch] E: $e\n'
+        '$st',
+      );
       try {
         return await idSearchEhentai(what);
       } catch (e, st) {
-        Logger.error('[hentai-idSearch] E: $e\n'
-            '$st');
+        Logger.error(
+          '[hentai-idSearch] E: $e\n'
+          '$st',
+        );
         try {
           return await idSearchExhentai(what);
         } catch (e, st) {
-          Logger.error('[hentai-idSearch] E: $e\n'
-              '$st');
+          Logger.error(
+            '[hentai-idSearch] E: $e\n'
+            '$st',
+          );
         }
       }
     }
@@ -103,11 +111,13 @@ class HentaiManager {
 
   static Future<SearchResult> idSearchHitomi(String what) async {
     final id = int.parse(what);
-    final headers =
-        await ScriptManager.runHitomiGetHeaderContent(id.toString());
+    final headers = await ScriptManager.runHitomiGetHeaderContent(
+      id.toString(),
+    );
     final hh = await http.get(
-        'https://ltn.gold-usergeneratedcontent.net/galleryblock/$id.html',
-        headers: headers);
+      'https://ltn.gold-usergeneratedcontent.net/galleryblock/$id.html',
+      headers: headers,
+    );
     final article = await HitomiParser.parseGalleryBlock(hh.body);
     final meta = {
       'Id': id,
@@ -122,7 +132,8 @@ class HentaiManager {
     final id = int.parse(what);
     final hash = await tryGetEhHash(id, false);
     final html = await EHSession.requestString(
-        'https://e-hentai.org/g/$id/$hash/?p=0&inline_set=ts_m');
+      'https://e-hentai.org/g/$id/$hash/?p=0&inline_set=ts_m',
+    );
     final articleEh = EHParser.parseArticleData(html);
     final meta = {
       'Id': id,
@@ -138,7 +149,8 @@ class HentaiManager {
     final id = int.parse(what);
     final hash = await tryGetEhHash(id, true);
     final html = await EHSession.requestString(
-        'https://exhentai.org/g/$id/$hash/?p=0&inline_set=ts_m');
+      'https://exhentai.org/g/$id/$hash/?p=0&inline_set=ts_m',
+    );
     final articleEh = EHParser.parseArticleData(html);
     final meta = {
       'Id': id,
@@ -151,8 +163,10 @@ class HentaiManager {
   }
 
   // static double _latestSeed = 0;
-  static Future<SearchResult> _randomSearch(String what,
-      [int offset = 0]) async {
+  static Future<SearchResult> _randomSearch(
+    String what, [
+    int offset = 0,
+  ]) async {
     var wwhat = what.split(' ').where((x) => x != 'random').join(' ');
     double? seed = -1.0;
     if (what.split(' ').where((x) => x.startsWith('random:')).isNotEmpty) {
@@ -173,18 +187,18 @@ class HentaiManager {
       }
     }
     final queryString = translate2query(
-        '$wwhat ${Settings.includeTags.value} ${Settings.serializedExcludeTags}');
+      '$wwhat ${Settings.includeTags.value} ${Settings.serializedExcludeTags}',
+    );
 
     // if (offset == 0 && seed < 0) _latestSeed = new Random().nextDouble() + 1;
     await Logger.info('[Database Query]\nSQL: $queryString');
 
     const int itemsPerPage = 500;
-    final queryResult = (await (await DataBaseManager.getInstance())
-            .query('$queryString ORDER BY '
-                'Id * $seed - ROUND(Id * $seed - 0.5, 0) DESC'
-                ' LIMIT $itemsPerPage OFFSET $offset'))
-        .map((e) => QueryResult(result: e))
-        .toList();
+    final queryResult = (await (await DataBaseManager.getInstance()).query(
+      '$queryString ORDER BY '
+      'Id * $seed - ROUND(Id * $seed - 0.5, 0) DESC'
+      ' LIMIT $itemsPerPage OFFSET $offset',
+    )).map((e) => QueryResult(result: e)).toList();
 
     return SearchResult(
       results: queryResult,
@@ -194,15 +208,15 @@ class HentaiManager {
 
   static Future<SearchResult> _dbSearch(String what, [int offset = 0]) async {
     final queryString = translate2query(
-        '$what ${Settings.includeTags.value} ${Settings.serializedExcludeTags}');
+      '$what ${Settings.includeTags.value} ${Settings.serializedExcludeTags}',
+    );
 
     await Logger.info('[Database Query]\nSQL: $queryString');
 
     const int itemsPerPage = 500;
     final queryResult = (await (await DataBaseManager.getInstance()).query(
-            '$queryString ORDER BY Id DESC LIMIT $itemsPerPage OFFSET $offset'))
-        .map((e) => QueryResult(result: e))
-        .toList();
+      '$queryString ORDER BY Id DESC LIMIT $itemsPerPage OFFSET $offset',
+    )).map((e) => QueryResult(result: e)).toList();
 
     return SearchResult(
       results: queryResult,
@@ -210,8 +224,11 @@ class HentaiManager {
     );
   }
 
-  static Future<SearchResult> _networkSearch(String what,
-      [int offset = 0, int next = 0]) async {
+  static Future<SearchResult> _networkSearch(
+    String what, [
+    int offset = 0,
+    int next = 0,
+  ]) async {
     var route = Settings.searchRule;
     for (int i = 0; i < route.length; i++) {
       try {
@@ -240,8 +257,10 @@ class HentaiManager {
             break;
         }
       } catch (e, st) {
-        Logger.error('[hentai-_networkSearch] E: $e\n'
-            '$st');
+        Logger.error(
+          '[hentai-_networkSearch] E: $e\n'
+          '$st',
+        );
       }
     }
 
@@ -251,11 +270,17 @@ class HentaiManager {
 
   static Future<int> countSearch(String what) async {
     final queryString = translate2query(
-        '$what ${Settings.includeTags.value} ${Settings.serializedExcludeTags}');
+      '$what ${Settings.includeTags.value} ${Settings.serializedExcludeTags}',
+    );
 
-    var count = (await (await DataBaseManager.getInstance()).query(queryString
-            .replaceAll('SELECT * FROM', 'SELECT COUNT(*) AS C FROM')))
-        .first['C'] as int;
+    var count =
+        (await (await DataBaseManager.getInstance()).query(
+              queryString.replaceAll(
+                'SELECT * FROM',
+                'SELECT COUNT(*) AS C FROM',
+              ),
+            )).first['C']
+            as int;
 
     return count;
   }
@@ -279,7 +304,8 @@ class HentaiManager {
   static Future<QueryResult> idQueryEhentai(String id) async {
     final hash = await tryGetEhHash(int.parse(id), false);
     final html = await EHSession.requestString(
-        'https://e-hentai.org/g/$id/$hash/?p=0&inline_set=ts_m');
+      'https://e-hentai.org/g/$id/$hash/?p=0&inline_set=ts_m',
+    );
     final articleEh = EHParser.parseArticleData(html);
     final meta = {
       'Id': int.parse(id),
@@ -293,7 +319,8 @@ class HentaiManager {
   static Future<QueryResult> idQueryExhentai(String id) async {
     final hash = await tryGetEhHash(int.parse(id), true);
     final html = await EHSession.requestString(
-        'https://exhentai.org/g/$id/$hash/?p=0&inline_set=ts_m');
+      'https://exhentai.org/g/$id/$hash/?p=0&inline_set=ts_m',
+    );
     final articleEh = EHParser.parseArticleData(html);
     final meta = {
       'Id': int.parse(id),
@@ -314,32 +341,37 @@ class HentaiManager {
             {
               final ehash = qr.ehash() ?? await tryGetEhHash(qr.id(), false);
               final html = await EHSession.requestString(
-                  'https://e-hentai.org/g/${qr.id()}/$ehash/?p=0&inline_set=ts_m');
+                'https://e-hentai.org/g/${qr.id()}/$ehash/?p=0&inline_set=ts_m',
+              );
               final article = EHParser.parseArticleData(html);
               return EHentaiImageProvider(
-                  count: article.length,
-                  thumbnail: article.thumbnail,
-                  pagesUrl: List<String>.generate(
-                      (article.length / article.imagesPerPage).ceil(),
-                      (index) =>
-                          'https://e-hentai.org/g/${qr.id()}/$ehash/?p=$index'),
-                  isEHentai: true,
-                  imagesPerPage: article.imagesPerPage);
+                count: article.length,
+                thumbnail: article.thumbnail,
+                pagesUrl: List<String>.generate(
+                  (article.length / article.imagesPerPage).ceil(),
+                  (index) =>
+                      'https://e-hentai.org/g/${qr.id()}/$ehash/?p=$index',
+                ),
+                isEHentai: true,
+                imagesPerPage: article.imagesPerPage,
+              );
             }
 
           case 'ExHentai':
             {
               final ehash = qr.ehash() ?? await tryGetEhHash(qr.id(), true);
               final html = await EHSession.requestString(
-                  'https://exhentai.org/g/${qr.id()}/$ehash/?p=0&inline_set=ts_m');
+                'https://exhentai.org/g/${qr.id()}/$ehash/?p=0&inline_set=ts_m',
+              );
               final article = EHParser.parseArticleData(html);
               return EHentaiImageProvider(
                 count: article.length,
                 thumbnail: article.thumbnail,
                 pagesUrl: List<String>.generate(
-                    (article.length / article.imagesPerPage).ceil(),
-                    (index) =>
-                        'https://exhentai.org/g/${qr.id()}/$ehash/?p=$index'),
+                  (article.length / article.imagesPerPage).ceil(),
+                  (index) =>
+                      'https://exhentai.org/g/${qr.id()}/$ehash/?p=$index',
+                ),
                 isEHentai: false,
                 imagesPerPage: article.imagesPerPage,
               );
@@ -347,8 +379,9 @@ class HentaiManager {
 
           case 'Hitomi':
             {
-              final imgList =
-                  await HitomiManager.getImageList(qr.id().toString());
+              final imgList = await HitomiManager.getImageList(
+                qr.id().toString(),
+              );
               if (imgList.bigThumbnails.isEmpty ||
                   imgList.bigThumbnails.isEmpty) {
                 break;
@@ -357,25 +390,33 @@ class HentaiManager {
             }
         }
       } catch (e, st) {
-        Logger.error('[hentai-getImageProvider] E: $e\n'
-            '$st');
+        Logger.error(
+          '[hentai-getImageProvider] E: $e\n'
+          '$st',
+        );
       }
     }
 
     throw Exception('gallery not found');
   }
 
-  static Future<List<QueryResult>> searchEHentai(String what,
-      [int next = 0, bool exh = false]) async {
+  static Future<List<QueryResult>> searchEHentai(
+    String what, [
+    int next = 0,
+    bool exh = false,
+  ]) async {
     final search = Uri.encodeComponent(
-        '${Settings.includeTagNetwork.value ? '${Settings.includeTags.value} ' : ''}$what${Settings.excludeTagNetwork.value ? ' ${Settings.serializedExcludeTags}' : ''}');
+      '${Settings.includeTagNetwork.value ? '${Settings.includeTags.value} ' : ''}$what${Settings.excludeTagNetwork.value ? ' ${Settings.serializedExcludeTags}' : ''}',
+    );
     final url =
         'https://e${exh ? 'x' : '-'}hentai.org/?${next == 0 ? '' : 'next=$next&'}f_cats=${Settings.searchCategory.value}&f_search=$search&advsearch=1&f_sname=on&f_stags=on${Settings.searchExpunged.value ? '&f_sh=on' : ''}&f_spf=&f_spt=';
 
     final cookie =
         (await SharedPreferences.getInstance()).getString('eh_cookies') ?? '';
-    final html =
-        (await http.get(url, headers: {'Cookie': '$cookie;sl=dm_2'})).body;
+    final html = (await http.get(
+      url,
+      headers: {'Cookie': '$cookie;sl=dm_2'},
+    )).body;
 
     final result = EHParser.parseReulstPageExtendedListView(html);
 
@@ -396,7 +437,8 @@ class HentaiManager {
         'Groups': descripts?['group']?.join('|'),
         'Characters': descripts?['character']?.join('|'),
         'Series': descripts?['parody']?.join('|') ?? 'n/a',
-        'Language': descripts?['language']
+        'Language':
+            descripts?['language']
                 ?.where((element) => !element.contains('translate'))
                 .join('|') ??
             'n/a',
@@ -438,11 +480,13 @@ Future<String> tryGetEhHash(int id, bool onExh) async {
   for (String url in urls) {
     try {
       final listHtml = await EHSession.requestString(url);
-      final href = parse(listHtml)
-          .querySelector('a[href*="/g/$id/"]')
-          ?.attributes['href'];
-      ehash =
-          href?.split('/').where((element) => element.isNotEmpty).lastOrNull;
+      final href = parse(
+        listHtml,
+      ).querySelector('a[href*="/g/$id/"]')?.attributes['href'];
+      ehash = href
+          ?.split('/')
+          .where((element) => element.isNotEmpty)
+          .lastOrNull;
       if (ehash != null) break;
     } catch (e, st) {
       Logger.error('[tryGetEhHash] $e\n$st');

@@ -13,9 +13,7 @@ typedef IntCallback = Future Function(int);
 
 class PreviewAreaWidget extends StatelessWidget {
   final QueryResult queryResult;
-  final PageController pageController = PageController(
-    initialPage: 0,
-  );
+  final PageController pageController = PageController(initialPage: 0);
   final IntCallback onPageTapped;
 
   PreviewAreaWidget({
@@ -37,40 +35,53 @@ class PreviewAreaWidget extends StatelessWidget {
     if (ProviderManager.isExists(queryResult.id())) {
       return FutureBuilder(
         future: Future.value(1).then((value) async {
-          VioletImageProvider prov =
-              await ProviderManager.get(queryResult.id());
+          VioletImageProvider prov = await ProviderManager.get(
+            queryResult.id(),
+          );
 
           return (await prov.getSmallImagesUrl(), await prov.getHeader(0));
         }),
-        builder: (context,
-            AsyncSnapshot<(List<String>, Map<String, String>)> snapshot) {
-          if (!snapshot.hasData) {
-            return const CircularProgressIndicator();
-          }
+        builder:
+            (
+              context,
+              AsyncSnapshot<(List<String>, Map<String, String>)> snapshot,
+            ) {
+              if (!snapshot.hasData) {
+                return const CircularProgressIndicator();
+              }
 
-          final pages = (snapshot.data!.$1)
-              .chunk(30)
-              .map((chunk) => GridView.count(
-                    controller: null,
-                    physics: const ScrollPhysics(),
-                    shrinkWrap: true,
-                    crossAxisCount: columnLength,
-                    childAspectRatio: 3 / 4,
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 8,
-                    children: chunk.$2
-                        .asMap()
-                        .map((i, e) => MapEntry(
-                            i,
-                            _buildTappableItem(context, chunk.$1 * 30 + i, e,
-                                snapshot.data!.$2)))
-                        .values
-                        .toList(),
-                  ))
-              .toList();
+              final pages = (snapshot.data!.$1)
+                  .chunk(30)
+                  .map(
+                    (chunk) => GridView.count(
+                      controller: null,
+                      physics: const ScrollPhysics(),
+                      shrinkWrap: true,
+                      crossAxisCount: columnLength,
+                      childAspectRatio: 3 / 4,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                      children: chunk.$2
+                          .asMap()
+                          .map(
+                            (i, e) => MapEntry(
+                              i,
+                              _buildTappableItem(
+                                context,
+                                chunk.$1 * 30 + i,
+                                e,
+                                snapshot.data!.$2,
+                              ),
+                            ),
+                          )
+                          .values
+                          .toList(),
+                    ),
+                  )
+                  .toList();
 
-          return ExpandablePageView(children: pages);
-        },
+              return ExpandablePageView(children: pages);
+            },
       );
     }
     return const Row(
@@ -81,26 +92,25 @@ class PreviewAreaWidget extends StatelessWidget {
           width: 100,
           height: 100,
           child: Align(
-            child: Text(
-              '??? Unknown Error!',
-              textAlign: TextAlign.center,
-            ),
+            child: Text('??? Unknown Error!', textAlign: TextAlign.center),
           ),
-        )
+        ),
       ],
     );
   }
 
-  Widget _buildTappableItem(BuildContext context, int index, String image,
-      Map<String, String> headers) {
+  Widget _buildTappableItem(
+    BuildContext context,
+    int index,
+    String image,
+    Map<String, String> headers,
+  ) {
     return SizedBox.expand(
       child: Stack(
         children: <Widget>[
           SizedBox.expand(
-              child: CachedNetworkImage(
-            imageUrl: image,
-            httpHeaders: headers,
-          )),
+            child: CachedNetworkImage(imageUrl: image, httpHeaders: headers),
+          ),
           Align(
             alignment: Alignment.topCenter,
             child: Container(
@@ -124,7 +134,7 @@ class PreviewAreaWidget extends StatelessWidget {
                 },
               ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -135,10 +145,7 @@ class PreviewAreaWidget extends StatelessWidget {
 class ExpandablePageView extends StatefulWidget {
   final List<Widget> children;
 
-  const ExpandablePageView({
-    super.key,
-    required this.children,
-  });
+  const ExpandablePageView({super.key, required this.children});
 
   @override
   State<ExpandablePageView> createState() => _ExpandablePageViewState();
@@ -183,54 +190,54 @@ class _ExpandablePageViewState extends State<ExpandablePageView>
   @override
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
-        curve: Curves.easeOutCirc,
-        duration: const Duration(milliseconds: 400),
-        tween: Tween<double>(begin: _heights[0], end: _currentHeight),
-        builder: (context, value, child) =>
-            SizedBox(height: value, child: child),
-        child: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 20.0),
-              child: PageView(
-                controller: _pageController,
-                children: _sizeReportingChildren
-                    .asMap() //
-                    .map((index, child) => MapEntry(index, child))
-                    .values
-                    .toList(),
-              ),
+      curve: Curves.easeOutCirc,
+      duration: const Duration(milliseconds: 400),
+      tween: Tween<double>(begin: _heights[0], end: _currentHeight),
+      builder: (context, value, child) => SizedBox(height: value, child: child),
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 20.0),
+            child: PageView(
+              controller: _pageController,
+              children: _sizeReportingChildren
+                  .asMap() //
+                  .map((index, child) => MapEntry(index, child))
+                  .values
+                  .toList(),
             ),
-            FutureBuilder(
-              future: Future.value(1),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) return Container();
+          ),
+          FutureBuilder(
+            future: Future.value(1),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) return Container();
 
-                return Positioned(
-                  top: 0.0,
-                  left: 0.0,
-                  right: 0.0,
-                  child: Container(
-                    color: null,
-                    child: Center(
-                      child: DotsIndicator(
-                        controller: _pageController,
-                        itemCount: _sizeReportingChildren.length,
-                        onPageSelected: (int page) {
-                          _pageController.animateToPage(
-                            page,
-                            duration: _kDuration,
-                            curve: _kCurve,
-                          );
-                        },
-                      ),
+              return Positioned(
+                top: 0.0,
+                left: 0.0,
+                right: 0.0,
+                child: Container(
+                  color: null,
+                  child: Center(
+                    child: DotsIndicator(
+                      controller: _pageController,
+                      itemCount: _sizeReportingChildren.length,
+                      onPageSelected: (int page) {
+                        _pageController.animateToPage(
+                          page,
+                          duration: _kDuration,
+                          curve: _kCurve,
+                        );
+                      },
                     ),
                   ),
-                );
-              },
-            ),
-          ],
-        ));
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   List<Widget> get _sizeReportingChildren => widget.children

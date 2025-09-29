@@ -47,7 +47,6 @@ class FilterController {
             succ = isOr;
           }
         }
-
         // If Multitag
         else if ((element.result[dbColumn] as String == split[1]) == isOr) {
           succ = isOr;

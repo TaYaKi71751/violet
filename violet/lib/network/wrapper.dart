@@ -25,20 +25,19 @@ class HttpWrapper {
 bool _isScriptUrl(String url) {
   const hosts = [
     'ltn.gold-usergeneratedcontent.net',
-    'raw.githubusercontent.com/project-violet/violet-message-search'
+    'raw.githubusercontent.com/project-violet/violet-message-search',
   ];
 
   return hosts.any((element) => url.contains(element));
 }
 
-Future<http.Response> get(String url,
-    {Map<String, String>? headers, Duration? timeout}) async {
+Future<http.Response> get(
+  String url, {
+  Map<String, String>? headers,
+  Duration? timeout,
+}) async {
   if (url.contains('exhentai.org') || url.contains('e-hentai.org')) {
-    return await _ehentaiGet(
-      url,
-      headers: headers,
-      timeout: timeout,
-    );
+    return await _ehentaiGet(url, headers: headers, timeout: timeout);
   } else if (_isScriptUrl(url)) {
     return await _scriptGet(url, headers: headers, timeout: timeout);
   }
@@ -52,19 +51,30 @@ Future<http.Response> get(String url,
   return res;
 }
 
-Future<http.Response> post(String url,
-    {Map<String, String>? headers, dynamic body, Encoding? encoding}) async {
+Future<http.Response> post(
+  String url, {
+  Map<String, String>? headers,
+  dynamic body,
+  Encoding? encoding,
+}) async {
   Logger.info('[Http Request] POST: $url');
-  var res = await http.post(Uri.parse(url),
-      headers: headers, body: body, encoding: encoding);
+  var res = await http.post(
+    Uri.parse(url),
+    headers: headers,
+    body: body,
+    encoding: encoding,
+  );
   if (res.statusCode != 200) {
     Logger.warning('[Http Response] CODE: ${res.statusCode}, POST: $url');
   }
   return res;
 }
 
-Future<http.Response> _ehentaiGet(String url,
-    {Map<String, String>? headers, Duration? timeout}) async {
+Future<http.Response> _ehentaiGet(
+  String url, {
+  Map<String, String>? headers,
+  Duration? timeout,
+}) async {
   if (HttpWrapper.cacheResponse.containsKey(url)) {
     return HttpWrapper.cacheResponse[url]!;
   }
@@ -106,9 +116,11 @@ Future<http.Response> _ehentaiGet(String url,
       }
       response = await sent;
     } catch (e, st) {
-      Logger.error('[Http Request] GET: $url\n'
-          'E:$e\n'
-          '$st');
+      Logger.error(
+        '[Http Request] GET: $url\n'
+        'E:$e\n'
+        '$st',
+      );
       release.call();
       if (!(timeout || e.toString().contains('Connection reset by peer')) ||
           (timeout && retry > 10)) {
@@ -142,8 +154,11 @@ Future<http.Response> _ehentaiGet(String url,
   }
 }
 
-Future<http.Response> _scriptGet(String url,
-    {Map<String, String>? headers, Duration? timeout}) async {
+Future<http.Response> _scriptGet(
+  String url, {
+  Map<String, String>? headers,
+  Duration? timeout,
+}) async {
   Logger.info('[Http Cache] GET: $url');
 
   if (HttpWrapper.cacheResponse.containsKey(url)) {

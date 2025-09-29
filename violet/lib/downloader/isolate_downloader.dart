@@ -13,14 +13,7 @@ import 'package:violet/log/log.dart';
 
 part './isolate/core.dart';
 
-enum DownloadTaskState {
-  wait,
-  append,
-  downloading,
-  complete,
-  error,
-  cancel,
-}
+enum DownloadTaskState { wait, append, downloading, complete, error, cancel }
 
 class DownloadTaskStatus {
   final DownloadTaskState state;
@@ -70,8 +63,10 @@ class IsolateDownloader {
   Future<void> init() async {
     await _initThreadCount();
     _receivePort.listen((dynamic message) => _listen(message));
-    _isolate =
-        await Isolate.spawn(_downloadIsolateRoutine, _receivePort.sendPort);
+    _isolate = await Isolate.spawn(
+      _downloadIsolateRoutine,
+      _receivePort.sendPort,
+    );
     _tasks = <int, DownloadTask>{};
     _taskTotalSizes = <int, int>{};
     _taskCountSizes = <int, int>{};
@@ -140,8 +135,9 @@ class IsolateDownloader {
 
   void changeThreadCount(int threadCount) {
     _threadCount = threadCount;
-    _sendPort!
-        .send(SendPortData(type: SendPortType.tasksize, data: threadCount));
+    _sendPort!.send(
+      SendPortData(type: SendPortType.tasksize, data: threadCount),
+    );
   }
 
   void cancel(int taskId) {
@@ -175,9 +171,7 @@ class IsolateDownloader {
   DownloadTaskStatus getStatus(int taskId) {
     if (_appendedTask.contains(taskId)) {
       if (_canceledTask.contains(taskId)) {
-        return DownloadTaskStatus(
-          state: DownloadTaskState.cancel,
-        );
+        return DownloadTaskStatus(state: DownloadTaskState.cancel);
       }
 
       if (_erroredTask.contains(taskId)) {
@@ -215,7 +209,8 @@ class IsolateDownloader {
     }
     if (_tasks[unit.id]!.downloadCallback != null) {
       _tasks[unit.id]!.downloadCallback!(
-          (unit.countSize - _tasks[unit.id]!.accDownloadSize).toDouble());
+        (unit.countSize - _tasks[unit.id]!.accDownloadSize).toDouble(),
+      );
     }
     _taskTotalSizes[unit.id] = unit.totalSize;
     _taskCountSizes[unit.id] = unit.countSize;
@@ -239,10 +234,12 @@ class IsolateDownloader {
     _erroredTask.add(unit.id);
     _errorContent[unit.id] = unit;
 
-    await Logger.error('[downloader-err] URL: ${_tasks[unit.id]!.url!}\n'
-        'P: ${_tasks[unit.id]!.downloadPath!}\n'
-        'E: ${unit.error}\n'
-        '${unit.stackTrace}');
+    await Logger.error(
+      '[downloader-err] URL: ${_tasks[unit.id]!.url!}\n'
+      'P: ${_tasks[unit.id]!.downloadPath!}\n'
+      'E: ${unit.error}\n'
+      '${unit.stackTrace}',
+    );
 
     _tasks.remove(unit.id);
   }
@@ -253,9 +250,11 @@ class IsolateDownloader {
     var count = data['count'] as int;
     var code = data['code'] as int;
 
-    await Logger.warning('[downloader-retry] URL: $url\n'
-        'CODE: $code\n'
-        'P: ${_tasks[id]!.downloadPath!}\n'
-        'C: $count');
+    await Logger.warning(
+      '[downloader-retry] URL: $url\n'
+      'CODE: $code\n'
+      'P: ${_tasks[id]!.downloadPath!}\n'
+      'C: $count',
+    );
   }
 }

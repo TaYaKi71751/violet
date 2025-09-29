@@ -125,10 +125,7 @@ class _UsableTabList extends StatefulWidget {
   final int articleId;
   final List<QueryResult> usableTabList;
 
-  const _UsableTabList({
-    required this.articleId,
-    required this.usableTabList,
-  });
+  const _UsableTabList({required this.articleId, required this.usableTabList});
 
   @override
   State<_UsableTabList> createState() => __UsableTabListState();
@@ -164,18 +161,19 @@ class __UsableTabListState extends State<_UsableTabList>
     }
 
     Future.value(1).then((value) {
-      var row = widget.usableTabList
-              .indexWhere((element) => element.id() == widget.articleId) ~/
+      var row =
+          widget.usableTabList.indexWhere(
+            (element) => element.id() == widget.articleId,
+          ) ~/
           columnLength;
       if (row == 0) return;
-      var firstItemHeight = (itemKeys[widget.usableTabList.first.id()]!
-              .currentContext!
-              .findRenderObject() as RenderBox)
-          .size
-          .height;
-      _scrollController.jumpTo(
-        row * (firstItemHeight + 8) - 100,
-      );
+      var firstItemHeight =
+          (itemKeys[widget.usableTabList.first.id()]!.currentContext!
+                      .findRenderObject()
+                  as RenderBox)
+              .size
+              .height;
+      _scrollController.jumpTo(row * (firstItemHeight + 8) - 100);
     });
   }
 
@@ -197,31 +195,29 @@ class __UsableTabListState extends State<_UsableTabList>
               childAspectRatio: 3 / 4,
             ),
             delegate: SliverChildListDelegate(
-              widget.usableTabList.map(
-                (e) {
-                  return Padding(
-                    key: itemKeys[e.id()],
-                    padding: EdgeInsets.zero,
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Provider<ArticleListItem>.value(
-                        value: ArticleListItem.fromArticleListItem(
-                          queryResult: e,
-                          addBottomPadding: false,
-                          showDetail: false,
-                          width: (windowWidth - 4.0) / columnLength,
-                          thumbnailTag: const Uuid().v4(),
-                          selectMode: true,
-                          selectCallback: () {
-                            Navigator.pop(context, e);
-                          },
-                        ),
-                        child: const ArticleListItemWidget(),
+              widget.usableTabList.map((e) {
+                return Padding(
+                  key: itemKeys[e.id()],
+                  padding: EdgeInsets.zero,
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Provider<ArticleListItem>.value(
+                      value: ArticleListItem.fromArticleListItem(
+                        queryResult: e,
+                        addBottomPadding: false,
+                        showDetail: false,
+                        width: (windowWidth - 4.0) / columnLength,
+                        thumbnailTag: const Uuid().v4(),
+                        selectMode: true,
+                        selectCallback: () {
+                          Navigator.pop(context, e);
+                        },
                       ),
+                      child: const ArticleListItemWidget(),
                     ),
-                  );
-                },
-              ).toList(),
+                  ),
+                );
+              }).toList(),
             ),
           ),
         ),
@@ -234,10 +230,7 @@ class _ArtistsArticleTabList extends StatefulWidget {
   final int articleId;
   final double height;
 
-  const _ArtistsArticleTabList({
-    required this.articleId,
-    required this.height,
-  });
+  const _ArtistsArticleTabList({required this.articleId, required this.height});
 
   @override
   State<_ArtistsArticleTabList> createState() => __ArtistsArticleTabListState();
@@ -301,11 +294,11 @@ class __ArtistsArticleTabListState extends State<_ArtistsArticleTabList>
       }
 
       final queryString = translate2query(
-          '($what) ${Settings.includeTags.value} ${Settings.serializedExcludeTags}');
-      var queryResult = (await (await DataBaseManager.getInstance())
-              .query('$queryString ORDER BY Id DESC LIMIT 500'))
-          .map((e) => QueryResult(result: e))
-          .toList();
+        '($what) ${Settings.includeTags.value} ${Settings.serializedExcludeTags}',
+      );
+      var queryResult = (await (await DataBaseManager.getInstance()).query(
+        '$queryString ORDER BY Id DESC LIMIT 500',
+      )).map((e) => QueryResult(result: e)).toList();
 
       if (queryResult.isEmpty) {
         setState(() => isLoaded = true);
@@ -324,18 +317,19 @@ class __ArtistsArticleTabListState extends State<_ArtistsArticleTabList>
       }
 
       Future.delayed(const Duration(milliseconds: 50)).then((value) {
-        var row = articleList
-                .indexWhere((element) => element.id() == widget.articleId) ~/
+        var row =
+            articleList.indexWhere(
+              (element) => element.id() == widget.articleId,
+            ) ~/
             columnLength;
         if (row == 0) return;
-        var firstItemHeight = (itemKeys[articleList.first.id()]!
-                .currentContext!
-                .findRenderObject() as RenderBox)
-            .size
-            .height;
-        _scrollController.jumpTo(
-          row * (firstItemHeight + 8) - 100,
-        );
+        var firstItemHeight =
+            (itemKeys[articleList.first.id()]!.currentContext!
+                        .findRenderObject()
+                    as RenderBox)
+                .size
+                .height;
+        _scrollController.jumpTo(row * (firstItemHeight + 8) - 100);
       });
     });
   }
@@ -370,37 +364,35 @@ class __ArtistsArticleTabListState extends State<_ArtistsArticleTabList>
                     childAspectRatio: 3 / 4,
                   ),
                   delegate: SliverChildListDelegate(
-                    articleList.map(
-                      (e) {
-                        return Padding(
-                          key: itemKeys[e.id()],
-                          padding: EdgeInsets.zero,
-                          child: Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Provider<ArticleListItem>.value(
-                              value: ArticleListItem.fromArticleListItem(
-                                queryResult: e,
-                                addBottomPadding: false,
-                                showDetail: false,
-                                width: (windowWidth - 4.0) / columnLength,
-                                thumbnailTag: const Uuid().v4(),
-                                selectMode: true,
-                                selectCallback: () async {
-                                  if (!Settings
-                                      .showNewViewerWhenArtistArticleListItemTap
-                                      .value) {
-                                    _showArticleInfo(e);
-                                  } else {
-                                    _showViewer(e);
-                                  }
-                                },
-                              ),
-                              child: const ArticleListItemWidget(),
+                    articleList.map((e) {
+                      return Padding(
+                        key: itemKeys[e.id()],
+                        padding: EdgeInsets.zero,
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Provider<ArticleListItem>.value(
+                            value: ArticleListItem.fromArticleListItem(
+                              queryResult: e,
+                              addBottomPadding: false,
+                              showDetail: false,
+                              width: (windowWidth - 4.0) / columnLength,
+                              thumbnailTag: const Uuid().v4(),
+                              selectMode: true,
+                              selectCallback: () async {
+                                if (!Settings
+                                    .showNewViewerWhenArtistArticleListItemTap
+                                    .value) {
+                                  _showArticleInfo(e);
+                                } else {
+                                  _showViewer(e);
+                                }
+                              },
                             ),
+                            child: const ArticleListItemWidget(),
                           ),
-                        );
-                      },
-                    ).toList(),
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
               ),
@@ -438,21 +430,24 @@ class __ArtistsArticleTabListState extends State<_ArtistsArticleTabList>
         fullscreenDialog: true,
         builder: (context) {
           return Provider<ViewerPageProvider>.value(
-              value: ViewerPageProvider(
-                uris: List<String>.filled(prov.length(), ''),
-                useProvider: true,
-                provider: prov,
-                headers: headers,
-                id: e.id(),
-                title: e.title(),
-                usableTabList: articleList,
-              ),
-              child: const ViewerPage());
+            value: ViewerPageProvider(
+              uris: List<String>.filled(prov.length(), ''),
+              useProvider: true,
+              provider: prov,
+              headers: headers,
+              id: e.id(),
+              title: e.title(),
+              usableTabList: articleList,
+            ),
+            child: const ViewerPage(),
+          );
         },
       ),
     ).then((value) async {
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-          overlays: SystemUiOverlay.values);
+      SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.manual,
+        overlays: SystemUiOverlay.values,
+      );
     });
   }
 }

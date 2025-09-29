@@ -59,9 +59,7 @@ class VioletLicensePage extends StatelessWidget {
                 );
               },
             ),
-            Container(
-              height: 50,
-            ),
+            Container(height: 50),
             Text(
               'This program was created using open sources.',
               style: TextStyle(
@@ -71,56 +69,46 @@ class VioletLicensePage extends StatelessWidget {
                 letterSpacing: 1.0,
               ),
             ),
-            Container(
-              height: 50,
+            Container(height: 50),
+            Wrap(
+              children: [
+                SvgPicture.network(
+                  'https://github.com/project-violet/violet/releases/download/logos/flutter.svg',
+                  width: 50,
+                  height: 30,
+                ),
+                Container(width: 8),
+                SvgPicture.network(
+                  'https://github.com/project-violet/violet/releases/download/logos/dart.svg',
+                  width: 30,
+                  height: 30,
+                ),
+                Container(width: 8),
+                SvgPicture.network(
+                  'https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg',
+                  width: 30,
+                  height: 30,
+                ),
+                Container(width: 8),
+                Image.network(
+                  'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Rust_programming_language_black_logo.svg/800px-Rust_programming_language_black_logo.svg.png',
+                  width: 30,
+                  height: 30,
+                ),
+                Container(width: 8),
+                Image.network(
+                  'https://upload.wikimedia.org/wikipedia/commons/b/b5/Kotlin-logo.png',
+                  width: 30,
+                  height: 30,
+                ),
+                Container(width: 8),
+                Image.network(
+                  'https://upload.wikimedia.org/wikipedia/commons/b/b5/Kotlin-logo.png',
+                  width: 30,
+                  height: 30,
+                ),
+              ],
             ),
-            Wrap(children: [
-              SvgPicture.network(
-                'https://github.com/project-violet/violet/releases/download/logos/flutter.svg',
-                width: 50,
-                height: 30,
-              ),
-              Container(
-                width: 8,
-              ),
-              SvgPicture.network(
-                'https://github.com/project-violet/violet/releases/download/logos/dart.svg',
-                width: 30,
-                height: 30,
-              ),
-              Container(
-                width: 8,
-              ),
-              SvgPicture.network(
-                'https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg',
-                width: 30,
-                height: 30,
-              ),
-              Container(
-                width: 8,
-              ),
-              Image.network(
-                'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Rust_programming_language_black_logo.svg/800px-Rust_programming_language_black_logo.svg.png',
-                width: 30,
-                height: 30,
-              ),
-              Container(
-                width: 8,
-              ),
-              Image.network(
-                'https://upload.wikimedia.org/wikipedia/commons/b/b5/Kotlin-logo.png',
-                width: 30,
-                height: 30,
-              ),
-              Container(
-                width: 8,
-              ),
-              Image.network(
-                'https://upload.wikimedia.org/wikipedia/commons/b/b5/Kotlin-logo.png',
-                width: 30,
-                height: 30,
-              ),
-            ]),
             // Container(
             //   width: double.infinity,
             //   height: 0.5,

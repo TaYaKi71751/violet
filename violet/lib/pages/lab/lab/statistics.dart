@@ -56,19 +56,20 @@ class _StatisticsState extends State<Statistics> {
 
   Future<void> updateRercord(dummy) async {
     try {
-      final articles = await User.getInstance()
-          .then((value) => value.getUserLog().then((value) async {
-                totalRead = value.length;
-                var overap = HashSet<String>();
-                var rr = <ArticleReadLog>[];
-                for (var element in value) {
-                  if (overap.contains(element.articleId())) continue;
-                  rr.add(element);
-                  overap.add(element.articleId());
-                }
-                pureRead = rr.length;
-                return rr;
-              }));
+      final articles = await User.getInstance().then(
+        (value) => value.getUserLog().then((value) async {
+          totalRead = value.length;
+          var overap = HashSet<String>();
+          var rr = <ArticleReadLog>[];
+          for (var element in value) {
+            if (overap.contains(element.articleId())) continue;
+            rr.add(element);
+            overap.add(element.articleId());
+          }
+          pureRead = rr.length;
+          return rr;
+        }),
+      );
 
       final queryRaw =
           '${translate2query('${Settings.includeTags.value} ${Settings.serializedExcludeTags}')} AND '
@@ -95,21 +96,22 @@ class _StatisticsState extends State<Statistics> {
               .split('|')
               .where((element) => element != '')
               .forEach((element) {
-            if (element.startsWith('female:')) {
-              femaleTags += 1;
-            } else if (element.startsWith('male:')) {
-              maleTags += 1;
-            } else {
-              tags += 1;
-            }
+                if (element.startsWith('female:')) {
+                  femaleTags += 1;
+                } else if (element.startsWith('male:')) {
+                  maleTags += 1;
+                } else {
+                  tags += 1;
+                }
 
-            if (!ffstat.containsKey(element)) ffstat[element] = 0;
-            ffstat[element] = ffstat[element]! + 1;
-          });
+                if (!ffstat.containsKey(element)) ffstat[element] = 0;
+                ffstat[element] = ffstat[element]! + 1;
+              });
         }
       } else {
-        final log =
-            await User.getInstance().then((value) => value.getUserLog());
+        final log = await User.getInstance().then(
+          (value) => value.getUserLog(),
+        );
         final idMap = <String, QueryResult>{};
         for (var element in query.results!) {
           idMap[element.id().toString()] = element;
@@ -122,17 +124,17 @@ class _StatisticsState extends State<Statistics> {
               .split('|')
               .where((element) => element != '')
               .forEach((element) {
-            if (element.startsWith('female:')) {
-              femaleTags += 1;
-            } else if (element.startsWith('male:')) {
-              maleTags += 1;
-            } else {
-              tags += 1;
-            }
+                if (element.startsWith('female:')) {
+                  femaleTags += 1;
+                } else if (element.startsWith('male:')) {
+                  maleTags += 1;
+                } else {
+                  tags += 1;
+                }
 
-            if (!ffstat.containsKey(element)) ffstat[element] = 0;
-            ffstat[element] = ffstat[element]! + 1;
-          });
+                if (!ffstat.containsKey(element)) ffstat[element] = 0;
+                ffstat[element] = ffstat[element]! + 1;
+              });
         }
       }
 
@@ -153,8 +155,10 @@ class _StatisticsState extends State<Statistics> {
 
       setState(() {});
     } catch (e, st) {
-      Logger.error('[lab-statistics] E: $e\n'
-          '$st');
+      Logger.error(
+        '[lab-statistics] E: $e\n'
+        '$st',
+      );
     }
   }
 
@@ -175,7 +179,9 @@ class _StatisticsState extends State<Statistics> {
 
     const chunkSize = 64 * 1024 * 1024;
     final chunkStarts = List.generate(
-        (logSize / chunkSize.toDouble()).ceil(), (i) => i * chunkSize);
+      (logSize / chunkSize.toDouble()).ceil(),
+      (i) => i * chunkSize,
+    );
     final raf = await Logger.logFile.open(mode: FileMode.read);
 
     final dts = <DateTime>[];
@@ -196,10 +202,12 @@ class _StatisticsState extends State<Statistics> {
           baseTime ??= dt;
 
           if (line.contains(
-              'https://raw.githubusercontent.com/violet-dev/sync-data/master/syncversion.txt')) {
+            'https://raw.githubusercontent.com/violet-dev/sync-data/master/syncversion.txt',
+          )) {
             stopMark.add(latestStopMarkPos);
           } else if (line.contains(
-              'https://raw.githubusercontent.com/project-violet/scripts/main/hitomi_get_image_list_v3.js')) {
+            'https://raw.githubusercontent.com/project-violet/scripts/main/hitomi_get_image_list_v3.js',
+          )) {
             latestStopMarkPos = dts.length - 1;
           }
         }
@@ -224,8 +232,10 @@ class _StatisticsState extends State<Statistics> {
     totalSeconds = 0;
     startUpTimes = 0;
     for (var i = 0; i < stopMark.length - 1; i++) {
-      final s =
-          dts[stopMark[i]].difference(dts[stopMark[i + 1] - 1]).abs().inSeconds;
+      final s = dts[stopMark[i]]
+          .difference(dts[stopMark[i + 1] - 1])
+          .abs()
+          .inSeconds;
       if (s > 60 * 60 * 24) continue;
       totalSeconds += s;
       startUpTimes += 1;
@@ -253,16 +263,26 @@ class _StatisticsState extends State<Statistics> {
       }
     }
 
-    final minDate = DateTime.fromMicrosecondsSinceEpoch(events.entries
-        .map((e) =>
-            e.value.map((e) => e.dateTime!.microsecondsSinceEpoch).reduce(min))
-        .reduce(min));
-    final maxDate = DateTime.fromMicrosecondsSinceEpoch(events.entries
-        .map((e) =>
-            e.value.map((e) => e.dateTime!.microsecondsSinceEpoch).reduce(max))
-        .reduce(max));
+    final minDate = DateTime.fromMicrosecondsSinceEpoch(
+      events.entries
+          .map(
+            (e) => e.value
+                .map((e) => e.dateTime!.microsecondsSinceEpoch)
+                .reduce(min),
+          )
+          .reduce(min),
+    );
+    final maxDate = DateTime.fromMicrosecondsSinceEpoch(
+      events.entries
+          .map(
+            (e) => e.value
+                .map((e) => e.dateTime!.microsecondsSinceEpoch)
+                .reduce(max),
+          )
+          .reduce(max),
+    );
 
-    for (var i = 0;; i++) {
+    for (var i = 0; ; i++) {
       final d = DateTime(minDate.year, minDate.month, minDate.day + i);
 
       timePerDate[d] = 0;
@@ -318,9 +338,9 @@ class _StatisticsState extends State<Statistics> {
     final dir = await getTemporaryDirectory();
 
     if (dir.existsSync()) {
-      dir
-          .listSync(recursive: true, followLinks: false)
-          .forEach((FileSystemEntity entity) {
+      dir.listSync(recursive: true, followLinks: false).forEach((
+        FileSystemEntity entity,
+      ) {
         if (entity is File) {
           cacheCount++;
           cacheSize += entity.lengthSync();
@@ -386,13 +406,14 @@ class _StatisticsState extends State<Statistics> {
                   onChanged: (value) {
                     if (value != null) {
                       _allowOverlap = value;
-                      Future.delayed(const Duration(milliseconds: 100))
-                          .then(updateRercord);
+                      Future.delayed(
+                        const Duration(milliseconds: 100),
+                      ).then(updateRercord);
                       setState(() {});
                     }
                   },
                 ),
-              )
+              ),
             ],
           ),
         ],
@@ -429,107 +450,112 @@ class _StatisticsState extends State<Statistics> {
   _tagChart() {
     final width = MediaQuery.of(context).size.width;
     var axis1 = charts.AxisSpec<String>(
-        renderSpec: charts.GridlineRendererSpec(
-            labelStyle: charts.TextStyleSpec(
-                fontSize: isExpanded ? 10 : 14,
-                color: charts.MaterialPalette.white),
-            lineStyle: const charts.LineStyleSpec(
-                color: charts.MaterialPalette.transparent)));
-    var axis2 = const charts.NumericAxisSpec(
-        renderSpec: charts.GridlineRendererSpec(
-      labelStyle: charts.TextStyleSpec(
-          fontSize: 10, color: charts.MaterialPalette.white),
-    ));
-    return Column(children: [
-      Container(
-        height: 16,
-      ),
-      const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('나의 통계',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-        ],
-      ),
-      Padding(
-        padding: const EdgeInsets.fromLTRB(64, 16, 64, 0),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8.0),
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                  flex: femaleTags,
-                  child: Container(
-                    height: 8,
-                    color: Colors.pink,
-                  )),
-              Expanded(
-                  flex: maleTags,
-                  child: Container(
-                    height: 8,
-                    color: Colors.blue,
-                  )),
-              Expanded(
-                  flex: tags,
-                  child: Container(
-                    height: 8,
-                    color: Colors.grey,
-                  )),
-            ],
-          ),
+      renderSpec: charts.GridlineRendererSpec(
+        labelStyle: charts.TextStyleSpec(
+          fontSize: isExpanded ? 10 : 14,
+          color: charts.MaterialPalette.white,
+        ),
+        lineStyle: const charts.LineStyleSpec(
+          color: charts.MaterialPalette.transparent,
         ),
       ),
-      Container(
-        padding: const EdgeInsets.all(4),
+    );
+    var axis2 = const charts.NumericAxisSpec(
+      renderSpec: charts.GridlineRendererSpec(
+        labelStyle: charts.TextStyleSpec(
+          fontSize: 10,
+          color: charts.MaterialPalette.white,
+        ),
       ),
-      InkWell(
-        child: SizedBox(
+    );
+    return Column(
+      children: [
+        Container(height: 16),
+        const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              '나의 통계',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(64, 16, 64, 0),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8.0),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  flex: femaleTags,
+                  child: Container(height: 8, color: Colors.pink),
+                ),
+                Expanded(
+                  flex: maleTags,
+                  child: Container(height: 8, color: Colors.blue),
+                ),
+                Expanded(
+                  flex: tags,
+                  child: Container(height: 8, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Container(padding: const EdgeInsets.all(4)),
+        InkWell(
+          child: SizedBox(
             width: width - 16 - 32,
-            height:
-                isExpanded ? lff.length * 14.0 + 10 : lff.length * 22.0 + 10,
+            height: isExpanded
+                ? lff.length * 14.0 + 10
+                : lff.length * 22.0 + 10,
             child: charts.BarChart(
               [
                 charts.Series<(String, int), String>(
-                    id: 'Sales',
-                    data: lff,
-                    domainFn: ((String, int) sales, f) => sales.$1.contains(':')
-                        ? sales.$1.split(':')[1]
-                        : sales.$1,
-                    measureFn: ((String, int) sales, _) => sales.$2,
-                    colorFn: ((String, int) sales, _) {
-                      if (sales.$1.startsWith('female:')) {
-                        return charts.MaterialPalette.pink.shadeDefault;
-                      } else if (sales.$1.startsWith('male:')) {
-                        return charts.MaterialPalette.blue.shadeDefault;
-                      } else {
-                        return charts.MaterialPalette.gray.shadeDefault;
-                      }
-                    }),
+                  id: 'Sales',
+                  data: lff,
+                  domainFn: ((String, int) sales, f) => sales.$1.contains(':')
+                      ? sales.$1.split(':')[1]
+                      : sales.$1,
+                  measureFn: ((String, int) sales, _) => sales.$2,
+                  colorFn: ((String, int) sales, _) {
+                    if (sales.$1.startsWith('female:')) {
+                      return charts.MaterialPalette.pink.shadeDefault;
+                    } else if (sales.$1.startsWith('male:')) {
+                      return charts.MaterialPalette.blue.shadeDefault;
+                    } else {
+                      return charts.MaterialPalette.gray.shadeDefault;
+                    }
+                  },
+                ),
               ],
               primaryMeasureAxis: Settings.themeWhat.value ? axis2 : null,
               domainAxis: Settings.themeWhat.value ? axis1 : null,
               animate: true,
               vertical: false,
-            )),
-        onTap: () {},
-        onTapCancel: () {
-          isExpanded = !isExpanded;
-          if (isExpanded) {
-            lff = lffOrigin!;
-          } else {
-            lff = lffOrigin!.take(5).toList();
-          }
-          setState(() {});
-          Future.delayed(const Duration(milliseconds: 100)).then((value) =>
-              _controller.animateTo(0.0,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.fastOutSlowIn));
-        },
-      ),
-      Container(
-        padding: const EdgeInsets.all(8),
-      ),
-    ]);
+            ),
+          ),
+          onTap: () {},
+          onTapCancel: () {
+            isExpanded = !isExpanded;
+            if (isExpanded) {
+              lff = lffOrigin!;
+            } else {
+              lff = lffOrigin!.take(5).toList();
+            }
+            setState(() {});
+            Future.delayed(const Duration(milliseconds: 100)).then(
+              (value) => _controller.animateTo(
+                0.0,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.fastOutSlowIn,
+              ),
+            );
+          },
+        ),
+        Container(padding: const EdgeInsets.all(8)),
+      ],
+    );
   }
 
   _status() {
@@ -544,22 +570,14 @@ class _StatisticsState extends State<Statistics> {
         Container(height: 15),
         Text('앱 시작 횟수: ${numberWithComma(startUpTimes)}번'),
         Text('앱 실행 시간: ${durationToString(Duration(seconds: totalSeconds))}'),
-        const Text(
-          '* 백그라운드 포함',
-          style: TextStyle(fontSize: 13.0),
-        ),
-        Text(
-          '* 기준: $baseTime 부터',
-          style: const TextStyle(fontSize: 13.0),
-        ),
+        const Text('* 백그라운드 포함', style: TextStyle(fontSize: 13.0)),
+        Text('* 기준: $baseTime 부터', style: const TextStyle(fontSize: 13.0)),
         Container(height: 30),
         Text('앱 전환 횟수: ${numberWithComma(pureStartUpTime)}번'),
         Text(
-            '순수 앱 사용 시간: ${durationToString(Duration(seconds: totalPureSeconds))}'),
-        Text(
-          '* 기준: $basePureTime 부터',
-          style: const TextStyle(fontSize: 13.0),
+          '순수 앱 사용 시간: ${durationToString(Duration(seconds: totalPureSeconds))}',
         ),
+        Text('* 기준: $basePureTime 부터', style: const TextStyle(fontSize: 13.0)),
       ],
     );
   }
@@ -586,24 +604,31 @@ class _StatisticsState extends State<Statistics> {
             dateTimeFactory: const charts.LocalDateTimeFactory(),
             behaviors: [
               charts.SelectNearest(
-                  eventTrigger: charts.SelectionTrigger.tapAndDrag),
+                eventTrigger: charts.SelectionTrigger.tapAndDrag,
+              ),
               charts.LinePointHighlighter(
-                  symbolRenderer: TextSymbolRenderer(() => yvalue))
+                symbolRenderer: TextSymbolRenderer(() => yvalue),
+              ),
             ],
             selectionModels: [
               charts.SelectionModelConfig(
-                  changedListener: (charts.SelectionModel model) {
-                if (model.hasDatumSelection) {
-                  final d = model.selectedSeries[0]
-                      .domainFn(model.selectedDatum[0].index) as DateTime;
+                changedListener: (charts.SelectionModel model) {
+                  if (model.hasDatumSelection) {
+                    final d =
+                        model.selectedSeries[0].domainFn(
+                              model.selectedDatum[0].index,
+                            )
+                            as DateTime;
 
-                  yvalue = '${d.month}/${d.day}, '
-                      '${model.selectedSeries[0].measureFn(model.selectedDatum[0].index)}분';
-                }
-              })
+                    yvalue =
+                        '${d.month}/${d.day}, '
+                        '${model.selectedSeries[0].measureFn(model.selectedDatum[0].index)}분';
+                  }
+                },
+              ),
             ],
           ),
-        )
+        ),
       ],
     );
   }
@@ -617,14 +642,18 @@ class _StatisticsState extends State<Statistics> {
         child: HeatMap(
           datasets: timePerDate,
           colorMode: ColorMode.opacity,
-          startDate: timePerDate.entries.map((e) => e.key).reduce(
-              ((value, element) =>
-                  value.compareTo(element) < 0 ? value : element)),
+          startDate: timePerDate.entries
+              .map((e) => e.key)
+              .reduce(
+                ((value, element) =>
+                    value.compareTo(element) < 0 ? value : element),
+              ),
           showText: false,
           scrollable: true,
           onClick: (value) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(value.toString())));
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(value.toString())));
           },
           colorsets: {1: Settings.majorColor.value},
         ),
@@ -636,26 +665,35 @@ class _StatisticsState extends State<Statistics> {
 typedef GetText = String Function();
 
 class TextSymbolRenderer extends charts.CircleSymbolRenderer {
-  TextSymbolRenderer(this.getText,
-      {this.marginBottom = 8, this.padding = const EdgeInsets.all(8)});
+  TextSymbolRenderer(
+    this.getText, {
+    this.marginBottom = 8,
+    this.padding = const EdgeInsets.all(8),
+  });
 
   final GetText getText;
   final double marginBottom;
   final EdgeInsets padding;
 
   @override
-  void paint(charts.ChartCanvas canvas, Rectangle<num> bounds,
-      {List<int>? dashPattern,
-      charts.Color? fillColor,
-      charts.FillPatternType? fillPattern,
-      charts.Color? strokeColor,
-      double? strokeWidthPx}) {
-    super.paint(canvas, bounds,
-        dashPattern: dashPattern,
-        fillColor: fillColor,
-        fillPattern: fillPattern,
-        strokeColor: strokeColor,
-        strokeWidthPx: strokeWidthPx);
+  void paint(
+    charts.ChartCanvas canvas,
+    Rectangle<num> bounds, {
+    List<int>? dashPattern,
+    charts.Color? fillColor,
+    charts.FillPatternType? fillPattern,
+    charts.Color? strokeColor,
+    double? strokeWidthPx,
+  }) {
+    super.paint(
+      canvas,
+      bounds,
+      dashPattern: dashPattern,
+      fillColor: fillColor,
+      fillPattern: fillPattern,
+      strokeColor: strokeColor,
+      strokeWidthPx: strokeWidthPx,
+    );
 
     final textStyle = canvas.graphicsFactory.createTextPaint()
       ..color = charts.Color.black
@@ -668,7 +706,8 @@ class TextSymbolRenderer extends charts.CircleSymbolRenderer {
     double height = textElement.measurement.verticalSliceWidth;
 
     double centerX = bounds.left + bounds.width / 2;
-    double centerY = bounds.top +
+    double centerY =
+        bounds.top +
         bounds.height / 2 -
         marginBottom -
         (padding.top + padding.bottom);

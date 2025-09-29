@@ -43,7 +43,8 @@ void main() async {
 
     const searchQuery = '다채로운 문체';
     final result = await llmSearchService.search(
-      query: '''
+      query:
+          '''
 당신은 다양한 작품들을 분석하는 전문가다.
 작품이 $searchQuery와 관련된 정보를 포함하는지에 대한 여부를 판단하여 간단한 설명(reason)을 작성한다.
 관련된 정보를 포함하지 않거나 동떨어진 경우에는 해당 작품을 제외해야 하되 가능한 많은 결과를 출력하도록 노력한다.

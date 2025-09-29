@@ -32,10 +32,12 @@ void main() {
 
     test('Hitomi Query Auto Complete Fuzzy', () async {
       final result0 = await HentaiIndex.queryAutoCompleteFuzzy('michoking');
-      final result1 =
-          await HentaiIndex.queryAutoCompleteFuzzy('artist:michoking');
-      final result2 =
-          await HentaiIndex.queryAutoCompleteFuzzy('female:bigbreakfast');
+      final result1 = await HentaiIndex.queryAutoCompleteFuzzy(
+        'artist:michoking',
+      );
+      final result2 = await HentaiIndex.queryAutoCompleteFuzzy(
+        'female:bigbreakfast',
+      );
 
       expect(result0[0].$1.toString(), 'artist:michiking');
       expect(result1[0].$1.toString(), 'artist:michiking');
@@ -44,19 +46,28 @@ void main() {
 
     test('Hitomi Query To Sql', () {
       Settings.searchPure.setValue(false);
-      final result0 =
-          translate2query('female:sole_female (lang:korean or lang:n/a)');
-      final result1 =
-          translate2query('female:sole_female -(female:mother female:milf)');
-      final result2 =
-          translate2query('(lang:korean or lang:n/a) -female:sole_female');
+      final result0 = translate2query(
+        'female:sole_female (lang:korean or lang:n/a)',
+      );
+      final result1 = translate2query(
+        'female:sole_female -(female:mother female:milf)',
+      );
+      final result2 = translate2query(
+        '(lang:korean or lang:n/a) -female:sole_female',
+      );
 
-      expect(result0,
-          'SELECT * FROM HitomiColumnModel WHERE Tags LIKE \'%|female:sole female|%\' AND (Language LIKE \'%korean%\' OR Language LIKE \'%n/a%\')  AND ExistOnHitomi=1');
-      expect(result1,
-          'SELECT * FROM HitomiColumnModel WHERE Tags LIKE \'%|female:sole female|%\' AND NOT (Tags LIKE \'%|female:mother|%\' AND Tags LIKE \'%|female:milf|%\')  AND ExistOnHitomi=1');
-      expect(result2,
-          'SELECT * FROM HitomiColumnModel WHERE (Language LIKE \'%korean%\' OR Language LIKE \'%n/a%\') AND (Tags LIKE \'%|female:sole female|%\') IS NOT 1  AND ExistOnHitomi=1');
+      expect(
+        result0,
+        'SELECT * FROM HitomiColumnModel WHERE Tags LIKE \'%|female:sole female|%\' AND (Language LIKE \'%korean%\' OR Language LIKE \'%n/a%\')  AND ExistOnHitomi=1',
+      );
+      expect(
+        result1,
+        'SELECT * FROM HitomiColumnModel WHERE Tags LIKE \'%|female:sole female|%\' AND NOT (Tags LIKE \'%|female:mother|%\' AND Tags LIKE \'%|female:milf|%\')  AND ExistOnHitomi=1',
+      );
+      expect(
+        result2,
+        'SELECT * FROM HitomiColumnModel WHERE (Language LIKE \'%korean%\' OR Language LIKE \'%n/a%\') AND (Tags LIKE \'%|female:sole female|%\') IS NOT 1  AND ExistOnHitomi=1',
+      );
     });
   });
 }

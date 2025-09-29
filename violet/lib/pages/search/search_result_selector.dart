@@ -48,11 +48,7 @@ class SearchResultSelector extends StatelessWidget {
                       padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Expanded(
-                            child: Container(),
-                          )
-                        ],
+                        children: <Widget>[Expanded(child: Container())],
                       ),
                     ),
                   ),

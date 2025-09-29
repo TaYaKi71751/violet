@@ -26,7 +26,8 @@ class SearchPageController extends GetxController {
   late AssetFlare asset;
 
   FilterController filterController = FilterController(
-      heroKey: 'searchtype${ModalBottomSheetContext.getCount()}');
+    heroKey: 'searchtype${ModalBottomSheetContext.getCount()}',
+  );
 
   ScrollController? scrollController;
   Map<String, GlobalKey> itemKeys = <String, GlobalKey>{};
@@ -75,8 +76,13 @@ class SearchPageController extends GetxController {
         // invisible article is not rendered yet
         // so we can find live elements
         if (key.value.currentContext != null) {
-          final bottomPadding =
-              [8, 8, 0, 0, 0][Settings.searchResultType.value.index];
+          final bottomPadding = [
+            8,
+            8,
+            0,
+            0,
+            0,
+          ][Settings.searchResultType.value.index];
           _itemHeight = key.value.currentContext!.size!.height + bottomPadding;
           break;
         }
@@ -89,8 +95,8 @@ class SearchPageController extends GetxController {
     const searchBarHeight = 64 + 16;
     final curI =
         ((scrollController!.offset - searchBarHeight) / _itemHeight + 1)
-                .toInt() *
-            itemPerRow;
+            .toInt() *
+        itemPerRow;
 
     if (curI != searchPageNum.value && isExtended.value) {
       searchPageNum.value = curI;
@@ -99,7 +105,8 @@ class SearchPageController extends GetxController {
     //
     // scroll direction
     //
-    var upScrolling = scrollController!.position.userScrollDirection ==
+    var upScrolling =
+        scrollController!.position.userScrollDirection ==
         ScrollDirection.forward;
 
     if (upScrolling) {
@@ -184,11 +191,14 @@ class SearchPageController extends GetxController {
         latestQuery!.$1 == null ? 0 : latestQuery!.$1!.next ?? 0,
       );
       if (!Settings.ignoreTimeout.value) {
-        search.timeout(const Duration(seconds: 10), onTimeout: () {
-          Logger.error('[Search_loadNextQuery] Search Timeout');
+        search.timeout(
+          const Duration(seconds: 10),
+          onTimeout: () {
+            Logger.error('[Search_loadNextQuery] Search Timeout');
 
-          throw TimeoutException('Failed to search the query');
-        });
+            throw TimeoutException('Failed to search the query');
+          },
+        );
       }
       var next = await search;
 
@@ -209,8 +219,9 @@ class SearchPageController extends GetxController {
       if (searchTotalResultCount.value == 0 &&
           !latestQuery!.$2.contains('random:')) {
         Future.delayed(const Duration(milliseconds: 100)).then((value) async {
-          searchTotalResultCount.value =
-              await HentaiManager.countSearch(latestQuery!.$2);
+          searchTotalResultCount.value = await HentaiManager.countSearch(
+            latestQuery!.$2,
+          );
         });
       }
 
@@ -218,8 +229,10 @@ class SearchPageController extends GetxController {
 
       ScriptManager.refresh();
     } catch (e, st) {
-      Logger.error('[search-error] E: $e\n'
-          '$st');
+      Logger.error(
+        '[search-error] E: $e\n'
+        '$st',
+      );
       rethrow;
     } finally {
       _querySem.release();
@@ -236,7 +249,8 @@ class SearchPageController extends GetxController {
     _queryEnd = false;
     queryResult = [];
     filterController = FilterController(
-        heroKey: 'searchtype${ModalBottomSheetContext.getCount()}');
+      heroKey: 'searchtype${ModalBottomSheetContext.getCount()}',
+    );
     isFilterUsed = false;
     searchTotalResultCount.value = 0;
     searchPageNum.value = 0;

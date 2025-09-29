@@ -30,8 +30,9 @@ class LabRecordViewPage extends StatelessWidget {
   Widget future(context, double width) {
     var windowWidth = MediaQuery.of(context).size.width;
     return FutureBuilder(
-      future:
-          Future.delayed(const Duration(milliseconds: 100)).then((value) async {
+      future: Future.delayed(const Duration(milliseconds: 100)).then((
+        value,
+      ) async {
         var overap = HashSet<String>();
         var rr = <ArticleReadLog>[];
 
@@ -42,7 +43,8 @@ class LabRecordViewPage extends StatelessWidget {
         });
 
         return await QueryManager.queryIds(
-            rr.map((e) => e.articleId()).toList());
+          rr.map((e) => e.articleId()).toList(),
+        );
       }),
       builder: (context, AsyncSnapshot<List<QueryResult>> snapshot) {
         if (!snapshot.hasData) return Container();
@@ -59,36 +61,33 @@ class LabRecordViewPage extends StatelessWidget {
                   childAspectRatio: 3 / 4,
                 ),
                 delegate: SliverChildListDelegate(
-                  snapshot.data!.map(
-                    (e) {
-                      return Padding(
-                        key: Key('lab_record/${e.id()}'),
-                        padding: EdgeInsets.zero,
-                        child: Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: <Widget>[
-                              snapshot.hasData
-                                  ? Provider<ArticleListItem>.value(
-                                      value:
-                                          ArticleListItem.fromArticleListItem(
-                                        queryResult: e,
-                                        addBottomPadding: false,
-                                        showDetail: false,
-                                        width: (windowWidth - 4.0 - 48) / 3,
-                                        thumbnailTag: const Uuid().v4(),
-                                        usableTabList: snapshot.data,
-                                      ),
-                                      child: const ArticleListItemWidget(),
-                                    )
-                                  : Container()
-                            ],
-                          ),
+                  snapshot.data!.map((e) {
+                    return Padding(
+                      key: Key('lab_record/${e.id()}'),
+                      padding: EdgeInsets.zero,
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            snapshot.hasData
+                                ? Provider<ArticleListItem>.value(
+                                    value: ArticleListItem.fromArticleListItem(
+                                      queryResult: e,
+                                      addBottomPadding: false,
+                                      showDetail: false,
+                                      width: (windowWidth - 4.0 - 48) / 3,
+                                      thumbnailTag: const Uuid().v4(),
+                                      usableTabList: snapshot.data,
+                                    ),
+                                    child: const ArticleListItemWidget(),
+                                  )
+                                : Container(),
+                          ],
                         ),
-                      );
-                    },
-                  ).toList(),
+                      ),
+                    );
+                  }).toList(),
                 ),
               ),
             ),

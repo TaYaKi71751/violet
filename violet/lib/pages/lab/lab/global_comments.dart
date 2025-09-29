@@ -31,8 +31,9 @@ class _LabGlobalCommentsState extends State<LabGlobalComments> {
   void initState() {
     super.initState();
 
-    Future.delayed(const Duration(milliseconds: 100))
-        .then((value) async => await readComments());
+    Future.delayed(
+      const Duration(milliseconds: 100),
+    ).then((value) async => await readComments());
   }
 
   TextEditingController text = TextEditingController();
@@ -41,13 +42,7 @@ class _LabGlobalCommentsState extends State<LabGlobalComments> {
     var tcomments = await VioletServerV2.getComments('general');
 
     comments = tcomments.elements
-        .map((e) => (
-              e.id,
-              e.dateTime,
-              e.userAppId,
-              e.body,
-              e.parent,
-            ))
+        .map((e) => (e.id, e.dateTime, e.userAppId, e.body, e.parent))
         .toList();
 
     if (comments.isNotEmpty) setState(() {});
@@ -76,8 +71,9 @@ class _LabGlobalCommentsState extends State<LabGlobalComments> {
                   dateTime: pureComments[index].$2,
                   reply: reply,
                   replies: comments
-                      .where((x) =>
-                          x.$5 != null && x.$5! == pureComments[index].$1)
+                      .where(
+                        (x) => x.$5 != null && x.$5! == pureComments[index].$1,
+                      )
                       .toList()
                       .reversed
                       .toList(),
@@ -106,10 +102,11 @@ class _LabGlobalCommentsState extends State<LabGlobalComments> {
             child: Ink(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               decoration: BoxDecoration(
-                  color: Settings.themeWhat.value
-                      ? Colors.grey.shade800
-                      : const Color(0xffe2e4e7),
-                  borderRadius: const BorderRadius.all(Radius.circular(6.0))),
+                color: Settings.themeWhat.value
+                    ? Colors.grey.shade800
+                    : const Color(0xffe2e4e7),
+                borderRadius: const BorderRadius.all(Radius.circular(6.0)),
+              ),
               child: Row(
                 children: [
                   if (modReply)
@@ -132,10 +129,13 @@ class _LabGlobalCommentsState extends State<LabGlobalComments> {
                   Expanded(
                     child: TextField(
                       focusNode: myFocusNode,
-                      style:
-                          const TextStyle(fontSize: 14.0, color: Colors.grey),
+                      style: const TextStyle(
+                        fontSize: 14.0,
+                        color: Colors.grey,
+                      ),
                       decoration: const InputDecoration.collapsed(
-                          hintText: '500자까지 입력할 수 있습니다.'),
+                        hintText: '500자까지 입력할 수 있습니다.',
+                      ),
                       controller: text,
                       // onEditingComplete: () async {},
                     ),
@@ -152,23 +152,30 @@ class _LabGlobalCommentsState extends State<LabGlobalComments> {
                       ),
                       child: const Text(
                         '작성',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: TextStyle(fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
                       onPressed: () async {
                         if (text.text.length < 5 || text.text.length > 500) {
-                          await showOkDialog(context, '너무 짧아요!',
-                              Translations.instance!.trans('comment'));
+                          await showOkDialog(
+                            context,
+                            '너무 짧아요!',
+                            Translations.instance!.trans('comment'),
+                          );
                           return;
                         }
                         if (!modReply) {
                           await VioletCommunityAnonymous.postArtistComment(
-                              null, 'global_general', text.text);
+                            null,
+                            'global_general',
+                            text.text,
+                          );
                         } else {
                           await VioletCommunityAnonymous.postArtistComment(
-                              replyParent, 'global_general', text.text);
+                            replyParent,
+                            'global_general',
+                            text.text,
+                          );
                           replyParent = null;
                           modReply = false;
                         }
@@ -228,12 +235,15 @@ class CommentUnit extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: <Widget>[
+      children:
+          <Widget>[
             InkWell(
               onDoubleTap: () {
                 if (!author.startsWith(dev)) {
                   PlatformNavigator.navigateSlide(
-                      context, LabUserRecentRecords(author));
+                    context,
+                    LabUserRecentRecords(author),
+                  );
                 }
               },
               onLongPress: !isReply
@@ -244,9 +254,15 @@ class CommentUnit extends StatelessWidget {
               child: Padding(
                 padding: isReply
                     ? const EdgeInsets.only(
-                        right: 24.0, top: 12.0, bottom: 12.0, left: 48)
+                        right: 24.0,
+                        top: 12.0,
+                        bottom: 12.0,
+                        left: 48,
+                      )
                     : const EdgeInsets.symmetric(
-                        horizontal: 24.0, vertical: 12.0),
+                        horizontal: 24.0,
+                        vertical: 12.0,
+                      ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -275,7 +291,7 @@ class CommentUnit extends StatelessWidget {
                             MdiIcons.pencilOutline,
                             size: 15.0,
                             color: Color(0xffffa500),
-                          )
+                          ),
                       ],
                     ),
                     RichText(
@@ -290,8 +306,9 @@ class CommentUnit extends StatelessWidget {
                           TextSpan(text: body),
                           const TextSpan(text: ' '),
                           TextSpan(
-                            text:
-                                DateFormat('yyyy.MM.dd HH:mm').format(dateTime),
+                            text: DateFormat(
+                              'yyyy.MM.dd HH:mm',
+                            ).format(dateTime),
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Settings.themeWhat.value
@@ -305,7 +322,7 @@ class CommentUnit extends StatelessWidget {
                   ],
                 ),
               ),
-            )
+            ),
           ] +
           replies
               .map(

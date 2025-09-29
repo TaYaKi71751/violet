@@ -17,8 +17,9 @@ String translate2query(String query, {bool filter = true}) {
     return 'SELECT * FROM HitomiColumnModel ${filterExistsOnHitomi ? 'WHERE ExistOnHitomi=1' : ''}';
   }
 
-  final tokens =
-      _splitTokens(query).map((x) => x.trim()).where((x) => x != '').toList();
+  final tokens = _splitTokens(
+    query,
+  ).map((x) => x.trim()).where((x) => x != '').toList();
   final where = _QueryTranslator(tokens).parseExpression();
 
   return 'SELECT * FROM HitomiColumnModel WHERE $where ${filterExistsOnHitomi ? ' AND ExistOnHitomi=1' : ''}';

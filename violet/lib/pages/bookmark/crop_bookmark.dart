@@ -42,13 +42,16 @@ class CropBookmarkPage extends StatefulWidget {
 }
 
 class _CropBookmarkPageState extends State<CropBookmarkPage> {
-  final ValueNotifier<int> columnCount =
-      ValueNotifier(Settings.cropBookmarkAlign.value);
-  final ValueNotifier<bool> showOverlay =
-      ValueNotifier(Settings.cropBookmarkShowOverlay.value);
+  final ValueNotifier<int> columnCount = ValueNotifier(
+    Settings.cropBookmarkAlign.value,
+  );
+  final ValueNotifier<bool> showOverlay = ValueNotifier(
+    Settings.cropBookmarkShowOverlay.value,
+  );
   bool sortDesc = Settings.cropBookmarkSortDesc.value;
-  final FilterController _filterController =
-      FilterController(heroKey: 'cropbookmark');
+  final FilterController _filterController = FilterController(
+    heroKey: 'cropbookmark',
+  );
   List<int> _filterIds = [];
 
   List<String>? imagesUrlForEvict;
@@ -101,8 +104,11 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
           padding: EdgeInsets.zero,
           itemBuilder: (context, index) {
             final e = imgs[index];
-            final area =
-                e.area().split(',').map((e) => double.parse(e)).toList();
+            final area = e
+                .area()
+                .split(',')
+                .map((e) => double.parse(e))
+                .toList();
             return buildItem(
               e,
               index,
@@ -116,10 +122,7 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
 
         if (_isCapturing) {
           return SingleChildScrollView(
-            child: RepaintBoundary(
-              key: _captureKey,
-              child: masonryGrid,
-            ),
+            child: RepaintBoundary(key: _captureKey, child: masonryGrid),
           );
         } else {
           return masonryGrid;
@@ -167,8 +170,9 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
     double aspectRatio,
   ) {
     return FutureBuilder(
-      future:
-          Future.delayed(const Duration(milliseconds: 100)).then((value) async {
+      future: Future.delayed(const Duration(milliseconds: 100)).then((
+        value,
+      ) async {
         final provider = await getImageProviderFromId(articleId);
         final image = await provider.getImageUrl(page);
         final header = await provider.getHeader(page);
@@ -177,68 +181,73 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
       }),
       builder:
           (context, AsyncSnapshot<(String, Map<String, String>)> snapshot) {
-        final width = (MediaQuery.of(context).size.width -
-                (6.0 / columnCount.value) * (columnCount.value - 1)) /
-            columnCount.value;
-        final cropRawAspectRatio =
-            calculateCropRawAspectRatio(width, aspectRatio, rect);
+            final width =
+                (MediaQuery.of(context).size.width -
+                    (6.0 / columnCount.value) * (columnCount.value - 1)) /
+                columnCount.value;
+            final cropRawAspectRatio = calculateCropRawAspectRatio(
+              width,
+              aspectRatio,
+              rect,
+            );
 
-        if (!snapshot.hasData) {
-          return AspectRatio(
-            aspectRatio: cropRawAspectRatio,
-            child: const Align(
-              alignment: Alignment.center,
-              child: SizedBox(
-                width: 50,
-                height: 50,
-                child: CircularProgressIndicator(),
-              ),
-            ),
-          );
-        }
-
-        return Material(
-          child: AspectRatio(
-            aspectRatio: cropRawAspectRatio,
-            child: Stack(
-              children: [
-                CropImageWidget(
-                  articleId: articleId,
-                  page: page,
-                  url: snapshot.data!.$1,
-                  headers: snapshot.data!.$2,
-                  rect: rect,
-                  aspectRatio: aspectRatio,
-                  columnCount: columnCount.value,
-                  showOverlay: showOverlay,
-                ),
-                Positioned.fill(
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () async {
-                        showArticleInfoById(context, articleId);
-                      },
-                      onDoubleTap: () async {
-                        showViewer(context, articleId, page);
-                      },
-                      onLongPress: () async {
-                        if (await showYesNoDialog(context, '북마크를 삭제할까요?')) {
-                          await (await Bookmark.getInstance())
-                              .deleteCropBookmark(crop);
-                          setState(() {});
-                        }
-                      },
-                      highlightColor:
-                          Theme.of(context).highlightColor.withOpacity(0.15),
-                    ),
+            if (!snapshot.hasData) {
+              return AspectRatio(
+                aspectRatio: cropRawAspectRatio,
+                child: const Align(
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: CircularProgressIndicator(),
                   ),
                 ),
-              ],
-            ),
-          ),
-        );
-      },
+              );
+            }
+
+            return Material(
+              child: AspectRatio(
+                aspectRatio: cropRawAspectRatio,
+                child: Stack(
+                  children: [
+                    CropImageWidget(
+                      articleId: articleId,
+                      page: page,
+                      url: snapshot.data!.$1,
+                      headers: snapshot.data!.$2,
+                      rect: rect,
+                      aspectRatio: aspectRatio,
+                      columnCount: columnCount.value,
+                      showOverlay: showOverlay,
+                    ),
+                    Positioned.fill(
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () async {
+                            showArticleInfoById(context, articleId);
+                          },
+                          onDoubleTap: () async {
+                            showViewer(context, articleId, page);
+                          },
+                          onLongPress: () async {
+                            if (await showYesNoDialog(context, '북마크를 삭제할까요?')) {
+                              await (await Bookmark.getInstance())
+                                  .deleteCropBookmark(crop);
+                              setState(() {});
+                            }
+                          },
+                          highlightColor: Theme.of(
+                            context,
+                          ).highlightColor.withOpacity(0.15),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
     );
   }
 
@@ -251,11 +260,14 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
               title: 'Export',
               icon: CupertinoIcons.arrowshape_turn_up_left,
               onTap: () async {
-                final crops =
-                    await (await Bookmark.getInstance()).getCropImages();
+                final crops = await (await Bookmark.getInstance())
+                    .getCropImages();
                 if (!context.mounted) return;
                 await showOkDialog(
-                    context, jsonEncode(crops), 'Export Crop Bookmarks');
+                  context,
+                  jsonEncode(crops),
+                  'Export Crop Bookmarks',
+                );
               },
             ),
             PullDownMenuItem(
@@ -284,9 +296,13 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
 
                     for (var e in arr as List<dynamic>) {
                       final elem = e as Map<String, dynamic>;
-                      await bookmark.insertCropImage(elem['article'],
-                          elem['page'], elem['area'], elem['aspectRatio'],
-                          logging: false);
+                      await bookmark.insertCropImage(
+                        elem['article'],
+                        elem['page'],
+                        elem['area'],
+                        elem['aspectRatio'],
+                        logging: false,
+                      );
                     }
 
                     showToast(
@@ -342,8 +358,9 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
             final dir = await getApplicationDocumentsDirectory();
             final dio = Dio();
             await dio.download(
-                'https://github.com/project-violet/violet/raw/dev/violet/assets/daily.zip',
-                '${dir.path}/daily.zip');
+              'https://github.com/project-violet/violet/raw/dev/violet/assets/daily.zip',
+              '${dir.path}/daily.zip',
+            );
 
             final inputStream = InputFileStream('${dir.path}/daily.zip');
             final archive = ZipDecoder().decodeBytes(inputStream.toUint8List());
@@ -355,13 +372,15 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
                 final json = jsonDecode(utf8.decode(outputStream.getBytes()));
                 List<BookmarkCropImage> bookmarks = [];
                 for (final e in json as List<dynamic>) {
-                  final bookmark = BookmarkCropImage(result: {
-                    'Article': e['article'],
-                    'Page': e['page'],
-                    'Area': e['area'],
-                    'AspectRatio': e['aspectRatio'],
-                    'DateTime': e['datetime'],
-                  });
+                  final bookmark = BookmarkCropImage(
+                    result: {
+                      'Article': e['article'],
+                      'Page': e['page'],
+                      'Area': e['area'],
+                      'AspectRatio': e['aspectRatio'],
+                      'DateTime': e['datetime'],
+                    },
+                  );
                   bookmarks.add(bookmark);
                 }
 
@@ -369,9 +388,10 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
                 PlatformNavigator.navigateSlide(
                   context,
                   CropBookmarkPage(
-                      bookmarks: bookmarks
-                          .sortedBy((e) => DateTime.parse(e.datetime()))
-                          .toList()),
+                    bookmarks: bookmarks
+                        .sortedBy((e) => DateTime.parse(e.datetime()))
+                        .toList(),
+                  ),
                   opaque: false,
                 );
               }
@@ -399,7 +419,8 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
   }
 
   Future<void> _filter(BuildContext context) async {
-    final bookmarks = widget.bookmarks ??
+    final bookmarks =
+        widget.bookmarks ??
         await (await Bookmark.getInstance()).getCropImages();
     final ids = bookmarks.map((e) => e.article()).toList();
     final queryResults = await QueryManager.queryIds(ids);
@@ -409,9 +430,7 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
       context,
       Provider<FilterController>.value(
         value: _filterController,
-        child: FilterPage(
-          queryResult: queryResults,
-        ),
+        child: FilterPage(queryResult: queryResults),
       ),
     );
 
@@ -446,7 +465,10 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
 }
 
 double calculateCropRawAspectRatio(
-    double width, double aspectRatio, Rect cropRect) {
+  double width,
+  double aspectRatio,
+  Rect cropRect,
+) {
   final height = width / aspectRatio;
 
   final cropSize = Size(cropRect.width * width, cropRect.height * height);
@@ -485,14 +507,17 @@ class _CropImageWidgetState extends State<CropImageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final width = (MediaQuery.of(context).size.width -
+    final width =
+        (MediaQuery.of(context).size.width -
             (6.0 / widget.columnCount) * (widget.columnCount - 1)) /
         widget.columnCount;
     final height = width / widget.aspectRatio;
 
     // 참고: https://github.com/project-violet/violet/pull/363#issuecomment-1908442196
-    final cropSize =
-        Size(widget.rect.width * width, widget.rect.height * height);
+    final cropSize = Size(
+      widget.rect.width * width,
+      widget.rect.height * height,
+    );
     final cropRawAspectRatio = cropSize.width / cropSize.height;
     final cropRawRect = Rect.fromLTRB(
       widget.rect.left * width,
@@ -554,7 +579,7 @@ class _CropImageWidgetState extends State<CropImageWidget> {
                 value: state.loadingProgress == null
                     ? null
                     : state.loadingProgress!.cumulativeBytesLoaded /
-                        state.loadingProgress!.expectedTotalBytes!,
+                          state.loadingProgress!.expectedTotalBytes!,
               ),
             ),
           );
@@ -590,12 +615,11 @@ class _CropImageWidgetState extends State<CropImageWidget> {
         scaleY: viewRawSize.height / cropRawRect.height,
         alignment: Alignment.topLeft,
         child: Transform.translate(
-          offset: Offset(-cropRawRect.left / translateRatio,
-              -cropRawRect.top / translateRatio),
-          child: ClipRect(
-            clipper: RectClipper(cropRect),
-            child: image,
+          offset: Offset(
+            -cropRawRect.left / translateRatio,
+            -cropRawRect.top / translateRatio,
           ),
+          child: ClipRect(clipper: RectClipper(cropRect), child: image),
         ),
       ),
     );
@@ -605,18 +629,12 @@ class _CropImageWidgetState extends State<CropImageWidget> {
       child: Transform(
         transform: Matrix4.identity()..scale(0.9),
         child: Theme(
-          data: ThemeData(
-            useMaterial3: false,
-            canvasColor: Colors.transparent,
-          ),
+          data: ThemeData(useMaterial3: false, canvasColor: Colors.transparent),
           child: RawChip(
             labelPadding: const EdgeInsets.all(0.0),
             label: Text(
               '${widget.articleId} (${widget.page + 1} Page)',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13.0,
-              ),
+              style: const TextStyle(color: Colors.white, fontSize: 13.0),
             ),
             elevation: 6.0,
             shadowColor: Colors.grey[60],
@@ -635,10 +653,7 @@ class _CropImageWidgetState extends State<CropImageWidget> {
         ValueListenableBuilder(
           valueListenable: widget.showOverlay,
           builder: (context, value, child) {
-            return Visibility(
-              visible: value,
-              child: pageOverlay,
-            );
+            return Visibility(visible: value, child: pageOverlay);
           },
         ),
       ],
@@ -692,14 +707,14 @@ class _SliderMenuItemState extends State<SliderMenuItem> {
 
   @override
   Widget build(BuildContext context) => CupertinoTheme(
-        data: const CupertinoThemeData(brightness: Brightness.light),
-        child: CupertinoSlider(
-          value: value.toDouble(),
-          min: 1,
-          max: 8,
-          onChanged: onChanged,
-        ),
-      );
+    data: const CupertinoThemeData(brightness: Brightness.light),
+    child: CupertinoSlider(
+      value: value.toDouble(),
+      min: 1,
+      max: 8,
+      onChanged: onChanged,
+    ),
+  );
 }
 
 @immutable
@@ -735,10 +750,7 @@ class _SwitchMenuItemState extends State<SwitchMenuItem> {
     return Material(
       color: Colors.transparent,
       child: CupertinoSwitchListTile(
-        title: Text(
-          widget.title,
-          style: TextStyle(fontSize: fontSize),
-        ),
+        title: Text(widget.title, style: TextStyle(fontSize: fontSize)),
         activeColor: CupertinoColors.activeGreen,
         value: value,
         onChanged: onChanged,

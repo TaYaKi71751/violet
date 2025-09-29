@@ -52,17 +52,16 @@ class DotsIndicator extends AnimatedWidget {
       width: _kDotSpacing,
       child: Center(
         child: Material(
-          color: (Settings.themeWhat.value
-                  ? Palette.lightThemeBackground
-                  : Palette.darkThemeBackground)
-              .withAlpha((max(zoom - 1, 0.5) * 255).toInt()),
+          color:
+              (Settings.themeWhat.value
+                      ? Palette.lightThemeBackground
+                      : Palette.darkThemeBackground)
+                  .withAlpha((max(zoom - 1, 0.5) * 255).toInt()),
           type: MaterialType.circle,
           child: SizedBox(
             width: _kDotSize * zoom,
             height: _kDotSize * zoom,
-            child: InkWell(
-              onTap: () => onPageSelected(index),
-            ),
+            child: InkWell(onTap: () => onPageSelected(index)),
           ),
         ),
       ),

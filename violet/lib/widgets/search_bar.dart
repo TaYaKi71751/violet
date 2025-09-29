@@ -7,9 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 class AnimatedOpacitySliver implements SliverPersistentHeaderDelegate {
-  AnimatedOpacitySliver({
-    this.searchBar,
-  });
+  AnimatedOpacitySliver({this.searchBar});
 
   Widget? searchBar;
 
@@ -21,7 +19,10 @@ class AnimatedOpacitySliver implements SliverPersistentHeaderDelegate {
 
   @override
   Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -29,7 +30,7 @@ class AnimatedOpacitySliver implements SliverPersistentHeaderDelegate {
           opacity: 1.0 - max(0.0, shrinkOffset - 20) / (maxExtent - 20),
           duration: const Duration(milliseconds: 100),
           child: searchBar,
-        )
+        ),
       ],
     );
   }

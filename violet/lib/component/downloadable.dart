@@ -206,15 +206,19 @@ class FileNameFormat {
 
         if (type == 's') {
           if (pptk != '') {
-            builder.write(literal
-                .substring(0, int.parse(pptk))
-                .replaceAll('|', 'ㅣ')
-                .replaceAll(RegExp(r'[/\\?%*:|"<>]'), ''));
+            builder.write(
+              literal
+                  .substring(0, int.parse(pptk))
+                  .replaceAll('|', 'ㅣ')
+                  .replaceAll(RegExp(r'[/\\?%*:|"<>]'), ''),
+            );
           } else {
-            builder.write(literal
-                .toString()
-                .replaceAll('|', 'ㅣ')
-                .replaceAll(RegExp(r'[/\\?%*:|"<>]'), ''));
+            builder.write(
+              literal
+                  .toString()
+                  .replaceAll('|', 'ㅣ')
+                  .replaceAll(RegExp(r'[/\\?%*:|"<>]'), ''),
+            );
           }
         }
         // else if (type == 'd')

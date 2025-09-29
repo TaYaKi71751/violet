@@ -15,8 +15,9 @@ void main() {
 
   setUp(() async {
     await RustLib.init(
-      externalLibrary:
-          ExternalLibrary.open('rust/target/debug/rust_lib_violet.dll'),
+      externalLibrary: ExternalLibrary.open(
+        'rust/target/debug/rust_lib_violet.dll',
+      ),
     );
   });
 

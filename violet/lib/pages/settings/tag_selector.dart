@@ -11,8 +11,11 @@ class TagSelectorDialog extends StatefulWidget {
   final String what;
   final bool onlyFMT;
 
-  const TagSelectorDialog(
-      {super.key, required this.what, this.onlyFMT = false});
+  const TagSelectorDialog({
+    super.key,
+    required this.what,
+    this.onlyFMT = false,
+  });
 
   @override
   State<TagSelectorDialog> createState() => _TagSelectorDialogState();
@@ -23,14 +26,17 @@ class _TagSelectorDialogState extends State<TagSelectorDialog> {
   void initState() {
     super.initState();
     if (widget.what == 'include') {
-      _searchController =
-          TextEditingController(text: Settings.includeTags.value);
+      _searchController = TextEditingController(
+        text: Settings.includeTags.value,
+      );
     } else if (widget.what == 'exclude') {
-      _searchController =
-          TextEditingController(text: Settings.excludeTags.value.join(' '));
+      _searchController = TextEditingController(
+        text: Settings.excludeTags.value.join(' '),
+      );
     } else if (widget.what == 'blurred') {
-      _searchController =
-          TextEditingController(text: Settings.blurredTags.value.join(' '));
+      _searchController = TextEditingController(
+        text: Settings.blurredTags.value.join(' '),
+      );
     } else {
       _searchController = TextEditingController();
     }
@@ -39,7 +45,8 @@ class _TagSelectorDialogState extends State<TagSelectorDialog> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    var height = MediaQuery.of(context).size.height -
+    var height =
+        MediaQuery.of(context).size.height -
         MediaQuery.of(context).padding.top -
         MediaQuery.of(context).viewInsets.bottom;
 
@@ -90,10 +97,14 @@ class _TagSelectorDialogState extends State<TagSelectorDialog> {
                 Expanded(
                   child: _searchLists.isEmpty || _nothing
                       ? Center(
-                          child: Text(_nothing
-                              ? Translations.instance!.trans('nosearchresult')
-                              : Translations.instance!
-                                  .trans('inputsearchtoken')))
+                          child: Text(
+                            _nothing
+                                ? Translations.instance!.trans('nosearchresult')
+                                : Translations.instance!.trans(
+                                    'inputsearchtoken',
+                                  ),
+                          ),
+                        )
                       : Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 0),
                           child: SingleChildScrollView(
@@ -109,9 +120,11 @@ class _TagSelectorDialogState extends State<TagSelectorDialog> {
                         ),
                 ),
                 widget.what == 'include'
-                    ? Text(Translations.instance!.trans('tagmsgdefault'),
-                        style: const TextStyle(fontSize: 14.0))
-                    : Container()
+                    ? Text(
+                        Translations.instance!.trans('tagmsgdefault'),
+                        style: const TextStyle(fontSize: 14.0),
+                      )
+                    : Container(),
               ],
             ),
           ),
@@ -168,8 +181,9 @@ class _TagSelectorDialogState extends State<TagSelectorDialog> {
     }
 
     var last = target.indexOf(' ', pos);
-    var token =
-        target.substring(pos, last == -1 ? target.length : last + 1).trim();
+    var token = target
+        .substring(pos, last == -1 ? target.length : last + 1)
+        .trim();
 
     if (pos != target.length && (target[pos] == '-' || target[pos] == '(')) {
       token = token.substring(1);
@@ -185,17 +199,18 @@ class _TagSelectorDialogState extends State<TagSelectorDialog> {
     _insertPos = pos;
     _insertLength = token.length;
     _searchText = target;
-    final result = (await HentaiIndex.queryAutoComplete(token))
-        .take(_searchResultMaximum)
-        .toList();
+    final result = (await HentaiIndex.queryAutoComplete(
+      token,
+    )).take(_searchResultMaximum).toList();
     if (result.isEmpty) _nothing = true;
     setState(() {
       if (!widget.onlyFMT) {
         _searchLists = result;
       } else {
         _searchLists = result
-            .where((element) =>
-                ['female', 'male', 'tag'].contains(element.$1.group))
+            .where(
+              (element) => ['female', 'male', 'tag'].contains(element.$1.group),
+            )
             .toList();
       }
     });
@@ -238,9 +253,7 @@ class _TagSelectorDialogState extends State<TagSelectorDialog> {
       ),
       label: Text(
         ' $tagDisplayed$count',
-        style: const TextStyle(
-          color: Colors.white,
-        ),
+        style: const TextStyle(color: Colors.white),
       ),
       backgroundColor: color,
       elevation: 6.0,
@@ -251,10 +264,13 @@ class _TagSelectorDialogState extends State<TagSelectorDialog> {
         if (info.$1.group != 'prefix') {
           final insert = info.$1.getTag().replaceAll(' ', '_');
 
-          _searchController.text = _searchText!.substring(0, _insertPos) +
+          _searchController.text =
+              _searchText!.substring(0, _insertPos) +
               insert +
-              _searchText!
-                  .substring(_insertPos! + _insertLength!, _searchText!.length);
+              _searchText!.substring(
+                _insertPos! + _insertLength!,
+                _searchText!.length,
+              );
           _searchController.selection = TextSelection(
             baseOffset: _insertPos! + insert.length,
             extentOffset: _insertPos! + insert.length,
@@ -276,7 +292,9 @@ class _TagSelectorDialogState extends State<TagSelectorDialog> {
             );
           }
           await searchProcess(
-              _searchController.text, _searchController.selection);
+            _searchController.text,
+            _searchController.selection,
+          );
         }
       },
     );

@@ -16,7 +16,8 @@ class RootCert extends CertData {
     return RootCert(data: jsonDecode(utf8.fuse(base64).decode(str)));
   }
 
-  static RootCert koromoCA() => fromBase64('''
+  static RootCert koromoCA() => fromBase64(
+    '''
       eyJQdWJLZXkiOiJleUpsZUhCdmJtVnVkQ0k2SWpZMU5UTTNJaXdpYlc5a2RXeDFjeUk2SWpF
       NU5qYzRNVEU1TlRVeU9ETXdOVFExTkRrMk5UTTFNalEwTURZMU5EVTFPRGczTmpjME9EUXdP
       REU0TVRVME1EZ3hNVEV3TWpNME5EVTFNRE14TWpnNE9UUXlNall4T0RnM01UTXhOVEV5TXpn
@@ -43,7 +44,8 @@ class RootCert extends CertData {
       TThVcTA3MkNtVVB5WWc4TUFSaHA4Q0sxQ0s5S1Z6Y2E2L3RwOGxRSktZMWsxS3NpQkNzdE5M
       M0U4L3pON2QrZjVnUDZqNjZnSEhqditWcE9kdVV6YzlGL1pEZVo1T0NCK2ZRSVcrUVBxam9I
       eW93NE5nRWhsYW9oS0ZTRTcrNENrMzUxWi8zQmlRUnRIdz09In0='''
-      .replaceAll(' ', '')
-      .replaceAll('\n', '')
-      .replaceAll('\r', ''));
+        .replaceAll(' ', '')
+        .replaceAll('\n', '')
+        .replaceAll('\r', ''),
+  );
 }

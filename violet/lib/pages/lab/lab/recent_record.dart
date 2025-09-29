@@ -48,12 +48,17 @@ class _LabRecentRecordsState extends State<LabRecentRecords> {
       }
     });
 
-    Future.delayed(const Duration(milliseconds: 100)).then(updateRercord).then(
-        (value) => Future.delayed(const Duration(milliseconds: 100)).then(
+    Future.delayed(const Duration(milliseconds: 100))
+        .then(updateRercord)
+        .then(
+          (value) => Future.delayed(const Duration(milliseconds: 100)).then(
             (value) => _controller.animateTo(
-                _controller.position.maxScrollExtent,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.fastOutSlowIn)));
+              _controller.position.maxScrollExtent,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.fastOutSlowIn,
+            ),
+          ),
+        );
     timer = Timer.periodic(const Duration(seconds: 1), updateRercord);
   }
 
@@ -70,8 +75,10 @@ class _LabRecentRecordsState extends State<LabRecentRecords> {
 
       var xrecords = trecords as List<(int, int, int)>;
 
-      latestId =
-          max(latestId, xrecords.reduce((x, y) => x.$1 > y.$1 ? x : y).$1 + 1);
+      latestId = max(
+        latestId,
+        xrecords.reduce((x, y) => x.$1 > y.$1 ? x : y).$1 + 1,
+      );
 
       var queryRaw =
           '${translate2query('${Settings.includeTags.value} ${Settings.serializedExcludeTags}')} AND ';
@@ -109,8 +116,10 @@ class _LabRecentRecordsState extends State<LabRecentRecords> {
         setState(() {});
       }
     } catch (e, st) {
-      Logger.error('[lab-recent_record] E: $e\n'
-          '$st');
+      Logger.error(
+        '[lab-recent_record] E: $e\n'
+        '$st',
+      );
     }
   }
 
@@ -133,7 +142,8 @@ class _LabRecentRecordsState extends State<LabRecentRecords> {
               itemBuilder: (BuildContext ctxt, int index) {
                 return Align(
                   key: Key(
-                      'records$index/${xrecords[xrecords.length - index - 1].$1.id()}'),
+                    'records$index/${xrecords[xrecords.length - index - 1].$1.id()}',
+                  ),
                   alignment: Alignment.center,
                   child: Provider<ArticleListItem>.value(
                     value: ArticleListItem.fromArticleListItem(
@@ -163,16 +173,18 @@ class _LabRecentRecordsState extends State<LabRecentRecords> {
                         activeTrackColor: Colors.blue,
                         inactiveTrackColor: Color(0xffd0d2d3),
                         trackHeight: 3,
-                        thumbShape:
-                            RoundSliderThumbShape(enabledThumbRadius: 6.0),
+                        thumbShape: RoundSliderThumbShape(
+                          enabledThumbRadius: 6.0,
+                        ),
                       ),
                       child: Slider(
                         value: limit.toDouble(),
                         max: 180,
                         min: 0,
                         divisions: (180 - 0),
-                        inactiveColor:
-                            Settings.majorColor.value.withOpacity(0.7),
+                        inactiveColor: Settings.majorColor.value.withOpacity(
+                          0.7,
+                        ),
                         activeColor: Settings.majorColor.value,
                         onChangeEnd: (value) async {
                           limit = value.toInt();

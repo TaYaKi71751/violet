@@ -58,7 +58,8 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
   bool get wantKeepAlive => widget.searchKeyWord == null;
 
   @override
-  VoidCallback? get shouldReloadCallback => () => _shouldReload = true;
+  VoidCallback? get shouldReloadCallback =>
+      () => _shouldReload = true;
 
   late final String getxId;
   late final SearchPageController c;
@@ -68,10 +69,7 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
     super.initState();
 
     getxId = const Uuid().v4();
-    c = Get.put(
-      SearchPageController(reloadForce: reloadForce),
-      tag: getxId,
-    );
+    c = Get.put(SearchPageController(reloadForce: reloadForce), tag: getxId);
 
     c.init(context);
 
@@ -97,13 +95,16 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
 
       if (c.searchTotalResultCount.value == 0) {
         Future.delayed(const Duration(milliseconds: 100)).then((value) async {
-          c.searchTotalResultCount.value =
-              await HentaiManager.countSearch(widget.searchKeyWord ?? '');
+          c.searchTotalResultCount.value = await HentaiManager.countSearch(
+            widget.searchKeyWord ?? '',
+          );
         });
       }
     } catch (e, st) {
-      Logger.error('[Initial-Search] E: $e\n'
-          '$st');
+      Logger.error(
+        '[Initial-Search] E: $e\n'
+        '$st',
+      );
       c.showErrorToast('Failed to search all: $e');
     }
   }
@@ -159,20 +160,12 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
           floating: true,
           delegate: AnimatedOpacitySliver(
             searchBar: Stack(
-              children: <Widget>[
-                searchBar(),
-                msgsearch(),
-                align(),
-              ],
+              children: <Widget>[searchBar(), msgsearch(), align()],
             ),
           ),
         )
       else
-        SliverToBoxAdapter(
-          child: Container(
-            height: 16,
-          ),
-        ),
+        SliverToBoxAdapter(child: Container(height: 16)),
       _cachedPannel!,
     ];
 
@@ -201,11 +194,7 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
           trailing: CupertinoButton(
             padding: const EdgeInsets.all(10),
             onPressed: alignLongPress,
-            child: const Icon(
-              MdiIcons.filter,
-              size: 21.0,
-              color: Colors.grey,
-            ),
+            child: const Icon(MdiIcons.filter, size: 21.0, color: Colors.grey),
           ),
         ),
         child: SafeArea(
@@ -215,8 +204,8 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
             physics: const ScrollPhysics(parent: PageScrollPhysics()),
             headerSliverBuilder:
                 (BuildContext context, bool innerBoxIsScrolled) {
-              return [];
-            },
+                  return [];
+                },
             body: CustomScrollView(
               controller: ModalScrollController.of(context),
               physics: const BouncingScrollPhysics(),
@@ -259,10 +248,7 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
     );
 
     return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: pageKeyListener,
-      ),
+      body: SafeArea(bottom: false, child: pageKeyListener),
       floatingActionButton: _floatingActionButton(),
     );
   }
@@ -277,13 +263,13 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
           switchOutCurve: Curves.easeOut,
           transitionBuilder: (Widget child, Animation<double> animation) =>
               FadeTransition(
-            opacity: animation,
-            child: SizeTransition(
-              sizeFactor: animation,
-              axis: Axis.horizontal,
-              child: child,
-            ),
-          ),
+                opacity: animation,
+                child: SizeTransition(
+                  sizeFactor: animation,
+                  axis: Axis.horizontal,
+                  child: child,
+                ),
+              ),
           child: !c.isExtended.value
               ? const Icon(MdiIcons.bookOpenPageVariantOutline)
               : Row(
@@ -294,7 +280,8 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
                     ),
                     Obx(
                       () => Text(
-                          '${c.searchPageNum.value + c.baseCount}/${c.queryResult.length}/${c.searchTotalResultCount}'),
+                        '${c.searchPageNum.value + c.baseCount}/${c.queryResult.length}/${c.searchTotalResultCount}',
+                      ),
                     ),
                   ],
                 ),
@@ -325,8 +312,8 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
   }
 
   searchBar() {
-    final searchHintText = c.latestQuery != null &&
-            c.latestQuery!.$2.trim() != ''
+    final searchHintText =
+        c.latestQuery != null && c.latestQuery!.$2.trim() != ''
         ? c.latestQuery!.$2
         : widget.searchKeyWord ?? trans.Translations.instance!.trans('search');
 
@@ -353,21 +340,18 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
         Material(
           color: Settings.themeWhat.value
               ? Settings.themeBlack.value
-                  ? Palette.blackThemeBackground
-                  : Colors.grey.shade900.withOpacity(0.4)
+                    ? Palette.blackThemeBackground
+                    : Colors.grey.shade900.withOpacity(0.4)
               : Colors.grey.shade200.withOpacity(0.4),
           child: ListTile(
             title: textFormField,
             leading: SizedBox(
               width: 25,
               height: 25,
-              child: FlareActor.asset(
-                c.asset,
-                controller: c.heroFlareControls,
-              ),
+              child: FlareActor.asset(c.asset, controller: c.heroFlareControls),
             ),
           ),
-        )
+        ),
       ],
     );
 
@@ -395,18 +379,11 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
         height: 64,
         child: Card(
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(4.0),
-            ),
+            borderRadius: BorderRadius.all(Radius.circular(4.0)),
           ),
           elevation: !Settings.themeFlat.value ? 100 : 0,
           clipBehavior: Clip.antiAliasWithSaveLayer,
-          child: Stack(
-            children: <Widget>[
-              searchBar,
-              searchBarOverlay,
-            ],
-          ),
+          child: Stack(children: <Widget>[searchBar, searchBarOverlay]),
         ),
       ),
     );
@@ -446,7 +423,8 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
       c.doSearch();
     } catch (e, st) {
       await Logger.error(
-          '[showSearchBar] E: ${e.toString()}\n${st.toString()}');
+        '[showSearchBar] E: ${e.toString()}\n${st.toString()}',
+      );
     }
   }
 
@@ -462,12 +440,7 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
         width: 64,
         child: Stack(
           alignment: Alignment.center,
-          children: <Widget>[
-            Icon(
-              MdiIcons.commentSearch,
-              color: Colors.grey,
-            ),
-          ],
+          children: <Widget>[Icon(MdiIcons.commentSearch, color: Colors.grey)],
         ),
       ),
     );
@@ -475,7 +448,8 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
     final msgsearchBody = Card(
       color: Palette.themeColor,
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(4.0))),
+        borderRadius: BorderRadius.all(Radius.circular(4.0)),
+      ),
       elevation: !Settings.themeFlat.value ? 100 : 0,
       clipBehavior: Clip.antiAliasWithSaveLayer,
       child: msgsearchOverlay,
@@ -504,12 +478,7 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
         width: 64,
         child: Stack(
           alignment: Alignment.center,
-          children: <Widget>[
-            Icon(
-              MdiIcons.formatListText,
-              color: Colors.grey,
-            ),
-          ],
+          children: <Widget>[Icon(MdiIcons.formatListText, color: Colors.grey)],
         ),
       ),
     );
@@ -517,7 +486,8 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
     final alignBody = Card(
       color: Palette.themeColor,
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(4.0))),
+        borderRadius: BorderRadius.all(Radius.circular(4.0)),
+      ),
       elevation: !Settings.themeFlat.value ? 100 : 0,
       clipBehavior: Clip.antiAliasWithSaveLayer,
       child: alignOverlay,
@@ -537,20 +507,27 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
 
   alignOnTap() async {
     final previousAlignType = Settings.searchResultType.value;
-    final newAlignType = await Navigator.of(context).push(PageRouteBuilder(
-      opaque: false,
-      transitionDuration: const Duration(milliseconds: 500),
-      transitionsBuilder: (BuildContext context, Animation<double> animation,
-          Animation<double> secondaryAnimation, Widget wi) {
-        return FadeTransition(opacity: animation, child: wi);
-      },
-      pageBuilder: (_, __, ___) => SearchType(
-        heroTag: 'searchtype${ModalBottomSheetContext.getCount()}',
-        previousType: previousAlignType,
+    final newAlignType = await Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: false,
+        transitionDuration: const Duration(milliseconds: 500),
+        transitionsBuilder:
+            (
+              BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget wi,
+            ) {
+              return FadeTransition(opacity: animation, child: wi);
+            },
+        pageBuilder: (_, __, ___) => SearchType(
+          heroTag: 'searchtype${ModalBottomSheetContext.getCount()}',
+          previousType: previousAlignType,
+        ),
+        barrierColor: Colors.black12,
+        barrierDismissible: true,
       ),
-      barrierColor: Colors.black12,
-      barrierDismissible: true,
-    ));
+    );
 
     if (newAlignType == null || previousAlignType == newAlignType) return;
 
@@ -570,9 +547,7 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
       context,
       Provider<FilterController>.value(
         value: c.filterController,
-        child: FilterPage(
-          queryResult: c.queryResult,
-        ),
+        child: FilterPage(queryResult: c.queryResult),
       ),
     ).then((value) {
       c.applyFilter();
@@ -619,33 +594,36 @@ class ResultPanelWidget extends StatelessWidget {
     switch (searchResultType) {
       case SearchResultType.threeGrid:
       case SearchResultType.twoGrid:
-        final columnCount =
-            searchResultType == SearchResultType.threeGrid ? 3 : 2;
-        final simpleModeColumnCount =
-            Settings.useTabletMode.value ? columnCount * 2 : columnCount;
+        final columnCount = searchResultType == SearchResultType.threeGrid
+            ? 3
+            : 2;
+        final simpleModeColumnCount = Settings.useTabletMode.value
+            ? columnCount * 2
+            : columnCount;
         return SliverPadding(
-            padding: padding,
-            sliver: SliverGrid(
-              key: sliverKey,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: simpleModeColumnCount,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-                childAspectRatio: 3 / 4,
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (BuildContext context, int index) {
-                  return articleItem(
-                    index,
-                    windowWidth,
-                    (windowWidth - 4.0) / simpleModeColumnCount,
-                    alignment: Alignment.bottomCenter,
-                    debouncing: bookmarkMode,
-                  );
-                },
-                childCount: resultList.length,
-              ),
-            ));
+          padding: padding,
+          sliver: SliverGrid(
+            key: sliverKey,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: simpleModeColumnCount,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+              childAspectRatio: 3 / 4,
+            ),
+            delegate: SliverChildBuilderDelegate((
+              BuildContext context,
+              int index,
+            ) {
+              return articleItem(
+                index,
+                windowWidth,
+                (windowWidth - 4.0) / simpleModeColumnCount,
+                alignment: Alignment.bottomCenter,
+                debouncing: bookmarkMode,
+              );
+            }, childCount: resultList.length),
+          ),
+        );
 
       case SearchResultType.bigLine:
       case SearchResultType.detail:
@@ -655,8 +633,8 @@ class ResultPanelWidget extends StatelessWidget {
           const kDetailModeColumnCount = 2;
           final aspectRatioHeight =
               Settings.useTabletMode.value && searchResultType.isUltra
-                  ? 220
-                  : 130;
+              ? 220
+              : 130;
 
           return SliverPadding(
             padding: padding,
@@ -689,19 +667,19 @@ class ResultPanelWidget extends StatelessWidget {
         } else {
           return SliverList(
             key: key,
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                return articleItem(
-                  index,
-                  windowWidth,
-                  windowWidth - 4.0,
-                  showDetail: searchResultType.isDetailLike,
-                  showUltra: searchResultType.isUltra,
-                  addBottomPadding: true,
-                );
-              },
-              childCount: resultList.length,
-            ),
+            delegate: SliverChildBuilderDelegate((
+              BuildContext context,
+              int index,
+            ) {
+              return articleItem(
+                index,
+                windowWidth,
+                windowWidth - 4.0,
+                showDetail: searchResultType.isDetailLike,
+                showUltra: searchResultType.isUltra,
+                addBottomPadding: true,
+              );
+            }, childCount: resultList.length),
           );
         }
     }
@@ -749,9 +727,7 @@ class ResultPanelWidget extends StatelessWidget {
       padding: EdgeInsets.zero,
       child: Align(
         alignment: Alignment.bottomCenter,
-        child: SizedBox(
-          child: article,
-        ),
+        child: SizedBox(child: article),
       ),
     );
 

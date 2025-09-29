@@ -26,8 +26,14 @@ class Translations {
   }
 
   bool isSupported() {
-    final lc =
-        ['ko', 'en', 'ja', 'zh', 'it', 'eo'].contains(locale.languageCode);
+    final lc = [
+      'ko',
+      'en',
+      'ja',
+      'zh',
+      'it',
+      'eo',
+    ].contains(locale.languageCode);
     final sc = ['Hans', 'Hant'].contains(locale.scriptCode);
     if (locale.languageCode == 'zh') {
       return sc;

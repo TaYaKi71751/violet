@@ -64,16 +64,12 @@ class _DBRebuildPagePageState extends State<DBRebuildPage> {
                     padding: EdgeInsets.fromLTRB(0, 8, 0, 8),
                     child: Stack(
                       children: [
-                        Center(
-                          child: CircularProgressIndicator(),
-                        ),
+                        Center(child: CircularProgressIndicator()),
                         Align(
                           alignment: Alignment.bottomCenter,
                           child: Padding(
                             padding: EdgeInsets.only(bottom: 33),
-                            child: Text(
-                              'Processing...',
-                            ),
+                            child: Text('Processing...'),
                           ),
                         ),
                       ],
@@ -111,9 +107,13 @@ class _DBRebuildPagePageState extends State<DBRebuildPage> {
 
   Future indexing() async {
     var sql = translate2query(
-        '${Settings.includeTags.value} ${Settings.serializedExcludeTags}');
+      '${Settings.includeTags.value} ${Settings.serializedExcludeTags}',
+    );
 
-    await (await DataBaseManager.getInstance()).delete('HitomiColumnModel',
-        'NOT (${sql.substring(sql.indexOf('WHERE') + 6)})', []);
+    await (await DataBaseManager.getInstance()).delete(
+      'HitomiColumnModel',
+      'NOT (${sql.substring(sql.indexOf('WHERE') + 6)})',
+      [],
+    );
   }
 }

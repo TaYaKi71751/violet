@@ -76,10 +76,7 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
 
   void _search() async {
     if (_searchQueryController.text.isEmpty) {
-      showToast(
-        level: ToastLevel.error,
-        message: '검색어를 입력해주세요.',
-      );
+      showToast(level: ToastLevel.error, message: '검색어를 입력해주세요.');
       return;
     }
 
@@ -120,18 +117,22 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
           if (item is Map<String, dynamic> &&
               item.containsKey('id') &&
               item.containsKey('reason')) {
-            searchResults.add(SearchResult(
-              id: item['id'] is int
-                  ? item['id']
-                  : int.tryParse(item['id'].toString()) ?? 0,
-              reason: item['reason'].toString(),
-            ));
+            searchResults.add(
+              SearchResult(
+                id: item['id'] is int
+                    ? item['id']
+                    : int.tryParse(item['id'].toString()) ?? 0,
+                reason: item['reason'].toString(),
+              ),
+            );
           }
         }
 
         // 이미지 표시를 위한 초기화
         _keys = List<GlobalKey>.generate(
-            searchResults.length, (index) => GlobalKey());
+          searchResults.length,
+          (index) => GlobalKey(),
+        );
         _urls = List<String>.filled(searchResults.length, '');
 
         setState(() {
@@ -180,10 +181,7 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
               ],
             ),
           ),
-          if (_searchResults.isNotEmpty)
-            Expanded(
-              child: _buildResultsGrid(),
-            ),
+          if (_searchResults.isNotEmpty) Expanded(child: _buildResultsGrid()),
         ],
       ),
     );
@@ -217,10 +215,7 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
           const SizedBox(width: 8),
           const Text(
             'Violet LLM Search',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -254,8 +249,10 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
               final db = await LLMSearchLogDatabase.getInstance();
               final queries = await db.getQueries();
               return queries
-                  .where((query) =>
-                      query.toLowerCase().contains(pattern.toLowerCase()))
+                  .where(
+                    (query) =>
+                        query.toLowerCase().contains(pattern.toLowerCase()),
+                  )
                   .toSet()
                   .toList();
             },
@@ -286,8 +283,10 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
               labelText: '문서 수',
               hintText: '50',
               border: OutlineInputBorder(),
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 12,
+              ),
             ),
             keyboardType: TextInputType.number,
           ),
@@ -312,10 +311,7 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
                       strokeWidth: 2,
                     ),
                   )
-                : const Text(
-                    '검색',
-                    style: TextStyle(fontSize: 16),
-                  ),
+                : const Text('검색', style: TextStyle(fontSize: 16)),
           ),
         ),
       ],
@@ -337,17 +333,15 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
             child: Row(
               children: [
                 Checkbox(
-                    value: _strictRelevance,
-                    onChanged: (value) {
-                      setState(() {
-                        _strictRelevance = value ?? false;
-                      });
-                    },
-                    activeColor: Settings.majorColor.value),
-                const Text(
-                  '정확한 검색',
-                  style: TextStyle(fontSize: 14),
+                  value: _strictRelevance,
+                  onChanged: (value) {
+                    setState(() {
+                      _strictRelevance = value ?? false;
+                    });
+                  },
+                  activeColor: Settings.majorColor.value,
                 ),
+                const Text('정확한 검색', style: TextStyle(fontSize: 14)),
                 const SizedBox(width: 8),
                 Text(
                   '(관련성이 높은 결과만 표시)',
@@ -376,8 +370,9 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
               label: Text(
                 '검색 결과 요약',
                 style: TextStyle(
-                  color:
-                      Settings.themeWhat.value ? Colors.white : Colors.black87,
+                  color: Settings.themeWhat.value
+                      ? Colors.white
+                      : Colors.black87,
                   fontSize: 14,
                 ),
               ),
@@ -470,8 +465,9 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
     final result = _searchResults[index];
 
     return FutureBuilder(
-      future:
-          Future.delayed(const Duration(milliseconds: 100)).then((value) async {
+      future: Future.delayed(const Duration(milliseconds: 100)).then((
+        value,
+      ) async {
         final provider = await getImageProviderFromId(result.id);
         final image = await provider.getThumbnailUrl();
         final header = await provider.getHeader(0);
@@ -481,139 +477,148 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
       }),
       builder:
           (context, AsyncSnapshot<(String, Map<String, String>)> snapshot) {
-        if (!snapshot.hasData) {
-          return Card(
-            elevation: 3,
-            child: InkWell(
-              onTap: () async {
-                FocusScope.of(context).unfocus();
-                showArticleInfoById(context, result.id);
-              },
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(
-                    width: 50,
-                    height: 50,
-                    child: CircularProgressIndicator(),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'ID: ${result.id}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Text(
-                      result.reason,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-
-        return Card(
-          elevation: 3,
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: () async {
-              FocusScope.of(context).unfocus();
-              showArticleInfoById(context, result.id);
-            },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                FutureBuilder<Size>(
-                  future: _calculateImageDimension(
-                      snapshot.data!.$1, snapshot.data!.$2),
-                  builder: (context, sizeSnapshot) {
-                    double aspectRatio = 1.0;
-                    if (sizeSnapshot.hasData) {
-                      aspectRatio =
-                          sizeSnapshot.data!.width / sizeSnapshot.data!.height;
-                      if (aspectRatio > 2.5) aspectRatio = 2.5;
-                      if (aspectRatio < 0.4) aspectRatio = 0.4;
-                    }
-
-                    return AspectRatio(
-                      aspectRatio: aspectRatio,
-                      child: Container(
-                        color: Settings.themeWhat.value
-                            ? Colors.black12
-                            : Colors.grey.shade100,
-                        child: Hero(
-                          tag: 'result_image_${result.id}',
-                          child: VCachedNetworkImage(
-                            key: _keys![index],
-                            fit: BoxFit.contain,
-                            fadeInDuration: const Duration(microseconds: 500),
-                            fadeInCurve: Curves.easeIn,
-                            imageUrl: snapshot.data!.$1,
-                            httpHeaders: snapshot.data!.$2,
-                            progressIndicatorBuilder:
-                                (context, string, progress) {
-                              return Center(
-                                child: SizedBox(
-                                  width: 30,
-                                  height: 30,
-                                  child: CircularProgressIndicator(
-                                    value: progress.progress,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
+            if (!snapshot.hasData) {
+              return Card(
+                elevation: 3,
+                child: InkWell(
+                  onTap: () async {
+                    FocusScope.of(context).unfocus();
+                    showArticleInfoById(context, result.id);
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: CircularProgressIndicator(),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'ID: ${result.id}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Text(
+                          result.reason,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                    );
-                  },
+                    ],
+                  ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
-                  child: Text(
-                    'ID: ${result.id}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
+              );
+            }
+
+            return Card(
+              elevation: 3,
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: () async {
+                  FocusScope.of(context).unfocus();
+                  showArticleInfoById(context, result.id);
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    FutureBuilder<Size>(
+                      future: _calculateImageDimension(
+                        snapshot.data!.$1,
+                        snapshot.data!.$2,
+                      ),
+                      builder: (context, sizeSnapshot) {
+                        double aspectRatio = 1.0;
+                        if (sizeSnapshot.hasData) {
+                          aspectRatio =
+                              sizeSnapshot.data!.width /
+                              sizeSnapshot.data!.height;
+                          if (aspectRatio > 2.5) aspectRatio = 2.5;
+                          if (aspectRatio < 0.4) aspectRatio = 0.4;
+                        }
+
+                        return AspectRatio(
+                          aspectRatio: aspectRatio,
+                          child: Container(
+                            color: Settings.themeWhat.value
+                                ? Colors.black12
+                                : Colors.grey.shade100,
+                            child: Hero(
+                              tag: 'result_image_${result.id}',
+                              child: VCachedNetworkImage(
+                                key: _keys![index],
+                                fit: BoxFit.contain,
+                                fadeInDuration: const Duration(
+                                  microseconds: 500,
+                                ),
+                                fadeInCurve: Curves.easeIn,
+                                imageUrl: snapshot.data!.$1,
+                                httpHeaders: snapshot.data!.$2,
+                                progressIndicatorBuilder:
+                                    (context, string, progress) {
+                                      return Center(
+                                        child: SizedBox(
+                                          width: 30,
+                                          height: 30,
+                                          child: CircularProgressIndicator(
+                                            value: progress.progress,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
+                      child: Text(
+                        'ID: ${result.id}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                      child: Text(
+                        result.reason,
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-                  child: Text(
-                    result.reason,
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+              ),
+            );
+          },
     );
   }
 
   Future<Size> _calculateImageDimension(
-      String url, Map<String, String> header) {
+    String url,
+    Map<String, String> header,
+  ) {
     Completer<Size> completer = Completer();
-    Image image =
-        Image(image: CachedNetworkImageProvider(url, headers: header));
-    image.image.resolve(const ImageConfiguration()).addListener(
-      ImageStreamListener(
-        (ImageInfo image, bool synchronousCall) {
-          var myImage = image.image;
-          Size size = Size(myImage.width.toDouble(), myImage.height.toDouble());
-          completer.complete(size);
-        },
-      ),
+    Image image = Image(
+      image: CachedNetworkImageProvider(url, headers: header),
     );
+    image.image
+        .resolve(const ImageConfiguration())
+        .addListener(
+          ImageStreamListener((ImageInfo image, bool synchronousCall) {
+            var myImage = image.image;
+            Size size = Size(
+              myImage.width.toDouble(),
+              myImage.height.toDouble(),
+            );
+            completer.complete(size);
+          }),
+        );
     return completer.future;
   }
 }
@@ -631,9 +636,7 @@ class LLMSearchInfoDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         padding: const EdgeInsets.all(24),
         width: 500,
@@ -655,10 +658,7 @@ class LLMSearchInfoDialog extends StatelessWidget {
             const SizedBox(height: 16),
             const Text(
               'Violet LLM Search',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const Text(
               'A manga search engine powered by retrieval-augmented generation.\nDeveloped using various open-source tools and APIs, including Cursor, Claude, EasyOCR, DeepSeek, and Gemini.',

@@ -243,7 +243,7 @@ class Artists {
       'arakure',
       'hirari',
       'ayakase chiyoko',
-      'bang-you'
+      'bang-you',
     ],
     {'default': 'Exhibitionist', 'ko': '노출증'}: [
       'momota',
@@ -300,11 +300,7 @@ class Artists {
       'tawara hiryuu',
       'karma tatsurou',
     ],
-    {'default': 'ㅇㅅㅇ', 'ko': 'ㅇㅅㅇ'}: [
-      'chacharan',
-      'homura subaru',
-      'motoyon',
-    ],
+    {'default': 'ㅇㅅㅇ', 'ko': 'ㅇㅅㅇ'}: ['chacharan', 'homura subaru', 'motoyon'],
 
     //
     //  Effeminate
@@ -314,9 +310,7 @@ class Artists {
     //
     //  Gay
     //
-    {'default': 'Gay', 'ko': '게이'}: [
-      'tagame gengoroh',
-    ],
+    {'default': 'Gay', 'ko': '게이'}: ['tagame gengoroh'],
     {'default': 'Yaoi', 'ko': '야오이'}: [
       'sakura siro',
       'shinagawa mikuzu',
@@ -1518,6 +1512,6 @@ class Artists {
       'artist:nakajima yuka              ',
       'group:clesta                      ',
       'artist:cle masahiro               ',
-    ].reversed.toList()
+    ].reversed.toList(),
   };
 }

@@ -13,12 +13,14 @@ class VioletCommunityArticle {
   static Future<dynamic> _getV(String api, String params) async {
     var vToken = DateTime.now().toUtc().millisecondsSinceEpoch;
     var vValid = getValid(vToken.toString());
-    var gg =
-        await http.get(Uri.parse('${VioletServer.api}$api?$params'), headers: {
-      'v-token': vToken.toString(),
-      'v-valid': vValid,
-      'Content-Type': 'application/json'
-    });
+    var gg = await http.get(
+      Uri.parse('${VioletServer.api}$api?$params'),
+      headers: {
+        'v-token': vToken.toString(),
+        'v-valid': vValid,
+        'Content-Type': 'application/json',
+      },
+    );
 
     if (gg.statusCode != 200) {
       return gg.statusCode;
@@ -32,17 +34,21 @@ class VioletCommunityArticle {
     var vValid = getValid(vToken.toString());
 
     try {
-      var res = await http.post(Uri.parse(VioletServer.api + api),
-          headers: {
-            'v-token': vToken.toString(),
-            'v-valid': vValid,
-            'Content-Type': 'application/json'
-          },
-          body: jsonEncode(body));
+      var res = await http.post(
+        Uri.parse(VioletServer.api + api),
+        headers: {
+          'v-token': vToken.toString(),
+          'v-valid': vValid,
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
       return res;
     } catch (e, st) {
-      Logger.error('[API-postv] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-postv] E: $e\n'
+        '$st',
+      );
     }
     return null;
   }
@@ -63,8 +69,13 @@ class VioletCommunityArticle {
   }
 
   /* */
-  static Future<dynamic> writeArticle(VioletCommunitySession session, int board,
-      String title, String body, String etc) async {
+  static Future<dynamic> writeArticle(
+    VioletCommunitySession session,
+    int board,
+    String title,
+    String body,
+    String etc,
+  ) async {
     return await _postV('/community/article/write', {
       'Session': session.session,
       'Board': board,
@@ -76,7 +87,10 @@ class VioletCommunityArticle {
 
   /* Already Vote, etc */
   static Future<dynamic> voteArticle(
-      VioletCommunitySession session, int article, int status) async {
+    VioletCommunitySession session,
+    int article,
+    int status,
+  ) async {
     return await _postV('/community/article/vote', {
       'Session': session.session,
       'Article': article,
@@ -85,8 +99,14 @@ class VioletCommunityArticle {
   }
 
   /* Edit or Insert */
-  static Future<dynamic> editArticle(VioletCommunitySession session, int id,
-      int board, String title, String body, String etc) async {
+  static Future<dynamic> editArticle(
+    VioletCommunitySession session,
+    int id,
+    int board,
+    String title,
+    String body,
+    String etc,
+  ) async {
     return await _postV('/community/article/edit', {
       'Session': session.session,
       'Board': board,
@@ -104,8 +124,12 @@ class VioletCommunityArticle {
 
   /* Edit or Insert */
   static Future<dynamic> writeComment(
-      VioletCommunitySession session, int id, String body, String etc,
-      [int parent = -1]) async {
+    VioletCommunitySession session,
+    int id,
+    String body,
+    String etc, [
+    int parent = -1,
+  ]) async {
     if (parent != -1) {
       return await _postV('/community/comment/write', {
         'Session': session.session,
@@ -115,8 +139,12 @@ class VioletCommunityArticle {
         'Etc': etc,
       });
     }
-    return await _postV('/community/comment/write',
-        {'Session': session.session, 'Id': id, 'Body': body, 'Etc': etc});
+    return await _postV('/community/comment/write', {
+      'Session': session.session,
+      'Id': id,
+      'Body': body,
+      'Etc': etc,
+    });
   }
 
   static Future<String> getUserNickName(String id) async {

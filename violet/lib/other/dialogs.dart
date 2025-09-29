@@ -7,8 +7,11 @@ import 'package:violet/settings/settings.dart';
 
 const defaultTitle = 'Project Violet';
 
-Future<void> showOkDialog(BuildContext context, String message,
-    [String? title]) async {
+Future<void> showOkDialog(
+  BuildContext context,
+  String message, [
+  String? title,
+]) async {
   await showDialog(
     context: context,
     builder: (context) => AlertDialog(
@@ -16,8 +19,9 @@ Future<void> showOkDialog(BuildContext context, String message,
       content: SelectableText(message),
       actions: [
         TextButton(
-          style:
-              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
+          style: TextButton.styleFrom(
+            foregroundColor: Settings.majorColor.value,
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -40,8 +44,10 @@ Future<bool> showOkCancelDialog({
   VoidCallback? onCancelPressed,
   bool useRootNavigator = true,
 }) async {
-  assert((contentText != null && contentBuilder == null) ||
-      (contentText == null && contentBuilder != null));
+  assert(
+    (contentText != null && contentBuilder == null) ||
+        (contentText == null && contentBuilder != null),
+  );
 
   return await showDialog(
     context: context,
@@ -54,8 +60,9 @@ Future<bool> showOkCancelDialog({
       contentPadding: contentPadding!,
       actions: [
         TextButton(
-          style:
-              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
+          style: TextButton.styleFrom(
+            foregroundColor: Settings.majorColor.value,
+          ),
           onPressed: () {
             if (onOkPressed != null) {
               onOkPressed();
@@ -66,8 +73,9 @@ Future<bool> showOkCancelDialog({
           child: Text(okText ?? Translations.instance!.trans('ok')),
         ),
         TextButton(
-          style:
-              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
+          style: TextButton.styleFrom(
+            foregroundColor: Settings.majorColor.value,
+          ),
           onPressed: () {
             if (onCancelPressed != null) {
               onCancelPressed();
@@ -82,8 +90,11 @@ Future<bool> showOkCancelDialog({
   );
 }
 
-Future<bool> showYesNoDialog(BuildContext context, String message,
-    [String? title]) async {
+Future<bool> showYesNoDialog(
+  BuildContext context,
+  String message, [
+  String? title,
+]) async {
   final result = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
@@ -91,16 +102,18 @@ Future<bool> showYesNoDialog(BuildContext context, String message,
       content: Text(message),
       actions: [
         TextButton(
-          style:
-              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
+          style: TextButton.styleFrom(
+            foregroundColor: Settings.majorColor.value,
+          ),
           onPressed: () {
             Navigator.pop(context, true);
           },
           child: Text(Translations.instance!.trans('yes')),
         ),
         TextButton(
-          style:
-              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
+          style: TextButton.styleFrom(
+            foregroundColor: Settings.majorColor.value,
+          ),
           onPressed: () {
             Navigator.pop(context, false);
           },
@@ -112,8 +125,11 @@ Future<bool> showYesNoDialog(BuildContext context, String message,
   return result ?? false;
 }
 
-Future<bool?> showYesNoCancelDialog(BuildContext context, String message,
-    [String? title]) async {
+Future<bool?> showYesNoCancelDialog(
+  BuildContext context,
+  String message, [
+  String? title,
+]) async {
   final result = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
@@ -121,16 +137,18 @@ Future<bool?> showYesNoCancelDialog(BuildContext context, String message,
       content: Text(message),
       actions: [
         TextButton(
-          style:
-              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
+          style: TextButton.styleFrom(
+            foregroundColor: Settings.majorColor.value,
+          ),
           onPressed: () {
             Navigator.pop(context, true);
           },
           child: Text(Translations.instance!.trans('yes')),
         ),
         TextButton(
-          style:
-              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
+          style: TextButton.styleFrom(
+            foregroundColor: Settings.majorColor.value,
+          ),
           onPressed: () {
             Navigator.pop(context, false);
           },

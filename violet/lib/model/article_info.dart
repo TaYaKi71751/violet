@@ -42,7 +42,8 @@ class ArticleInfo {
     List<QueryResult>? usableTabList,
     bool lockRead = false,
   }) {
-    var artist = (queryResult.artists() as String)
+    var artist =
+        (queryResult.artists() as String)
             .split('|')
             .firstWhereOrNull((e) => e.isNotEmpty) ??
         'N/A';

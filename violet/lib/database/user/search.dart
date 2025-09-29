@@ -31,7 +31,8 @@ class SearchLogDatabase {
       if (_instance == null) {
         final db = await CommonUserDatabase.getInstance();
         final rows = await db.query(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='SearchLog';");
+          "SELECT name FROM sqlite_master WHERE type='table' AND name='SearchLog';",
+        );
         if (rows.isEmpty || rows[0].isEmpty) {
           try {
             await db.execute('''CREATE TABLE SearchLog (
@@ -40,8 +41,10 @@ class SearchLogDatabase {
               DateTime text);
               ''');
           } catch (e, st) {
-            Logger.error('[Record-Instance] E: $e\n'
-                '$st');
+            Logger.error(
+              '[Record-Instance] E: $e\n'
+              '$st',
+            );
           }
         }
         _instance = SearchLogDatabase();
@@ -51,12 +54,9 @@ class SearchLogDatabase {
   }
 
   Future<List<SearchLog>> getSearchLog() async {
-    return (await (await CommonUserDatabase.getInstance())
-            .query('SELECT * FROM SearchLog'))
-        .map((x) => SearchLog(result: x))
-        .toList()
-        .reversed
-        .toList();
+    return (await (await CommonUserDatabase.getInstance()).query(
+      'SELECT * FROM SearchLog',
+    )).map((x) => SearchLog(result: x)).toList().reversed.toList();
   }
 
   Future<void> insertSearchLog(String? searchWhat, [DateTime? datetime]) async {

@@ -19,10 +19,7 @@ import 'package:violet/settings/settings_wrapper.dart';
 
 class HorizontalViewerPage extends StatefulWidget {
   final String getxId;
-  const HorizontalViewerPage({
-    super.key,
-    required this.getxId,
-  });
+  const HorizontalViewerPage({super.key, required this.getxId});
 
   @override
   State<HorizontalViewerPage> createState() => _HorizontalViewerPageState();
@@ -57,7 +54,8 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
       if (c.onTwoPageJump) return;
 
       final orientation = MediaQuery.of(context).orientation;
-      final candidate = (!Settings.disableTwoPageView.value &&
+      final candidate =
+          (!Settings.disableTwoPageView.value &&
           orientation == Orientation.landscape);
 
       // orientation이 변경되고, twoPage 설정이 바뀌는 경우라면 페이지 재설정이 필요함
@@ -97,9 +95,7 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
           //   }),
           // ),
           Container(
-            decoration: const BoxDecoration(
-              color: Colors.black,
-            ),
+            decoration: const BoxDecoration(color: Colors.black),
             constraints: BoxConstraints.expand(
               height: MediaQuery.of(context).size.height,
             ),
@@ -110,8 +106,9 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
                   () => VPhotoViewGallery.builder(
                     scrollPhysics: const AlwaysScrollableScrollPhysics(),
                     builder: _buildItem,
-                    itemCount:
-                        c.onTwoPage.value ? landscapeMaxPage() : c.maxPage,
+                    itemCount: c.onTwoPage.value
+                        ? landscapeMaxPage()
+                        : c.maxPage,
                     backgroundDecoration: const BoxDecoration(
                       color: Colors.black,
                     ),
@@ -215,12 +212,14 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
       } else {
         if (page.toInt() - 2 >= 0 && c.urlCache[page.toInt() - 2] != null) {
           CachedNetworkImage.evictFromCache(
-              c.urlCache[page.toInt() - 2]!.value);
+            c.urlCache[page.toInt() - 2]!.value,
+          );
         }
         if (page.toInt() + 2 < c.maxPage &&
             c.urlCache[page.toInt() + 2] != null) {
           CachedNetworkImage.evictFromCache(
-              c.urlCache[page.toInt() + 2]!.value);
+            c.urlCache[page.toInt() + 2]!.value,
+          );
         }
         await c.precache(context, page.toInt() - 1);
         if (!mounted) return;
@@ -258,13 +257,16 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
             if (c.maxPage > firstIndex && firstIndex >= 0)
               wrappingGestureDetector(
                 Image(
-                  image: ExtendedFileImageProvider(
-                    File(c.provider.uris[firstIndex]),
-                    imageCacheName: c.provider.uris[firstIndex],
-                  )..resolve(ImageConfiguration.empty)
-                        .addListener(ImageStreamListener((imageInfo, _) {
-                      sizeNotification(firstIndex, imageInfo);
-                    })),
+                  image:
+                      ExtendedFileImageProvider(
+                          File(c.provider.uris[firstIndex]),
+                          imageCacheName: c.provider.uris[firstIndex],
+                        )
+                        ..resolve(ImageConfiguration.empty).addListener(
+                          ImageStreamListener((imageInfo, _) {
+                            sizeNotification(firstIndex, imageInfo);
+                          }),
+                        ),
                 ),
                 firstIndex,
               )
@@ -281,13 +283,16 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
             if (c.maxPage > secondIndex && secondIndex >= 0)
               wrappingGestureDetector(
                 Image(
-                  image: ExtendedFileImageProvider(
-                    File(c.provider.uris[secondIndex]),
-                    imageCacheName: c.provider.uris[secondIndex],
-                  )..resolve(ImageConfiguration.empty)
-                        .addListener(ImageStreamListener((imageInfo, _) {
-                      sizeNotification(secondIndex, imageInfo);
-                    })),
+                  image:
+                      ExtendedFileImageProvider(
+                          File(c.provider.uris[secondIndex]),
+                          imageCacheName: c.provider.uris[secondIndex],
+                        )
+                        ..resolve(ImageConfiguration.empty).addListener(
+                          ImageStreamListener((imageInfo, _) {
+                            sizeNotification(secondIndex, imageInfo);
+                          }),
+                        ),
                 ),
                 secondIndex,
               )
@@ -326,18 +331,20 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
         future: c.onTwoPage.value
             ? Future.wait([
                 c.load(index * 2 - indexPad),
-                c.load(index * 2 + 1 - indexPad)
+                c.load(index * 2 + 1 - indexPad),
               ])
             : c.load(index),
         builder: (context, snapshot) {
           var twoPageLoaded = true;
           if (c.onTwoPage.value) {
             final firstIndex = index * 2 - indexPad;
-            final firstLoaded = (firstIndex < 0 ||
+            final firstLoaded =
+                (firstIndex < 0 ||
                 c.urlCache[firstIndex] != null &&
                     c.headerCache[firstIndex] != null);
             final secondIndex = index * 2 + 1 - indexPad;
-            final secondLoaded = c.maxPage <= secondIndex ||
+            final secondLoaded =
+                c.maxPage <= secondIndex ||
                 (c.urlCache[secondIndex] != null &&
                     c.headerCache[secondIndex] != null);
 
@@ -405,8 +412,9 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
                     retries: 10,
                     timeRetry: const Duration(milliseconds: 300),
                   ),
-                  filterQuality:
-                      SettingsWrapper.getImageQuality(c.imgQuality.value),
+                  filterQuality: SettingsWrapper.getImageQuality(
+                    c.imgQuality.value,
+                  ),
                   initialScale: PhotoViewComputedScale.contained,
                   minScale: PhotoViewComputedScale.contained * 1.0,
                   maxScale: PhotoViewComputedScale.contained * 5.0,
@@ -513,7 +521,9 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
     if (alreadyCalculated[imageIndex]) return;
     alreadyCalculated[imageIndex] = true;
     sizes[imageIndex] = Size(
-        imageInfo.image.width.toDouble(), imageInfo.image.height.toDouble());
+      imageInfo.image.width.toDouble(),
+      imageInfo.image.height.toDouble(),
+    );
 
     // TODO: how to optimize this logic?
     WidgetsBinding.instance.addPostFrameCallback(
@@ -532,9 +542,11 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
 
     provider
         .resolve(ImageConfiguration.empty)
-        .addListener(ImageStreamListener((imageInfo, _) {
-      sizeNotification(index, imageInfo);
-    }));
+        .addListener(
+          ImageStreamListener((imageInfo, _) {
+            sizeNotification(index, imageInfo);
+          }),
+        );
 
     final image = Image(
       key: c.imgKeys[index],

@@ -50,7 +50,8 @@ class _GroupArtistListState extends State<LabGroupArtistList>
     for (int i = 0; i < artists.length; i++) {
       final postfix = artists[i].artist().toLowerCase().replaceAll(' ', '_');
       final queryString = translate2query(
-          '${artists[i].type().name}:$postfix ${Settings.includeTags.value}');
+        '${artists[i].type().name}:$postfix ${Settings.includeTags.value}',
+      );
       final qm = QueryManager.queryPagination(queryString, 1);
       var query = (await qm.next())[0].id();
       ids.add((query, i));
@@ -67,8 +68,9 @@ class _GroupArtistListState extends State<LabGroupArtistList>
 
   Future<List<QueryResult>> _future(String e, ArtistType type) async {
     var postfix = e.toLowerCase().replaceAll(' ', '_');
-    var queryString =
-        translate2query('${type.name}:$postfix ${Settings.includeTags.value}');
+    var queryString = translate2query(
+      '${type.name}:$postfix ${Settings.includeTags.value}',
+    );
     final qm = QueryManager.queryPagination(queryString, 3);
     return await qm.next();
   }
@@ -88,47 +90,46 @@ class _GroupArtistListState extends State<LabGroupArtistList>
       resizeToAvoidBottomInset: false,
       body: FutureBuilder<List<BookmarkArtist>>(
         future: _bookmark(),
-        builder: (BuildContext context,
-            AsyncSnapshot<List<BookmarkArtist>> snapshot) {
-          if (!snapshot.hasData) return Container();
-          return CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: <Widget>[
-              SliverPersistentHeader(
-                floating: true,
-                delegate: AnimatedOpacitySliver(
-                  searchBar: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Stack(children: <Widget>[
-                        _filter(),
-                        _title(),
-                      ])),
-                ),
-              ),
-              SliverList(
-                // padding: EdgeInsets.fromLTRB(0, 4, 0, 0),
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    var e = artists[index];
-                    return FutureBuilder<List<QueryResult>>(
-                      future: _future(e.artist(), e.type()),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<List<QueryResult>> snapshot) {
-                        if (!snapshot.hasData) {
-                          return Container(
-                            height: 195,
-                          );
-                        }
-                        return _listItem(context, e, snapshot.data!);
-                      },
-                    );
-                  },
-                  childCount: _progressingFilter ? 0 : artists.length,
-                ),
-              )
-            ],
-          );
-        },
+        builder:
+            (
+              BuildContext context,
+              AsyncSnapshot<List<BookmarkArtist>> snapshot,
+            ) {
+              if (!snapshot.hasData) return Container();
+              return CustomScrollView(
+                physics: const BouncingScrollPhysics(),
+                slivers: <Widget>[
+                  SliverPersistentHeader(
+                    floating: true,
+                    delegate: AnimatedOpacitySliver(
+                      searchBar: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Stack(children: <Widget>[_filter(), _title()]),
+                      ),
+                    ),
+                  ),
+                  SliverList(
+                    // padding: EdgeInsets.fromLTRB(0, 4, 0, 0),
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      var e = artists[index];
+                      return FutureBuilder<List<QueryResult>>(
+                        future: _future(e.artist(), e.type()),
+                        builder:
+                            (
+                              BuildContext context,
+                              AsyncSnapshot<List<QueryResult>> snapshot,
+                            ) {
+                              if (!snapshot.hasData) {
+                                return Container(height: 195);
+                              }
+                              return _listItem(context, e, snapshot.data!);
+                            },
+                      );
+                    }, childCount: _progressingFilter ? 0 : artists.length),
+                  ),
+                ],
+              );
+            },
       ),
     );
   }
@@ -143,9 +144,7 @@ class _GroupArtistListState extends State<LabGroupArtistList>
         child: Card(
           color: Palette.themeColor,
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(8.0),
-            ),
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
           ),
           elevation: !Settings.themeFlat.value ? 100 : 0,
           clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -173,13 +172,15 @@ class _GroupArtistListState extends State<LabGroupArtistList>
                           height: 30,
                           width: 30,
                           child: CircularProgressIndicator(
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.grey),
-                          ))
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.grey,
+                            ),
+                          ),
+                        )
                       : Icon(
                           [
                             MdiIcons.formatListText,
-                            Mdi.sortClockDescendingOutline
+                            Mdi.sortClockDescendingOutline,
                           ][_filterLevel],
                           color: Colors.grey,
                         ),
@@ -195,13 +196,18 @@ class _GroupArtistListState extends State<LabGroupArtistList>
   Widget _title() {
     return const Padding(
       padding: EdgeInsets.only(top: 24, left: 12),
-      child: Text('Artists Collection',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      child: Text(
+        'Artists Collection',
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
     );
   }
 
   Widget _listItem(
-      BuildContext context, BookmarkArtist e, List<QueryResult> qq) {
+    BuildContext context,
+    BookmarkArtist e,
+    List<QueryResult> qq,
+  ) {
     var windowWidth = MediaQuery.of(context).size.width;
     return Container(
       color: Colors.transparent,
@@ -209,10 +215,7 @@ class _GroupArtistListState extends State<LabGroupArtistList>
         onTap: () async {
           PlatformNavigator.navigateSlide(
             context,
-            ArtistInfoPage(
-              type: e.type(),
-              name: e.artist(),
-            ),
+            ArtistInfoPage(type: e.type(), name: e.artist()),
           );
         },
         child: SizedBox(
@@ -226,8 +229,9 @@ class _GroupArtistListState extends State<LabGroupArtistList>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Text(
-                        ' ${e.type().name}:${e.artist()} (${HentaiIndex.getArticleCount(e.type().name, e.artist())})',
-                        style: const TextStyle(fontSize: 17)),
+                      ' ${e.type().name}:${e.artist()} (${HentaiIndex.getArticleCount(e.type().name, e.artist())})',
+                      style: const TextStyle(fontSize: 17),
+                    ),
                   ],
                 ),
                 SizedBox(
@@ -251,24 +255,25 @@ class _GroupArtistListState extends State<LabGroupArtistList>
 
   Widget _image(List<QueryResult> qq, int index, double windowWidth) {
     return Expanded(
-        flex: 1,
-        child: qq.length > index
-            ? Padding(
-                key: Key('${qq[index].id()}/${index}_thumbnail_bookmark'),
-                padding: const EdgeInsets.all(4),
-                child: Provider<ArticleListItem>.value(
-                  value: ArticleListItem.fromArticleListItem(
-                    queryResult: qq[index],
-                    showDetail: false,
-                    addBottomPadding: false,
-                    width: (windowWidth - 16 - 4.0 - 16.0) / 3,
-                    thumbnailTag: const Uuid().v4(),
-                    disableFilter: true,
-                    usableTabList: qq,
-                  ),
-                  child: const ArticleListItemWidget(),
+      flex: 1,
+      child: qq.length > index
+          ? Padding(
+              key: Key('${qq[index].id()}/${index}_thumbnail_bookmark'),
+              padding: const EdgeInsets.all(4),
+              child: Provider<ArticleListItem>.value(
+                value: ArticleListItem.fromArticleListItem(
+                  queryResult: qq[index],
+                  showDetail: false,
+                  addBottomPadding: false,
+                  width: (windowWidth - 16 - 4.0 - 16.0) / 3,
+                  thumbnailTag: const Uuid().v4(),
+                  disableFilter: true,
+                  usableTabList: qq,
                 ),
-              )
-            : Container());
+                child: const ArticleListItemWidget(),
+              ),
+            )
+          : Container(),
+    );
   }
 }

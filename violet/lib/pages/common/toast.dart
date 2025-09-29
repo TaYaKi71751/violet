@@ -5,11 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:violet/widgets/toast.dart';
 
-enum ToastLevel {
-  check,
-  warning,
-  error,
-}
+enum ToastLevel { check, warning, error }
 
 void showToast({
   required ToastLevel level,

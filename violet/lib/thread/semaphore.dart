@@ -6,10 +6,7 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:violet/util/call_once.dart';
 
-enum Priority {
-  urgent,
-  normal,
-}
+enum Priority { urgent, normal }
 
 // https://github.com/mezoni/semaphore/blob/master/lib/src/semaphore/semaphore.dart
 class Semaphore {
@@ -17,13 +14,12 @@ class Semaphore {
 
   int _currentCount = 0;
 
-  Semaphore({
-    required this.maxCount,
-  });
+  Semaphore({required this.maxCount});
 
   final PriorityQueue<(Priority, Completer<CallOnce>)> _waitQueue =
       PriorityQueue<(Priority, Completer<CallOnce>)>(
-          (a, b) => a.$1.index.compareTo(b.$1.index));
+        (a, b) => a.$1.index.compareTo(b.$1.index),
+      );
 
   Future<CallOnce> acquire([Priority priority = Priority.normal]) {
     var completer = Completer<CallOnce>();

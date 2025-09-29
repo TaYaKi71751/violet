@@ -28,12 +28,7 @@ class SimpleInfoWidget extends StatelessWidget {
       children: <Widget>[
         Row(
           children: [
-            Stack(
-              children: <Widget>[
-                thumbnail(context, data),
-                bookmark(data),
-              ],
-            ),
+            Stack(children: <Widget>[thumbnail(context, data), bookmark(data)]),
             Expanded(
               child: SizedBox(
                 height: size.height,
@@ -74,20 +69,27 @@ class SimpleInfoWidget extends StatelessWidget {
   }
 
   void thumbnailTapped(BuildContext context, ArticleInfo data) {
-    Navigator.of(context).push(PageRouteBuilder(
-      opaque: false,
-      transitionDuration: const Duration(milliseconds: 500),
-      transitionsBuilder: (BuildContext context, Animation<double> animation,
-          Animation<double> secondaryAnimation, Widget wi) {
-        return FadeTransition(opacity: animation, child: wi);
-      },
-      pageBuilder: (_, __, ___) => ThumbnailViewPage(
-        thumbnail: data.thumbnail,
-        headers: data.headers,
-        heroKey: data.heroKey,
-        showUltra: false,
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: false,
+        transitionDuration: const Duration(milliseconds: 500),
+        transitionsBuilder:
+            (
+              BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget wi,
+            ) {
+              return FadeTransition(opacity: animation, child: wi);
+            },
+        pageBuilder: (_, __, ___) => ThumbnailViewPage(
+          thumbnail: data.thumbnail,
+          headers: data.headers,
+          heroKey: data.heroKey,
+          showUltra: false,
+        ),
       ),
-    ));
+    );
   }
 
   Widget thumbnailImage(ArticleInfo data) {
@@ -159,17 +161,14 @@ class SimpleInfoWidget extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 4.0),
           child: Theme(
             data: ThemeData(
-                iconTheme: IconThemeData(
-                    color: !Settings.themeWhat.value
-                        ? Colors.black
-                        : Colors.white)),
+              iconTheme: IconThemeData(
+                color: !Settings.themeWhat.value ? Colors.black : Colors.white,
+              ),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                simpleInfoDateTime(data),
-                simpleInfoPages(data),
-              ],
+              children: [simpleInfoDateTime(data), simpleInfoPages(data)],
             ),
           ),
         ),
@@ -182,10 +181,12 @@ class SimpleInfoWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
-        Text(data.title,
-            maxLines: 5,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        Text(
+          data.title,
+          maxLines: 5,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
         Text(data.artist),
       ],
     );
@@ -194,15 +195,13 @@ class SimpleInfoWidget extends StatelessWidget {
   Widget simpleInfoDateTime(ArticleInfo data) {
     return Row(
       children: <Widget>[
-        const Icon(
-          Icons.date_range,
-          size: 20,
-        ),
+        const Icon(Icons.date_range, size: 20),
         Text(
-            data.queryResult.getDateTime() != null
-                ? _dateFormat.format(data.queryResult.getDateTime()!.toLocal())
-                : '',
-            style: const TextStyle(fontSize: 15)),
+          data.queryResult.getDateTime() != null
+              ? _dateFormat.format(data.queryResult.getDateTime()!.toLocal())
+              : '',
+          style: const TextStyle(fontSize: 15),
+        ),
       ],
     );
   }
@@ -212,13 +211,11 @@ class SimpleInfoWidget extends StatelessWidget {
 
     return Row(
       children: <Widget>[
-        const Icon(
-          Icons.photo,
-          size: 20,
-        ),
+        const Icon(Icons.photo, size: 20),
         Text(
-            ' ${data.thumbnail != null ? '${ProviderManager.isExists(id) ? ProviderManager.getIgnoreDirty(id).length() : '?'} Page' : ''}',
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+          ' ${data.thumbnail != null ? '${ProviderManager.isExists(id) ? ProviderManager.getIgnoreDirty(id).length() : '?'} Page' : ''}',
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+        ),
       ],
     );
   }

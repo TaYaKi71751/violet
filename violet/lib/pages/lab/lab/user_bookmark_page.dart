@@ -29,18 +29,17 @@ class _LabUserBookmarkPageState extends State<LabUserBookmarkPage> {
         future: Bookmark.getInstance().then((value) => value.getUser()),
         builder: (context, AsyncSnapshot<List<BookmarkUser>> snapshot) {
           if (!snapshot.hasData) {
-            return const Center(
-              child: Text('Loading ...'),
-            );
+            return const Center(child: Text('Loading ...'));
           }
           return ListView.builder(
-              padding: const EdgeInsets.fromLTRB(4, 8, 4, 8),
-              physics: const BouncingScrollPhysics(),
-              controller: _scrollController,
-              itemCount: snapshot.data!.length,
-              itemBuilder: (BuildContext ctxt, int index) {
-                return _buildItem(snapshot.data![index]);
-              });
+            padding: const EdgeInsets.fromLTRB(4, 8, 4, 8),
+            physics: const BouncingScrollPhysics(),
+            controller: _scrollController,
+            itemCount: snapshot.data!.length,
+            itemBuilder: (BuildContext ctxt, int index) {
+              return _buildItem(snapshot.data![index]);
+            },
+          );
         },
       ),
     );
@@ -53,10 +52,11 @@ class _LabUserBookmarkPageState extends State<LabUserBookmarkPage> {
       decoration: BoxDecoration(
         color: Settings.themeWhat.value ? Colors.black26 : Colors.white,
         borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(8),
-            topRight: Radius.circular(8),
-            bottomLeft: Radius.circular(8),
-            bottomRight: Radius.circular(8)),
+          topLeft: Radius.circular(8),
+          topRight: Radius.circular(8),
+          bottomLeft: Radius.circular(8),
+          bottomRight: Radius.circular(8),
+        ),
         boxShadow: [
           BoxShadow(
             color: Settings.themeWhat.value
@@ -73,24 +73,29 @@ class _LabUserBookmarkPageState extends State<LabUserBookmarkPage> {
         child: Material(
           color: Settings.themeWhat.value
               ? Settings.themeBlack.value
-                  ? Palette.blackThemeBackground
-                  : Colors.black38
+                    ? Palette.blackThemeBackground
+                    : Colors.black38
               : Colors.white,
           child: ListTile(
-            title: Text(data.title() ?? data.user().substring(0, 8),
-                style: const TextStyle(fontSize: 16.0)),
+            title: Text(
+              data.title() ?? data.user().substring(0, 8),
+              style: const TextStyle(fontSize: 16.0),
+            ),
             subtitle: Text(data.subtitle() ?? ''),
             trailing: Text(data.datetime().split(' ')[0]),
             onTap: () {
               PlatformNavigator.navigateSlide(
-                  context, LabUserRecentRecords(data.user()));
+                context,
+                LabUserRecentRecords(data.user()),
+              );
             },
             onLongPress: () async {
               var rr = await showDialog(
                 context: context,
                 builder: (BuildContext context) => GroupModifyPage(
-                    name: data.title() ?? data.user().substring(0, 8),
-                    desc: data.subtitle() ?? ''),
+                  name: data.title() ?? data.user().substring(0, 8),
+                  desc: data.subtitle() ?? '',
+                ),
               );
 
               if (rr == null) return;
@@ -107,8 +112,9 @@ class _LabUserBookmarkPageState extends State<LabUserBookmarkPage> {
                 rrt['Title'] = nname;
                 rrt['Subtitle'] = ndesc;
 
-                await (await Bookmark.getInstance())
-                    .modfiyUser(BookmarkUser(result: rrt));
+                await (await Bookmark.getInstance()).modfiyUser(
+                  BookmarkUser(result: rrt),
+                );
                 setState(() {});
               }
             },

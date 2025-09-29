@@ -13,8 +13,9 @@ class CommentsCount {
   static Future<void> init() async {
     String data;
     if (Platform.environment.containsKey('FLUTTER_TEST')) {
-      final file =
-          File(join(Directory.current.path, 'assets/rank/comments.json'));
+      final file = File(
+        join(Directory.current.path, 'assets/rank/comments.json'),
+      );
       data = await file.readAsString();
     } else {
       data = await rootBundle.loadString('assets/rank/comments.json');

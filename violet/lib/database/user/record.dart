@@ -59,7 +59,8 @@ class User {
   static Future<void> load() async {
     var db = await CommonUserDatabase.getInstance();
     var ee = await db.query(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name='ArticleReadLog';");
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='ArticleReadLog';",
+    );
     if (ee.isEmpty || ee[0].isEmpty) {
       try {
         await db.execute('''CREATE TABLE ArticleReadLog (
@@ -71,8 +72,10 @@ class User {
               Type integer);
               ''');
       } catch (e, st) {
-        Logger.error('[Record-Instance] E: $e\n'
-            '$st');
+        Logger.error(
+          '[Record-Instance] E: $e\n'
+          '$st',
+        );
       }
     }
     _instance = User();
@@ -86,25 +89,32 @@ class User {
   Lock userLogLock = Lock();
   Future<List<ArticleReadLog>> getUserLog() async {
     await userLogLock.synchronized(() async {
-      cachedReadLog ??= (await (await CommonUserDatabase.getInstance())
-              .query('SELECT * FROM ArticleReadLog ORDER BY Id DESC'))
-          // TODO: 왜 Article에 null이 들어가는지 확인 필요
-          .where((e) => e['Article'] != null)
-          .map((x) => ArticleReadLog(result: x))
-          .toList();
+      cachedReadLog ??=
+          (await (await CommonUserDatabase.getInstance()).query(
+                'SELECT * FROM ArticleReadLog ORDER BY Id DESC',
+              ))
+              // TODO: 왜 Article에 null이 들어가는지 확인 필요
+              .where((e) => e['Article'] != null)
+              .map((x) => ArticleReadLog(result: x))
+              .toList();
     });
     return cachedReadLog!;
   }
 
-  Future<void> insertUserLog(int article, int type,
-      [DateTime? datetime]) async {
+  Future<void> insertUserLog(
+    int article,
+    int type, [
+    DateTime? datetime,
+  ]) async {
     datetime ??= DateTime.now();
     final db = await CommonUserDatabase.getInstance();
-    final log = ArticleReadLog(result: {
-      'Article': article.toString(),
-      'Type': type,
-      'DateTimeStart': datetime.toString(),
-    });
+    final log = ArticleReadLog(
+      result: {
+        'Article': article.toString(),
+        'Type': type,
+        'DateTimeStart': datetime.toString(),
+      },
+    );
     final id = await db.insert('ArticleReadLog', log.result);
     log.result['Id'] = id;
     cachedReadLog!.insert(0, log);

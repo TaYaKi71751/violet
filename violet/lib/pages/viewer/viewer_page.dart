@@ -169,10 +169,10 @@ class _ViewerPageState extends State<ViewerPage> {
   }
 
   _exitFullScreen() {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
-      SystemUiOverlay.top,
-      SystemUiOverlay.bottom,
-    ]);
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
+    );
   }
 
   _jumpPage() {
@@ -180,12 +180,14 @@ class _ViewerPageState extends State<ViewerPage> {
       if (_pageInfo.jumpPage != null) {
         c.jump(_pageInfo.jumpPage!);
       } else {
-        c.bookmark.value =
-            await (await Bookmark.getInstance()).isBookmark(_pageInfo.id);
+        c.bookmark.value = await (await Bookmark.getInstance()).isBookmark(
+          _pageInfo.id,
+        );
 
         if (Settings.showRecordJumpMessage.value) {
-          await Future.delayed(const Duration(milliseconds: 100))
-              .then((value) => _checkLatestRead());
+          await Future.delayed(
+            const Duration(milliseconds: 100),
+          ).then((value) => _checkLatestRead());
         }
       }
 
@@ -194,16 +196,18 @@ class _ViewerPageState extends State<ViewerPage> {
   }
 
   _allocDeviceEventHandler() {
-    ApplePencilDoubleTap().listen(v1Callback: (PreferredAction preferedAction) {
-      if (ModalRoute.of(context)!.isCurrent) {
-        c.next();
-      }
-    });
+    ApplePencilDoubleTap().listen(
+      v1Callback: (PreferredAction preferedAction) {
+        if (ModalRoute.of(context)!.isCurrent) {
+          c.next();
+        }
+      },
+    );
 
     if (Platform.isAndroid) {
-      const EventChannel('xyz.project.violet/volume')
-          .receiveBroadcastStream()
-          .listen((event) {
+      const EventChannel(
+        'xyz.project.violet/volume',
+      ).receiveBroadcastStream().listen((event) {
         if (event is String) {
           if (event == 'up') {
             c.prev();
@@ -219,12 +223,15 @@ class _ViewerPageState extends State<ViewerPage> {
     _lifecycleEventHandler = LifecycleEventHandler(
       inactiveCallBack: () async {
         _inactivateTime = DateTime.now();
-        await (await User.getInstance())
-            .updateUserLog(_pageInfo.id, c.page.value);
+        await (await User.getInstance()).updateUserLog(
+          _pageInfo.id,
+          c.page.value,
+        );
       },
       resumeCallBack: () async {
-        _inactivateSeconds +=
-            DateTime.now().difference(_inactivateTime).inSeconds;
+        _inactivateSeconds += DateTime.now()
+            .difference(_inactivateTime)
+            .inSeconds;
         await ScriptManager.refresh();
       },
     );
@@ -332,13 +339,15 @@ class _ViewerPageState extends State<ViewerPage> {
   }
 
   _savePageRead() async {
-    await (await User.getInstance())
-        .updateUserLog(_pageInfo.id, c.page.value + 1);
+    await (await User.getInstance()).updateUserLog(
+      _pageInfo.id,
+      c.page.value + 1,
+    );
     if (!_pageInfo.useFileSystem && Settings.useVioletServer.value) {
       VioletServer.viewClose(
-          _pageInfo.id,
-          DateTime.now().difference(_startsTime).inSeconds -
-              _inactivateSeconds);
+        _pageInfo.id,
+        DateTime.now().difference(_startsTime).inSeconds - _inactivateSeconds,
+      );
     }
   }
 
@@ -358,17 +367,17 @@ class _ViewerPageState extends State<ViewerPage> {
         reverseTransitionDuration: Duration.zero,
         pageBuilder: (context, animation1, animation2) =>
             Provider<ViewerPageProvider>.value(
-          value: ViewerPageProvider(
-            uris: List<String>.filled(prov.length(), ''),
-            useProvider: true,
-            provider: prov,
-            headers: headers,
-            id: article.id(),
-            title: article.title(),
-            usableTabList: _pageInfo.usableTabList,
-          ),
-          child: const ViewerPage(),
-        ),
+              value: ViewerPageProvider(
+                uris: List<String>.filled(prov.length(), ''),
+                useProvider: true,
+                provider: prov,
+                headers: headers,
+                id: article.id(),
+                title: article.title(),
+                usableTabList: _pageInfo.usableTabList,
+              ),
+              child: const ViewerPage(),
+            ),
       ),
     );
   }

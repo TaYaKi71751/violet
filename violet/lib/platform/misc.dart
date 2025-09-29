@@ -26,14 +26,11 @@ class PlatformMiscMethods {
       throw UnsupportedError('Android only');
     }
 
-    await _methodChannel.invokeMethod<String>(
-      'exportFile',
-      <String, dynamic>{
-        'filePath': filePath,
-        'mimeType': mimeType,
-        'fileNameToSaveAs': fileNameToSaveAs,
-      },
-    );
+    await _methodChannel.invokeMethod<String>('exportFile', <String, dynamic>{
+      'filePath': filePath,
+      'mimeType': mimeType,
+      'fileNameToSaveAs': fileNameToSaveAs,
+    });
   }
 
   Future<void> setWindowSecure() async {

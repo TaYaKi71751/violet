@@ -37,16 +37,16 @@ class _LogPageState extends State<LogPage> {
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.only(
-            top: statusBarHeight + 16, bottom: mediaQuery.padding.bottom),
+          top: statusBarHeight + 16,
+          bottom: mediaQuery.padding.bottom,
+        ),
         child: Column(
           children: [
             const Text(
               'Log Record',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            Container(
-              height: 16,
-            ),
+            Container(height: 16),
             Expanded(
               child: ListView.separated(
                 physics: const BouncingScrollPhysics(),
@@ -54,16 +54,20 @@ class _LogPageState extends State<LogPage> {
                 itemBuilder: (c, i) {
                   final ii = errors[i];
 
-                  final icon = Icon(ii.isError == false && ii.isWarning == false
-                      ? Icons.check
-                      : ii.isWarning
-                          ? Icons.warning
-                          : Icons.cancel);
+                  final icon = Icon(
+                    ii.isError == false && ii.isWarning == false
+                        ? Icons.check
+                        : ii.isWarning
+                        ? Icons.warning
+                        : Icons.cancel,
+                  );
 
                   final title = Text(
                     ii.title,
                     style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 15),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
                   );
 
                   final defailButton = Expanded(
@@ -88,14 +92,16 @@ class _LogPageState extends State<LogPage> {
 
                   return Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 24.0, vertical: 12.0),
+                      horizontal: 24.0,
+                      vertical: 12.0,
+                    ),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10.0),
                       color: ii.isError == false && ii.isWarning == false
                           ? Colors.greenAccent.withOpacity(0.8)
                           : ii.isWarning
-                              ? Colors.orangeAccent.withOpacity(0.8)
-                              : Colors.redAccent.withOpacity(0.8),
+                          ? Colors.orangeAccent.withOpacity(0.8)
+                          : Colors.redAccent.withOpacity(0.8),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,9 +110,7 @@ class _LogPageState extends State<LogPage> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             icon,
-                            const SizedBox(
-                              width: 12.0,
-                            ),
+                            const SizedBox(width: 12.0),
                             title,
                             if (ii.detail != null) defailButton,
                           ],
@@ -119,9 +123,7 @@ class _LogPageState extends State<LogPage> {
                 },
                 itemCount: errors.length,
                 separatorBuilder: (context, index) {
-                  return Container(
-                    height: 8,
-                  );
+                  return Container(height: 8);
                 },
               ),
             ),

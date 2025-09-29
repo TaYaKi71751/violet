@@ -42,9 +42,7 @@ class ArticleListItemWidgetController extends GetxController {
 
   GlobalKey bodyKey = GlobalKey();
 
-  ArticleListItemWidgetController(
-    this.articleListItem,
-  ) {
+  ArticleListItemWidgetController(this.articleListItem) {
     if (!Settings.simpleItemWidgetLoadingIcon.value) {
       flareController = FlareControls();
     }
@@ -65,8 +63,10 @@ class ArticleListItemWidgetController extends GetxController {
         Future.delayed(const Duration(milliseconds: 500)).then((value) {
           if (bodyKey.currentContext != null && !disposed) {
             if (Settings.useTabletMode.value) {
-              thisHeight.value =
-                  max(220.0, bodyKey.currentContext!.size!.height);
+              thisHeight.value = max(
+                220.0,
+                bodyKey.currentContext!.size!.height,
+              );
             } else {
               thisHeight.value = bodyKey.currentContext!.size!.height;
             }
@@ -86,25 +86,30 @@ class ArticleListItemWidgetController extends GetxController {
 
   checkIsBookmarked() {
     Bookmark.getInstance().then((value) async {
-      isBookmarked.value =
-          await value.isBookmark(articleListItem.queryResult.id());
+      isBookmarked.value = await value.isBookmark(
+        articleListItem.queryResult.id(),
+      );
     });
   }
 
   checkLastRead() {
-    User.getInstance().then((value) => value.getUserLog().then((value) async {
-          var x = value.where((e) =>
+    User.getInstance().then(
+      (value) => value.getUserLog().then((value) async {
+        var x = value.where(
+          (e) =>
               e.articleId() == articleListItem.queryResult.id().toString() &&
               e.lastPage() != null &&
               e.lastPage()! > 1 &&
-              DateTime.parse(e.datetimeStart())
-                      .difference(DateTime.now())
-                      .inDays <
-                  31);
-          if (x.isEmpty) return;
-          isLatestRead.value = true;
-          latestReadPage.value = x.first.lastPage()!;
-        }));
+              DateTime.parse(
+                    e.datetimeStart(),
+                  ).difference(DateTime.now()).inDays <
+                  31,
+        );
+        if (x.isEmpty) return;
+        isLatestRead.value = true;
+        latestReadPage.value = x.first.lastPage()!;
+      }),
+    );
   }
 
   initTexts() {
@@ -122,8 +127,9 @@ class ArticleListItemWidgetController extends GetxController {
 
     title = HtmlUnescape().convert(articleListItem.queryResult.title());
     dateTime = articleListItem.queryResult.getDateTime() != null
-        ? DateFormat('yyyy/MM/dd HH:mm')
-            .format(articleListItem.queryResult.getDateTime()!.toLocal())
+        ? DateFormat(
+            'yyyy/MM/dd HH:mm',
+          ).format(articleListItem.queryResult.getDateTime()!.toLocal())
         : '';
   }
 

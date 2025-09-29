@@ -26,10 +26,13 @@ class _ViewerRecordPanelState extends State<ViewerRecordPanel> {
   @override
   Widget build(BuildContext context) {
     var records = FutureBuilder(
-      future: User.getInstance().then((value) => value.getUserLog().then(
+      future: User.getInstance().then(
+        (value) => value.getUserLog().then(
           (value) => value
               .where((e) => e.articleId() == widget.articleId.toString())
-              .toList())),
+              .toList(),
+        ),
+      ),
       builder: (context, AsyncSnapshot<List<ArticleReadLog>> snapshot) {
         if (!snapshot.hasData) return Container();
         final e = snapshot.data!;

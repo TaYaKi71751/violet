@@ -22,12 +22,14 @@ class TagTranslate {
     String data;
 
     if (Platform.environment.containsKey('FLUTTER_TEST')) {
-      final file =
-          File(join(Directory.current.path, 'assets/locale/tag/korean.json'));
+      final file = File(
+        join(Directory.current.path, 'assets/locale/tag/korean.json'),
+      );
       data = await file.readAsString();
     } else {
-      data = await rootBundle
-          .loadString('assets/locale/tag/$defaultLanguage.json');
+      data = await rootBundle.loadString(
+        'assets/locale/tag/$defaultLanguage.json',
+      );
     }
 
     Future<(Map<String, String>, Map<String, String>)> decodeJsonData() async {
@@ -59,8 +61,9 @@ class TagTranslate {
             return null;
           }
 
-          late final String nomalizedValue =
-              value.replaceAll('female:', '').replaceAll('male:', '');
+          late final String nomalizedValue = value
+              .replaceAll('female:', '')
+              .replaceAll('male:', '');
 
           translateMap[nomalizedKey] = nomalizedValue;
           reverseAndroMap[disassembly(nomalizedValue)] = nomalizedKey;
@@ -84,7 +87,8 @@ class TagTranslate {
     }
 
     return TagTranslatedRegacy.mapSeries2Kor(
-        TagTranslatedRegacy.mapTag2Kor(key));
+      TagTranslatedRegacy.mapTag2Kor(key),
+    );
   }
 
   static String ofAny(String key) {
@@ -105,7 +109,8 @@ class TagTranslate {
     }
 
     return TagTranslatedRegacy.mapSeries2Kor(
-        TagTranslatedRegacy.mapTag2Kor(key));
+      TagTranslatedRegacy.mapTag2Kor(key),
+    );
   }
 
   // [<Origin, Translated>]
@@ -122,8 +127,9 @@ class TagTranslate {
     part = disassembly(part.replaceAll(' ', ''));
     return _reverseAndroMap.entries
         .where((element) => element.key.replaceAll(' ', '').contains(part))
-        .map((e) =>
-            DisplayedTag(tag: e.value, translated: _translateMap[e.value]))
+        .map(
+          (e) => DisplayedTag(tag: e.value, translated: _translateMap[e.value]),
+        )
         .toList();
   }
 
@@ -144,12 +150,15 @@ class TagTranslate {
   static List<(DisplayedTag, int)> containsFuzzing(String part) {
     part = part.replaceAll(' ', '');
     var result = _translateMap.entries
-        .map((e) => (
-              DisplayedTag(tag: e.key, translated: e.value.split('|')[0]),
-              Distance.levenshteinDistance(
-                  e.value.replaceAll(' ', '').split('|')[0].runes.toList(),
-                  part.runes.toList())
-            ))
+        .map(
+          (e) => (
+            DisplayedTag(tag: e.key, translated: e.value.split('|')[0]),
+            Distance.levenshteinDistance(
+              e.value.replaceAll(' ', '').split('|')[0].runes.toList(),
+              part.runes.toList(),
+            ),
+          ),
+        )
         .toList();
     result.sort((x, y) => x.$2.compareTo(y.$2));
     return result;
@@ -159,14 +168,18 @@ class TagTranslate {
   static List<(DisplayedTag, int)> containsFuzzingAndro(String part) {
     part = disassembly(part.replaceAll(' ', ''));
     var result = _reverseAndroMap.entries
-        .map((e) => (
-              DisplayedTag(
-                  tag: e.value,
-                  translated: _translateMap[e.value]!.split('|')[0]),
-              Distance.levenshteinDistance(
-                  e.key.replaceAll(' ', '').split('|')[0].runes.toList(),
-                  part.runes.toList())
-            ))
+        .map(
+          (e) => (
+            DisplayedTag(
+              tag: e.value,
+              translated: _translateMap[e.value]!.split('|')[0],
+            ),
+            Distance.levenshteinDistance(
+              e.key.replaceAll(' ', '').split('|')[0].runes.toList(),
+              part.runes.toList(),
+            ),
+          ),
+        )
         .toList();
     result.sort((x, y) => x.$2.compareTo(y.$2));
     return result;
@@ -198,26 +211,26 @@ class TagTranslate {
     ' ', 'qr', 'qe', 'qtr', 'qte', 'qw', 'qe', ' ', //
     ' ', 'tr', 'ts', 'te', 'tq', 'tw', ' ', 'dd', //
     'd', 'dt', ' ', ' ', 'gg', ' ', 'yi', 'yO', //
-    'yl', 'bu', 'bP', 'bl'
+    'yl', 'bu', 'bP', 'bl',
   ];
   static const indexInitial2 = [
     'r', 'R', 's', 'e', 'E', 'f', 'a', 'q', //
     'Q', 't', 'T', 'd', 'w', 'W', 'c', 'z', //
-    'x', 'v', 'g' //
+    'x', 'v', 'g', //
   ];
   static const indexMedial2 = [
     'k', 'o', 'i', 'O', 'j', 'p', 'u', 'P', //
     'h', 'hk', 'ho', 'hl', 'y', 'n', 'nj', 'np', //
-    'nl', 'b', 'm', 'ml', 'l' //
+    'nl', 'b', 'm', 'ml', 'l', //
   ];
   static const indexFinal2 = [
     '', 'r', 'R', 'rt', 's', 'sw', 'sg', 'e', //
     'f', 'fr', 'fa', 'fq', 'ft', 'fx', 'fv', 'fg', //
     'a', 'q', 'qt', 't', 'T', 'd', 'w', '', //
-    'z', 'x', 'v', 'g' //
+    'z', 'x', 'v', 'g', //
   ];
   static const indexFinal2Du = [
-    't', 'w', 'g', 'r', 'a', 'q', 'x', 'v' //
+    't', 'w', 'g', 'r', 'a', 'q', 'x', 'v', //
   ];
 
   static Map<String, int> distortion(int ch) {

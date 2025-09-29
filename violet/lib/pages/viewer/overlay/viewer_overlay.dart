@@ -37,10 +37,7 @@ import 'package:violet/widgets/toast.dart';
 class ViewerOverlay extends StatefulWidget {
   final String getxId;
 
-  const ViewerOverlay({
-    super.key,
-    required this.getxId,
-  });
+  const ViewerOverlay({super.key, required this.getxId});
 
   @override
   State<ViewerOverlay> createState() => _ViewerOverlayState();
@@ -113,14 +110,16 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
             padding: EdgeInsets.only(
-              top: height -
+              top:
+                  height -
                   Variables.bottomBarHeight -
                   (48 + 48 + 48 + 32 - 24) -
                   (c.search.value ? 48 : 0) -
                   (c.thumb.value ? c.thumbSizeValue : 0) -
                   (c.showSlider.value ? 48.0 : 0) -
                   statusBarHeight,
-              bottom: (48 + 48.0 + 32 - 24) +
+              bottom:
+                  (48 + 48.0 + 32 - 24) +
                   (c.search.value ? 48 : 0) +
                   (c.thumb.value ? c.thumbSizeValue : 0) +
                   (c.showSlider.value ? 48.0 : 0),
@@ -180,13 +179,16 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
                   ? EdgeInsets.only(
                       top: !Settings.disableFullScreen.value
                           ? Variables.statusBarHeight
-                          : 0.0)
+                          : 0.0,
+                    )
                   : EdgeInsets.only(
-                      top: height -
+                      top:
+                          height -
                           Variables.bottomBarHeight -
                           (48) -
                           (Platform.isIOS ? 48 - 24 : 0) -
-                          statusBarHeight),
+                          statusBarHeight,
+                    ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisAlignment: c.appBarToBottom.value
@@ -233,7 +235,8 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
                   ),
                   !Settings.disableFullScreen.value && c.appBarToBottom.value
                       ? Container(
-                          height: Variables.bottomBarHeight +
+                          height:
+                              Variables.bottomBarHeight +
                               (Platform.isIOS ? 48 - 24 : 0),
                           color: Platform.isIOS
                               ? Colors.black.withOpacity(0.8)
@@ -266,8 +269,9 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
       icon: Icon(c.bookmark.value ? MdiIcons.heart : MdiIcons.heartOutline),
       color: Colors.white,
       onPressed: () async {
-        c.bookmark.value =
-            await (await Bookmark.getInstance()).isBookmark(c.articleId);
+        c.bookmark.value = await (await Bookmark.getInstance()).isBookmark(
+          c.articleId,
+        );
 
         if (c.bookmark.value) {
           if (!mounted) return;
@@ -353,16 +357,17 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
         c.isStaring = false;
         ViewerTabPanel? cache;
         await showModalBottomSheet(
-            context: context,
-            isScrollControlled: false,
-            builder: (context) {
-              cache ??= ViewerTabPanel(
-                articleId: c.articleId,
-                usableTabList: c.provider.usableTabList,
-                height: height,
-              );
-              return cache!;
-            }).then((value) async {
+          context: context,
+          isScrollControlled: false,
+          builder: (context) {
+            cache ??= ViewerTabPanel(
+              articleId: c.articleId,
+              usableTabList: c.provider.usableTabList,
+              height: height,
+            );
+            return cache!;
+          },
+        ).then((value) async {
           if (value == null) return;
 
           c.replace(value as QueryResult);
@@ -412,13 +417,18 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
 
   _appBarS2S() {
     return IconButton(
-      icon: Obx(() => Icon(c.secondPageToSecondPage.value
-          ? MdiIcons.homeFloor1
-          : MdiIcons.homeFloor2)),
+      icon: Obx(
+        () => Icon(
+          c.secondPageToSecondPage.value
+              ? MdiIcons.homeFloor1
+              : MdiIcons.homeFloor2,
+        ),
+      ),
       color: Colors.white,
       onPressed: () async {
-        await Settings.secondPageToSecondPage
-            .setValue(!Settings.secondPageToSecondPage.value);
+        await Settings.secondPageToSecondPage.setValue(
+          !Settings.secondPageToSecondPage.value,
+        );
         c.secondPageToSecondPage.value = Settings.secondPageToSecondPage.value;
       },
     );
@@ -426,18 +436,23 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
 
   _appBarTwoPage() {
     return IconButton(
-      icon: Obx(() => Icon(
-          c.onTwoPage.value ? MdiIcons.cardOutline : MdiIcons.cardOffOutline)),
+      icon: Obx(
+        () => Icon(
+          c.onTwoPage.value ? MdiIcons.cardOutline : MdiIcons.cardOffOutline,
+        ),
+      ),
       color: Colors.white,
       onPressed: () async {
-        await Settings.disableTwoPageView
-            .setValue(!Settings.disableTwoPageView.value);
+        await Settings.disableTwoPageView.setValue(
+          !Settings.disableTwoPageView.value,
+        );
         final curPage = c.page.value;
         c.onTwoPageJump = true;
         c.page.value = c.onTwoPage.value ? curPage ~/ 2 * 2 : curPage;
         c.onTwoPage.value = !Settings.disableTwoPageView.value;
-        c.horizontalPageController
-            .jumpToPage(c.onTwoPage.value ? curPage ~/ 2 : curPage);
+        c.horizontalPageController.jumpToPage(
+          c.onTwoPage.value ? curPage ~/ 2 : curPage,
+        );
         WidgetsBinding.instance.addPostFrameCallback(
           (_) => c.onTwoPageJump = false,
         );
@@ -461,9 +476,7 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
               heightFactor: 0.8,
               child: Provider<ViewerPageProvider>.value(
                 value: c.provider,
-                child: ViewerThumbnail(
-                  viewedPage: c.page.value,
-                ),
+                child: ViewerThumbnail(viewedPage: c.page.value),
               ),
             );
             return cache!;
@@ -487,34 +500,37 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
         c.isStaring = false;
         ViewerSettingPanel? cache;
         await showModalBottomSheet(
-            context: context,
-            isScrollControlled: false,
-            builder: (context) {
-              cache ??= ViewerSettingPanel(
-                getxId: widget.getxId,
-                viewerStyleChangeEvent: () {
-                  if (Settings.isHorizontal.value) {
-                    c.horizontalPageController =
-                        PreloadPageController(initialPage: c.page.value);
-                  } else {
-                    c.sliderOnChange = true;
-                    Future.delayed(const Duration(milliseconds: 180))
-                        .then((value) {
-                      c.verticalItemScrollController.scrollTo(
-                        index: c.page.value,
-                        duration: const Duration(microseconds: 1),
-                        alignment: 0.12,
-                      );
-                      c.sliderOnChange = false;
-                    });
-                  }
-                },
-                thumbSizeChangeEvent: () {
-                  _preprocessImageInfoForFileImage();
-                },
-              );
-              return cache!;
-            });
+          context: context,
+          isScrollControlled: false,
+          builder: (context) {
+            cache ??= ViewerSettingPanel(
+              getxId: widget.getxId,
+              viewerStyleChangeEvent: () {
+                if (Settings.isHorizontal.value) {
+                  c.horizontalPageController = PreloadPageController(
+                    initialPage: c.page.value,
+                  );
+                } else {
+                  c.sliderOnChange = true;
+                  Future.delayed(const Duration(milliseconds: 180)).then((
+                    value,
+                  ) {
+                    c.verticalItemScrollController.scrollTo(
+                      index: c.page.value,
+                      duration: const Duration(microseconds: 1),
+                      alignment: 0.12,
+                    );
+                    c.sliderOnChange = false;
+                  });
+                }
+              },
+              thumbSizeChangeEvent: () {
+                _preprocessImageInfoForFileImage();
+              },
+            );
+            return cache!;
+          },
+        );
         c.startTimer();
         c.isStaring = true;
       },
@@ -538,8 +554,8 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
       child: Slider(
         value: c.page.value >= 0
             ? c.page.value < c.maxPage
-                ? c.page.value.toDouble() + 1
-                : c.maxPage.toDouble()
+                  ? c.page.value.toDouble() + 1
+                  : c.maxPage.toDouble()
             : 1,
         max: c.maxPage.toDouble(),
         min: 1,
@@ -569,7 +585,8 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
               );
             } else {
               c.horizontalPageController.jumpToPage(
-                  c.onTwoPage.value ? value.toInt() ~/ 2 : value.toInt() - 1);
+                c.onTwoPage.value ? value.toInt() ~/ 2 : value.toInt() - 1,
+              );
             }
           }
         },
@@ -581,18 +598,19 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Obx(() => Text('${c.page.value + 1}',
-              style: const TextStyle(color: Colors.white70, fontSize: 16.0))),
+          Obx(
+            () => Text(
+              '${c.page.value + 1}',
+              style: const TextStyle(color: Colors.white70, fontSize: 16.0),
+            ),
+          ),
         ],
       ),
     );
 
     final rightPageIndicator = Text(
       '${c.maxPage}',
-      style: const TextStyle(
-        color: Colors.white70,
-        fontSize: 15.0,
-      ),
+      style: const TextStyle(color: Colors.white70, fontSize: 15.0),
     );
 
     final thumbBarIndicator = IconButton(
@@ -622,16 +640,17 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
             AnimatedPadding(
               duration: const Duration(milliseconds: 300),
               padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).viewInsets.bottom > 1
-                      ? height - MediaQuery.of(context).viewInsets.bottom - 48.0
-                      : (height -
+                top: MediaQuery.of(context).viewInsets.bottom > 1
+                    ? height - MediaQuery.of(context).viewInsets.bottom - 48.0
+                    : (height -
                           Variables.bottomBarHeight -
                           (48) -
                           (Platform.isIOS ? 48 - 24 : 0) -
                           (c.thumb.value ? c.thumbSizeValue : 0) -
                           (c.search.value ? 48 : 0) -
                           statusBarHeight -
-                          (c.appBarToBottom.value ? 48 : 0))),
+                          (c.appBarToBottom.value ? 48 : 0)),
+              ),
               curve: Curves.easeInOut,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
@@ -639,9 +658,9 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
                 height: MediaQuery.of(context).viewInsets.bottom > 1
                     ? MediaQuery.of(context).viewInsets.bottom + 48
                     : (48 +
-                        (c.thumb.value ? c.thumbSizeValue : 0) +
-                        (c.search.value ? 48 : 0) +
-                        (!c.appBarToBottom.value ? 48 : 0)),
+                          (c.thumb.value ? c.thumbSizeValue : 0) +
+                          (c.search.value ? 48 : 0) +
+                          (!c.appBarToBottom.value ? 48 : 0)),
                 curve: Curves.easeInOut,
                 child: Material(
                   color: Colors.black.withOpacity(0.8),
@@ -675,13 +694,9 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
                         children: [
                           if (c.provider.useFileSystem) thumbBarIndicator,
                           leftPageIndicator,
-                          Expanded(
-                            child: sliderWidget,
-                          ),
+                          Expanded(child: sliderWidget),
                           rightPageIndicator,
-                          Container(
-                            width: 16.0,
-                          )
+                          Container(width: 16.0),
                         ],
                       ),
                       if (!Platform.isIOS &&
@@ -690,7 +705,7 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
                         Container(
                           height: Variables.bottomBarHeight,
                           color: Colors.black,
-                        )
+                        ),
                     ],
                   ),
                 ),
@@ -753,8 +768,9 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
     final jumpOffset =
         _thumbImageStartPos[page] - width / 2 + _thumbImageWidth[page] / 2;
 
-    c.thumbController =
-        ScrollController(initialScrollOffset: jumpOffset > 0 ? jumpOffset : 0);
+    c.thumbController = ScrollController(
+      initialScrollOffset: jumpOffset > 0 ? jumpOffset : 0,
+    );
   }
 
   _thumbArea() {
@@ -789,15 +805,17 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
                   ),
                 ),
                 Container(height: 2.0),
-                Text((index + 1).toString(),
-                    style:
-                        const TextStyle(color: Colors.white, fontSize: 12.0)),
+                Text(
+                  (index + 1).toString(),
+                  style: const TextStyle(color: Colors.white, fontSize: 12.0),
+                ),
               ],
             ),
             onTap: () {
               c.jump(index);
 
-              final jumpOffset = _thumbImageStartPos[index] -
+              final jumpOffset =
+                  _thumbImageStartPos[index] -
                   width / 2 +
                   _thumbImageWidth[index] / 2;
               c.thumbController.animateTo(
@@ -852,16 +870,22 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
               return MessageSearch.autocompleteTarget
                   .where((element) => element.$2.startsWith(ppattern))
                   .toList()
-                ..addAll(MessageSearch.autocompleteTarget
-                    .where((element) =>
-                        !element.$2.startsWith(ppattern) &&
-                        element.$2.contains(ppattern))
-                    .toList());
+                ..addAll(
+                  MessageSearch.autocompleteTarget
+                      .where(
+                        (element) =>
+                            !element.$2.startsWith(ppattern) &&
+                            element.$2.contains(ppattern),
+                      )
+                      .toList(),
+                );
             },
             itemBuilder: (context, (String, String, int) suggestion) {
               return ListTile(
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 0.0,
+                  horizontal: 16.0,
+                ),
                 title: Text(suggestion.$1),
                 trailing: Text(
                   '${suggestion.$3}회',
@@ -874,8 +898,9 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
             onSelected: ((String, String, int) suggestion) {
               c.searchText.text = suggestion.$1;
               setState(() {});
-              Future.delayed(const Duration(milliseconds: 100))
-                  .then((value) async {
+              Future.delayed(const Duration(milliseconds: 100)).then((
+                value,
+              ) async {
                 c.onModifiedText();
                 c.suggestionsController!.close();
               });
@@ -888,8 +913,9 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
                 focusNode: focusNode,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration.collapsed(
-                    hintText: '대사 입력',
-                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.5))),
+                  hintText: '대사 입력',
+                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                ),
                 // autofocus: true,
                 onEditingComplete: c.onModifiedText,
               );
@@ -897,8 +923,10 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
           ),
         ),
         upIndicator,
-        Text('${c.messageIndex}/${c.messages.length}',
-            style: const TextStyle(color: Colors.white, fontSize: 16.0)),
+        Text(
+          '${c.messageIndex}/${c.messages.length}',
+          style: const TextStyle(color: Colors.white, fontSize: 16.0),
+        ),
         downIndicator,
         const SizedBox(width: 8.0),
       ],

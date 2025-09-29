@@ -14,77 +14,70 @@ class ThumbnailWidget extends StatelessWidget {
   late final ArticleListItemWidgetController c;
   final String getxId;
 
-  ThumbnailWidget({
-    super.key,
-    required this.getxId,
-  }) {
+  ThumbnailWidget({super.key, required this.getxId}) {
     c = Get.find(tag: getxId);
   }
 
   @override
   Widget build(BuildContext context) {
-    final result = Obx(
-      () {
-        final greyScale = c.isLatestRead.value &&
-            c.imageCount.value - c.latestReadPage.value <= 2 &&
-            !c.articleListItem.disableFilter &&
-            Settings.showArticleProgress.value;
+    final result = Obx(() {
+      final greyScale =
+          c.isLatestRead.value &&
+          c.imageCount.value - c.latestReadPage.value <= 2 &&
+          !c.articleListItem.disableFilter &&
+          Settings.showArticleProgress.value;
 
-        return SizedBox(
-          width: c.articleListItem.showDetail
-              ? c.articleListItem.showUltra
+      return SizedBox(
+        width: c.articleListItem.showDetail
+            ? c.articleListItem.showUltra
                   ? 120 - c.pad.value
                   : 100 - c.pad.value / 6 * 5
-              : null,
-          child: c.thumbnail.value != ''
-              ? Stack(
-                  children: <Widget>[
-                    ThumbnailImageWidget(
-                      headers: c.headers,
-                      thumbnail: c.thumbnail.value,
-                      thumbnailTag: c.articleListItem.thumbnailTag,
-                      showUltra: c.articleListItem.showDetail,
+            : null,
+        child: c.thumbnail.value != ''
+            ? Stack(
+                children: <Widget>[
+                  ThumbnailImageWidget(
+                    headers: c.headers,
+                    thumbnail: c.thumbnail.value,
+                    thumbnailTag: c.articleListItem.thumbnailTag,
+                    showUltra: c.articleListItem.showDetail,
+                    greyScale: greyScale,
+                  ),
+                  BookmarkIndicatorWidget(getxId: getxId, greyScale: greyScale),
+                  Obx(
+                    () => ReadProgressOverlayWidget(
+                      imageCount: c.imageCount.value,
+                      latestReadPage: c.latestReadPage.value,
+                      isLastestRead: c.isLatestRead.value,
                       greyScale: greyScale,
                     ),
-                    BookmarkIndicatorWidget(
-                      getxId: getxId,
-                      greyScale: greyScale,
+                  ),
+                  Obx(
+                    () => PagesOverlayWidget(
+                      imageCount: c.imageCount.value,
+                      showDetail: c.articleListItem.showDetail,
                     ),
-                    Obx(
-                      () => ReadProgressOverlayWidget(
-                        imageCount: c.imageCount.value,
-                        latestReadPage: c.latestReadPage.value,
-                        isLastestRead: c.isLatestRead.value,
-                        greyScale: greyScale,
-                      ),
-                    ),
-                    Obx(
-                      () => PagesOverlayWidget(
-                        imageCount: c.imageCount.value,
-                        showDetail: c.articleListItem.showDetail,
-                      ),
-                    ),
-                  ],
-                )
-              : !Settings.simpleItemWidgetLoadingIcon.value
-                  ? const FlareActor(
-                      'assets/flare/Loading2.flr',
-                      alignment: Alignment.center,
-                      fit: BoxFit.fitHeight,
-                      animation: 'Alarm',
-                    )
-                  : Center(
-                      child: SizedBox(
-                        width: 30,
-                        height: 30,
-                        child: CircularProgressIndicator(
-                          color: Settings.majorColor.value.withAlpha(150),
-                        ),
-                      ),
-                    ),
-        );
-      },
-    );
+                  ),
+                ],
+              )
+            : !Settings.simpleItemWidgetLoadingIcon.value
+            ? const FlareActor(
+                'assets/flare/Loading2.flr',
+                alignment: Alignment.center,
+                fit: BoxFit.fitHeight,
+                animation: 'Alarm',
+              )
+            : Center(
+                child: SizedBox(
+                  width: 30,
+                  height: 30,
+                  child: CircularProgressIndicator(
+                    color: Settings.majorColor.value.withAlpha(150),
+                  ),
+                ),
+              ),
+      );
+    });
 
     if (c.articleListItem.showDetail) {
       return ClipRRect(
@@ -92,10 +85,7 @@ class ThumbnailWidget extends StatelessWidget {
         child: Material(child: result),
       );
     } else {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(3.0),
-        child: result,
-      );
+      return ClipRRect(borderRadius: BorderRadius.circular(3.0), child: result);
     }
   }
 }
@@ -151,7 +141,8 @@ class ThumbnailImageWidget extends StatelessWidget {
             ),
             errorWidget: (context, url, error) {
               Future.delayed(const Duration(milliseconds: 300)).then(
-                  (value) => _rebuildValueNotifier.value = const Uuid().v1());
+                (value) => _rebuildValueNotifier.value = const Uuid().v1(),
+              );
               return Center(
                 child: SizedBox(
                   width: 30,
@@ -223,13 +214,13 @@ class BookmarkIndicatorWidget extends StatelessWidget {
                         : MdiIcons.heartOutline,
                     color: c.isBookmarked.value
                         ? !greyScale
-                            ? const Color(0xFFE2264D)
-                            : Settings.themeWhat.value
-                                ? const Color(0xFF626262)
-                                : const Color(0xFF636363)
+                              ? const Color(0xFFE2264D)
+                              : Settings.themeWhat.value
+                              ? const Color(0xFF626262)
+                              : const Color(0xFF636363)
                         : !Settings.themeWhat.value
-                            ? Colors.black
-                            : Colors.white,
+                        ? Colors.black
+                        : Colors.white,
                   ),
           ),
         ),
@@ -267,7 +258,8 @@ class ReadProgressOverlayWidget extends StatelessWidget {
                 borderRadius: const BorderRadius.all(Radius.circular(10)),
                 child: LinearProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(
-                      !greyScale ? Colors.red : const Color(0xFF777777)),
+                    !greyScale ? Colors.red : const Color(0xFF777777),
+                  ),
                   value: isLastestRead && imageCount - latestReadPage <= 2
                       ? 1.0
                       : latestReadPage / imageCount,
@@ -308,9 +300,7 @@ class PagesOverlayWidget extends StatelessWidget {
               labelPadding: const EdgeInsets.all(0.0),
               label: Text(
                 '$imageCount Page',
-                style: const TextStyle(
-                  color: Colors.white,
-                ),
+                style: const TextStyle(color: Colors.white),
               ),
               elevation: 6.0,
               shadowColor: Colors.grey[60],

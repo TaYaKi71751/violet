@@ -56,9 +56,7 @@ class DownloadImageMenu extends StatelessWidget {
                         _typeItem(context, MdiIcons.rotateLeft, 'Recovery', 3),
                         // _typeItem(context, MdiIcons.viewAgendaOutline, 'srt2', 2),
                         _typeItem(context, MdiIcons.trashCan, 'Delete', -1),
-                        Expanded(
-                          child: Container(),
-                        )
+                        Expanded(child: Container()),
                       ],
                     ),
                   ),
@@ -72,11 +70,17 @@ class DownloadImageMenu extends StatelessWidget {
   }
 
   Widget _typeItem(
-      BuildContext context, IconData icon, String text, int selection) {
+    BuildContext context,
+    IconData icon,
+    String text,
+    int selection,
+  ) {
     return ListTile(
       leading: Icon(icon, color: getColor(selection)),
-      title: Text(text, //Translations.instance!.trans(text),
-          style: TextStyle(color: getColor(selection))),
+      title: Text(
+        text, //Translations.instance!.trans(text),
+        style: TextStyle(color: getColor(selection)),
+      ),
       onTap: () async {
         Navigator.pop(context, selection);
       },

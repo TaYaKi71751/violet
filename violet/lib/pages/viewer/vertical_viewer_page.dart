@@ -20,10 +20,7 @@ typedef StringCallback = Future Function(String);
 
 class VerticalViewerPage extends StatefulWidget {
   final String getxId;
-  const VerticalViewerPage({
-    super.key,
-    required this.getxId,
-  });
+  const VerticalViewerPage({super.key, required this.getxId});
 
   @override
   State<VerticalViewerPage> createState() => _VerticalViewerPageState();
@@ -57,14 +54,15 @@ class _VerticalViewerPageState extends State<VerticalViewerPage>
     super.initState();
 
     c = Get.find(tag: widget.getxId);
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    )..addListener(() {
-        if (_animation != null) {
-          _transformationController.value = _animation!.value;
-        }
-      });
+    _animationController =
+        AnimationController(
+          vsync: this,
+          duration: const Duration(milliseconds: 200),
+        )..addListener(() {
+          if (_animation != null) {
+            _transformationController.value = _animation!.value;
+          }
+        });
 
     _itemPositionsListener.itemPositions.addListener(() {
       if (!c.onSession.value) return;
@@ -218,9 +216,7 @@ class _VerticalViewerPageState extends State<VerticalViewerPage>
     _animation = Matrix4Tween(
       begin: _transformationController.value,
       end: endMatrix,
-    ).animate(
-      CurveTween(curve: Curves.easeOut).animate(_animationController),
-    );
+    ).animate(CurveTween(curve: Curves.easeOut).animate(_animationController));
     _animationController.forward(from: 0);
   }
 
@@ -310,8 +306,10 @@ class _VerticalViewerPageState extends State<VerticalViewerPage>
       c.loadingEstimaed[index] = true;
       Future.delayed(const Duration(milliseconds: 1)).then((value) async {
         if (!c.onSession.value) return;
-        final h =
-            await c.provider.provider!.getEstimatedImageHeight(index, width);
+        final h = await c.provider.provider!.getEstimatedImageHeight(
+          index,
+          width,
+        );
         final oh = await c.provider.provider!.getOriginalImageHeight(index);
         if (h > 0) {
           setState(() {
@@ -364,8 +362,8 @@ class _VerticalViewerPageState extends State<VerticalViewerPage>
               constraints: c.imgHeight[index] != 0
                   ? BoxConstraints(minHeight: c.imgHeight[index])
                   : c.estimatedImgHeight[index] != 0
-                      ? BoxConstraints(minHeight: c.estimatedImgHeight[index])
-                      : null,
+                  ? BoxConstraints(minHeight: c.estimatedImgHeight[index])
+                  : null,
               child: image,
             );
           },
@@ -376,8 +374,9 @@ class _VerticalViewerPageState extends State<VerticalViewerPage>
 
   _loadingWidget(int index) {
     return SizedBox(
-      height:
-          c.estimatedImgHeight[index] != 0 ? c.estimatedImgHeight[index] : 300,
+      height: c.estimatedImgHeight[index] != 0
+          ? c.estimatedImgHeight[index]
+          : 300,
       child: const Center(
         child: SizedBox(
           width: 30,
@@ -396,8 +395,9 @@ class _VerticalViewerPageState extends State<VerticalViewerPage>
               c.imgKeys[index].currentContext!.findRenderObject() as RenderBox;
           final sizeRender = renderBoxRed.size;
           if (sizeRender.height != 300) {
-            c.imgHeight[index] =
-                (width / sizeRender.aspectRatio - 1.5).floor().toDouble();
+            c.imgHeight[index] = (width / sizeRender.aspectRatio - 1.5)
+                .floor()
+                .toDouble();
           }
           if (_latestIndex >= index && !_onScroll) {
             _patchHeightForDynamicLoadedImage();
@@ -416,8 +416,9 @@ class _VerticalViewerPageState extends State<VerticalViewerPage>
 
   _messageSearchLayer(int index) {
     final ratio = c.imgHeight[index] / c.realImgHeight[index];
-    final messages =
-        c.messages.where((element) => element.page == index).toList();
+    final messages = c.messages
+        .where((element) => element.page == index)
+        .toList();
 
     final boxes = messages.map((e) {
       var brtx = e.rect[0];
@@ -433,10 +434,7 @@ class _VerticalViewerPageState extends State<VerticalViewerPage>
           height: (brby - brty) * ratio + 8,
           child: Container(
             decoration: BoxDecoration(
-              border: Border.all(
-                width: 3,
-                color: Colors.red,
-              ),
+              border: Border.all(width: 3, color: Colors.red),
             ),
           ),
         ),

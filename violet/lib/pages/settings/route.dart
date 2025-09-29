@@ -59,8 +59,11 @@ class _RouteDialogState extends State<RouteDialog> {
                 width: 25,
                 fit: BoxFit.fill,
               ),
-              trailing:
-                  const Icon(Icons.reorder, color: Colors.grey, size: 24.0),
+              trailing: const Icon(
+                Icons.reorder,
+                color: Colors.grey,
+                size: 24.0,
+              ),
             );
           }).toList(),
         ),
@@ -103,7 +106,9 @@ class _ImageRouteDialogState extends State<ImageRouteDialog> {
 
             final prefs = await SharedPreferences.getInstance();
             await prefs.setString(
-                'routingrule', Settings.routingRule.join('|'));
+              'routingrule',
+              Settings.routingRule.join('|'),
+            );
             setState(() {});
           },
           children: Settings.routingRule.map((e) {
@@ -124,8 +129,11 @@ class _ImageRouteDialogState extends State<ImageRouteDialog> {
                 width: 25,
                 fit: BoxFit.fill,
               ),
-              trailing:
-                  const Icon(Icons.reorder, color: Colors.grey, size: 24.0),
+              trailing: const Icon(
+                Icons.reorder,
+                color: Colors.grey,
+                size: 24.0,
+              ),
             );
           }).toList(),
         ),

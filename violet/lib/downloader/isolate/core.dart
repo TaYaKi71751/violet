@@ -3,14 +3,7 @@
 
 part of '../isolate_downloader.dart';
 
-enum SendPortType {
-  init,
-  append,
-  cancel,
-  terminate,
-  tasksize,
-  test,
-}
+enum SendPortType { init, append, cancel, terminate, tasksize, test }
 
 class SendPortData {
   final dynamic data;
@@ -19,13 +12,7 @@ class SendPortData {
   const SendPortData({required this.type, this.data});
 }
 
-enum ReceivePortType {
-  append,
-  progresss,
-  error,
-  complete,
-  retry,
-}
+enum ReceivePortType { append, progresss, error, complete, retry }
 
 class ReceivePortData {
   final dynamic data;
@@ -188,10 +175,7 @@ Future<void> _processTask(IsolateDownloaderTask task) async {
             if (await file.length() != 0) {
               tooManyRetry = false;
               _sendPort.send(
-                ReceivePortData(
-                  type: ReceivePortType.complete,
-                  data: task.id,
-                ),
+                ReceivePortData(type: ReceivePortType.complete, data: task.id),
               );
               break;
             }
