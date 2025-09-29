@@ -19,13 +19,13 @@ import flutter_downloader
   ) {
     let secureKey = "flutter.useSecureMode"
     if UserDefaults.standard.bool(forKey: secureKey) {
-      self.window.isHidden = true;
+      self.window?.isHidden = true
     }
   }
   override func applicationDidBecomeActive(
     _ application: UIApplication
   ) {
-    self.window.isHidden = false;
+    self.window?.isHidden = false
   }
 }
 
