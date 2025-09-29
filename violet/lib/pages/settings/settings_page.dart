@@ -85,7 +85,7 @@ class _SettingsPageState extends State<SettingsPage>
   @override
   void initState() {
     super.initState();
-    _themeSwitch = Settings.themeWhat;
+    _themeSwitch = Settings.themeWhat.value;
   }
 
   List<Widget>? _cachedGroups;
@@ -136,9 +136,9 @@ class _SettingsPageState extends State<SettingsPage>
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
       width: double.infinity,
-      decoration: !Settings.themeFlat
+      decoration: !Settings.themeFlat.value
           ? BoxDecoration(
-              color: Settings.themeWhat ? Colors.black26 : Colors.white,
+              color: Settings.themeWhat.value ? Colors.black26 : Colors.white,
               borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(8),
                   topRight: Radius.circular(8),
@@ -146,27 +146,27 @@ class _SettingsPageState extends State<SettingsPage>
                   bottomRight: Radius.circular(8)),
               boxShadow: [
                 BoxShadow(
-                  color: Settings.themeWhat
+                  color: Settings.themeWhat.value
                       ? Colors.black26
                       : Colors.grey.withOpacity(0.1),
-                  spreadRadius: Settings.themeWhat ? 0 : 5,
+                  spreadRadius: Settings.themeWhat.value ? 0 : 5,
                   blurRadius: 7,
                   offset: const Offset(0, 3), // changes position of shadow
                 ),
               ],
             )
           : null,
-      color: !Settings.themeFlat
+      color: !Settings.themeFlat.value
           ? null
-          : Settings.themeWhat
+          : Settings.themeWhat.value
               ? Colors.black26
               : Colors.white,
-      child: !Settings.themeFlat
+      child: !Settings.themeFlat.value
           ? ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
               child: Material(
-                color: Settings.themeWhat
-                    ? Settings.themeBlack
+                color: Settings.themeWhat.value
+                    ? Settings.themeBlack.value
                         ? Palette.blackThemeBackground
                         : Colors.black38
                     : Colors.white,
@@ -217,7 +217,7 @@ class _SettingsPageState extends State<SettingsPage>
               _flareController.play('switch_day');
             }
             _themeSwitch = !_themeSwitch;
-            await Settings.setThemeWhat(_themeSwitch);
+            await Settings.themeWhat.setValue(_themeSwitch);
             DynamicTheme.of(context)!.setBrightness(
                 !_themeSwitch ? Brightness.light : Brightness.dark);
             ThemeSwitchableStateTargetStore.doChange();
@@ -248,9 +248,9 @@ class _SettingsPageState extends State<SettingsPage>
                   title: Text(Translations.instance!.trans('selectcolor')),
                   content: SingleChildScrollView(
                     child: BlockPicker(
-                      pickerColor: Settings.majorColor,
+                      pickerColor: Settings.majorColor.value,
                       onColorChanged: (color) async {
-                        await Settings.setMajorColor(color);
+                        await Settings.majorColor.setValue(color);
                         setState(() {
                           _shouldReload = true;
                         });
@@ -265,11 +265,12 @@ class _SettingsPageState extends State<SettingsPage>
         InkWell(
           onTap: _themeSwitch
               ? () async {
-                  await Settings.setThemeBlack(!Settings.themeBlack);
+                  await Settings.themeBlack
+                      .setValue(!Settings.themeBlack.value);
                   DynamicTheme.of(context)!.setThemeData(
                     ThemeData(
                       appBarTheme: AppBarTheme(
-                          systemOverlayStyle: !Settings.themeWhat
+                          systemOverlayStyle: !Settings.themeWhat.value
                               ? SystemUiOverlayStyle.dark
                               : SystemUiOverlayStyle.light),
                       useMaterial3: false,
@@ -277,26 +278,27 @@ class _SettingsPageState extends State<SettingsPage>
                       bottomSheetTheme: BottomSheetThemeData(
                           backgroundColor: Colors.black.withOpacity(0)),
                       scaffoldBackgroundColor:
-                          Settings.themeBlack && Settings.themeWhat
+                          Settings.themeBlack.value && Settings.themeWhat.value
                               ? Colors.black
                               : null,
                       dialogBackgroundColor:
-                          Settings.themeBlack && Settings.themeWhat
+                          Settings.themeBlack.value && Settings.themeWhat.value
                               ? Palette.blackThemeBackground
                               : null,
-                      cardColor: Settings.themeBlack && Settings.themeWhat
-                          ? Palette.blackThemeBackground
-                          : null,
+                      cardColor:
+                          Settings.themeBlack.value && Settings.themeWhat.value
+                              ? Palette.blackThemeBackground
+                              : null,
                       colorScheme: ColorScheme.fromSwatch().copyWith(
-                        secondary: Settings.majorColor,
+                        secondary: Settings.majorColor.value,
                         brightness: Theme.of(context).brightness,
                       ),
                       cupertinoOverrideTheme: CupertinoThemeData(
                         brightness: Theme.of(context).brightness,
-                        primaryColor: Settings.majorColor,
+                        primaryColor: Settings.majorColor.value,
                         textTheme: const CupertinoTextThemeData(),
-                        barBackgroundColor: Settings.themeWhat
-                            ? Settings.themeBlack
+                        barBackgroundColor: Settings.themeWhat.value
+                            ? Settings.themeBlack.value
                                 ? const Color(0xFF181818)
                                 : Colors.grey.shade800
                             : null,
@@ -310,42 +312,44 @@ class _SettingsPageState extends State<SettingsPage>
                 }
               : null,
           child: ListTile(
-            leading: Icon(MdiIcons.brightness3, color: Settings.majorColor),
+            leading:
+                Icon(MdiIcons.brightness3, color: Settings.majorColor.value),
             title: Text(Translations.instance!.trans('blackmode')),
             trailing: Switch(
-              value: Settings.themeBlack,
+              value: Settings.themeBlack.value,
               onChanged: _themeSwitch
                   ? (newValue) async {
-                      await Settings.setThemeFlat(newValue);
+                      await Settings.themeFlat.setValue(newValue);
                       DynamicTheme.of(context)!.setThemeData(
                         ThemeData(
                           appBarTheme: AppBarTheme(
-                              systemOverlayStyle: !Settings.themeWhat
+                              systemOverlayStyle: !Settings.themeWhat.value
                                   ? SystemUiOverlayStyle.dark
                                   : SystemUiOverlayStyle.light),
                           useMaterial3: false,
                           brightness: Theme.of(context).brightness,
                           bottomSheetTheme: BottomSheetThemeData(
                               backgroundColor: Colors.black.withOpacity(0)),
-                          scaffoldBackgroundColor:
-                              Settings.themeBlack && Settings.themeWhat
-                                  ? Colors.black
-                                  : null,
-                          dialogBackgroundColor:
-                              Settings.themeBlack && Settings.themeWhat
-                                  ? Palette.blackThemeBackground
-                                  : null,
-                          cardColor: Settings.themeBlack && Settings.themeWhat
+                          scaffoldBackgroundColor: Settings.themeBlack.value &&
+                                  Settings.themeWhat.value
+                              ? Colors.black
+                              : null,
+                          dialogBackgroundColor: Settings.themeBlack.value &&
+                                  Settings.themeWhat.value
+                              ? Palette.blackThemeBackground
+                              : null,
+                          cardColor: Settings.themeBlack.value &&
+                                  Settings.themeWhat.value
                               ? Palette.blackThemeBackground
                               : null,
                           colorScheme: ColorScheme.fromSwatch()
-                              .copyWith(secondary: Settings.majorColor),
+                              .copyWith(secondary: Settings.majorColor.value),
                           cupertinoOverrideTheme: CupertinoThemeData(
                             brightness: Theme.of(context).brightness,
-                            primaryColor: Settings.majorColor,
+                            primaryColor: Settings.majorColor.value,
                             textTheme: const CupertinoTextThemeData(),
-                            barBackgroundColor: Settings.themeWhat
-                                ? Settings.themeBlack
+                            barBackgroundColor: Settings.themeWhat.value
+                                ? Settings.themeBlack.value
                                     ? const Color(0xFF181818)
                                     : Colors.grey.shade800
                                 : null,
@@ -357,29 +361,29 @@ class _SettingsPageState extends State<SettingsPage>
                       });
                     }
                   : null,
-              activeTrackColor: Settings.majorColor,
-              activeColor: Settings.majorAccentColor,
+              activeTrackColor: Settings.majorColor.value,
+              activeColor: Settings.majorAccentColor.value,
             ),
           ),
         ),
         InkWell(
           child: ListTile(
-            leading: Icon(Mdi.buffer, color: Settings.majorColor),
+            leading: Icon(Mdi.buffer, color: Settings.majorColor.value),
             title: Text(Translations.instance!.trans('useflattheme')),
             trailing: Switch(
-              value: Settings.themeFlat,
+              value: Settings.themeFlat.value,
               onChanged: (newValue) async {
-                await Settings.setThemeFlat(newValue);
+                await Settings.themeFlat.setValue(newValue);
                 setState(() {
                   _shouldReload = true;
                 });
               },
-              activeTrackColor: Settings.majorColor,
-              activeColor: Settings.majorAccentColor,
+              activeTrackColor: Settings.majorColor.value,
+              activeColor: Settings.majorAccentColor.value,
             ),
           ),
           onTap: () async {
-            await Settings.setThemeFlat(!Settings.themeFlat);
+            await Settings.themeFlat.setValue(!Settings.themeFlat.value);
             setState(() {
               _shouldReload = true;
             });
@@ -387,22 +391,24 @@ class _SettingsPageState extends State<SettingsPage>
         ),
         InkWell(
           child: ListTile(
-            leading: Icon(MdiIcons.tabletDashboard, color: Settings.majorColor),
+            leading: Icon(MdiIcons.tabletDashboard,
+                color: Settings.majorColor.value),
             title: Text(Translations.instance!.trans('usetabletmode')),
             trailing: Switch(
-              value: Settings.useTabletMode,
+              value: Settings.useTabletMode.value,
               onChanged: (newValue) async {
-                await Settings.setUseTabletMode(newValue);
+                await Settings.useTabletMode.setValue(newValue);
                 setState(() {
                   _shouldReload = true;
                 });
               },
-              activeTrackColor: Settings.majorColor,
-              activeColor: Settings.majorAccentColor,
+              activeTrackColor: Settings.majorColor.value,
+              activeColor: Settings.majorAccentColor.value,
             ),
           ),
           onTap: () async {
-            await Settings.setUseTabletMode(!Settings.useTabletMode);
+            await Settings.useTabletMode
+                .setValue(!Settings.useTabletMode.value);
             setState(() {
               _shouldReload = true;
             });
@@ -414,12 +420,13 @@ class _SettingsPageState extends State<SettingsPage>
                   bottomLeft: Radius.circular(8.0),
                   bottomRight: Radius.circular(8.0))),
           child: ListTile(
-            leading: Icon(MdiIcons.cellphoneText, color: Settings.majorColor),
+            leading:
+                Icon(MdiIcons.cellphoneText, color: Settings.majorColor.value),
             title: Text(Translations.instance!.trans('userdrawer')),
             trailing: Switch(
-              value: Settings.useDrawer,
+              value: Settings.useDrawer.value,
               onChanged: (newValue) async {
-                await Settings.setUseDrawer(newValue);
+                await Settings.useDrawer.setValue(newValue);
                 setState(() {
                   _shouldReload = true;
                 });
@@ -430,12 +437,12 @@ class _SettingsPageState extends State<SettingsPage>
                   _shouldReload = true;
                 });
               },
-              activeTrackColor: Settings.majorColor,
-              activeColor: Settings.majorAccentColor,
+              activeTrackColor: Settings.majorColor.value,
+              activeColor: Settings.majorAccentColor.value,
             ),
           ),
           onTap: () async {
-            await Settings.setUseDrawer(!Settings.useDrawer);
+            await Settings.useDrawer.setValue(!Settings.useDrawer.value);
             setState(() {
               _shouldReload = true;
             });
@@ -497,8 +504,8 @@ class _SettingsPageState extends State<SettingsPage>
             },
           ),
           ListTile(
-            leading:
-                Icon(MdiIcons.accessPointNetwork, color: Settings.majorColor),
+            leading: Icon(MdiIcons.accessPointNetwork,
+                color: Settings.majorColor.value),
             title: Text(Translations.instance!.trans('realtimeuserrecord')),
             trailing: const Icon(Icons.keyboard_arrow_right),
             onTap: () async {
@@ -507,8 +514,8 @@ class _SettingsPageState extends State<SettingsPage>
             },
           ),
           ListTile(
-            leading:
-                Icon(MdiIcons.commentTextMultiple, color: Settings.majorColor),
+            leading: Icon(MdiIcons.commentTextMultiple,
+                color: Settings.majorColor.value),
             title: Text(Translations.instance!.trans('comment')),
             trailing: const Icon(Icons.keyboard_arrow_right),
             onTap: () async {
@@ -518,7 +525,7 @@ class _SettingsPageState extends State<SettingsPage>
           ),
           ListTile(
             leading: Icon(MdiIcons.star,
-                color: Settings.themeWhat
+                color: Settings.themeWhat.value
                     ? Colors.yellowAccent
                     : Colors.yellow.shade900),
             title: Text(Translations.instance!.trans('artistcollection')),
@@ -570,7 +577,7 @@ class _SettingsPageState extends State<SettingsPage>
             child: ListTile(
               leading: Icon(
                 MdiIcons.tagHeartOutline,
-                color: Settings.majorColor,
+                color: Settings.majorColor.value,
               ),
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -578,7 +585,7 @@ class _SettingsPageState extends State<SettingsPage>
                   Text(Translations.instance!.trans('defaulttag')),
                   Text(
                     Translations.instance!.trans('currenttag') +
-                        Settings.includeTags,
+                        Settings.includeTags.value,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -593,7 +600,7 @@ class _SettingsPageState extends State<SettingsPage>
               );
 
               if (vv != null && vv.$1 == 1) {
-                Settings.setIncludeTags(vv.$2);
+                Settings.includeTags.setValue(vv.$2);
                 setState(() {
                   _shouldReload = true;
                 });
@@ -603,7 +610,7 @@ class _SettingsPageState extends State<SettingsPage>
           ListTile(
             leading: Icon(
               MdiIcons.tagOff,
-              color: Settings.majorColor,
+              color: Settings.majorColor.value,
             ),
             title: Text(Translations.instance!.trans('excludetag')),
             trailing: const Icon(Icons.keyboard_arrow_right),
@@ -615,7 +622,7 @@ class _SettingsPageState extends State<SettingsPage>
               );
 
               if (vv?.$1 == 1) {
-                Settings.setExcludeTags(vv!.$2);
+                Settings.excludeTags.setValue(vv!.$2.split(' ').toList());
                 setState(() {
                   _shouldReload = true;
                 });
@@ -625,7 +632,7 @@ class _SettingsPageState extends State<SettingsPage>
           ListTile(
             leading: Icon(
               MdiIcons.tooltipEdit,
-              color: Settings.majorColor,
+              color: Settings.majorColor.value,
             ),
             title: Text(Translations.instance!.trans('tagrebuild')),
             trailing: const Icon(Icons.keyboard_arrow_right),
@@ -651,22 +658,23 @@ class _SettingsPageState extends State<SettingsPage>
           ),
           InkWell(
             child: ListTile(
-              leading: Icon(Mdi.compassOutline, color: Settings.majorColor),
+              leading:
+                  Icon(Mdi.compassOutline, color: Settings.majorColor.value),
               title: const Text('Pure Search'),
               trailing: Switch(
-                value: Settings.searchPure,
+                value: Settings.searchPure.value,
                 onChanged: (newValue) async {
-                  await Settings.setSearchPure(newValue);
+                  await Settings.searchPure.setValue(newValue);
                   setState(() {
                     _shouldReload = true;
                   });
                 },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
             onTap: () async {
-              await Settings.setSearchPure(!Settings.searchPure);
+              await Settings.searchPure.setValue(!Settings.searchPure.value);
               setState(() {
                 _shouldReload = true;
               });
@@ -680,29 +688,30 @@ class _SettingsPageState extends State<SettingsPage>
             child: ListTile(
               leading: Icon(
                 MdiIcons.searchWeb,
-                color: Settings.majorColor,
+                color: Settings.majorColor.value,
               ),
               title: Text(Translations.instance!.trans('usewebsearch')),
               trailing: Switch(
-                value: Settings.searchNetwork,
+                value: Settings.searchNetwork.value,
                 onChanged: (newValue) async {
-                  await Settings.setSearchOnWeb(newValue);
+                  await Settings.searchNetwork.setValue(newValue);
                   setState(() {
                     _shouldReload = true;
                   });
                 },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
             onTap: () async {
-              await Settings.setSearchOnWeb(!Settings.searchNetwork);
+              await Settings.searchNetwork
+                  .setValue(!Settings.searchNetwork.value);
               setState(() {
                 _shouldReload = true;
               });
             },
           ),
-          if (Settings.searchNetwork)
+          if (Settings.searchNetwork.value)
             InkWell(
               customBorder: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
@@ -711,29 +720,30 @@ class _SettingsPageState extends State<SettingsPage>
               child: ListTile(
                 leading: Icon(
                   MdiIcons.searchWeb,
-                  color: Settings.majorColor,
+                  color: Settings.majorColor.value,
                 ),
                 title: Text(Translations.instance!.trans('usesearchexpunged')),
                 trailing: Switch(
-                  value: Settings.searchExpunged,
+                  value: Settings.searchExpunged.value,
                   onChanged: (newValue) async {
-                    await Settings.setSearchExpunged(newValue);
+                    await Settings.searchExpunged.setValue(newValue);
                     setState(() {
                       _shouldReload = true;
                     });
                   },
-                  activeTrackColor: Settings.majorColor,
-                  activeColor: Settings.majorAccentColor,
+                  activeTrackColor: Settings.majorColor.value,
+                  activeColor: Settings.majorAccentColor.value,
                 ),
               ),
               onTap: () async {
-                await Settings.setSearchExpunged(!Settings.searchExpunged);
+                await Settings.searchExpunged
+                    .setValue(!Settings.searchExpunged.value);
                 setState(() {
                   _shouldReload = true;
                 });
               },
             ),
-          if (Settings.searchNetwork)
+          if (Settings.searchNetwork.value)
             InkWell(
               customBorder: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
@@ -742,29 +752,30 @@ class _SettingsPageState extends State<SettingsPage>
               child: ListTile(
                 leading: Icon(
                   MdiIcons.searchWeb,
-                  color: Settings.majorColor,
+                  color: Settings.majorColor.value,
                 ),
                 title: Text(Translations.instance!.trans('includetagnetwork')),
                 trailing: Switch(
-                  value: Settings.includeTagNetwork,
+                  value: Settings.includeTagNetwork.value,
                   onChanged: (newValue) async {
-                    await Settings.setIncludeTagOnWeb(newValue);
+                    await Settings.includeTagNetwork.setValue(newValue);
                     setState(() {
                       _shouldReload = true;
                     });
                   },
-                  activeTrackColor: Settings.majorColor,
-                  activeColor: Settings.majorAccentColor,
+                  activeTrackColor: Settings.majorColor.value,
+                  activeColor: Settings.majorAccentColor.value,
                 ),
               ),
               onTap: () async {
-                await Settings.setIncludeTagOnWeb(!Settings.includeTagNetwork);
+                await Settings.includeTagNetwork
+                    .setValue(!Settings.includeTagNetwork.value);
                 setState(() {
                   _shouldReload = true;
                 });
               },
             ),
-          if (Settings.searchNetwork)
+          if (Settings.searchNetwork.value)
             InkWell(
               customBorder: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
@@ -773,29 +784,30 @@ class _SettingsPageState extends State<SettingsPage>
               child: ListTile(
                 leading: Icon(
                   MdiIcons.searchWeb,
-                  color: Settings.majorColor,
+                  color: Settings.majorColor.value,
                 ),
                 title: Text(Translations.instance!.trans('excludetagnetwork')),
                 trailing: Switch(
-                  value: Settings.excludeTagNetwork,
+                  value: Settings.excludeTagNetwork.value,
                   onChanged: (newValue) async {
-                    await Settings.setExcludeTagOnWeb(newValue);
+                    await Settings.excludeTagNetwork.setValue(newValue);
                     setState(() {
                       _shouldReload = true;
                     });
                   },
-                  activeTrackColor: Settings.majorColor,
-                  activeColor: Settings.majorAccentColor,
+                  activeTrackColor: Settings.majorColor.value,
+                  activeColor: Settings.majorAccentColor.value,
                 ),
               ),
               onTap: () async {
-                await Settings.setExcludeTagOnWeb(!Settings.excludeTagNetwork);
+                await Settings.excludeTagNetwork
+                    .setValue(!Settings.excludeTagNetwork.value);
                 setState(() {
                   _shouldReload = true;
                 });
               },
             ),
-          if (Settings.searchNetwork)
+          if (Settings.searchNetwork.value)
             InkWell(
               customBorder: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(8.0)),
@@ -809,7 +821,7 @@ class _SettingsPageState extends State<SettingsPage>
                 trailing: const Icon(Icons.keyboard_arrow_right),
               ),
               onTap: () async {
-                var cats = Settings.searchCategory;
+                var cats = Settings.searchCategory.value;
 
                 var catsController = TextEditingController(text: '$cats');
 
@@ -834,12 +846,12 @@ class _SettingsPageState extends State<SettingsPage>
 
                 Widget okButton = TextButton(
                   style: TextButton.styleFrom(
-                      foregroundColor: Settings.majorColor),
+                      foregroundColor: Settings.majorColor.value),
                   child: Text(Translations.instance!.trans('ok')),
                   onPressed: () {
                     try {
                       cats = int.parse(catsController.text);
-                      Settings.setSearchCategory(cats);
+                      Settings.searchCategory.setValue(cats);
                     } catch (e, st) {
                       Logger.error('[Search Categories] $e\n'
                           '$st');
@@ -849,7 +861,7 @@ class _SettingsPageState extends State<SettingsPage>
                 );
                 Widget cancelButton = TextButton(
                   style: TextButton.styleFrom(
-                      foregroundColor: Settings.majorColor),
+                      foregroundColor: Settings.majorColor.value),
                   child: Text(Translations.instance!.trans('cancel')),
                   onPressed: () {
                     Navigator.pop(context);
@@ -905,7 +917,7 @@ class _SettingsPageState extends State<SettingsPage>
                     topLeft: Radius.circular(8.0),
                     topRight: Radius.circular(8.0))),
             child: ListTile(
-              leading: Icon(Icons.receipt, color: Settings.majorColor),
+              leading: Icon(Icons.receipt, color: Settings.majorColor.value),
               title: Text(Translations.instance!.trans('logrecord')),
               trailing: const Icon(Icons.keyboard_arrow_right),
             ),
@@ -914,7 +926,7 @@ class _SettingsPageState extends State<SettingsPage>
             },
           ),
           ListTile(
-            leading: Icon(Icons.language, color: Settings.majorColor),
+            leading: Icon(Icons.language, color: Settings.majorColor.value),
             title: Text(Translations.instance!.trans('language')),
             trailing: const Icon(Icons.keyboard_arrow_right),
             onTap: () {
@@ -932,7 +944,7 @@ class _SettingsPageState extends State<SettingsPage>
                         onValuePicked: (Country country) async {
                           var exc = country as ExCountry;
                           await Translations.instance!.load(exc.toString());
-                          await Settings.setLanguage(exc.toString());
+                          await Settings.language.setValue(exc.toString());
                           setState(() {
                             _shouldReload = true;
                           });
@@ -964,52 +976,54 @@ class _SettingsPageState extends State<SettingsPage>
               );
             },
           ),
-          if (Settings.language == 'ko')
+          if (Settings.language.value == 'ko')
             ListTile(
-              leading: Icon(Icons.translate, color: Settings.majorColor),
+              leading: Icon(Icons.translate, color: Settings.majorColor.value),
               title: Text(Translations.instance!.trans('translatetagtokorean')),
               trailing: Switch(
-                value: Settings.translateTags,
+                value: Settings.translateTags.value,
                 onChanged: (newValue) async {
-                  await Settings.setTranslateTags(newValue);
+                  await Settings.translateTags.setValue(newValue);
                   setState(() {
                     _shouldReload = true;
                   });
                 },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
               onTap: () async {
-                await Settings.setTranslateTags(!Settings.translateTags);
+                await Settings.translateTags
+                    .setValue(!Settings.translateTags.value);
                 setState(() {
                   _shouldReload = true;
                 });
               },
             ),
           ListTile(
-            leading:
-                Icon(MdiIcons.imageSizeSelectLarge, color: Settings.majorColor),
+            leading: Icon(MdiIcons.imageSizeSelectLarge,
+                color: Settings.majorColor.value),
             title: Text(Translations.instance!.trans('lowresmode')),
             trailing: Switch(
-              value: Settings.useLowPerf,
+              value: Settings.useLowPerf.value,
               onChanged: (newValue) async {
-                await Settings.setUseLowPerf(newValue);
+                await Settings.useLowPerf.setValue(newValue);
                 setState(() {
                   _shouldReload = true;
                 });
               },
-              activeTrackColor: Settings.majorColor,
-              activeColor: Settings.majorAccentColor,
+              activeTrackColor: Settings.majorColor.value,
+              activeColor: Settings.majorAccentColor.value,
             ),
             onTap: () async {
-              await Settings.setUseLowPerf(!Settings.useLowPerf);
+              await Settings.useLowPerf.setValue(!Settings.useLowPerf.value);
               setState(() {
                 _shouldReload = true;
               });
             },
           ),
           ListTile(
-            leading: Icon(Mdi.tableArrowRight, color: Settings.majorColor),
+            leading:
+                Icon(Mdi.tableArrowRight, color: Settings.majorColor.value),
             title: Text(Translations.instance!.trans('exportlog')),
             trailing: const Icon(Icons.keyboard_arrow_right),
             onTap: () async {
@@ -1044,7 +1058,7 @@ class _SettingsPageState extends State<SettingsPage>
             },
           ),
           ListTile(
-            leading: Icon(Icons.info_outline, color: Settings.majorColor),
+            leading: Icon(Icons.info_outline, color: Settings.majorColor.value),
             title: Text(Translations.instance!.trans('info')),
             trailing: const Icon(Icons.keyboard_arrow_right),
             onTap: () async {
@@ -1097,7 +1111,7 @@ class _SettingsPageState extends State<SettingsPage>
               // borderRadius: BorderRadius.circular(8.0),
               leading: Icon(
                 Icons.lock_outline,
-                color: Settings.majorColor,
+                color: Settings.majorColor.value,
               ),
               title: Text(Translations.instance!.trans('lockapp')),
               trailing: const Icon(
@@ -1121,25 +1135,26 @@ class _SettingsPageState extends State<SettingsPage>
             child: ListTile(
               leading: Icon(
                 MdiIcons.shieldLockOutline,
-                color: Settings.majorColor,
+                color: Settings.majorColor.value,
               ),
               title: Text(Translations.instance!.trans('securemode')),
               trailing: Switch(
-                value: Settings.useSecureMode,
+                value: Settings.useSecureMode.value,
                 onChanged: (newValue) async {
-                  await Settings.setUseSecureMode(newValue);
-                  await _setSecureMode();
+                  await Settings.useSecureMode.setValue(newValue);
+                  await Settings.setSecureMode();
                   setState(() {
                     _shouldReload = true;
                   });
                 },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
             onTap: () async {
-              await Settings.setUseSecureMode(!Settings.useSecureMode);
-              await _setSecureMode();
+              await Settings.useSecureMode
+                  .setValue(!Settings.useSecureMode.value);
+              await Settings.setSecureMode();
               setState(() {
                 _shouldReload = true;
               });
@@ -1148,16 +1163,6 @@ class _SettingsPageState extends State<SettingsPage>
         ],
       ),
     ];
-  }
-
-  Future<void> _setSecureMode() async {
-    if (Platform.isAndroid) {
-      if (Settings.useSecureMode) {
-        await PlatformMiscMethods.instance.setWindowSecure();
-      } else {
-        await PlatformMiscMethods.instance.setWindowInsecure();
-      }
-    }
   }
 
   List<Widget> _databaseGroup() {
@@ -1177,8 +1182,8 @@ class _SettingsPageState extends State<SettingsPage>
                       )));
             },
             child: ListTile(
-              leading:
-                  Icon(MdiIcons.swapHorizontal, color: Settings.majorColor),
+              leading: Icon(MdiIcons.swapHorizontal,
+                  color: Settings.majorColor.value),
               title: Text(Translations.instance!.trans('switching')),
               trailing: const Icon(Icons.keyboard_arrow_right),
             ),
@@ -1187,7 +1192,7 @@ class _SettingsPageState extends State<SettingsPage>
             child: ListTile(
               leading: Icon(
                 MdiIcons.databaseEdit,
-                color: Settings.majorColor,
+                color: Settings.majorColor.value,
               ),
               title: Text(Translations.instance!.trans('dbrebuild')),
               trailing: const Icon(Icons.keyboard_arrow_right),
@@ -1214,24 +1219,24 @@ class _SettingsPageState extends State<SettingsPage>
             child: ListTile(
               leading: Icon(
                 MdiIcons.vectorIntersection,
-                color: Settings.majorColor,
+                color: Settings.majorColor.value,
               ),
               title: Text(Translations.instance!.trans('dbopt')),
               trailing: Switch(
-                value: Settings.useOptimizeDatabase,
+                value: Settings.useOptimizeDatabase.value,
                 onChanged: (newValue) async {
-                  await Settings.setUseOptimizeDatabase(newValue);
+                  await Settings.useOptimizeDatabase.setValue(newValue);
                   setState(() {
                     _shouldReload = true;
                   });
                 },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
             onTap: () async {
-              await Settings.setUseOptimizeDatabase(
-                  !Settings.useOptimizeDatabase);
+              await Settings.useOptimizeDatabase
+                  .setValue(!Settings.useOptimizeDatabase.value);
               setState(() {
                 _shouldReload = true;
               });
@@ -1271,7 +1276,7 @@ class _SettingsPageState extends State<SettingsPage>
               Navigator.of(context)
                   .push(MaterialPageRoute(
                       builder: (context) => DataBaseDownloadPage(
-                            dbType: Settings.databaseType,
+                            dbType: Settings.databaseType.value,
                             isSync: true,
                           )))
                   .then(
@@ -1291,7 +1296,8 @@ class _SettingsPageState extends State<SettingsPage>
               );
             },
             child: ListTile(
-              leading: Icon(MdiIcons.databaseSync, color: Settings.majorColor),
+              leading:
+                  Icon(MdiIcons.databaseSync, color: Settings.majorColor.value),
               title: Text(Translations.instance!.trans('syncmanual')),
               trailing: const Icon(Icons.keyboard_arrow_right),
             ),
@@ -1312,7 +1318,7 @@ class _SettingsPageState extends State<SettingsPage>
           //           topLeft: Radius.circular(8.0),
           //           topRight: Radius.circular(8.0))),
           //   child: ListTile(
-          //     leading: Icon(MdiIcons.vpn, color: Settings.majorColor),
+          //     leading: Icon(MdiIcons.vpn, color: Settings.majorColor.value),
           //     title: const Text('VPN'),
           //     trailing: const Icon(Icons.keyboard_arrow_right),
           //   ),
@@ -1327,7 +1333,7 @@ class _SettingsPageState extends State<SettingsPage>
             child: ListTile(
               leading: Icon(
                 Icons.router,
-                color: Settings.majorColor,
+                color: Settings.majorColor.value,
               ),
               title: Text(Translations.instance!.trans('routing_rule')),
               trailing: const Icon(Icons.keyboard_arrow_right),
@@ -1349,7 +1355,7 @@ class _SettingsPageState extends State<SettingsPage>
           ListTile(
             leading: Icon(
               Icons.router,
-              color: Settings.majorColor,
+              color: Settings.majorColor.value,
             ),
             title:
                 Text('Image ${Translations.instance!.trans('routing_rule')}'),
@@ -1365,37 +1371,37 @@ class _SettingsPageState extends State<SettingsPage>
           ListTile(
             leading: Icon(
               MdiIcons.commentSearch,
-              color: Settings.majorColor,
+              color: Settings.majorColor.value,
             ),
             title: Text(Translations.instance!.trans('messagesearchapi')),
             trailing: const Icon(Icons.keyboard_arrow_right),
             onTap: () async {
               TextEditingController text =
-                  TextEditingController(text: Settings.searchMessageAPI);
+                  TextEditingController(text: Settings.searchMessageAPI.value);
               Widget okButton = TextButton(
-                style:
-                    TextButton.styleFrom(foregroundColor: Settings.majorColor),
+                style: TextButton.styleFrom(
+                    foregroundColor: Settings.majorColor.value),
                 child: Text(Translations.instance!.trans('ok')),
                 onPressed: () {
                   Navigator.pop(context, true);
                 },
               );
               Widget cancelButton = TextButton(
-                style:
-                    TextButton.styleFrom(foregroundColor: Settings.majorColor),
+                style: TextButton.styleFrom(
+                    foregroundColor: Settings.majorColor.value),
                 child: Text(Translations.instance!.trans('cancel')),
                 onPressed: () {
                   Navigator.pop(context, false);
                 },
               );
               Widget defaultButton = TextButton(
-                style:
-                    TextButton.styleFrom(foregroundColor: Settings.majorColor),
+                style: TextButton.styleFrom(
+                    foregroundColor: Settings.majorColor.value),
                 child: Text(Translations.instance!.trans('default')),
                 onPressed: () {
                   _shouldReload = true;
                   setState(
-                      () => text.text = 'https://koromo.xyz/api/search/msg');
+                      () => text.text = 'https://koromo.cc/api/search/msg');
                 },
               );
               var dialog = await showDialog(
@@ -1413,26 +1419,26 @@ class _SettingsPageState extends State<SettingsPage>
                 ),
               );
               if (dialog != null && dialog == true) {
-                await Settings.setSearchMessageAPI(text.text);
+                await Settings.searchMessageAPI.setValue(text.text);
               }
             },
           ),
           ListTile(
             leading: Icon(
               MdiIcons.timerOff,
-              color: Settings.majorColor,
+              color: Settings.majorColor.value,
             ),
             title: Text(Translations.instance!.trans('ignoretimeout')),
             trailing: Switch(
-              value: Settings.ignoreTimeout,
+              value: Settings.ignoreTimeout.value,
               onChanged: (newValue) async {
-                await Settings.setIgnoreTimeout(newValue);
+                await Settings.ignoreTimeout.setValue(newValue);
                 setState(() {
                   _shouldReload = true;
                 });
               },
-              activeTrackColor: Settings.majorColor,
-              activeColor: Settings.majorAccentColor,
+              activeTrackColor: Settings.majorColor.value,
+              activeColor: Settings.majorAccentColor.value,
             ),
           ),
           InkWell(
@@ -1448,19 +1454,20 @@ class _SettingsPageState extends State<SettingsPage>
               ),
               title: Text(Translations.instance!.trans('usevioletserver')),
               trailing: Switch(
-                value: Settings.useVioletServer,
+                value: Settings.useVioletServer.value,
                 onChanged: (newValue) async {
-                  await Settings.setUseVioletServer(newValue);
+                  await Settings.useVioletServer.setValue(newValue);
                   setState(() {
                     _shouldReload = true;
                   });
                 },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
             onTap: () async {
-              await Settings.setUseVioletServer(!Settings.useVioletServer);
+              await Settings.useVioletServer
+                  .setValue(!Settings.useVioletServer.value);
               setState(() {
                 _shouldReload = true;
               });
@@ -1484,8 +1491,8 @@ class _SettingsPageState extends State<SettingsPage>
             onTap: Platform.isIOS
                 ? null
                 : () async {
-                    await Settings.setUserInnerStorage(
-                        !Settings.useInnerStorage);
+                    await Settings.useInnerStorage
+                        .setValue(!Settings.useInnerStorage.value);
                     setState(() {
                       _shouldReload = true;
                     });
@@ -1493,28 +1500,28 @@ class _SettingsPageState extends State<SettingsPage>
             child: ListTile(
               leading: Icon(
                 MdiIcons.downloadLock,
-                color: Settings.majorColor,
+                color: Settings.majorColor.value,
               ),
               title: Text(Translations.instance!.trans('useinnerstorage')),
               trailing: Switch(
-                value: Settings.useInnerStorage,
+                value: Settings.useInnerStorage.value,
                 onChanged: Platform.isIOS
                     ? null
                     : (newValue) async {
-                        await Settings.setUserInnerStorage(newValue);
+                        await Settings.useInnerStorage.setValue(newValue);
                         setState(() {
                           _shouldReload = true;
                         });
                       },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
           ),
           ListTile(
             leading: Icon(
               MdiIcons.lan,
-              color: Settings.majorColor,
+              color: Settings.majorColor.value,
             ),
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1549,8 +1556,8 @@ class _SettingsPageState extends State<SettingsPage>
               TextEditingController text =
                   TextEditingController(text: tc.toString());
               Widget yesButton = TextButton(
-                style:
-                    TextButton.styleFrom(foregroundColor: Settings.majorColor),
+                style: TextButton.styleFrom(
+                    foregroundColor: Settings.majorColor.value),
                 onPressed: () async {
                   if (int.tryParse(text.text) == null) {
                     await showOkDialog(
@@ -1571,16 +1578,16 @@ class _SettingsPageState extends State<SettingsPage>
                   Navigator.pop(context, true);
                 },
                 child: Text(Translations.instance!.trans('change'),
-                    style: TextStyle(color: Settings.majorColor)),
+                    style: TextStyle(color: Settings.majorColor.value)),
               );
               Widget noButton = TextButton(
-                style:
-                    TextButton.styleFrom(foregroundColor: Settings.majorColor),
+                style: TextButton.styleFrom(
+                    foregroundColor: Settings.majorColor.value),
                 onPressed: () {
                   Navigator.pop(context, false);
                 },
                 child: Text(Translations.instance!.trans('cancel'),
-                    style: TextStyle(color: Settings.majorColor)),
+                    style: TextStyle(color: Settings.majorColor.value)),
               );
               var dialog = await showDialog(
                 context: context,
@@ -1618,14 +1625,14 @@ class _SettingsPageState extends State<SettingsPage>
             //   borderRadius: BorderRadius.all(
             //     Radius.circular(8.0),
             //   ),
-            onTap: Settings.useInnerStorage
+            onTap: Settings.useInnerStorage.value
                 ? null
                 : () async {
-                    TextEditingController text =
-                        TextEditingController(text: Settings.downloadBasePath);
+                    TextEditingController text = TextEditingController(
+                        text: Settings.downloadBasePath.value);
                     Widget yesButton = TextButton(
                       style: TextButton.styleFrom(
-                          foregroundColor: Settings.majorColor),
+                          foregroundColor: Settings.majorColor.value),
                       child: Text(Translations.instance!.trans('ok')),
                       onPressed: () {
                         Navigator.pop(context, true);
@@ -1633,7 +1640,7 @@ class _SettingsPageState extends State<SettingsPage>
                     );
                     Widget noButton = TextButton(
                       style: TextButton.styleFrom(
-                          foregroundColor: Settings.majorColor),
+                          foregroundColor: Settings.majorColor.value),
                       child: Text(Translations.instance!.trans('cancel')),
                       onPressed: () {
                         Navigator.pop(context, false);
@@ -1641,7 +1648,7 @@ class _SettingsPageState extends State<SettingsPage>
                     );
                     Widget defaultButton = TextButton(
                       style: TextButton.styleFrom(
-                          foregroundColor: Settings.majorColor),
+                          foregroundColor: Settings.majorColor.value),
                       child: Text(Translations.instance!.trans('default')),
                       onPressed: () {
                         _shouldReload = true;
@@ -1667,25 +1674,26 @@ class _SettingsPageState extends State<SettingsPage>
                     if (dialog != null && dialog == true) {
                       try {
                         if (await Permission.manageExternalStorage.isGranted) {
-                          var prevDir = Directory(Settings.downloadBasePath);
+                          var prevDir =
+                              Directory(Settings.downloadBasePath.value);
                           if (await prevDir.exists()) {
                             await prevDir.rename(text.text);
                           }
                         }
                       } catch (_) {}
 
-                      await Settings.setBaseDownloadPath(text.text);
+                      await Settings.downloadBasePath.setValue(text.text);
                     }
                   },
             child: ListTile(
-              leading:
-                  Icon(MdiIcons.folderDownload, color: Settings.majorColor),
+              leading: Icon(MdiIcons.folderDownload,
+                  color: Settings.majorColor.value),
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(Translations.instance!.trans('downloadpath')),
                   Text(
-                    '${Translations.instance!.trans('curdownloadpath')}: ${Settings.downloadBasePath}',
+                    '${Translations.instance!.trans('curdownloadpath')}: ${Settings.downloadBasePath.value}',
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -1704,13 +1712,14 @@ class _SettingsPageState extends State<SettingsPage>
             //     ),
             //   ),
             child: ListTile(
-              leading: Icon(MdiIcons.folderTable, color: Settings.majorColor),
+              leading:
+                  Icon(MdiIcons.folderTable, color: Settings.majorColor.value),
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(Translations.instance!.trans('downloadrule')),
                   Text(
-                    '${Translations.instance!.trans('curdownloadrule')}: ${Settings.downloadRule}',
+                    '${Translations.instance!.trans('curdownloadrule')}: ${Settings.downloadRule.value}',
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -1719,26 +1728,26 @@ class _SettingsPageState extends State<SettingsPage>
             ),
             onTap: () async {
               TextEditingController text =
-                  TextEditingController(text: Settings.downloadRule);
+                  TextEditingController(text: Settings.downloadRule.value);
               Widget okButton = TextButton(
-                style:
-                    TextButton.styleFrom(foregroundColor: Settings.majorColor),
+                style: TextButton.styleFrom(
+                    foregroundColor: Settings.majorColor.value),
                 child: Text(Translations.instance!.trans('ok')),
                 onPressed: () {
                   Navigator.pop(context, true);
                 },
               );
               Widget cancelButton = TextButton(
-                style:
-                    TextButton.styleFrom(foregroundColor: Settings.majorColor),
+                style: TextButton.styleFrom(
+                    foregroundColor: Settings.majorColor.value),
                 child: Text(Translations.instance!.trans('cancel')),
                 onPressed: () {
                   Navigator.pop(context, false);
                 },
               );
               Widget defaultButton = TextButton(
-                style:
-                    TextButton.styleFrom(foregroundColor: Settings.majorColor),
+                style: TextButton.styleFrom(
+                    foregroundColor: Settings.majorColor.value),
                 child: Text(Translations.instance!.trans('default')),
                 onPressed: () {
                   _shouldReload = true;
@@ -1763,7 +1772,7 @@ class _SettingsPageState extends State<SettingsPage>
                 ),
               );
               if (dialog != null && dialog == true) {
-                await Settings.setDownloadRule(text.text);
+                await Settings.downloadRule.setValue(text.text);
               }
             },
           ),
@@ -1775,7 +1784,7 @@ class _SettingsPageState extends State<SettingsPage>
   List<Widget> _bookmarkGroup() {
     /*
     Future<void> toggleAutoBackupBookmark() async {
-      await Settings.setAutoBackupBookmark(!Settings.autobackupBookmark);
+      await Settings.setAutoBackupBookmark(!Settings.autobackupBookmark.value);
       setState(() {
         _shouldReload = true;
       });
@@ -1803,22 +1812,22 @@ class _SettingsPageState extends State<SettingsPage>
             child: ListTile(
               leading: Icon(
                 MdiIcons.bookArrowUpOutline,
-                color: Settings.majorColor,
+                color: Settings.majorColor.value,
               ),
               title: Text(Translations.instance!.trans('autobackupbookmark')),
               trailing: Switch(
-                value: Settings.autobackupBookmark,
+                value: Settings.autobackupBookmark.value,
                 // onChanged: setAutoBackupBookmark,
                 onChanged: null,
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
           ),
           ListTile(
             leading: Icon(
               MdiIcons.bookArrowDownOutline,
-              color: Settings.majorColor,
+              color: Settings.majorColor.value,
             ),
             title: Text(Translations.instance!.trans('restoringbookmark')),
             trailing: const Icon(Icons.keyboard_arrow_right),
@@ -1834,16 +1843,16 @@ class _SettingsPageState extends State<SettingsPage>
               // 1. 북마크 유저 아이디 선택
               TextEditingController text = TextEditingController(text: myappid);
               Widget okButton = TextButton(
-                style:
-                    TextButton.styleFrom(foregroundColor: Settings.majorColor),
+                style: TextButton.styleFrom(
+                    foregroundColor: Settings.majorColor.value),
                 child: Text(Translations.instance!.trans('ok')),
                 onPressed: () {
                   Navigator.pop(context, true);
                 },
               );
               Widget cancelButton = TextButton(
-                style:
-                    TextButton.styleFrom(foregroundColor: Settings.majorColor),
+                style: TextButton.styleFrom(
+                    foregroundColor: Settings.majorColor.value),
                 child: Text(Translations.instance!.trans('cancel')),
                 onPressed: () {
                   Navigator.pop(context, false);
@@ -1941,7 +1950,7 @@ class _SettingsPageState extends State<SettingsPage>
             },
           ),
           ListTile(
-            leading: Icon(MdiIcons.import, color: Settings.majorColor),
+            leading: Icon(MdiIcons.import, color: Settings.majorColor.value),
             title: Text(Translations.instance!.trans('importingbookmark')),
             trailing: const Icon(Icons.keyboard_arrow_right),
             onTap: () async {
@@ -1976,7 +1985,7 @@ class _SettingsPageState extends State<SettingsPage>
           ListTile(
             leading: Icon(
               MdiIcons.export,
-              color: Settings.majorColor,
+              color: Settings.majorColor.value,
             ),
             title: Text(Translations.instance!.trans('exportingbookmark')),
             trailing: const Icon(Icons.keyboard_arrow_right),
@@ -2015,7 +2024,7 @@ class _SettingsPageState extends State<SettingsPage>
             child: ListTile(
               leading: Icon(
                 MdiIcons.cloudSearchOutline,
-                color: Settings.majorColor,
+                color: Settings.majorColor.value,
               ),
               title: Text(Translations.instance!.trans('importfromeh')),
               trailing: const Icon(Icons.keyboard_arrow_right),
@@ -2089,7 +2098,7 @@ class _SettingsPageState extends State<SettingsPage>
             child: ListTile(
               leading: Icon(
                 MdiIcons.cloudSearchOutline,
-                color: Settings.majorColor,
+                color: Settings.majorColor.value,
               ),
               title: Text(Translations.instance!.trans('importfromjson')),
               trailing: const Icon(Icons.keyboard_arrow_right),
@@ -2098,16 +2107,16 @@ class _SettingsPageState extends State<SettingsPage>
               TextEditingController textController = TextEditingController();
 
               Widget importButton = TextButton(
-                style:
-                    TextButton.styleFrom(foregroundColor: Settings.majorColor),
+                style: TextButton.styleFrom(
+                    foregroundColor: Settings.majorColor.value),
                 child: const Text('Import'),
                 onPressed: () async {
                   Navigator.pop(context, textController.text);
                 },
               );
               Widget cancelButton = TextButton(
-                style:
-                    TextButton.styleFrom(foregroundColor: Settings.majorColor),
+                style: TextButton.styleFrom(
+                    foregroundColor: Settings.majorColor.value),
                 child: const Text('Cancel'),
                 onPressed: () {
                   Navigator.pop(context, null);
@@ -2227,14 +2236,14 @@ class _SettingsPageState extends State<SettingsPage>
                     children: <Widget>[
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Settings.majorColor,
+                          backgroundColor: Settings.majorColor.value,
                         ),
                         child: const Text('Login From WebPage'),
                         onPressed: () => Navigator.pop(context, 1),
                       ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Settings.majorColor,
+                          backgroundColor: Settings.majorColor.value,
                         ),
                         child: const Text('Enter Cookie Information'),
                         onPressed: () => Navigator.pop(context, 2),
@@ -2290,7 +2299,7 @@ class _SettingsPageState extends State<SettingsPage>
                         cookie != null ? parseCookies(cookie)['igneous'] : '');
                 Widget okButton = TextButton(
                   style: TextButton.styleFrom(
-                      foregroundColor: Settings.majorColor),
+                      foregroundColor: Settings.majorColor.value),
                   child: Text(Translations.instance!.trans('ok')),
                   onPressed: () {
                     Navigator.pop(context, true);
@@ -2298,7 +2307,7 @@ class _SettingsPageState extends State<SettingsPage>
                 );
                 Widget cancelButton = TextButton(
                   style: TextButton.styleFrom(
-                      foregroundColor: Settings.majorColor),
+                      foregroundColor: Settings.majorColor.value),
                   child: Text(Translations.instance!.trans('cancel')),
                   onPressed: () {
                     Navigator.pop(context, false);
@@ -2380,24 +2389,24 @@ class _SettingsPageState extends State<SettingsPage>
             child: ListTile(
               leading: Icon(
                 MdiIcons.progressClock,
-                color: Settings.majorColor,
+                color: Settings.majorColor.value,
               ),
               title: Text(Translations.instance!.trans('showarticleprogress')),
               trailing: Switch(
-                value: Settings.showArticleProgress,
+                value: Settings.showArticleProgress.value,
                 onChanged: (newValue) async {
-                  await Settings.setShowArticleProgress(newValue);
+                  await Settings.showArticleProgress.setValue(newValue);
                   setState(() {
                     _shouldReload = true;
                   });
                 },
-                activeTrackColor: Settings.majorColor,
-                activeColor: Settings.majorAccentColor,
+                activeTrackColor: Settings.majorColor.value,
+                activeColor: Settings.majorAccentColor.value,
               ),
             ),
             onTap: () async {
-              await Settings.setShowArticleProgress(
-                  !Settings.showArticleProgress);
+              await Settings.showArticleProgress
+                  .setValue(!Settings.showArticleProgress.value);
               setState(() {
                 _shouldReload = true;
               });
@@ -2422,7 +2431,7 @@ class _SettingsPageState extends State<SettingsPage>
               // borderRadius: BorderRadius.circular(8.0),
               leading: Icon(
                 Icons.update,
-                color: Settings.majorColor,
+                color: Settings.majorColor.value,
               ),
               title: Text(Translations.instance!.trans('checkupdate')),
               trailing: const Icon(
@@ -2453,7 +2462,7 @@ class _SettingsPageState extends State<SettingsPage>
             child: ListTile(
               leading: Icon(
                 MdiIcons.cellphoneArrowDown,
-                color: Settings.majorColor,
+                color: Settings.majorColor.value,
               ),
               title: Text(Translations.instance!.trans('manualupdate')),
               trailing: const Icon(
@@ -2569,7 +2578,7 @@ class _SettingsPageState extends State<SettingsPage>
           ListTile(
             leading: Icon(
               MdiIcons.humanHandsup,
-              color: Settings.majorColor,
+              color: Settings.majorColor.value,
             ),
             title: const Text('Developers'),
             trailing: const Icon(
@@ -2590,7 +2599,7 @@ class _SettingsPageState extends State<SettingsPage>
             child: ListTile(
               leading: Icon(
                 MdiIcons.library,
-                color: Settings.majorColor,
+                color: Settings.majorColor.value,
               ),
               title: Text(Translations.instance!.trans('license')),
               trailing: const Icon(Icons.keyboard_arrow_right),
@@ -2636,7 +2645,7 @@ class _SettingsPageState extends State<SettingsPage>
             Text(
               'Project Violet',
               style: TextStyle(
-                color: Settings.themeWhat ? Colors.white : Colors.black87,
+                color: Settings.themeWhat.value ? Colors.white : Colors.black87,
                 fontSize: 16.0,
                 fontFamily: 'Calibre-Semibold',
                 letterSpacing: 1.0,
@@ -2645,7 +2654,7 @@ class _SettingsPageState extends State<SettingsPage>
             Text(
               'Copyright (C) 2020-2024 by project-violet',
               style: TextStyle(
-                color: Settings.themeWhat ? Colors.white : Colors.black87,
+                color: Settings.themeWhat.value ? Colors.white : Colors.black87,
                 fontSize: 12.0,
                 fontFamily: 'Calibre-Semibold',
                 letterSpacing: 1.0,
@@ -2671,7 +2680,9 @@ class SettingGroupDivider extends StatelessWidget {
       ),
       width: double.infinity,
       height: 1.0,
-      color: Settings.themeWhat ? Colors.grey.shade600 : Colors.grey.shade400,
+      color: Settings.themeWhat.value
+          ? Colors.grey.shade600
+          : Colors.grey.shade400,
     );
   }
 }
@@ -2694,7 +2705,7 @@ class SettingGroupName extends StatelessWidget {
           Text(
             name,
             style: TextStyle(
-              color: Settings.themeWhat ? Colors.white : Colors.black87,
+              color: Settings.themeWhat.value ? Colors.white : Colors.black87,
               fontSize: 24.0,
               fontFamily: 'Calibre-Semibold',
               letterSpacing: 1.0,
@@ -2728,7 +2739,7 @@ class _CategoryButtonState extends State<CategoryButton> {
   Widget build(BuildContext context) {
     return InkWell(
       child: ListTile(
-        leading: Icon(Mdi.compassOutline, color: Settings.majorColor),
+        leading: Icon(Mdi.compassOutline, color: Settings.majorColor.value),
         title: Text(widget.name),
         trailing: Switch(
           value: (stat =
@@ -2743,8 +2754,8 @@ class _CategoryButtonState extends State<CategoryButton> {
               stat = newStat;
             });
           },
-          activeTrackColor: Settings.majorColor,
-          activeColor: Settings.majorAccentColor,
+          activeTrackColor: Settings.majorColor.value,
+          activeColor: Settings.majorAccentColor.value,
         ),
       ),
       onTap: () async {

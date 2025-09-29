@@ -84,7 +84,7 @@ class EHentaiImageProvider extends VioletImageProvider {
 
     var img = await EHSession.requestString(urls[page]!);
 
-    if (Settings.downloadEhRawImage) {
+    if (Settings.downloadEhRawImage.value) {
       var unescape = HtmlUnescape();
       return imgUrls[page] =
           unescape.convert(EHParser.getOriginalImageAddress(img));

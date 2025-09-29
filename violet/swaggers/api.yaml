@@ -21,14 +21,13 @@ paths:
   /api/v2/comment:
     get:
       operationId: CommentController_getComment
-      summary: Get Comment
-      parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CommentGetDto'
+      parameters:
+        - name: where
+          required: true
+          in: query
+          description: Where to get
+          schema:
+            type: string
       responses:
         '201':
           description: Comment Elements
@@ -36,11 +35,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CommentGetResponseDto'
+      summary: Get Comment
       tags:
         - comment
     post:
       operationId: CommentController_postComment
-      summary: Post Comment
       parameters: []
       requestBody:
         required: true
@@ -51,12 +50,27 @@ paths:
       responses:
         '201':
           description: ''
+      summary: Post Comment
+      tags:
+        - comment
+  /api/v2/comment/{id}/hidden:
+    patch:
+      operationId: CommentController_toggleCommentHidden
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      summary: Toggle comment hidden status
       tags:
         - comment
   /api/v2/user:
     get:
       operationId: UserController_getCurrentUser
-      summary: Get current user information
       parameters: []
       responses:
         '201':
@@ -65,11 +79,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+      summary: Get current user information
       tags:
         - user
     post:
       operationId: UserController_registerUser
-      summary: Register User
       parameters: []
       requestBody:
         required: true
@@ -80,12 +94,28 @@ paths:
       responses:
         '201':
           description: ''
+      summary: Register User
+      tags:
+        - user
+  /api/v2/user/list:
+    get:
+      operationId: UserController_getAllUsers
+      parameters: []
+      responses:
+        '201':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+      summary: Get all users
       tags:
         - user
   /api/v2/user/discord:
     get:
       operationId: UserController_listDiscordUserAppIds
-      summary: Get userAppIds registered by discord id
       parameters: []
       responses:
         '201':
@@ -94,12 +124,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListDiscordUserAppIdsResponseDto'
+      summary: Get userAppIds registered by discord id
       tags:
         - user
   /api/v2/auth:
     post:
       operationId: AuthController_logIn
-      summary: Login
       parameters: []
       requestBody:
         required: true
@@ -114,21 +144,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Tokens'
+      summary: Login
       tags:
         - auth
     delete:
       operationId: AuthController_logout
-      summary: Logout
       parameters: []
       responses:
         '200':
           description: ''
+      summary: Logout
       tags:
         - auth
   /api/v2/auth/refresh:
     get:
       operationId: AuthController_refreshToken
-      summary: Get refresh token
       parameters: []
       responses:
         '201':
@@ -137,45 +167,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResLoginUser'
+      summary: Get refresh token
       tags:
         - auth
   /api/v2/auth/discord:
     get:
       operationId: AuthController_logInDiscord
-      summary: Login From Discord
       parameters: []
       responses:
         '200':
           description: ''
+      summary: Login From Discord
       tags:
         - auth
   /api/v2/auth/discord/redirect:
     get:
       operationId: AuthController_redirect
-      summary: Redirect discord oauth2
       parameters: []
       responses:
         '200':
           description: ''
+      summary: Redirect discord oauth2
       tags:
         - auth
   /api/v2/view:
     get:
       operationId: ViewController_get
-      summary: Get article read view
       parameters:
         - name: offset
           required: true
           in: query
           description: Offset
           schema:
-            type: number
+            type: integer
         - name: count
           required: true
           in: query
           description: Count
           schema:
-            type: number
+            type: integer
         - name: type
           required: false
           in: query
@@ -189,24 +219,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ViewGetResponseDto'
+      summary: Get article read view
       tags:
         - view
     post:
       operationId: ViewController_post
-      summary: Post article read data
       parameters:
         - name: articleId
           required: true
           in: query
           description: ArticleId
           schema:
-            type: number
+            type: integer
         - name: viewSeconds
           required: true
           in: query
           description: Count
           schema:
-            type: number
+            type: integer
         - name: userAppId
           required: true
           in: query
@@ -216,25 +246,25 @@ paths:
       responses:
         '201':
           description: ''
+      summary: Post article read data
       tags:
         - view
   /api/v2/view/logined:
     post:
       operationId: ViewController_postLogined
-      summary: Post article read data
       parameters:
         - name: articleId
           required: true
           in: query
           description: ArticleId
           schema:
-            type: number
+            type: integer
         - name: viewSeconds
           required: true
           in: query
           description: Count
           schema:
-            type: number
+            type: integer
         - name: userAppId
           required: true
           in: query
@@ -244,8 +274,43 @@ paths:
       responses:
         '201':
           description: ''
+      summary: Post article read data
       tags:
         - view
+  /api/v2/stats:
+    get:
+      operationId: StatsController_getStats
+      parameters: []
+      responses:
+        '200':
+          description: 통계 데이터
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsResponseDto'
+      summary: 통계 데이터 조회
+      tags:
+        - stats
+  /api/v2/bookmark/backup:
+    post:
+      operationId: BookmarkController_createBookmarkBackup
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      summary: Create Bookmark Backup
+      tags:
+        - bookmark
+  /api/v2/bookmark:
+    get:
+      operationId: BookmarkController_getUserBookmarks
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      summary: Get User Bookmarks
+      tags:
+        - bookmark
 info:
   title: Violet Server API Docs
   description: Violet Server API description
@@ -255,19 +320,11 @@ tags: []
 servers: []
 components:
   schemas:
-    CommentGetDto:
-      type: object
-      properties:
-        where:
-          type: string
-          description: Where to get
-      required:
-        - where
     CommentGetResponseDtoElement:
       type: object
       properties:
         id:
-          type: number
+          type: integer
           description: Comment Id
         userAppId:
           type: string
@@ -280,7 +337,7 @@ components:
           type: string
           description: Write DateTime
         parent:
-          type: number
+          type: integer
           description: Parent Comment
       required:
         - id
@@ -307,7 +364,7 @@ components:
           type: string
           description: Post Body
         parent:
-          type: number
+          type: integer
           description: Parent Comment
       required:
         - where
@@ -329,6 +386,13 @@ components:
         userAppId:
           type: string
           description: User Id
+        role:
+          type: string
+          description: User Role
+          enum:
+            - admin
+            - user
+          default: user
         discordId:
           type: string
           description: Discord Id
@@ -343,6 +407,7 @@ components:
         - createdAt
         - updatedAt
         - userAppId
+        - role
         - discordId
         - avatar
         - nickname
@@ -383,10 +448,10 @@ components:
       type: object
       properties:
         articleId:
-          type: number
+          type: integer
           description: Article Id
         count:
-          type: number
+          type: integer
           description: Count
       required:
         - articleId
@@ -401,3 +466,23 @@ components:
             $ref: '#/components/schemas/ViewGetResponseDtoElement'
       required:
         - elements
+    StatsResponseDto:
+      type: object
+      properties:
+        totalUsers:
+          type: integer
+          description: 총 사용자 수
+        totalComments:
+          type: integer
+          description: 총 댓글 수
+        userGrowth:
+          type: object
+          description: 사용자 성장 데이터
+        commentGrowth:
+          type: object
+          description: 댓글 성장 데이터
+      required:
+        - totalUsers
+        - totalComments
+        - userGrowth
+        - commentGrowth

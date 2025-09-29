@@ -54,9 +54,7 @@ Future<http.Response> get(String url,
 
 Future<http.Response> post(String url,
     {Map<String, String>? headers, dynamic body, Encoding? encoding}) async {
-  Logger.info('[Http Request] POST: $url\n'
-      'HEADERS: ${jsonEncode(headers)}\n'
-      'BODY: $body');
+  Logger.info('[Http Request] POST: $url');
   var res = await http.post(Uri.parse(url),
       headers: headers, body: body, encoding: encoding);
   if (res.statusCode != 200) {
@@ -97,7 +95,7 @@ Future<http.Response> _ehentaiGet(String url,
 
     try {
       final sent = client.send(request);
-      if (!Settings.ignoreTimeout) {
+      if (!Settings.ignoreTimeout.value) {
         sent.timeout(
           const Duration(seconds: 3),
           onTimeout: () {
@@ -161,7 +159,7 @@ Future<http.Response> _scriptGet(String url,
     do {
       isTimeout = false;
       final sent = http.get(Uri.parse(url), headers: headers);
-      if (!Settings.ignoreTimeout) {
+      if (!Settings.ignoreTimeout.value) {
         sent.timeout(
           timeout,
           onTimeout: () {

@@ -52,7 +52,7 @@ class _GroupArtistArticleListState extends State<GroupArtistArticleList>
 
         final queryString = translate2query(artists
             .map((e) =>
-                '${e.type().name}:${e.artist().toLowerCase().replaceAll(' ', '_')} ${Settings.includeTags}')
+                '${e.type().name}:${e.artist().toLowerCase().replaceAll(' ', '_')} ${Settings.includeTags.value}')
             .join(' or '));
 
         final qm = QueryManager.queryPagination(queryString, 100);
@@ -68,7 +68,7 @@ class _GroupArtistArticleListState extends State<GroupArtistArticleList>
         return PrimaryScrollController(
           controller: ScrollController(),
           child: CupertinoScrollbar(
-            scrollbarOrientation: Settings.bookmarkScrollbarPositionToLeft
+            scrollbarOrientation: Settings.bookmarkScrollbarPositionToLeft.value
                 ? ScrollbarOrientation.left
                 : ScrollbarOrientation.right,
             child: CustomScrollView(

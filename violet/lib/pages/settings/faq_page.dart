@@ -12,7 +12,7 @@ class FAQPageKorean extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Settings.majorColor,
+        backgroundColor: Settings.majorColor.value,
         title: const Text('FAQ'),
       ),
       body: SingleChildScrollView(
@@ -94,7 +94,9 @@ class FAQPageKorean extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: 0.5,
-      color: Settings.themeWhat ? Colors.grey.shade600 : Colors.grey.shade400,
+      color: Settings.themeWhat.value
+          ? Colors.grey.shade600
+          : Colors.grey.shade400,
     );
   }
 
@@ -105,7 +107,8 @@ class FAQPageKorean extends StatelessWidget {
         child: ScrollOnExpand(
           child: ExpandablePanel(
             theme: ExpandableThemeData(
-                iconColor: Settings.themeWhat ? Colors.white : Colors.grey,
+                iconColor:
+                    Settings.themeWhat.value ? Colors.white : Colors.grey,
                 animationDuration: const Duration(milliseconds: 500)),
             header: Padding(
               padding: const EdgeInsets.fromLTRB(12, 12, 0, 0),

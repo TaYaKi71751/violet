@@ -60,7 +60,7 @@ class _SearchPageModifyPageState extends State<SearchPageModifyPage> {
               const Spacer(),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Settings.majorColor,
+                  backgroundColor: Settings.majorColor.value,
                 ),
                 child: Text(Translations.instance!.trans('ok')),
                 onPressed: () async {
@@ -88,7 +88,7 @@ class _SearchPageModifyPageState extends State<SearchPageModifyPage> {
               const SizedBox(width: 8),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Settings.majorColor,
+                  backgroundColor: Settings.majorColor.value,
                 ),
                 child: Text(Translations.instance!.trans('cancel')),
                 onPressed: () {

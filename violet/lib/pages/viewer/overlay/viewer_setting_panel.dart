@@ -30,7 +30,7 @@ class ViewerSettingPanel extends StatefulWidget {
 
 class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
   late final ViewerController c;
-  int imgqualityOption = Settings.imageQuality;
+  int imgqualityOption = Settings.imageQuality.value;
 
   @override
   void initState() {
@@ -50,7 +50,7 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
             children: [
               Text(
                   '${locale.Translations.instance!.trans('timersetting')} '
-                  '(${Settings.timerTick.toStringAsFixed(1)}${locale.Translations.instance!.trans('second')})',
+                  '(${Settings.timerTick.value.toStringAsFixed(1)}${locale.Translations.instance!.trans('second')})',
                   style: const TextStyle(color: Colors.white)),
               Expanded(
                 child: Align(
@@ -63,18 +63,18 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
                           RoundSliderThumbShape(enabledThumbRadius: 6.0),
                     ),
                     child: Slider(
-                      value: Settings.timerTick,
+                      value: Settings.timerTick.value,
                       max: 20,
                       min: 1,
                       divisions: (20 - 1) * 2,
-                      inactiveColor: Settings.majorColor.withOpacity(0.7),
-                      activeColor: Settings.majorColor,
+                      inactiveColor: Settings.majorColor.value.withOpacity(0.7),
+                      activeColor: Settings.majorColor.value,
                       onChangeEnd: (value) async {
-                        await Settings.setTimerTick(value);
+                        await Settings.timerTick.setValue(value);
                       },
                       onChanged: (value) {
                         setState(() {
-                          Settings.timerTick = value;
+                          Settings.timerTick.setValue(value);
                         });
                       },
                     ),
@@ -85,26 +85,28 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
           ),
         ),
         _checkBox(
-          value: Settings.isHorizontal,
+          value: Settings.isHorizontal.value,
           title: locale.Translations.instance!.trans('toggleviewerstyle'),
           onChanged: (value) async {
-            await Settings.setIsHorizontal(!Settings.isHorizontal);
+            await Settings.isHorizontal.setValue(!Settings.isHorizontal.value);
 
             widget.viewerStyleChangeEvent.call();
 
-            c.viewType.value =
-                Settings.isHorizontal ? ViewType.horizontal : ViewType.vertical;
+            c.viewType.value = Settings.isHorizontal.value
+                ? ViewType.horizontal
+                : ViewType.vertical;
             setState(() {});
           },
         ),
         _checkBox(
           title: locale.Translations.instance!.trans('togglescrollvertical'),
-          value: Settings.scrollVertical,
-          enabled: Settings.isHorizontal,
+          value: Settings.scrollVertical.value,
+          enabled: Settings.isHorizontal.value,
           onChanged: (value) async {
-            await Settings.setScrollVertical(!Settings.scrollVertical);
+            await Settings.scrollVertical
+                .setValue(!Settings.scrollVertical.value);
 
-            c.viewScrollType.value = Settings.scrollVertical
+            c.viewScrollType.value = Settings.scrollVertical.value
                 ? ViewType.vertical
                 : ViewType.horizontal;
 
@@ -113,82 +115,82 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
         ),
         _checkBox(
           title: locale.Translations.instance!.trans('togglerighttoleft'),
-          value: Settings.rightToLeft,
+          value: Settings.rightToLeft.value,
           onChanged: (value) async {
-            await Settings.setRightToLeft(!Settings.rightToLeft);
+            await Settings.rightToLeft.setValue(!Settings.rightToLeft.value);
 
-            c.rightToLeft.value = Settings.rightToLeft;
+            c.rightToLeft.value = Settings.rightToLeft.value;
 
             setState(() {});
           },
         ),
         _checkBox(
           title: locale.Translations.instance!.trans('toggleanimatin'),
-          value: Settings.animation,
+          value: Settings.animation.value,
           onChanged: (value) async {
-            await Settings.setAnimation(!Settings.animation);
+            await Settings.animation.setValue(!Settings.animation.value);
 
-            c.animation.value = Settings.animation;
+            c.animation.value = Settings.animation.value;
 
             setState(() {});
           },
         ),
         _checkBox(
           title: locale.Translations.instance!.trans('togglepadding'),
-          value: Settings.padding,
+          value: Settings.padding.value,
           onChanged: (value) async {
-            await Settings.setPadding(!Settings.padding);
+            await Settings.padding.setValue(!Settings.padding.value);
 
-            c.padding.value = Settings.padding;
+            c.padding.value = Settings.padding.value;
 
             setState(() {});
           },
         ),
         _checkBox(
           title: locale.Translations.instance!.trans('disableoverlaybuttons'),
-          value: !Settings.disableOverlayButton,
+          value: !Settings.disableOverlayButton.value,
           onChanged: (value) async {
-            await Settings.setDisableOverlayButton(
-                !Settings.disableOverlayButton);
+            await Settings.disableOverlayButton
+                .setValue(!Settings.disableOverlayButton.value);
 
-            c.overlayButton.value = !Settings.disableOverlayButton;
+            c.overlayButton.value = !Settings.disableOverlayButton.value;
 
             setState(() {});
           },
         ),
         if (!Platform.isIOS)
           _checkBox(
-            value: Settings.moveToAppBarToBottom,
+            value: Settings.moveToAppBarToBottom.value,
             title: locale.Translations.instance!.trans('movetoappbartobottom'),
             onChanged: (value) async {
-              await Settings.setMoveToAppBarToBottom(
-                  !Settings.moveToAppBarToBottom);
+              await Settings.moveToAppBarToBottom
+                  .setValue(!Settings.moveToAppBarToBottom.value);
 
-              c.appBarToBottom.value = Settings.moveToAppBarToBottom;
+              c.appBarToBottom.value = Settings.moveToAppBarToBottom.value;
 
               setState(() {});
             },
           ),
         _checkBox(
-          value: Settings.showSlider,
+          value: Settings.showSlider.value,
           title: locale.Translations.instance!.trans('showslider'),
-          enabled: Settings.moveToAppBarToBottom,
+          enabled: Settings.moveToAppBarToBottom.value,
           onChanged: (value) async {
-            await Settings.setShowSlider(!Settings.showSlider);
+            await Settings.showSlider.setValue(!Settings.showSlider.value);
 
-            c.showSlider.value = Settings.showSlider;
+            c.showSlider.value = Settings.showSlider.value;
 
             setState(() {});
           },
         ),
         _checkBox(
-          value: Settings.showPageNumberIndicator,
+          value: Settings.showPageNumberIndicator.value,
           title: locale.Translations.instance!.trans('showpagenumberindicator'),
           onChanged: (value) async {
-            await Settings.setShowPageNumberIndicator(
-                !Settings.showPageNumberIndicator);
+            await Settings.showPageNumberIndicator
+                .setValue(!Settings.showPageNumberIndicator.value);
 
-            c.indicator.value = Settings.showPageNumberIndicator;
+            c.indicator.value = Settings.showPageNumberIndicator.value;
 
             setState(() {});
           },
@@ -196,13 +198,14 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
         if (!Platform.isIOS)
           _checkBox(
             title: locale.Translations.instance!.trans('disablefullscreen'),
-            value: !Settings.disableFullScreen,
+            value: !Settings.disableFullScreen.value,
             onChanged: (value) async {
-              await Settings.setDisableFullScreen(!Settings.disableFullScreen);
+              await Settings.disableFullScreen
+                  .setValue(!Settings.disableFullScreen.value);
 
-              c.fullscreen.value = Settings.disableFullScreen;
+              c.fullscreen.value = Settings.disableFullScreen.value;
 
-              if (Settings.disableFullScreen) {
+              if (Settings.disableFullScreen.value) {
                 SystemChrome.setEnabledSystemUIMode(
                   SystemUiMode.manual,
                   overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top],
@@ -213,7 +216,7 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
           ),
         PopupMenuButton<int>(
           onSelected: (int value) async {
-            await Settings.setImageQuality(value);
+            await Settings.imageQuality.setValue(value);
 
             c.imgQuality.value = value;
 
@@ -257,8 +260,8 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
           ),
         ),
         PopupMenuButton<int>(
-          onSelected: (int value) {
-            Settings.setThumbSize(value);
+          onSelected: (int value) async {
+            await Settings.thumbSize.setValue(value);
 
             c.thumbSize.value = value;
 
@@ -291,16 +294,17 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
                 locale.Translations.instance!.trans('large'),
                 locale.Translations.instance!.trans('middle'),
                 locale.Translations.instance!.trans('small')
-              ][Settings.thumbSize],
+              ][Settings.thumbSize.value],
               style: const TextStyle(color: Colors.white),
             ),
           ),
         ),
         _checkBox(
-          value: Settings.showRecordJumpMessage,
+          value: Settings.showRecordJumpMessage.value,
           title: locale.Translations.instance!.trans('showrecordjumpmessage'),
-          onChanged: (value) {
-            Settings.setShowRecordJumpMessage(!Settings.showRecordJumpMessage);
+          onChanged: (value) async {
+            await Settings.showRecordJumpMessage
+                .setValue(!Settings.showRecordJumpMessage.value);
             setState(() {});
           },
         ),
@@ -308,7 +312,7 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
       ],
     );
 
-    if (Settings.enableViewerFunctionBackdropFilter) {
+    if (Settings.enableViewerFunctionBackdropFilter.value) {
       return ClipRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
@@ -340,7 +344,7 @@ class _ViewerSettingPanelState extends State<ViewerSettingPanel> {
       trailing: Switch(
         onChanged: enabled ? onChanged : null,
         value: value,
-        activeColor: Settings.majorColor,
+        activeColor: Settings.majorColor.value,
       ),
       title: Text(title, style: const TextStyle(color: Colors.white)),
       onTap: () => onChanged(value),

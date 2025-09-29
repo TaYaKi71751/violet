@@ -45,7 +45,7 @@ class ArticleListItemWidgetController extends GetxController {
   ArticleListItemWidgetController(
     this.articleListItem,
   ) {
-    if (!Settings.simpleItemWidgetLoadingIcon) {
+    if (!Settings.simpleItemWidgetLoadingIcon.value) {
       flareController = FlareControls();
     }
 
@@ -64,7 +64,7 @@ class ArticleListItemWidgetController extends GetxController {
       } else {
         Future.delayed(const Duration(milliseconds: 500)).then((value) {
           if (bodyKey.currentContext != null && !disposed) {
-            if (Settings.useTabletMode) {
+            if (Settings.useTabletMode.value) {
               thisHeight.value =
                   max(220.0, bodyKey.currentContext!.size!.height);
             } else {

@@ -85,7 +85,7 @@ class QueryManager {
     var queryRaw = 'SELECT * FROM HitomiColumnModel WHERE ';
     queryRaw += 'Id IN (${ids.join(',')})';
     var qm = await QueryManager.query(
-        queryRaw + (!Settings.searchPure ? ' AND ExistOnHitomi=1' : ''));
+        queryRaw + (!Settings.searchPure.value ? ' AND ExistOnHitomi=1' : ''));
 
     var qr = <String, QueryResult>{};
     for (var element in qm.results!) {

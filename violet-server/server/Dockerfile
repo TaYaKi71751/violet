@@ -1,4 +1,4 @@
-FROM node:16-alpine as builder
+FROM node:22-alpine as builder
 
 ENV NODE_ENV build
 
@@ -6,15 +6,16 @@ USER node
 WORKDIR /home/node
 
 COPY package*.json ./
-RUN npm ci
 
 COPY --chown=node:node . .
-RUN npm run build \
-  && npm prune --production
+
+RUN npm install --legacy-peer-deps
+RUN npm run build --legacy-peer-deps \
+  && npm prune --production --legacy-peer-deps
 
 # ---
 
-FROM node:16-alpine
+FROM node:22-alpine
 
 ENV NODE_ENV prod
 

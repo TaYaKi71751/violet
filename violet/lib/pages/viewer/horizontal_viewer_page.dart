@@ -57,7 +57,7 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
       if (c.onTwoPageJump) return;
 
       final orientation = MediaQuery.of(context).orientation;
-      final candidate = (!Settings.disableTwoPageView &&
+      final candidate = (!Settings.disableTwoPageView.value &&
           orientation == Orientation.landscape);
 
       // orientation이 변경되고, twoPage 설정이 바뀌는 경우라면 페이지 재설정이 필요함
@@ -136,7 +136,7 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
                 child: Obx(
                   () => CustomDelayTapListener(
                     onTap: c.leftButton,
-                    delay: c.onTwoPage.value || Settings.useTabletMode
+                    delay: c.onTwoPage.value || Settings.useTabletMode.value
                         ? const Duration(milliseconds: 1)
                         : const Duration(milliseconds: 200),
                   ),
@@ -165,7 +165,7 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
                 child: Obx(
                   () => CustomDelayTapListener(
                     onTap: c.rightButton,
-                    delay: c.onTwoPage.value || Settings.useTabletMode
+                    delay: c.onTwoPage.value || Settings.useTabletMode.value
                         ? const Duration(milliseconds: 1)
                         : const Duration(milliseconds: 200),
                   ),

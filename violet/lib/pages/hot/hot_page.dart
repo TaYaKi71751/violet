@@ -12,7 +12,7 @@ import 'package:violet/database/query.dart';
 import 'package:violet/locale/locale.dart';
 import 'package:violet/model/article_list_item.dart';
 import 'package:violet/pages/segment/double_tap_to_top.dart';
-import 'package:violet/server/violet.dart';
+import 'package:violet/server/violet_v2.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/widgets/article_item/article_list_item_widget.dart';
 import 'package:violet/widgets/search_bar.dart';
@@ -182,19 +182,22 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
   Future<RequestType> _request([bool reload = false]) {
     _memoizer = AsyncMemoizer();
     return _memoizer!.runOnce(() async {
-      final value = await VioletServer.top(0, 600, i2t());
+      final response = await VioletServerV2.instance
+          .apiV2ViewGet(offset: 0, count: 600, type: i2t());
+      final value = response.body;
 
-      if (value is int) {
-        return (value, null);
+      if (value == null) {
+        return (response.statusCode, null);
       }
 
-      if (value == null || value.length == 0) {
+      if (value.elements.isEmpty) {
         return const (900, null);
       }
 
       var queryRaw =
-          '${translate2query('${Settings.includeTags} ${Settings.serializedExcludeTags}')} AND ';
-      queryRaw += '(${value.map((e) => 'Id=${e.$1}').join(' OR ')})';
+          '${translate2query('${Settings.includeTags.value} ${Settings.serializedExcludeTags}')} AND ';
+      queryRaw +=
+          '(${value.elements.map((e) => 'Id=${e.articleId}').join(' OR ')})';
       final query = await QueryManager.query(queryRaw);
 
       if (query.results!.isEmpty) {
@@ -207,13 +210,13 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
       }
 
       final result = <(QueryResult, int)>[];
-      value.forEach((element) {
-        if (qr[element.$1.toString()] == null) {
+      for (var element in value.elements) {
+        if (qr[element.articleId.toString()] == null) {
           // TODO: Handle qurey not found
-          return;
+          continue;
         }
-        result.add((qr[element.$1.toString()]!, element.$2));
-      });
+        result.add((qr[element.articleId.toString()]!, element.count));
+      }
 
       if (reload) setState(() {});
 
@@ -225,8 +228,8 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
     return Align(
       alignment: Alignment.centerRight,
       child: PopupMenuButton(
-        color: Settings.themeWhat
-            ? Settings.themeBlack
+        color: Settings.themeWhat.value
+            ? Settings.themeBlack.value
                 ? const Color(0xFF060606)
                 : Colors.grey.shade900.withOpacity(0.90)
             : Colors.grey.shade50,
@@ -234,7 +237,8 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
           data: ThemeData(
               useMaterial3: false,
               iconTheme: IconThemeData(
-                  color: !Settings.themeWhat ? Colors.black : Colors.white)),
+                  color:
+                      !Settings.themeWhat.value ? Colors.black : Colors.white)),
           child: const Icon(MdiIcons.finance),
         ),
         itemBuilder: (ctx) => [
@@ -263,7 +267,9 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
             data: ThemeData(
                 useMaterial3: false,
                 iconTheme: IconThemeData(
-                    color: !Settings.themeWhat ? Colors.black : Colors.white)),
+                    color: !Settings.themeWhat.value
+                        ? Colors.black
+                        : Colors.white)),
             child: Icon(
               iconData,
             ),

@@ -132,7 +132,7 @@ class _VerticalViewerPageState extends State<VerticalViewerPage>
           child: AbsorbPointer(
             absorbing: !_scrollListEnable,
             child: ColoredBox(
-              color: Settings.themeWhat && Settings.themeBlack
+              color: Settings.themeWhat.value && Settings.themeBlack.value
                   ? Colors.black
                   : const Color(0xff444444),
               child: notificationListener,
@@ -195,9 +195,9 @@ class _VerticalViewerPageState extends State<VerticalViewerPage>
   void _touchEvent(TapDownDetails details) {
     final width = MediaQuery.of(context).size.width;
     if (details.localPosition.dx < width / 3) {
-      if (!Settings.disableOverlayButton) c.leftButton();
+      if (!Settings.disableOverlayButton.value) c.leftButton();
     } else if (width / 3 * 2 < details.localPosition.dx) {
-      if (!Settings.disableOverlayButton) c.rightButton();
+      if (!Settings.disableOverlayButton.value) c.rightButton();
     } else {
       c.middleButton();
     }

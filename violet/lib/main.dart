@@ -46,6 +46,7 @@ Future<void> main() async {
     FlareCache.doesPrune = false;
     FlutterError.onError = recordFlutterError;
 
+    await initUserId();
     if (Platform.isAndroid || Platform.isIOS) {
       await initFirebase();
     }
@@ -88,16 +89,21 @@ Future<void> recordFlutterError(FlutterErrorDetails flutterErrorDetails) async {
 Future<void> initFirebase() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // check user-id is set
+  var analytics = FirebaseAnalytics.instance;
+  await analytics.setUserId(id: await initUserId());
+}
+
+Future<String> initUserId() async {
   final prefs = await SharedPreferences.getInstance();
   var id = prefs.getString('fa_userid');
+
+  // check user-id is set
   if (id == null) {
     id = sha1.convert(utf8.encode(DateTime.now().toString())).toString();
     prefs.setString('fa_userid', id);
   }
 
-  var analytics = FirebaseAnalytics.instance;
-  await analytics.setUserId(id: id);
+  return id;
 }
 
 class MyApp extends StatelessWidget {
@@ -109,7 +115,7 @@ class MyApp extends StatelessWidget {
       defaultBrightness: Brightness.light,
       data: (brightness) => ThemeData(
         appBarTheme: AppBarTheme(
-            systemOverlayStyle: !Settings.themeWhat
+            systemOverlayStyle: !Settings.themeWhat.value
                 ? SystemUiOverlayStyle.dark
                 : SystemUiOverlayStyle.light),
         useMaterial3: false,
@@ -117,21 +123,24 @@ class MyApp extends StatelessWidget {
         bottomSheetTheme:
             BottomSheetThemeData(backgroundColor: Colors.black.withOpacity(0)),
         scaffoldBackgroundColor:
-            Settings.themeBlack && Settings.themeWhat ? Colors.black : null,
-        dialogBackgroundColor: Settings.themeBlack && Settings.themeWhat
+            Settings.themeBlack.value && Settings.themeWhat.value
+                ? Colors.black
+                : null,
+        dialogBackgroundColor:
+            Settings.themeBlack.value && Settings.themeWhat.value
+                ? Palette.blackThemeBackground
+                : null,
+        cardColor: Settings.themeBlack.value && Settings.themeWhat.value
             ? Palette.blackThemeBackground
             : null,
-        cardColor: Settings.themeBlack && Settings.themeWhat
-            ? Palette.blackThemeBackground
-            : null,
-        colorScheme: ColorScheme.fromSwatch()
-            .copyWith(secondary: Settings.majorColor, brightness: brightness),
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+            secondary: Settings.majorColor.value, brightness: brightness),
         cupertinoOverrideTheme: CupertinoThemeData(
           brightness: brightness,
-          primaryColor: Settings.majorColor,
+          primaryColor: Settings.majorColor.value,
           textTheme: const CupertinoTextThemeData(),
-          barBackgroundColor: Settings.themeWhat
-              ? Settings.themeBlack
+          barBackgroundColor: Settings.themeWhat.value
+              ? Settings.themeBlack.value
                   ? const Color(0xFF181818)
                   : Colors.grey.shade800
               : null,
@@ -169,7 +178,7 @@ class MyApp extends StatelessWidget {
     };
 
     final home =
-        Settings.useLockScreen ? const LockScreen() : const SplashPage();
+        Settings.useLockScreen.value ? const LockScreen() : const SplashPage();
 
     final navigatorObservers = Platform.isAndroid || Platform.isIOS
         ? [
@@ -199,9 +208,9 @@ class MyApp extends StatelessWidget {
   }
 
   Locale localeResolution(Locale? locale, Iterable<Locale> supportedLocales) {
-    if (Settings.language != null) {
-      if (Settings.language!.contains('_')) {
-        final ss = Settings.language!.split('_');
+    if (Settings.language.value.isNotEmpty) {
+      if (Settings.language.value.contains('_')) {
+        final ss = Settings.language.value.split('_');
         if (ss.length == 2) {
           return Locale.fromSubtags(languageCode: ss[0], scriptCode: ss[1]);
         } else {
@@ -209,13 +218,13 @@ class MyApp extends StatelessWidget {
               languageCode: ss[0], scriptCode: ss[1], countryCode: ss[2]);
         }
       } else {
-        return Locale(Settings.language!);
+        return Locale(Settings.language.value);
       }
     }
 
     if (locale == null) {
-      if (Settings.language == null) {
-        Settings.setLanguage(supportedLocales.first.languageCode);
+      if (Settings.language.value.isEmpty) {
+        Settings.language.setValue(supportedLocales.first.languageCode);
       }
       return supportedLocales.first;
     }
@@ -223,15 +232,15 @@ class MyApp extends StatelessWidget {
     for (Locale supportedLocale in supportedLocales) {
       if (supportedLocale.languageCode == locale.languageCode ||
           supportedLocale.countryCode == locale.countryCode) {
-        if (Settings.language == null) {
-          Settings.setLanguage(supportedLocale.languageCode);
+        if (Settings.language.value.isEmpty) {
+          Settings.language.setValue(supportedLocale.languageCode);
         }
         return supportedLocale;
       }
     }
 
-    if (Settings.language == null) {
-      Settings.setLanguage(supportedLocales.first.languageCode);
+    if (Settings.language.value.isEmpty) {
+      Settings.language.setValue(supportedLocales.first.languageCode);
     }
 
     return supportedLocales.first;

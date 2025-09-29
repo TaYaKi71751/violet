@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
-  IsNumber,
+  IsInt,
   IsOptional,
   IsString,
   Matches,
@@ -17,21 +17,23 @@ export const RANK_REQUEST_TYPE = {
 };
 
 export class ViewPostRequestDto {
-  @IsNumber()
+  @IsInt()
   @Type(() => Number)
   @ApiProperty({
     description: 'ArticleId',
     required: true,
+    type: 'integer',
   })
   articleId: number;
 
-  @IsNumber()
+  @IsInt()
   @Type(() => Number)
   @Min(0)
   @Max(1000)
   @ApiProperty({
     description: 'Count',
     required: true,
+    type: 'integer',
   })
   viewSeconds: number;
 

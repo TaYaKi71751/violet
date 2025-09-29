@@ -115,7 +115,7 @@ class _BookmarkPageState extends State<LabBookmarkPage> {
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Settings.themeWhat ? Colors.black26 : Colors.white,
+          color: Settings.themeWhat.value ? Colors.black26 : Colors.white,
           borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(8),
               topRight: Radius.circular(8),
@@ -123,10 +123,10 @@ class _BookmarkPageState extends State<LabBookmarkPage> {
               bottomRight: Radius.circular(8)),
           boxShadow: [
             BoxShadow(
-              color: Settings.themeWhat
+              color: Settings.themeWhat.value
                   ? Colors.black26
                   : Colors.grey.withOpacity(0.1),
-              spreadRadius: Settings.themeWhat ? 0 : 5,
+              spreadRadius: Settings.themeWhat.value ? 0 : 5,
               blurRadius: 7,
               offset: const Offset(0, 3), // changes position of shadow
             ),
@@ -135,8 +135,8 @@ class _BookmarkPageState extends State<LabBookmarkPage> {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8.0),
           child: Material(
-            color: Settings.themeWhat
-                ? Settings.themeBlack
+            color: Settings.themeWhat.value
+                ? Settings.themeBlack.value
                     ? Palette.blackThemeBackground
                     : Colors.black38
                 : Colors.white,

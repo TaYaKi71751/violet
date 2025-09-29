@@ -10,7 +10,9 @@ class DownloadImageMenu extends StatelessWidget {
   const DownloadImageMenu({super.key});
 
   Color getColor(int i) {
-    return Settings.themeWhat ? Colors.grey.shade200 : Colors.grey.shade900;
+    return Settings.themeWhat.value
+        ? Colors.grey.shade200
+        : Colors.grey.shade900;
   }
 
   @override
@@ -24,7 +26,7 @@ class DownloadImageMenu extends StatelessWidget {
           borderRadius: const BorderRadius.all(Radius.circular(1)),
           boxShadow: [
             BoxShadow(
-              color: Settings.themeWhat
+              color: Settings.themeWhat.value
                   ? Colors.black.withOpacity(0.4)
                   : Colors.grey.withOpacity(0.2),
               spreadRadius: 1,

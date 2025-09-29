@@ -47,7 +47,7 @@ class _ThumbnailViewPageState extends State<ThumbnailViewPage> {
           borderRadius: const BorderRadius.all(Radius.circular(1)),
           boxShadow: [
             BoxShadow(
-              color: Settings.themeWhat
+              color: Settings.themeWhat.value
                   ? Colors.black.withOpacity(0.2)
                   : Colors.grey.withOpacity(0.2),
               spreadRadius: 1,
@@ -69,7 +69,7 @@ class _ThumbnailViewPageState extends State<ThumbnailViewPage> {
                     fit: !widget.showUltra ? BoxFit.cover : BoxFit.contain,
                     httpHeaders: widget.headers,
                     placeholder: (b, c) {
-                      if (!Settings.simpleItemWidgetLoadingIcon) {
+                      if (!Settings.simpleItemWidgetLoadingIcon.value) {
                         return const FlareActor(
                           'assets/flare/Loading2.flr',
                           alignment: Alignment.center,
@@ -82,7 +82,7 @@ class _ThumbnailViewPageState extends State<ThumbnailViewPage> {
                             width: 30,
                             height: 30,
                             child: CircularProgressIndicator(
-                              color: Settings.majorColor.withAlpha(150),
+                              color: Settings.majorColor.value.withAlpha(150),
                             ),
                           ),
                         );

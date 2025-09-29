@@ -97,8 +97,9 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
   }
 
   _exitButton() {
-    final statusBarHeight =
-        Settings.disableFullScreen ? MediaQuery.of(context).padding.top : 0;
+    final statusBarHeight = Settings.disableFullScreen.value
+        ? MediaQuery.of(context).padding.top
+        : 0;
     final height = MediaQuery.of(context).size.height;
 
     return Obx(
@@ -153,8 +154,9 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
   }
 
   _appBar() {
-    final statusBarHeight =
-        Settings.disableFullScreen ? MediaQuery.of(context).padding.top : 0;
+    final statusBarHeight = Settings.disableFullScreen.value
+        ? MediaQuery.of(context).padding.top
+        : 0;
     final height = MediaQuery.of(context).size.height;
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
@@ -164,7 +166,7 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
         duration: const Duration(milliseconds: 300),
         child: Stack(
           children: [
-            !Settings.disableFullScreen
+            !Settings.disableFullScreen.value
                 ? Padding(
                     padding: EdgeInsets.only(top: statusBarHeight.toDouble()),
                     child: Container(
@@ -176,7 +178,7 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
             Container(
               padding: !c.appBarToBottom.value
                   ? EdgeInsets.only(
-                      top: !Settings.disableFullScreen
+                      top: !Settings.disableFullScreen.value
                           ? Variables.statusBarHeight
                           : 0.0)
                   : EdgeInsets.only(
@@ -204,7 +206,7 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
                               children: [
                                 _appBarBookmark(),
                                 _appBarInfo(),
-                                if (Settings.inViewerMessageSearch)
+                                if (Settings.inViewerMessageSearch.value)
                                   _appBarSearch(),
                               ],
                             ),
@@ -229,7 +231,7 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
                       ],
                     ),
                   ),
-                  !Settings.disableFullScreen && c.appBarToBottom.value
+                  !Settings.disableFullScreen.value && c.appBarToBottom.value
                       ? Container(
                           height: Variables.bottomBarHeight +
                               (Platform.isIOS ? 48 - 24 : 0),
@@ -401,8 +403,8 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
       icon: Obx(() => Icon(c.timer.value ? MdiIcons.timer : MdiIcons.timerOff)),
       color: Colors.white,
       onPressed: () async {
-        await Settings.setEnableTimer(!Settings.enableTimer);
-        c.timer.value = Settings.enableTimer;
+        await Settings.enableTimer.setValue(!Settings.enableTimer.value);
+        c.timer.value = Settings.enableTimer.value;
         c.startTimer();
       },
     );
@@ -415,9 +417,9 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
           : MdiIcons.homeFloor2)),
       color: Colors.white,
       onPressed: () async {
-        await Settings.setSecondPageToSecondPage(
-            !Settings.secondPageToSecondPage);
-        c.secondPageToSecondPage.value = Settings.secondPageToSecondPage;
+        await Settings.secondPageToSecondPage
+            .setValue(!Settings.secondPageToSecondPage.value);
+        c.secondPageToSecondPage.value = Settings.secondPageToSecondPage.value;
       },
     );
   }
@@ -428,11 +430,12 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
           c.onTwoPage.value ? MdiIcons.cardOutline : MdiIcons.cardOffOutline)),
       color: Colors.white,
       onPressed: () async {
-        await Settings.setDisableTwoPageView(!Settings.disableTwoPageView);
+        await Settings.disableTwoPageView
+            .setValue(!Settings.disableTwoPageView.value);
         final curPage = c.page.value;
         c.onTwoPageJump = true;
         c.page.value = c.onTwoPage.value ? curPage ~/ 2 * 2 : curPage;
-        c.onTwoPage.value = !Settings.disableTwoPageView;
+        c.onTwoPage.value = !Settings.disableTwoPageView.value;
         c.horizontalPageController
             .jumpToPage(c.onTwoPage.value ? curPage ~/ 2 : curPage);
         WidgetsBinding.instance.addPostFrameCallback(
@@ -490,7 +493,7 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
               cache ??= ViewerSettingPanel(
                 getxId: widget.getxId,
                 viewerStyleChangeEvent: () {
-                  if (Settings.isHorizontal) {
+                  if (Settings.isHorizontal.value) {
                     c.horizontalPageController =
                         PreloadPageController(initialPage: c.page.value);
                   } else {
@@ -519,8 +522,9 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
   }
 
   _bottomAppBar() {
-    final statusBarHeight =
-        Settings.disableFullScreen ? MediaQuery.of(context).padding.top : 0;
+    final statusBarHeight = Settings.disableFullScreen.value
+        ? MediaQuery.of(context).padding.top
+        : 0;
     final height = MediaQuery.of(context).size.height;
 
     final sliderWidget = SliderTheme(
@@ -541,8 +545,8 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
         min: 1,
         label: '${c.page.value + 1}',
         divisions: c.maxPage,
-        inactiveColor: Settings.majorColor.withOpacity(0.7),
-        activeColor: Settings.majorColor,
+        inactiveColor: Settings.majorColor.value.withOpacity(0.7),
+        activeColor: Settings.majorColor.value,
         onChangeStart: (value) {
           c.sliderOnChange = true;
         },
@@ -558,7 +562,7 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
           c.page.value = value.toInt() - 1;
 
           if (!c.provider.useFileSystem) {
-            if (!Settings.isHorizontal) {
+            if (!Settings.isHorizontal.value) {
               c.verticalItemScrollController.jumpTo(
                 index: value.toInt() - 1,
                 alignment: 0.12,
@@ -596,7 +600,7 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
       icon: const Icon(Icons.keyboard_arrow_up),
       onPressed: () async {
         c.thumb.value = !c.thumb.value;
-        await Settings.setEnableThumbSlider(c.thumb.value);
+        await Settings.enableThumbSlider.setValue(c.thumb.value);
       },
     );
 
@@ -606,7 +610,7 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
         duration: const Duration(milliseconds: 300),
         child: Stack(
           children: [
-            !Settings.disableFullScreen && !c.appBarToBottom.value
+            !Settings.disableFullScreen.value && !c.appBarToBottom.value
                 ? Padding(
                     padding: EdgeInsets.only(top: statusBarHeight.toDouble()),
                     child: Container(
@@ -681,7 +685,7 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
                         ],
                       ),
                       if (!Platform.isIOS &&
-                          !Settings.disableFullScreen &&
+                          !Settings.disableFullScreen.value &&
                           !c.appBarToBottom.value)
                         Container(
                           height: Variables.bottomBarHeight,
@@ -699,7 +703,7 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
   }
 
   _preprocessImageInfoForFileImage() {
-    c.thumb.value = Settings.enableThumbSlider;
+    c.thumb.value = Settings.enableThumbSlider.value;
 
     var imageSizes = c.provider.uris.map((e) {
       final image = File(e);

@@ -99,12 +99,12 @@ class _AnimatedFloatingActionButtonState
 
   Widget toggle() {
     return FloatingActionButton(
-      backgroundColor: Settings.themeWhat
+      backgroundColor: Settings.themeWhat.value
           ? Colors.grey.shade800
           : Palette.lightThemeBackground,
       onPressed: animate,
       elevation: 2,
-      foregroundColor: Settings.majorColor,
+      foregroundColor: Settings.majorColor.value,
       child: AnimatedIcon(
         icon: widget.animatedIconData,
         progress: _animateIcon,

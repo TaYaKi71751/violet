@@ -12,7 +12,8 @@ class SettingsWrapper {
     FilterQuality.low,
   ];
 
-  static FilterQuality get imageQuality => _imageQuality[Settings.imageQuality];
+  static FilterQuality get imageQuality =>
+      _imageQuality[Settings.imageQuality.value];
 
   static FilterQuality getImageQuality(int value) => _imageQuality[value];
 }

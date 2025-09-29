@@ -108,14 +108,14 @@ class _CommunityPageState extends State<CommunityPage>
           // decoration:
           child: Ink(
             decoration: BoxDecoration(
-              color: Settings.themeWhat ? Colors.black26 : Colors.white,
+              color: Settings.themeWhat.value ? Colors.black26 : Colors.white,
               borderRadius: const BorderRadius.all(Radius.circular(8)),
               boxShadow: [
                 BoxShadow(
-                  color: Settings.themeWhat
+                  color: Settings.themeWhat.value
                       ? Colors.black26
                       : Colors.grey.withOpacity(0.1),
-                  spreadRadius: Settings.themeWhat ? 0 : 5,
+                  spreadRadius: Settings.themeWhat.value ? 0 : 5,
                   blurRadius: 7,
                   offset: const Offset(0, 3), // changes position of shadow
                 ),
@@ -199,7 +199,7 @@ class _CommunityPageState extends State<CommunityPage>
                               badgeContent: const Text('N',
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 12.0)),
-                              // badgeColor: Settings.majorAccentColor,
+                              // badgeColor: Settings.majorAccentColor.value,
                               child: Icon(
                                   sess == null
                                       ? MdiIcons.accountCancel
@@ -302,7 +302,9 @@ class _CommunityPageState extends State<CommunityPage>
       margin: const EdgeInsets.fromLTRB(0, 8, 0, 8),
       height: double.infinity,
       width: 1.0,
-      color: Settings.themeWhat ? Colors.grey.shade600 : Colors.grey.shade400,
+      color: Settings.themeWhat.value
+          ? Colors.grey.shade600
+          : Colors.grey.shade400,
     );
   }
 }

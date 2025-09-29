@@ -11,11 +11,11 @@ class DownloadAlignType extends StatelessWidget {
   const DownloadAlignType({super.key});
 
   Color getColor(int i) {
-    return Settings.themeWhat
-        ? Settings.downloadAlignType == i
+    return Settings.themeWhat.value
+        ? Settings.downloadAlignType.value == i
             ? Colors.grey.shade200
             : Colors.grey.shade400
-        : Settings.downloadAlignType == i
+        : Settings.downloadAlignType.value == i
             ? Colors.grey.shade900
             : Colors.grey.shade400;
   }
@@ -62,7 +62,7 @@ class DownloadAlignType extends StatelessWidget {
       title: Text(text,
           softWrap: false, style: TextStyle(color: getColor(selection))),
       onTap: () async {
-        await Settings.setDownloadAlignType(selection);
+        await Settings.downloadAlignType.setValue(selection);
 
         if (!context.mounted) return;
         Navigator.pop(context);

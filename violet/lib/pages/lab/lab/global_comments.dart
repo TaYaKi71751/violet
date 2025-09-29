@@ -11,6 +11,7 @@ import 'package:violet/pages/lab/lab/recent_user_record.dart';
 import 'package:violet/pages/segment/card_panel.dart';
 import 'package:violet/pages/segment/platform_navigator.dart';
 import 'package:violet/server/community/anon.dart';
+import 'package:violet/server/violet_v2.dart';
 import 'package:violet/settings/settings.dart';
 
 class LabGlobalComments extends StatefulWidget {
@@ -37,16 +38,15 @@ class _LabGlobalCommentsState extends State<LabGlobalComments> {
   TextEditingController text = TextEditingController();
 
   Future<void> readComments() async {
-    var tcomments = (await VioletCommunityAnonymous.getArtistComments(
-        'global_general'))['result'] as List<dynamic>;
+    var tcomments = await VioletServerV2.getComments('general');
 
-    comments = tcomments
+    comments = tcomments.elements
         .map((e) => (
-              e['Id'] as int,
-              DateTime.parse(e['TimeStamp']),
-              e['UserAppId'] as String,
-              e['Body'] as String,
-              e['Parent'] as int?,
+              e.id,
+              e.dateTime,
+              e.userAppId,
+              e.body,
+              e.parent,
             ))
         .toList();
 
@@ -92,7 +92,7 @@ class _LabGlobalCommentsState extends State<LabGlobalComments> {
                   ),
                   width: double.infinity,
                   height: 1.0,
-                  color: Settings.themeWhat
+                  color: Settings.themeWhat.value
                       ? Colors.grey.shade800
                       : Colors.grey.shade300,
                 );
@@ -106,7 +106,7 @@ class _LabGlobalCommentsState extends State<LabGlobalComments> {
             child: Ink(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               decoration: BoxDecoration(
-                  color: Settings.themeWhat
+                  color: Settings.themeWhat.value
                       ? Colors.grey.shade800
                       : const Color(0xffe2e4e7),
                   borderRadius: const BorderRadius.all(Radius.circular(6.0))),
@@ -119,7 +119,7 @@ class _LabGlobalCommentsState extends State<LabGlobalComments> {
                       icon: Icon(
                         Mdi.commentTextMultiple,
                         size: 15.0,
-                        color: Settings.themeWhat
+                        color: Settings.themeWhat.value
                             ? Colors.grey.shade600
                             : const Color(0xff3a4e66),
                       ),
@@ -144,7 +144,7 @@ class _LabGlobalCommentsState extends State<LabGlobalComments> {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       style: TextButton.styleFrom(
-                        foregroundColor: Settings.themeWhat
+                        foregroundColor: Settings.themeWhat.value
                             ? Colors.grey.shade600
                             : const Color(0xff3a4e66),
                         padding: EdgeInsets.zero,
@@ -256,7 +256,7 @@ class CommentUnit extends StatelessWidget {
                           author.substring(0, 7),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Settings.themeWhat
+                            color: Settings.themeWhat.value
                                 ? Colors.grey.shade300
                                 : const Color(0xff373a3c),
                             fontSize: 15.0,
@@ -281,7 +281,7 @@ class CommentUnit extends StatelessWidget {
                     RichText(
                       text: TextSpan(
                         style: TextStyle(
-                          color: Settings.themeWhat
+                          color: Settings.themeWhat.value
                               ? Colors.grey.shade300
                               : const Color(0xff373a3c),
                           fontSize: 12.0,
@@ -294,7 +294,7 @@ class CommentUnit extends StatelessWidget {
                                 DateFormat('yyyy.MM.dd HH:mm').format(dateTime),
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Settings.themeWhat
+                              color: Settings.themeWhat.value
                                   ? Colors.grey.shade500
                                   : const Color(0xff989dab),
                             ),

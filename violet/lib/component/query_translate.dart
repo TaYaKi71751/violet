@@ -11,7 +11,7 @@ String translate2query(String query, {bool filter = true}) {
     return 'SELECT * FROM HitomiColumnModel WHERE Id=$nn';
   }
 
-  final filterExistsOnHitomi = !Settings.searchPure && filter;
+  final filterExistsOnHitomi = !Settings.searchPure.value && filter;
 
   if (query.isEmpty) {
     return 'SELECT * FROM HitomiColumnModel ${filterExistsOnHitomi ? 'WHERE ExistOnHitomi=1' : ''}';

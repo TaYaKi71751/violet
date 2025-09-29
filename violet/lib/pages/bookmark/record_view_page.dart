@@ -159,7 +159,7 @@ class RecordViewPage extends StatelessWidget {
         //             xx.lastPage().toString() +
         //                 ' ${Translations.instance!.trans('readpage')} ',
         //             style: TextStyle(
-        //               color: Settings.themeWhat
+        //               color: Settings.themeWhat.value
         //                   ? Colors.grey.shade300
         //                   : Colors.grey.shade700,
         //             )),

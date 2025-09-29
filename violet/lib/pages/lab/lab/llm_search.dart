@@ -209,7 +209,7 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
               width: 42,
               height: 42,
               colorFilter: ColorFilter.mode(
-                Settings.themeWhat ? Colors.white : Colors.black87,
+                Settings.themeWhat.value ? Colors.white : Colors.black87,
                 BlendMode.srcIn,
               ),
             ),
@@ -298,7 +298,7 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
           child: ElevatedButton(
             onPressed: _isLoading ? null : _search,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Settings.majorColor,
+              backgroundColor: Settings.majorColor.value,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
               minimumSize: const Size(80, 48),
@@ -337,14 +337,13 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
             child: Row(
               children: [
                 Checkbox(
-                  value: _strictRelevance,
-                  onChanged: (value) {
-                    setState(() {
-                      _strictRelevance = value ?? false;
-                    });
-                  },
-                  activeColor: Settings.majorColor,
-                ),
+                    value: _strictRelevance,
+                    onChanged: (value) {
+                      setState(() {
+                        _strictRelevance = value ?? false;
+                      });
+                    },
+                    activeColor: Settings.majorColor.value),
                 const Text(
                   '정확한 검색',
                   style: TextStyle(fontSize: 14),
@@ -354,8 +353,9 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
                   '(관련성이 높은 결과만 표시)',
                   style: TextStyle(
                     fontSize: 12,
-                    color:
-                        Settings.themeWhat ? Colors.grey : Colors.grey.shade600,
+                    color: Settings.themeWhat.value
+                        ? Colors.grey
+                        : Colors.grey.shade600,
                   ),
                 ),
               ],
@@ -371,12 +371,13 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
               },
               icon: Icon(
                 _showEvaluate ? Icons.expand_less : Icons.expand_more,
-                color: Settings.themeWhat ? Colors.white : Colors.black87,
+                color: Settings.themeWhat.value ? Colors.white : Colors.black87,
               ),
               label: Text(
                 '검색 결과 요약',
                 style: TextStyle(
-                  color: Settings.themeWhat ? Colors.white : Colors.black87,
+                  color:
+                      Settings.themeWhat.value ? Colors.white : Colors.black87,
                   fontSize: 14,
                 ),
               ),
@@ -409,12 +410,12 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Settings.themeWhat
+                  color: Settings.themeWhat.value
                       ? Colors.black26
                       : Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: Settings.themeWhat
+                    color: Settings.themeWhat.value
                         ? Colors.grey.shade800
                         : Colors.grey.shade300,
                   ),
@@ -422,7 +423,9 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
                 child: Text(
                   _evaluate,
                   style: TextStyle(
-                    color: Settings.themeWhat ? Colors.white : Colors.black87,
+                    color: Settings.themeWhat.value
+                        ? Colors.white
+                        : Colors.black87,
                   ),
                 ),
               ),
@@ -542,7 +545,7 @@ class _LLMSearchPageState extends State<LLMSearchPage> {
                     return AspectRatio(
                       aspectRatio: aspectRatio,
                       child: Container(
-                        color: Settings.themeWhat
+                        color: Settings.themeWhat.value
                             ? Colors.black12
                             : Colors.grey.shade100,
                         child: Hero(
@@ -644,7 +647,7 @@ class LLMSearchInfoDialog extends StatelessWidget {
                 width: 96,
                 height: 96,
                 colorFilter: ColorFilter.mode(
-                  Settings.themeWhat ? Colors.white : Colors.black87,
+                  Settings.themeWhat.value ? Colors.white : Colors.black87,
                   BlendMode.srcIn,
                 ),
               ),

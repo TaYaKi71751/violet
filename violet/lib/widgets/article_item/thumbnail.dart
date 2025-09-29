@@ -28,7 +28,7 @@ class ThumbnailWidget extends StatelessWidget {
         final greyScale = c.isLatestRead.value &&
             c.imageCount.value - c.latestReadPage.value <= 2 &&
             !c.articleListItem.disableFilter &&
-            Settings.showArticleProgress;
+            Settings.showArticleProgress.value;
 
         return SizedBox(
           width: c.articleListItem.showDetail
@@ -66,7 +66,7 @@ class ThumbnailWidget extends StatelessWidget {
                     ),
                   ],
                 )
-              : !Settings.simpleItemWidgetLoadingIcon
+              : !Settings.simpleItemWidgetLoadingIcon.value
                   ? const FlareActor(
                       'assets/flare/Loading2.flr',
                       alignment: Alignment.center,
@@ -78,7 +78,7 @@ class ThumbnailWidget extends StatelessWidget {
                         width: 30,
                         height: 30,
                         child: CircularProgressIndicator(
-                          color: Settings.majorColor.withAlpha(150),
+                          color: Settings.majorColor.value.withAlpha(150),
                         ),
                       ),
                     ),
@@ -128,7 +128,7 @@ class ThumbnailImageWidget extends StatelessWidget {
         builder: (context, value, child) {
           return CachedNetworkImage(
             key: value.isEmpty ? null : ValueKey(value),
-            memCacheWidth: Settings.useLowPerf ? 300 : null,
+            memCacheWidth: Settings.useLowPerf.value ? 300 : null,
             imageUrl: thumbnail,
             fit: BoxFit.cover,
             httpHeaders: headers,
@@ -139,7 +139,7 @@ class ThumbnailImageWidget extends StatelessWidget {
                   fit: !showUltra ? BoxFit.cover : BoxFit.contain,
                   colorFilter: greyScale
                       ? ColorFilter.mode(
-                          Settings.themeWhat
+                          Settings.themeWhat.value
                               ? Colors.grey.shade800
                               : Colors.grey.shade300,
                           BlendMode.saturation,
@@ -157,13 +157,13 @@ class ThumbnailImageWidget extends StatelessWidget {
                   width: 30,
                   height: 30,
                   child: CircularProgressIndicator(
-                    color: Settings.majorColor.withAlpha(150),
+                    color: Settings.majorColor.value.withAlpha(150),
                   ),
                 ),
               );
             },
             placeholder: (b, c) {
-              if (!Settings.simpleItemWidgetLoadingIcon) {
+              if (!Settings.simpleItemWidgetLoadingIcon.value) {
                 return const FlareActor(
                   'assets/flare/Loading2.flr',
                   alignment: Alignment.center,
@@ -176,7 +176,7 @@ class ThumbnailImageWidget extends StatelessWidget {
                     width: 30,
                     height: 30,
                     child: CircularProgressIndicator(
-                      color: Settings.majorColor.withAlpha(150),
+                      color: Settings.majorColor.value.withAlpha(150),
                     ),
                   ),
                 );
@@ -211,7 +211,7 @@ class BookmarkIndicatorWidget extends StatelessWidget {
           width: 35,
           height: 35,
           child: Obx(
-            () => !Settings.simpleItemWidgetLoadingIcon
+            () => !Settings.simpleItemWidgetLoadingIcon.value
                 ? FlareActor(
                     'assets/flare/likeUtsua.flr',
                     animation: c.isBookmarked.value ? 'Like' : 'IdleUnlike',
@@ -224,10 +224,10 @@ class BookmarkIndicatorWidget extends StatelessWidget {
                     color: c.isBookmarked.value
                         ? !greyScale
                             ? const Color(0xFFE2264D)
-                            : Settings.themeWhat
+                            : Settings.themeWhat.value
                                 ? const Color(0xFF626262)
                                 : const Color(0xFF636363)
-                        : !Settings.themeWhat
+                        : !Settings.themeWhat.value
                             ? Colors.black
                             : Colors.white,
                   ),
@@ -254,7 +254,7 @@ class ReadProgressOverlayWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return !isLastestRead || !Settings.showArticleProgress
+    return !isLastestRead || !Settings.showArticleProgress.value
         ? Container()
         : Align(
             alignment: FractionalOffset.topRight,

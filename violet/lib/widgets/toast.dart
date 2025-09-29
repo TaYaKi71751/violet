@@ -92,7 +92,9 @@ class _ToastWrapperState extends State<ToastWrapper>
                 ? 0.0
                 : (Variables.bottomBarHeight.toDouble() +
                     6 +
-                    (Settings.useDrawer && !widget.ignoreDrawer ? 0.0 : 16.0)),
+                    (Settings.useDrawer.value && !widget.ignoreDrawer
+                        ? 0.0
+                        : 16.0)),
           ),
           child: SlideTransition(
             position: offset,
@@ -117,7 +119,7 @@ class _ToastWrapperState extends State<ToastWrapper>
                     padding: const EdgeInsets.symmetric(
                         horizontal: 24.0, vertical: 12.0),
                     decoration: BoxDecoration(
-                        color: Settings.themeWhat
+                        color: Settings.themeWhat.value
                             ? Colors.black.withOpacity(0.6)
                             : Colors.grey.withOpacity(0.1)),
                     // decoration: BoxDecoration(

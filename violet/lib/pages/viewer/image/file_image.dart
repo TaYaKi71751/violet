@@ -66,7 +66,7 @@ class _FileImageState extends State<FileImage> {
       fit: BoxFit.contain,
       imageCacheName: widget.path,
       filterQuality: SettingsWrapper.getImageQuality(c.imgQuality.value),
-      cacheWidth: Settings.useLowPerf
+      cacheWidth: Settings.useLowPerf.value
           ? (MediaQuery.of(context).size.width * 2.0).toInt()
           : null,
       clearMemoryCacheWhenDispose: true,
