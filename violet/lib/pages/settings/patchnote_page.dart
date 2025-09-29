@@ -22,6 +22,11 @@ class PatchModel {
 
 final patches = [
   PatchModel(
+    dateTime: DateTime(2025, 9, 29),
+    version: '1.34.2 Patch',
+    contents: ['upgrade flutter-sdk'],
+  ),
+  PatchModel(
     dateTime: DateTime(2025, 9, 13),
     version: '1.34.1 Patch',
     contents: ['fix series/character view', 'fix real time ranking'],
