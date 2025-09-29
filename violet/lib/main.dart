@@ -35,51 +35,53 @@ import 'package:violet/src/rust/frb_generated.dart';
 import 'package:violet/style/palette.dart';
 
 Future<void> main() async {
-  runZonedGuarded<Future<void>>(() async {
-    await RustLib.init();
-    WidgetsFlutterBinding.ensureInitialized();
-    await Logger.init();
+  runZonedGuarded<Future<void>>(
+    () async {
+      await RustLib.init();
+      WidgetsFlutterBinding.ensureInitialized();
+      await Logger.init();
 
-    if (Platform.isAndroid || Platform.isIOS) {
-      await FlutterDownloader.initialize();
-    }
-    FlareCache.doesPrune = false;
-    FlutterError.onError = recordFlutterError;
+      if (Platform.isAndroid || Platform.isIOS) {
+        await FlutterDownloader.initialize();
+      }
+      FlareCache.doesPrune = false;
+      FlutterError.onError = recordFlutterError;
 
-    await initUserId();
-    if (Platform.isAndroid || Platform.isIOS) {
-      await initFirebase();
-    }
-    await Settings.initFirst();
-    await warmupFlare();
+      await initUserId();
+      if (Platform.isAndroid || Platform.isIOS) {
+        await initFirebase();
+      }
+      await Settings.initFirst();
+      await warmupFlare();
 
-    runApp(const MyApp());
-  }, (exception, stack) async {
-    Logger.error('[async-error] E: $exception\n$stack');
+      runApp(const MyApp());
+    },
+    (exception, stack) async {
+      Logger.error('[async-error] E: $exception\n$stack');
 
-    if (Platform.isAndroid || Platform.isIOS) {
-      await FirebaseCrashlytics.instance.recordError(exception, stack);
-    }
-  });
+      if (Platform.isAndroid || Platform.isIOS) {
+        await FirebaseCrashlytics.instance.recordError(exception, stack);
+      }
+    },
+  );
 }
 
 const _filesToWarmup = [
   'assets/flare/Loading2.flr',
-  'assets/flare/likeUtsua.flr'
+  'assets/flare/likeUtsua.flr',
 ];
 
 Future<void> warmupFlare() async {
   for (final filename in _filesToWarmup) {
-    await cachedActor(
-      AssetFlare(bundle: rootBundle, name: filename),
-    );
+    await cachedActor(AssetFlare(bundle: rootBundle, name: filename));
   }
 }
 
 Future<void> recordFlutterError(FlutterErrorDetails flutterErrorDetails) async {
   Logger.error(
-      '[unhandled-error] E: ${flutterErrorDetails.exceptionAsString()}\n'
-      '${flutterErrorDetails.stack}');
+    '[unhandled-error] E: ${flutterErrorDetails.exceptionAsString()}\n'
+    '${flutterErrorDetails.stack}',
+  );
 
   if (Platform.isAndroid || Platform.isIOS) {
     await FirebaseCrashlytics.instance.recordFlutterError(flutterErrorDetails);
@@ -115,34 +117,38 @@ class MyApp extends StatelessWidget {
       defaultBrightness: Brightness.light,
       data: (brightness) => ThemeData(
         appBarTheme: AppBarTheme(
-            systemOverlayStyle: !Settings.themeWhat.value
-                ? SystemUiOverlayStyle.dark
-                : SystemUiOverlayStyle.light),
+          systemOverlayStyle: !Settings.themeWhat.value
+              ? SystemUiOverlayStyle.dark
+              : SystemUiOverlayStyle.light,
+        ),
         useMaterial3: false,
         brightness: brightness,
-        bottomSheetTheme:
-            BottomSheetThemeData(backgroundColor: Colors.black.withOpacity(0)),
+        bottomSheetTheme: BottomSheetThemeData(
+          backgroundColor: Colors.black.withOpacity(0),
+        ),
         scaffoldBackgroundColor:
             Settings.themeBlack.value && Settings.themeWhat.value
-                ? Colors.black
-                : null,
+            ? Colors.black
+            : null,
         dialogBackgroundColor:
             Settings.themeBlack.value && Settings.themeWhat.value
-                ? Palette.blackThemeBackground
-                : null,
+            ? Palette.blackThemeBackground
+            : null,
         cardColor: Settings.themeBlack.value && Settings.themeWhat.value
             ? Palette.blackThemeBackground
             : null,
         colorScheme: ColorScheme.fromSwatch().copyWith(
-            secondary: Settings.majorColor.value, brightness: brightness),
+          secondary: Settings.majorColor.value,
+          brightness: brightness,
+        ),
         cupertinoOverrideTheme: CupertinoThemeData(
           brightness: brightness,
           primaryColor: Settings.majorColor.value,
           textTheme: const CupertinoTextThemeData(),
           barBackgroundColor: Settings.themeWhat.value
               ? Settings.themeBlack.value
-                  ? const Color(0xFF181818)
-                  : Colors.grey.shade800
+                    ? const Color(0xFF181818)
+                    : Colors.grey.shade800
               : null,
         ),
       ),
@@ -167,7 +173,7 @@ class MyApp extends StatelessWidget {
       TranslationsDelegate(),
       GlobalMaterialLocalizations.delegate,
       GlobalCupertinoLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate
+      GlobalWidgetsLocalizations.delegate,
     ];
 
     final routes = <String, WidgetBuilder>{
@@ -177,13 +183,12 @@ class MyApp extends StatelessWidget {
       '/SplashPage': (context) => const SplashPage(),
     };
 
-    final home =
-        Settings.useLockScreen.value ? const LockScreen() : const SplashPage();
+    final home = Settings.useLockScreen.value
+        ? const LockScreen()
+        : const SplashPage();
 
     final navigatorObservers = Platform.isAndroid || Platform.isIOS
-        ? [
-            FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
-          ]
+        ? [FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance)]
         : <NavigatorObserver>[];
 
     final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -215,7 +220,10 @@ class MyApp extends StatelessWidget {
           return Locale.fromSubtags(languageCode: ss[0], scriptCode: ss[1]);
         } else {
           return Locale.fromSubtags(
-              languageCode: ss[0], scriptCode: ss[1], countryCode: ss[2]);
+            languageCode: ss[0],
+            scriptCode: ss[1],
+            countryCode: ss[2],
+          );
         }
       } else {
         return Locale(Settings.language.value);
@@ -252,9 +260,9 @@ class MyApp extends StatelessWidget {
 class CustomScrollBehavior extends MaterialScrollBehavior {
   @override
   Set<PointerDeviceKind> get dragDevices => {
-        PointerDeviceKind.touch,
-        PointerDeviceKind.mouse,
-      };
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+  };
 }
 
 // A widget to listen for the Escape key, XButton1 and raise the WillPopScope event
@@ -294,9 +302,9 @@ class EscapeKeyListener extends StatelessWidget {
         gestures: <Type, GestureRecognizerFactory>{
           MouseBackRecognizer:
               GestureRecognizerFactoryWithHandlers<MouseBackRecognizer>(
-            () => MouseBackRecognizer(),
-            (instance) => instance.onTapDown = (details) => navigatorPop(),
-          ),
+                () => MouseBackRecognizer(),
+                (instance) => instance.onTapDown = (details) => navigatorPop(),
+              ),
         },
         child: child,
       ),

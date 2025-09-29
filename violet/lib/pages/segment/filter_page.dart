@@ -17,10 +17,7 @@ import 'package:violet/settings/settings.dart';
 class FilterPage extends StatefulWidget {
   final List<QueryResult> queryResult;
 
-  const FilterPage({
-    super.key,
-    required this.queryResult,
-  });
+  const FilterPage({super.key, required this.queryResult});
 
   @override
   State<FilterPage> createState() => _FilterPageState();
@@ -128,16 +125,14 @@ class _FilterPageState extends State<FilterPage> {
               child: ListView(
                 padding: EdgeInsets.zero,
                 physics: const BouncingScrollPhysics(),
-                children: [
-                  _buildTagsPanel(),
-                ],
+                children: [_buildTagsPanel()],
               ),
             ),
             c.isSearch ? Container() : _buildSelectPanel(),
             c.isSearch
                 ? _buildSearchControlPanel()
                 : _buildSelectControlPanel(),
-            _buildOptionButtons()
+            _buildOptionButtons(),
           ],
         ),
       ),
@@ -245,16 +240,21 @@ class _FilterPageState extends State<FilterPage> {
 
     if (c.isSearch) {
       tags += _tags
-          .where((element) =>
-              ('${element.$1}:${element.$2}')
-                  .contains(_searchController.text) &&
-              !c.tagStates['${element.$1}|${element.$2}']!)
+          .where(
+            (element) =>
+                ('${element.$1}:${element.$2}').contains(
+                  _searchController.text,
+                ) &&
+                !c.tagStates['${element.$1}|${element.$2}']!,
+          )
           .toList();
     } else {
       tags += _tags
-          .where((element) =>
-              c.groupStates[element.$1]! &&
-              !c.tagStates['${element.$1}|${element.$2}']!)
+          .where(
+            (element) =>
+                c.groupStates[element.$1]! &&
+                !c.tagStates['${element.$1}|${element.$2}']!,
+          )
           .toList();
     }
 
@@ -262,41 +262,43 @@ class _FilterPageState extends State<FilterPage> {
     final runSpacing = Platform.isWindows ? 2.0 : -13.0;
 
     return Wrap(
-        // alignment: WrapAlignment.center,
-        spacing: spacing,
-        runSpacing: runSpacing,
-        children: tags.take(100).map(
-          (element) {
-            return _Chip(
-              selected: c.tagStates['${element.$1}|${element.$2}']!,
-              group: element.$1,
-              name: element.$2,
-              count: element.$3,
-              callback: (selected) {
-                c.tagStates['${element.$1}|${element.$2}'] = selected;
-              },
-            );
+      // alignment: WrapAlignment.center,
+      spacing: spacing,
+      runSpacing: runSpacing,
+      children: tags.take(100).map((element) {
+        return _Chip(
+          selected: c.tagStates['${element.$1}|${element.$2}']!,
+          group: element.$1,
+          name: element.$2,
+          count: element.$3,
+          callback: (selected) {
+            c.tagStates['${element.$1}|${element.$2}'] = selected;
           },
-        ).toList());
+        );
+      }).toList(),
+    );
   }
 
   _buildSelectPanel() {
     return Wrap(
-        alignment: WrapAlignment.center,
-        spacing: -7.0,
-        runSpacing: -13.0,
-        children: _groups
-            .map((element) => _Chip(
-                  count: element.$2,
-                  group: element.$1,
-                  name: element.$1,
-                  selected: c.groupStates[element.$1]!,
-                  callback: (value) {
-                    c.groupStates[element.$1] = value;
-                    setState(() {});
-                  },
-                ))
-            .toList());
+      alignment: WrapAlignment.center,
+      spacing: -7.0,
+      runSpacing: -13.0,
+      children: _groups
+          .map(
+            (element) => _Chip(
+              count: element.$2,
+              group: element.$1,
+              name: element.$1,
+              selected: c.groupStates[element.$1]!,
+              callback: (value) {
+                c.groupStates[element.$1] = value;
+                setState(() {});
+              },
+            ),
+          )
+          .toList(),
+    );
   }
 
   _buildSearchControlPanel() {
@@ -316,14 +318,20 @@ class _FilterPageState extends State<FilterPage> {
         suffixIcon: IconButton(
           onPressed: () async {
             _searchController.clear();
-            _searchController.selection =
-                const TextSelection(baseOffset: 0, extentOffset: 0);
+            _searchController.selection = const TextSelection(
+              baseOffset: 0,
+              extentOffset: 0,
+            );
             // await searchProcess('', _searchController.selection);
           },
           icon: const Icon(Icons.clear),
         ),
-        contentPadding:
-            const EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
+        contentPadding: const EdgeInsets.only(
+          left: 15,
+          bottom: 11,
+          top: 11,
+          right: 15,
+        ),
         hintText: trans.Translations.instance!.trans('search'),
       ),
     );
@@ -338,9 +346,9 @@ class _FilterPageState extends State<FilterPage> {
         FilterChip(
           label: Text(trans.Translations.instance!.trans('selectall')),
           onSelected: (bool value) {
-            _tags
-                .where((element) => c.groupStates[element.$1]!)
-                .forEach((element) {
+            _tags.where((element) => c.groupStates[element.$1]!).forEach((
+              element,
+            ) {
               c.tagStates['${element.$1}|${element.$2}'] = true;
             });
             setState(() {});
@@ -349,9 +357,9 @@ class _FilterPageState extends State<FilterPage> {
         FilterChip(
           label: Text(trans.Translations.instance!.trans('deselectall')),
           onSelected: (bool value) {
-            _tags
-                .where((element) => c.groupStates[element.$1]!)
-                .forEach((element) {
+            _tags.where((element) => c.groupStates[element.$1]!).forEach((
+              element,
+            ) {
               c.tagStates['${element.$1}|${element.$2}'] = false;
             });
             setState(() {});
@@ -360,9 +368,9 @@ class _FilterPageState extends State<FilterPage> {
         FilterChip(
           label: Text(trans.Translations.instance!.trans('inverse')),
           onSelected: (bool value) {
-            _tags
-                .where((element) => c.groupStates[element.$1]!)
-                .forEach((element) {
+            _tags.where((element) => c.groupStates[element.$1]!).forEach((
+              element,
+            ) {
               c.tagStates['${element.$1}|${element.$2}'] =
                   !c.tagStates['${element.$1}|${element.$2}']!;
             });
@@ -411,8 +419,9 @@ class __ChipState extends State<_Chip> {
     Color color = Colors.grey;
 
     if (Settings.translateTags.value) {
-      tagDisplayed =
-          TagTranslate.ofAny(tagDisplayed).split(':').last.split('|').first;
+      tagDisplayed = TagTranslate.ofAny(
+        tagDisplayed,
+      ).split(':').last.split('|').first;
     }
 
     if (group == 'female') {
@@ -448,30 +457,29 @@ class __ChipState extends State<_Chip> {
     }
 
     var fc = Transform.scale(
-        scale: 0.90,
-        child: RawChip(
-          selected: selected,
-          labelPadding: const EdgeInsets.all(0.0),
-          avatar: CircleAvatar(
-            backgroundColor: Colors.grey.shade600,
-            child: avatar,
-          ),
-          label: Text(
-            ' ${HtmlUnescape().convert(tagDisplayed)} (${widget.count})',
-            style: const TextStyle(
-              color: Colors.white,
-            ),
-          ),
-          backgroundColor: color,
-          elevation: 6.0,
-          padding: const EdgeInsets.all(6.0),
-          onSelected: (value) async {
-            widget.callback(value);
-            setState(() {
-              selected = value;
-            });
-          },
-        ));
+      scale: 0.90,
+      child: RawChip(
+        selected: selected,
+        labelPadding: const EdgeInsets.all(0.0),
+        avatar: CircleAvatar(
+          backgroundColor: Colors.grey.shade600,
+          child: avatar,
+        ),
+        label: Text(
+          ' ${HtmlUnescape().convert(tagDisplayed)} (${widget.count})',
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: color,
+        elevation: 6.0,
+        padding: const EdgeInsets.all(6.0),
+        onSelected: (value) async {
+          widget.callback(value);
+          setState(() {
+            selected = value;
+          });
+        },
+      ),
+    );
     return fc;
   }
 }

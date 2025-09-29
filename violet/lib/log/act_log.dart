@@ -65,11 +65,7 @@ class ActLogEvent {
   String? detail;
   ActLogType type;
 
-  ActLogEvent({
-    this.dateTime,
-    this.detail,
-    required this.type,
-  }) {
+  ActLogEvent({this.dateTime, this.detail, required this.type}) {
     dateTime ??= DateTime.now();
   }
 
@@ -131,8 +127,10 @@ class ActLogger {
     if (!Platform.environment.containsKey('FLUTTER_TEST')) {
       await lock.synchronized(() async {
         events.add(msg);
-        await logFile.writeAsString('$session ${msg.toJson()}\n',
-            mode: FileMode.append);
+        await logFile.writeAsString(
+          '$session ${msg.toJson()}\n',
+          mode: FileMode.append,
+        );
       });
     }
   }

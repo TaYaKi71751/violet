@@ -31,28 +31,37 @@ class _SignUpDialogState extends State<SignUpDialog> {
         var nn = _nnController.text.trim();
 
         if (pw != pwa || pw.length < 8) {
-          await showOkDialog(context,
-              'Please check your password. Pw and Pw Again must be the same, and must be at least 8 characters long.');
+          await showOkDialog(
+            context,
+            'Please check your password. Pw and Pw Again must be the same, and must be at least 8 characters long.',
+          );
           return;
         }
 
         if (await VioletCommunitySession.checkId(id) != 'success') {
           if (!context.mounted) return;
           await showOkDialog(
-              context, 'Id already exists. Please use a different ID.');
+            context,
+            'Id already exists. Please use a different ID.',
+          );
           return;
         }
 
         if (await VioletCommunitySession.checkNickName(nn) != 'success') {
           if (!context.mounted) return;
-          await showOkDialog(context,
-              'NickName already exists. Please use a different NickName.');
+          await showOkDialog(
+            context,
+            'NickName already exists. Please use a different NickName.',
+          );
           return;
         }
 
         if (!context.mounted) return;
-        Navigator.pop(context,
-            [_idController.text, _pwController.text, _nnController.text]);
+        Navigator.pop(context, [
+          _idController.text,
+          _pwController.text,
+          _nnController.text,
+        ]);
       },
     );
     Widget noButton = TextButton(
@@ -66,21 +75,16 @@ class _SignUpDialogState extends State<SignUpDialog> {
     return AlertDialog(
       title: const Text('Sign Up'),
       contentPadding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-      actions: [
-        yesButton,
-        noButton,
-      ],
+      actions: [yesButton, noButton],
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Row(children: [
-            const Text('Id: '),
-            Expanded(
-              child: TextField(
-                controller: _idController,
-              ),
-            ),
-          ]),
+          Row(
+            children: [
+              const Text('Id: '),
+              Expanded(child: TextField(controller: _idController)),
+            ],
+          ),
           Row(
             children: [
               const Text('Pw: '),
@@ -110,11 +114,7 @@ class _SignUpDialogState extends State<SignUpDialog> {
           Row(
             children: [
               const Text('NickName: '),
-              Expanded(
-                child: TextField(
-                  controller: _nnController,
-                ),
-              ),
+              Expanded(child: TextField(controller: _nnController)),
             ],
           ),
         ],

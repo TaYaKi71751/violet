@@ -50,8 +50,10 @@ class _CustomDoubleTapGestureDectectorState
           _isDoubleTap = true;
           _doubleTapCheckTimer!.cancel();
         } else {
-          _doubleTapCheckTimer =
-              Timer(widget.doubleTapMaxDelay, _doubleTapTimerElapsed);
+          _doubleTapCheckTimer = Timer(
+            widget.doubleTapMaxDelay,
+            _doubleTapTimerElapsed,
+          );
         }
       },
       onTapCancel: () {

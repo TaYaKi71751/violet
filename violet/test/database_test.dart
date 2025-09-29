@@ -21,14 +21,16 @@ void main() {
     Settings.includeTags.setValue('');
     Settings.excludeTags.setValue(['']);
 
-    db ??= await databaseFactoryFfi
-        .openDatabase(join(Directory.current.path, 'test/db/data.db'));
+    db ??= await databaseFactoryFfi.openDatabase(
+      join(Directory.current.path, 'test/db/data.db'),
+    );
   });
 
   test('Test korean db search', () async {
     final queryString = translate2query('artist:michiking (lang:korean)');
-    final count = (await db!.rawQuery(queryString.replaceAll(
-        'SELECT * FROM', 'SELECT COUNT(*) as cnt FROM')));
+    final count = (await db!.rawQuery(
+      queryString.replaceAll('SELECT * FROM', 'SELECT COUNT(*) as cnt FROM'),
+    ));
 
     expect(count[0]['cnt']! as int, isNot(0));
   });

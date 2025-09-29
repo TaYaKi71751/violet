@@ -10,22 +10,16 @@ class TransformFloatButton extends StatelessWidget {
   final Widget floatButton;
   final double translateValue;
 
-  TransformFloatButton(
-      {required this.floatButton, required this.translateValue})
-      : super(key: ObjectKey(floatButton));
+  TransformFloatButton({
+    required this.floatButton,
+    required this.translateValue,
+  }) : super(key: ObjectKey(floatButton));
 
   @override
   Widget build(BuildContext context) {
     return Transform(
-      transform: Matrix4.translationValues(
-        0.0,
-        translateValue,
-        0.0,
-      ),
-      child: Transform.scale(
-        scale: 0.8,
-        child: floatButton,
-      ),
+      transform: Matrix4.translationValues(0.0, translateValue, 0.0),
+      child: Transform.scale(scale: 0.8, child: floatButton),
     );
   }
 }
@@ -60,24 +54,23 @@ class _AnimatedFloatingActionButtonState
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 300))
-      ..addListener(() {
-        setState(() {});
-      });
-    _animateIcon =
-        Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
-    _translateButton = Tween<double>(
-      begin: _fabHeight,
-      end: -14.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Interval(
-        0.0,
-        0.75,
-        curve: _curve,
+    _animationController =
+        AnimationController(
+          vsync: this,
+          duration: const Duration(milliseconds: 300),
+        )..addListener(() {
+          setState(() {});
+        });
+    _animateIcon = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(_animationController);
+    _translateButton = Tween<double>(begin: _fabHeight, end: -14.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Interval(0.0, 0.75, curve: _curve),
       ),
-    ));
+    );
     _animationController.forward();
   }
 
@@ -115,10 +108,13 @@ class _AnimatedFloatingActionButtonState
   List<Widget> _setFabButtons() {
     final processButtons = <Widget>[];
     for (int i = 0; i < widget.fabButtons.length; i++) {
-      processButtons.add(TransformFloatButton(
-        floatButton: widget.fabButtons[i],
-        translateValue: _translateButton.value * (widget.fabButtons.length - i),
-      ));
+      processButtons.add(
+        TransformFloatButton(
+          floatButton: widget.fabButtons[i],
+          translateValue:
+              _translateButton.value * (widget.fabButtons.length - i),
+        ),
+      );
     }
     processButtons.add(toggle());
     return processButtons;

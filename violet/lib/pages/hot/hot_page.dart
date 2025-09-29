@@ -33,7 +33,8 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
   bool get wantKeepAlive => true;
 
   @override
-  VoidCallback? get shouldReloadCallback => () => _shouldReload = true;
+  VoidCallback? get shouldReloadCallback =>
+      () => _shouldReload = true;
 
   bool _shouldReload = false;
   final Map<String, GlobalKey> itemKeys = {};
@@ -65,9 +66,7 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
 
           if (!snapshot.hasData) {
             sliverList = const SliverToBoxAdapter(
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: Center(child: CircularProgressIndicator()),
             );
           } else if (snapshot.data!.$1 != 200) {
             final errmsg = {
@@ -110,7 +109,7 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
                       errmsg[snapshot.data!.$1] != null
                           ? 'Error: ${errmsg[snapshot.data!.$1]!}'
                           : 'Error Code: ${snapshot.data!.$1}',
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -157,11 +156,9 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
                 floating: true,
                 delegate: AnimatedOpacitySliver(
                   searchBar: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Stack(children: <Widget>[
-                        _filter(),
-                        _title(),
-                      ])),
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Stack(children: <Widget>[_filter(), _title()]),
+                  ),
                 ),
               ),
               sliverList,
@@ -171,19 +168,17 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
       );
     }
 
-    return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: cachedListView!,
-      ),
-    );
+    return Scaffold(body: SafeArea(bottom: false, child: cachedListView!));
   }
 
   Future<RequestType> _request([bool reload = false]) {
     _memoizer = AsyncMemoizer();
     return _memoizer!.runOnce(() async {
-      final response = await VioletServerV2.instance
-          .apiV2ViewGet(offset: 0, count: 600, type: i2t());
+      final response = await VioletServerV2.instance.apiV2ViewGet(
+        offset: 0,
+        count: 600,
+        type: i2t(),
+      );
       final value = response.body;
 
       if (value == null) {
@@ -230,15 +225,16 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
       child: PopupMenuButton(
         color: Settings.themeWhat.value
             ? Settings.themeBlack.value
-                ? const Color(0xFF060606)
-                : Colors.grey.shade900.withOpacity(0.90)
+                  ? const Color(0xFF060606)
+                  : Colors.grey.shade900.withOpacity(0.90)
             : Colors.grey.shade50,
         icon: Theme(
           data: ThemeData(
-              useMaterial3: false,
-              iconTheme: IconThemeData(
-                  color:
-                      !Settings.themeWhat.value ? Colors.black : Colors.white)),
+            useMaterial3: false,
+            iconTheme: IconThemeData(
+              color: !Settings.themeWhat.value ? Colors.black : Colors.white,
+            ),
+          ),
           child: const Icon(MdiIcons.finance),
         ),
         itemBuilder: (ctx) => [
@@ -257,7 +253,10 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
   }
 
   PopupMenuItem _buildPopupMenuItem(
-      String title, int index, IconData iconData) {
+    String title,
+    int index,
+    IconData iconData,
+  ) {
     return PopupMenuItem(
       value: index,
       child: Row(
@@ -265,14 +264,12 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
         children: [
           Theme(
             data: ThemeData(
-                useMaterial3: false,
-                iconTheme: IconThemeData(
-                    color: !Settings.themeWhat.value
-                        ? Colors.black
-                        : Colors.white)),
-            child: Icon(
-              iconData,
+              useMaterial3: false,
+              iconTheme: IconThemeData(
+                color: !Settings.themeWhat.value ? Colors.black : Colors.white,
+              ),
             ),
+            child: Icon(iconData),
           ),
           const SizedBox(width: 8),
           Text(Translations.instance!.trans(title)),
@@ -286,10 +283,7 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
       padding: const EdgeInsets.only(top: 24, left: 12),
       child: Text(
         '${Translations.instance!.trans(i2tr())} ${Translations.instance!.trans('hot')}',
-        style: const TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
+        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
     );
   }

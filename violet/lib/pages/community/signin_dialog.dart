@@ -28,8 +28,10 @@ class _SignInDialogState extends State<SignInDialog> {
 
         if (await VioletCommunitySession.signIn(id, pw) == null) {
           if (!context.mounted) return;
-          await showOkDialog(context,
-              'User is not registered, or password is different. If you continue to get this, please contact the developer.');
+          await showOkDialog(
+            context,
+            'User is not registered, or password is different. If you continue to get this, please contact the developer.',
+          );
           return;
         }
 
@@ -48,21 +50,16 @@ class _SignInDialogState extends State<SignInDialog> {
     return AlertDialog(
       title: const Text('Log In'),
       contentPadding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-      actions: [
-        yesButton,
-        noButton,
-      ],
+      actions: [yesButton, noButton],
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Row(children: [
-            const Text('Id: '),
-            Expanded(
-              child: TextField(
-                controller: _nameController,
-              ),
-            ),
-          ]),
+          Row(
+            children: [
+              const Text('Id: '),
+              Expanded(child: TextField(controller: _nameController)),
+            ],
+          ),
           Row(
             children: [
               const Text('Pw: '),

@@ -31,9 +31,7 @@ class PageLabel extends StatelessWidget {
             ),
             Text(
               '${c.page.value + 1}/${c.maxPage}',
-              style: TextStyle(
-                color: Colors.grey.shade300,
-              ),
+              style: TextStyle(color: Colors.grey.shade300),
             ),
           ],
         ),

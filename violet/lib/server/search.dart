@@ -120,11 +120,7 @@ class LLMSearchService {
       // 검색 쿼리 템플릿 생성
       String formattedQuery = _createJsonQueryTemplate(query, strictRelevance);
 
-      final payload = {
-        'query': formattedQuery,
-        'search_query': query,
-        'k': k,
-      };
+      final payload = {'query': formattedQuery, 'search_query': query, 'k': k};
 
       final decodedBody = await _searchRequest(
         payload: payload,
@@ -234,9 +230,11 @@ JSON 형식의 무결성을 최우선으로 유지하며, 오류(예: " 사용, 
     required Function(String) onResult,
     required Function(String) onError,
   }) {
-    search(query: query, searchQuery: searchQuery, k: k)
-        .then(onResult)
-        .catchError((e) => onError(e.toString()));
+    search(
+      query: query,
+      searchQuery: searchQuery,
+      k: k,
+    ).then(onResult).catchError((e) => onError(e.toString()));
   }
 
   /// 비동기 JSON 검색 API 호출 (백그라운드에서 실행)
@@ -252,9 +250,10 @@ JSON 형식의 무결성을 최우선으로 유지하며, 오류(예: " 사용, 
     required Function(Map<String, dynamic>) onResult,
     required Function(Map<String, dynamic>) onError,
   }) {
-    searchJson(query: query, k: k)
-        .then(onResult)
-        .catchError((e) => onError({'error': e.toString()}));
+    searchJson(
+      query: query,
+      k: k,
+    ).then(onResult).catchError((e) => onError({'error': e.toString()}));
   }
 }
 

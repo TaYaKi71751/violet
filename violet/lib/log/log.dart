@@ -28,13 +28,13 @@ class LogEvent {
   }
 
   LogEvent copy() => LogEvent(
-        dateTime: dateTime,
-        isError: isError,
-        isWarning: isWarning,
-        title: title,
-        message: message,
-        detail: detail,
-      );
+    dateTime: dateTime,
+    isError: isError,
+    isWarning: isWarning,
+    title: title,
+    message: message,
+    detail: detail,
+  );
 
   bool isHttpRequest() =>
       message.startsWith('GET:') || message.startsWith('GETS:');
@@ -65,8 +65,10 @@ class Logger {
 
     if (!Platform.environment.containsKey('FLUTTER_TEST')) {
       await lock.synchronized(() async {
-        await logFile.writeAsString('[${DateTime.now().toUtc()}] $msg\n',
-            mode: FileMode.append);
+        await logFile.writeAsString(
+          '[${DateTime.now().toUtc()}] $msg\n',
+          mode: FileMode.append,
+        );
       });
     }
   }
@@ -80,16 +82,19 @@ class Logger {
     var message =
         (msg.startsWith('[') ? msg.substring(msg.indexOf(']') + 1) : msg)
             .trim();
-    events.add(LogEvent(
-      dateTime: DateTime.now().toUtc(),
-      isError: isError,
-      isWarning: isWarning,
-      message:
-          message.length > 500 ? '${message.substring(0, 500)}...' : message,
-      detail: message.length > 500 ? message : null,
-      title:
-          '[$prefix] (${DateFormat('kk:mm').format(DateTime.now())}) ${msg.startsWith('[') ? msg.split('[')[1].split(']')[0] : ''}',
-    ));
+    events.add(
+      LogEvent(
+        dateTime: DateTime.now().toUtc(),
+        isError: isError,
+        isWarning: isWarning,
+        message: message.length > 500
+            ? '${message.substring(0, 500)}...'
+            : message,
+        detail: message.length > 500 ? message : null,
+        title:
+            '[$prefix] (${DateFormat('kk:mm').format(DateTime.now())}) ${msg.startsWith('[') ? msg.split('[')[1].split(']')[0] : ''}',
+      ),
+    );
     await log('[$prefix] $msg');
   }
 

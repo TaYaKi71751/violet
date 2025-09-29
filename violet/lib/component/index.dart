@@ -77,13 +77,19 @@ class HentaiIndex {
       final path11 = File('${directory.path}$subdir/series-series.json');
       seriesSeries = jsonDecode(await path11.readAsString());
     } catch (e, st) {
-      Logger.error('[Hitomi-Indexes] E: $e\n'
-          '$st');
+      Logger.error(
+        '[Hitomi-Indexes] E: $e\n'
+        '$st',
+      );
     }
 
-    var relatedData = json.decode(await rootBundle.loadString(
-            'assets/locale/tag/related-tag-${TagTranslate.defaultLanguage}.json'))
-        as List<dynamic>;
+    var relatedData =
+        json.decode(
+              await rootBundle.loadString(
+                'assets/locale/tag/related-tag-${TagTranslate.defaultLanguage}.json',
+              ),
+            )
+            as List<dynamic>;
     relatedTag = <String, dynamic>{};
     for (var element in relatedData) {
       var kv = (element as Map<String, dynamic>).entries.first;
@@ -119,7 +125,8 @@ class HentaiIndex {
       tagCount!['male'] = Map.fromEntries(maleTags);
 
       tags.removeWhere(
-          (tag, _) => tag.startsWith('female:') || tag.startsWith('male:'));
+        (tag, _) => tag.startsWith('female:') || tag.startsWith('male:'),
+      );
     }
   }
 
@@ -132,8 +139,9 @@ class HentaiIndex {
   static int? getArticleCount(String classification, String name) {
     if (tagCount == null) {
       final subdir = Platform.isAndroid ? '/data' : '';
-      final path =
-          File('${Variables.applicationDocumentsDirectory}$subdir/index.json');
+      final path = File(
+        '${Variables.applicationDocumentsDirectory}$subdir/index.json',
+      );
       final text = path.readAsStringSync();
       tagCount = jsonDecode(text);
     }
@@ -141,8 +149,10 @@ class HentaiIndex {
     return tagCount![classification][name];
   }
 
-  static Future<List<(DisplayedTag, int)>> queryAutoComplete(String prefix,
-      [bool useTranslated = false]) async {
+  static Future<List<(DisplayedTag, int)>> queryAutoComplete(
+    String prefix, [
+    bool useTranslated = false,
+  ]) async {
     await loadCountMapIfRequired();
 
     prefix = prefix.toLowerCase().replaceAll('_', ' ');
@@ -155,7 +165,9 @@ class HentaiIndex {
   }
 
   static List<(DisplayedTag, int)> _queryAutoCompleteWithTagmap(
-      String prefix, bool useTranslated) {
+    String prefix,
+    bool useTranslated,
+  ) {
     final groupOrig = prefix.split(':')[0];
     final group = _normalizeTagPrefix(groupOrig);
     final name = prefix.split(':').last;
@@ -165,20 +177,28 @@ class HentaiIndex {
 
     final nameCountsMap = tagCount![group] as Map<dynamic, dynamic>;
     if (!useTranslated) {
-      results.addAll(nameCountsMap.entries
-          .where((e) => e.key.toString().toLowerCase().contains(name))
-          .map((e) => (DisplayedTag(group: group, name: e.key), e.value)));
+      results.addAll(
+        nameCountsMap.entries
+            .where((e) => e.key.toString().toLowerCase().contains(name))
+            .map((e) => (DisplayedTag(group: group, name: e.key), e.value)),
+      );
     } else {
-      results.addAll(TagTranslate.containsTotal(name)
-          .where((e) => e.group! == group && nameCountsMap.containsKey(e.name))
-          .map((e) => (e, nameCountsMap[e.name])));
+      results.addAll(
+        TagTranslate.containsTotal(name)
+            .where(
+              (e) => e.group! == group && nameCountsMap.containsKey(e.name),
+            )
+            .map((e) => (e, nameCountsMap[e.name])),
+      );
     }
     results.sort((a, b) => b.$2.compareTo(a.$2));
     return results;
   }
 
   static List<(DisplayedTag, int)> _queryAutoCompleteFullSearch(
-      String prefix, bool useTranslated) {
+    String prefix,
+    bool useTranslated,
+  ) {
     if (useTranslated) {
       final results = TagTranslate.containsTotal(prefix)
           .where((e) => tagCount![e.group].containsKey(e.name))
@@ -215,8 +235,10 @@ class HentaiIndex {
     return results;
   }
 
-  static Future<List<(DisplayedTag, int)>> queryAutoCompleteFuzzy(String prefix,
-      [bool useTranslated = false]) async {
+  static Future<List<(DisplayedTag, int)>> queryAutoCompleteFuzzy(
+    String prefix, [
+    bool useTranslated = false,
+  ]) async {
     await loadCountMapIfRequired();
 
     prefix = prefix.toLowerCase().replaceAll('_', ' ');
@@ -238,15 +260,22 @@ class HentaiIndex {
           results.add((
             DisplayedTag(group: group, name: key),
             Distance.levenshteinDistance(
-                name.runes.toList(), key.runes.toList()),
-            value
+              name.runes.toList(),
+              key.runes.toList(),
+            ),
+            value,
           ));
         });
       } else {
-        results.addAll(TagTranslate.containsFuzzingTotal(name)
-            .where((e) =>
-                e.$1.group! == group && nameCountsMap.containsKey(e.$1.name))
-            .map((e) => (e.$1, e.$2, nameCountsMap[e.$1.name])));
+        results.addAll(
+          TagTranslate.containsFuzzingTotal(name)
+              .where(
+                (e) =>
+                    e.$1.group! == group &&
+                    nameCountsMap.containsKey(e.$1.name),
+              )
+              .map((e) => (e.$1, e.$2, nameCountsMap[e.$1.name])),
+        );
       }
       results.sort((a, b) => a.$2.compareTo(b.$2));
       return results.map((e) => (e.$1, e.$3)).toList();
@@ -258,8 +287,10 @@ class HentaiIndex {
             results.add((
               DisplayedTag(group: group, name: name),
               Distance.levenshteinDistance(
-                  prefix.runes.toList(), name.runes.toList()),
-              count
+                prefix.runes.toList(),
+                name.runes.toList(),
+              ),
+              count,
             ));
           });
         });
@@ -277,7 +308,9 @@ class HentaiIndex {
   }
 
   static List<(String, double)> _calculateSimilars(
-      Map<String, dynamic> map, String artist) {
+    Map<String, dynamic> map,
+    String artist,
+  ) {
     var rr = map[artist];
     var result = <(String, double)>[];
 
@@ -295,7 +328,9 @@ class HentaiIndex {
   }
 
   static List<(String, double)> caclulateSimilarsManual(
-      Map<String, dynamic> map, Map<String, dynamic> target) {
+    Map<String, dynamic> map,
+    Map<String, dynamic> target,
+  ) {
     final result = <(String, double)>[];
 
     map.forEach((key, value) {
@@ -332,12 +367,12 @@ class HentaiIndex {
 
   static List<(String, double)> calculateRelatedCharacterSeries(String series) {
     if (seriesSeries == null) {
-      return _calculateSimilars(characterSeries!, series)
-          .where((element) => element.$2 >= 0.000001)
-          .toList();
+      return _calculateSimilars(
+        characterSeries!,
+        series,
+      ).where((element) => element.$2 >= 0.000001).toList();
     } else {
-      var ll = (seriesSeries![series] as Map<String, dynamic>)
-          .entries
+      var ll = (seriesSeries![series] as Map<String, dynamic>).entries
           .map((e) => (e.key, (e.value as int).toDouble()))
           .toList();
       ll.sort((x, y) => y.$2.compareTo(x.$2));
@@ -346,14 +381,15 @@ class HentaiIndex {
   }
 
   static List<(String, double)> calculateRelatedSeriesCharacter(
-      String character) {
+    String character,
+  ) {
     if (characterCharacter == null) {
-      return _calculateSimilars(seriesCharacter!, character)
-          .where((element) => element.$2 >= 0.000001)
-          .toList();
+      return _calculateSimilars(
+        seriesCharacter!,
+        character,
+      ).where((element) => element.$2 >= 0.000001).toList();
     } else {
-      var ll = (characterCharacter![character] as Map<String, dynamic>)
-          .entries
+      var ll = (characterCharacter![character] as Map<String, dynamic>).entries
           .map((e) => (e.key, (e.value as num).toDouble()))
           .toList();
       ll.sort((x, y) => y.$2.compareTo(x.$2));
@@ -365,8 +401,7 @@ class HentaiIndex {
     if (!characterSeries!.containsKey(series)) {
       return <(String, double)>[];
     }
-    var ll = (characterSeries![series] as Map<String, dynamic>)
-        .entries
+    var ll = (characterSeries![series] as Map<String, dynamic>).entries
         .map((e) => (e.key, (e.value as num).toDouble()))
         .toList();
     ll.sort((x, y) => y.$2.compareTo(x.$2));
@@ -377,8 +412,7 @@ class HentaiIndex {
     if (!seriesCharacter!.containsKey(character)) {
       return <(String, double)>[];
     }
-    var ll = (seriesCharacter![character] as Map<String, dynamic>)
-        .entries
+    var ll = (seriesCharacter![character] as Map<String, dynamic>).entries
         .map((e) => (e.key, (e.value as num).toDouble()))
         .toList();
     ll.sort((x, y) => y.$2.compareTo(x.$2));
@@ -388,10 +422,12 @@ class HentaiIndex {
   static List<(String, double)> getRelatedTag(String tag) {
     if (!relatedTag.containsKey(tag)) return <(String, double)>[];
     var ll = (relatedTag[tag] as List<dynamic>)
-        .map((e) => (
-              (e as Map<String, dynamic>).entries.first.key,
-              (e.entries.first.value as num).toDouble()
-            ))
+        .map(
+          (e) => (
+            (e as Map<String, dynamic>).entries.first.key,
+            (e.entries.first.value as num).toDouble(),
+          ),
+        )
         .toList();
     ll.sort((x, y) => y.$2.compareTo(x.$2));
     return ll;

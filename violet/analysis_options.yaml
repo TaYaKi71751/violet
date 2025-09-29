@@ -37,6 +37,7 @@ analyzer:
     always_use_package_imports: error
     unrelated_type_equality_checks: error
   exclude:
+    - "build/**"
     - "rust_builder/**"
     - "lib/api/**"
     - "lib/src/rust/**"

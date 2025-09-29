@@ -27,8 +27,11 @@ class CertData {
     var rawData = getRawData();
     var rsaPub = rootCA.rsaPublic();
 
-    return CertUtil.verify(rsaPub, Uint8List.fromList(rawData.codeUnits),
-        base64.decode(signedData()));
+    return CertUtil.verify(
+      rsaPub,
+      Uint8List.fromList(rawData.codeUnits),
+      base64.decode(signedData()),
+    );
   }
 
   String toBase64() {
@@ -39,7 +42,8 @@ class CertData {
     return CertData(data: jsonDecode(utf8.fuse(base64).decode(str)));
   }
 
-  static CertData testCert() => fromBase64('''
+  static CertData testCert() => fromBase64(
+    '''
   eyJBdXRoU3RhcnRzIjoiMjAyMS0wOC0wNSAyMzowNjowNi42NjczMDVaIiwiQXV0aEVuZHMiOiIy
   MDMxLTA4LTA3IDIzOjA2OjA2LjY2ODgxM1oiLCJBdXRoVmVyc2lvbiI6IjEuMCIsIk93bmVyIjoi
   dGVzdCB1c2VyIiwiU2lnbmVkRGF0YSI6IkwweHpHbjYxMitZWW0vTldBQmk5bUwvazhrTEtVWlB3
@@ -49,7 +53,8 @@ class CertData {
   dE9zQmlIK3VHS2NTaWVveEZtcUNES1FIR1Z0VGFIdTVrMHNqcC9IZ2RmZi9aTnliVWpOQUIyOVd0
   MExaTXp3Wi9OcmFXcE9VNW51U2toNitmcFV5a3o3bG14Y0NFNjRRdmdNTFBiODREMWNIUHJNMGpl
   SGc2TC9aeElNMEp0a3MrNWduUmYzQXlHdz09In0='''
-      .replaceAll(' ', '')
-      .replaceAll('\n', '')
-      .replaceAll('\r', ''));
+        .replaceAll(' ', '')
+        .replaceAll('\n', '')
+        .replaceAll('\r', ''),
+  );
 }

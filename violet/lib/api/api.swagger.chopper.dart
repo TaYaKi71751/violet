@@ -21,28 +21,21 @@ final class _$Api extends Api {
   @override
   Future<Response<dynamic>> _apiV2Get() {
     final Uri $url = Uri.parse('/api/v2');
-    final Request $request = Request(
-      'GET',
-      $url,
-      client.baseUrl,
-    );
+    final Request $request = Request('GET', $url, client.baseUrl);
     return client.send<dynamic, dynamic>($request);
   }
 
   @override
   Future<Response<dynamic>> _apiV2HmacGet() {
     final Uri $url = Uri.parse('/api/v2/hmac');
-    final Request $request = Request(
-      'GET',
-      $url,
-      client.baseUrl,
-    );
+    final Request $request = Request('GET', $url, client.baseUrl);
     return client.send<dynamic, dynamic>($request);
   }
 
   @override
-  Future<Response<CommentGetResponseDto>> _apiV2CommentGet(
-      {required String? where}) {
+  Future<Response<CommentGetResponseDto>> _apiV2CommentGet({
+    required String? where,
+  }) {
     final Uri $url = Uri.parse('/api/v2/comment');
     final Map<String, dynamic> $params = <String, dynamic>{'where': where};
     final Request $request = Request(
@@ -58,34 +51,21 @@ final class _$Api extends Api {
   Future<Response<dynamic>> _apiV2CommentPost({required CommentPostDto? body}) {
     final Uri $url = Uri.parse('/api/v2/comment');
     final $body = body;
-    final Request $request = Request(
-      'POST',
-      $url,
-      client.baseUrl,
-      body: $body,
-    );
+    final Request $request = Request('POST', $url, client.baseUrl, body: $body);
     return client.send<dynamic, dynamic>($request);
   }
 
   @override
   Future<Response<dynamic>> _apiV2CommentIdHiddenPatch({required num? id}) {
     final Uri $url = Uri.parse('/api/v2/comment/${id}/hidden');
-    final Request $request = Request(
-      'PATCH',
-      $url,
-      client.baseUrl,
-    );
+    final Request $request = Request('PATCH', $url, client.baseUrl);
     return client.send<dynamic, dynamic>($request);
   }
 
   @override
   Future<Response<User>> _apiV2UserGet() {
     final Uri $url = Uri.parse('/api/v2/user');
-    final Request $request = Request(
-      'GET',
-      $url,
-      client.baseUrl,
-    );
+    final Request $request = Request('GET', $url, client.baseUrl);
     return client.send<User, User>($request);
   }
 
@@ -93,92 +73,60 @@ final class _$Api extends Api {
   Future<Response<dynamic>> _apiV2UserPost({required UserRegisterDTO? body}) {
     final Uri $url = Uri.parse('/api/v2/user');
     final $body = body;
-    final Request $request = Request(
-      'POST',
-      $url,
-      client.baseUrl,
-      body: $body,
-    );
+    final Request $request = Request('POST', $url, client.baseUrl, body: $body);
     return client.send<dynamic, dynamic>($request);
   }
 
   @override
   Future<Response<List<User>>> _apiV2UserListGet() {
     final Uri $url = Uri.parse('/api/v2/user/list');
-    final Request $request = Request(
-      'GET',
-      $url,
-      client.baseUrl,
-    );
+    final Request $request = Request('GET', $url, client.baseUrl);
     return client.send<List<User>, User>($request);
   }
 
   @override
   Future<Response<ListDiscordUserAppIdsResponseDto>> _apiV2UserDiscordGet() {
     final Uri $url = Uri.parse('/api/v2/user/discord');
-    final Request $request = Request(
-      'GET',
-      $url,
-      client.baseUrl,
-    );
-    return client.send<ListDiscordUserAppIdsResponseDto,
-        ListDiscordUserAppIdsResponseDto>($request);
+    final Request $request = Request('GET', $url, client.baseUrl);
+    return client.send<
+      ListDiscordUserAppIdsResponseDto,
+      ListDiscordUserAppIdsResponseDto
+    >($request);
   }
 
   @override
   Future<Response<Tokens>> _apiV2AuthPost({required UserRegisterDTO? body}) {
     final Uri $url = Uri.parse('/api/v2/auth');
     final $body = body;
-    final Request $request = Request(
-      'POST',
-      $url,
-      client.baseUrl,
-      body: $body,
-    );
+    final Request $request = Request('POST', $url, client.baseUrl, body: $body);
     return client.send<Tokens, Tokens>($request);
   }
 
   @override
   Future<Response<dynamic>> _apiV2AuthDelete() {
     final Uri $url = Uri.parse('/api/v2/auth');
-    final Request $request = Request(
-      'DELETE',
-      $url,
-      client.baseUrl,
-    );
+    final Request $request = Request('DELETE', $url, client.baseUrl);
     return client.send<dynamic, dynamic>($request);
   }
 
   @override
   Future<Response<ResLoginUser>> _apiV2AuthRefreshGet() {
     final Uri $url = Uri.parse('/api/v2/auth/refresh');
-    final Request $request = Request(
-      'GET',
-      $url,
-      client.baseUrl,
-    );
+    final Request $request = Request('GET', $url, client.baseUrl);
     return client.send<ResLoginUser, ResLoginUser>($request);
   }
 
   @override
   Future<Response<dynamic>> _apiV2AuthDiscordGet() {
     final Uri $url = Uri.parse('/api/v2/auth/discord');
-    final Request $request = Request(
-      'GET',
-      $url,
-      client.baseUrl,
-    );
+    final Request $request = Request('GET', $url, client.baseUrl);
     return client.send<dynamic, dynamic>($request);
   }
 
   @override
   Future<Response<dynamic>> _apiV2AuthDiscordRedirectGet() {
     final Uri $url = Uri.parse('/api/v2/auth/discord/redirect');
-    final Request $request = Request(
-      'GET',
-      $url,
-      client.baseUrl,
-    );
+    final Request $request = Request('GET', $url, client.baseUrl);
     return client.send<dynamic, dynamic>($request);
   }
 
@@ -248,33 +196,21 @@ final class _$Api extends Api {
   @override
   Future<Response<StatsResponseDto>> _apiV2StatsGet() {
     final Uri $url = Uri.parse('/api/v2/stats');
-    final Request $request = Request(
-      'GET',
-      $url,
-      client.baseUrl,
-    );
+    final Request $request = Request('GET', $url, client.baseUrl);
     return client.send<StatsResponseDto, StatsResponseDto>($request);
   }
 
   @override
   Future<Response<dynamic>> _apiV2BookmarkBackupPost() {
     final Uri $url = Uri.parse('/api/v2/bookmark/backup');
-    final Request $request = Request(
-      'POST',
-      $url,
-      client.baseUrl,
-    );
+    final Request $request = Request('POST', $url, client.baseUrl);
     return client.send<dynamic, dynamic>($request);
   }
 
   @override
   Future<Response<dynamic>> _apiV2BookmarkGet() {
     final Uri $url = Uri.parse('/api/v2/bookmark');
-    final Request $request = Request(
-      'GET',
-      $url,
-      client.baseUrl,
-    );
+    final Request $request = Request('GET', $url, client.baseUrl);
     return client.send<dynamic, dynamic>($request);
   }
 }

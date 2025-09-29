@@ -52,7 +52,8 @@ class LLMSearchLogDatabase {
       if (_instance == null) {
         final db = await CommonUserDatabase.getInstance();
         final rows = await db.query(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='LLMSearchLog';");
+          "SELECT name FROM sqlite_master WHERE type='table' AND name='LLMSearchLog';",
+        );
         if (rows.isEmpty || rows[0].isEmpty) {
           try {
             await db.execute('''
@@ -81,15 +82,17 @@ class LLMSearchLogDatabase {
 
   Future<List<LLMSearchLog>> getLogs() async {
     final db = await CommonUserDatabase.getInstance();
-    final List<Map<String, dynamic>> maps =
-        await db.query('SELECT * FROM LLMSearchLog');
+    final List<Map<String, dynamic>> maps = await db.query(
+      'SELECT * FROM LLMSearchLog',
+    );
     return maps.map((x) => LLMSearchLog.fromMap(x)).toList().reversed.toList();
   }
 
   Future<List<String>> getQueries() async {
     final db = await CommonUserDatabase.getInstance();
-    final List<Map<String, dynamic>> maps =
-        await db.query('SELECT query FROM LLMSearchLog');
+    final List<Map<String, dynamic>> maps = await db.query(
+      'SELECT query FROM LLMSearchLog',
+    );
     return maps.map((x) => x['query'] as String).toList().reversed.toList();
   }
 }

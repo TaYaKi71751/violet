@@ -34,24 +34,22 @@ class _LockSettingPageState extends State<LockSettingPage> {
               Navigator.push(
                 context,
                 CupertinoPageRoute(
-                  builder: (context) => const LockScreen(
-                    isRegisterMode: true,
-                  ),
+                  builder: (context) => const LockScreen(isRegisterMode: true),
                 ),
               );
             },
             trailing: FutureBuilder(
-                future: SharedPreferences.getInstance(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) return const Text('');
+              future: SharedPreferences.getInstance(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) return const Text('');
 
-                  if ((snapshot.data as SharedPreferences)
-                          .getString('pinPass') !=
-                      null) {
-                    return Text(Translations.instance!.trans('setted'));
-                  }
-                  return Text(Translations.instance!.trans('notsetted'));
-                }),
+                if ((snapshot.data as SharedPreferences).getString('pinPass') !=
+                    null) {
+                  return Text(Translations.instance!.trans('setted'));
+                }
+                return Text(Translations.instance!.trans('notsetted'));
+              },
+            ),
           ),
           Container(
             width: double.infinity,
@@ -113,7 +111,9 @@ class _LockSettingPageState extends State<LockSettingPage> {
     if (prefs.getString('pinPass') == null) {
       if (!mounted) return;
       showOkDialog(
-          context, Translations.instance!.trans('registerfinbeforeuseapplock'));
+        context,
+        Translations.instance!.trans('registerfinbeforeuseapplock'),
+      );
       return;
     }
 

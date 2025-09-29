@@ -14,11 +14,7 @@ class SeriesListPage extends StatelessWidget {
   final List<List<int>> series;
   final List<QueryResult> cc;
 
-  const SeriesListPage({
-    super.key,
-    required this.series,
-    required this.cc,
-  });
+  const SeriesListPage({super.key, required this.series, required this.cc});
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +33,9 @@ class SeriesListPage extends StatelessWidget {
 
           return ThreeArticlePanel(
             tappedRoute: () => ArticleListPage(
-                cc: e.map((e) => cc[e]).toList(), name: 'Series'),
+              cc: e.map((e) => cc[e]).toList(),
+              name: 'Series',
+            ),
             title: ' ${unescape.convert(cc[e[0]].title())}',
             count: '${e.length} ',
             articles: e.map((e) => cc[e]).toList(),

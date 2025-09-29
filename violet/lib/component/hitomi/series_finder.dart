@@ -36,11 +36,10 @@ class SeriesFinder {
       if (qr.length == 1) continue;
 
       HitomiTitleCluster.doClustering(
-              qr.map((e) => e.title() as String).toList())
-          .toList()
-          .where((element) => element.length > 1)
-          .toList()
-          .forEach((element) {
+        qr.map((e) => e.title() as String).toList(),
+      ).toList().where((element) => element.length > 1).toList().forEach((
+        element,
+      ) {
         seriesList.add(element.map((e) => qr[e]).toList());
       });
     }
@@ -58,11 +57,10 @@ class SeriesFinder {
       if (qr.length == 1) continue;
 
       HitomiTitleCluster.doClustering(
-              qr.map((e) => e.title() as String).toList())
-          .toList()
-          .where((element) => element.length > 1)
-          .toList()
-          .forEach((element) {
+        qr.map((e) => e.title() as String).toList(),
+      ).toList().where((element) => element.length > 1).toList().forEach((
+        element,
+      ) {
         seriesList.add(element.map((e) => qr[e]).toList());
       });
     }
@@ -75,7 +73,9 @@ class SeriesFinder {
 
   static Future<void> doFind2() async {
     final qm = QueryManager.queryPagination(
-        'SELECT Title, Artists, Groups FROM HitomiColumnModel', 999999);
+      'SELECT Title, Artists, Groups FROM HitomiColumnModel',
+      999999,
+    );
     final qr = await qm.next();
 
     final artists = <String, List<int>>{};
@@ -88,18 +88,18 @@ class SeriesFinder {
             .split('|')
             .where((element) => element.isNotEmpty)
             .forEach((element) {
-          if (!artists.containsKey(element)) artists[element] = <int>[];
-          artists[element]!.add(i);
-        });
+              if (!artists.containsKey(element)) artists[element] = <int>[];
+              artists[element]!.add(i);
+            });
       }
       if (element.groups() != null && element.groups() != '') {
         (element.groups() as String)
             .split('|')
             .where((element) => element.isNotEmpty)
             .forEach((element) {
-          if (!groups.containsKey(element)) groups[element] = <int>[];
-          groups[element]!.add(i);
-        });
+              if (!groups.containsKey(element)) groups[element] = <int>[];
+              groups[element]!.add(i);
+            });
       }
     }
 
@@ -112,16 +112,15 @@ class SeriesFinder {
 
       if (kv.value.length == 1) continue;
 
-      HitomiTitleCluster.doClustering(kv.value
-              .map((e) => qr[e])
-              .map((e) => e.title() as String)
-              .toList())
-          .toList()
-          .where((element) => element.length > 1)
-          .toList()
-          .forEach((element) {
-        seriesList.add(
-            ('artist:${kv.key}', element.map((e) => qr[kv.value[e]]).toList()));
+      HitomiTitleCluster.doClustering(
+        kv.value.map((e) => qr[e]).map((e) => e.title() as String).toList(),
+      ).toList().where((element) => element.length > 1).toList().forEach((
+        element,
+      ) {
+        seriesList.add((
+          'artist:${kv.key}',
+          element.map((e) => qr[kv.value[e]]).toList(),
+        ));
       });
     }
 
@@ -132,16 +131,15 @@ class SeriesFinder {
 
       if (kv.value.length == 1) continue;
 
-      HitomiTitleCluster.doClustering(kv.value
-              .map((e) => qr[e])
-              .map((e) => e.title() as String)
-              .toList())
-          .toList()
-          .where((element) => element.length > 1)
-          .toList()
-          .forEach((element) {
-        seriesList.add(
-            ('group:${kv.key}', element.map((e) => qr[kv.value[e]]).toList()));
+      HitomiTitleCluster.doClustering(
+        kv.value.map((e) => qr[e]).map((e) => e.title() as String).toList(),
+      ).toList().where((element) => element.length > 1).toList().forEach((
+        element,
+      ) {
+        seriesList.add((
+          'group:${kv.key}',
+          element.map((e) => qr[kv.value[e]]).toList(),
+        ));
       });
     }
 

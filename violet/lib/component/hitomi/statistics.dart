@@ -9,7 +9,7 @@ class HitomiStatistics {
     5.0535353481094E-11,
     2.3551578350816E-05,
     9.0060003108906,
-    327640.93204985
+    327640.93204985,
   ];
 
   // Valid for 9 ~ 1669507 (max +100000)
@@ -34,7 +34,8 @@ class HitomiStatistics {
     //         id +
     //     327640.93204985;
 
-    var min = coff[0] * id * id * id * id * id * id +
+    var min =
+        coff[0] * id * id * id * id * id * id +
         coff[1] * id * id * id * id * id -
         coff[2] * id * id * id * id +
         coff[3] * id * id * id -
@@ -42,7 +43,8 @@ class HitomiStatistics {
         coff[5] * id +
         coff[6];
 
-    return DateTime.fromMillisecondsSinceEpoch(1174358460000)
-        .add(Duration(minutes: min.toInt()));
+    return DateTime.fromMillisecondsSinceEpoch(
+      1174358460000,
+    ).add(Duration(minutes: min.toInt()));
   }
 }

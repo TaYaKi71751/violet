@@ -43,14 +43,13 @@ class _ToastWrapperState extends State<ToastWrapper>
   void initState() {
     super.initState();
     controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 700));
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
     offset = Tween<Offset>(
-            begin: widget.reverse ? const Offset(0.0, 1.0) : Offset.zero,
-            end: widget.reverse ? Offset.zero : const Offset(0.0, 1.0))
-        .animate(CurvedAnimation(
-      parent: controller,
-      curve: Curves.easeInOut,
-    ));
+      begin: widget.reverse ? const Offset(0.0, 1.0) : Offset.zero,
+      end: widget.reverse ? Offset.zero : const Offset(0.0, 1.0),
+    ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOut));
     Future.delayed(const Duration(milliseconds: 100)).then((value) {
       controller.reverse(from: 0.8);
       setState(() {
@@ -67,7 +66,7 @@ class _ToastWrapperState extends State<ToastWrapper>
     });
   }
 
-// https://dash-overflow.net/articles/why_vsync/
+  // https://dash-overflow.net/articles/why_vsync/
   @override
   void dispose() {
     controller.dispose();
@@ -76,12 +75,13 @@ class _ToastWrapperState extends State<ToastWrapper>
 
   @override
   Widget build(BuildContext context) {
-    var color = widget.color ??
+    var color =
+        widget.color ??
         (widget.isCheck
             ? Colors.greenAccent.withOpacity(0.8)
             : widget.isWarning
-                ? Colors.orangeAccent.withOpacity(0.8)
-                : Colors.redAccent.withOpacity(0.8));
+            ? Colors.orangeAccent.withOpacity(0.8)
+            : Colors.redAccent.withOpacity(0.8));
 
     return IgnorePointer(
       child: Visibility(
@@ -91,10 +91,10 @@ class _ToastWrapperState extends State<ToastWrapper>
             bottom: widget.reverse
                 ? 0.0
                 : (Variables.bottomBarHeight.toDouble() +
-                    6 +
-                    (Settings.useDrawer.value && !widget.ignoreDrawer
-                        ? 0.0
-                        : 16.0)),
+                      6 +
+                      (Settings.useDrawer.value && !widget.ignoreDrawer
+                          ? 0.0
+                          : 16.0)),
           ),
           child: SlideTransition(
             position: offset,
@@ -102,7 +102,9 @@ class _ToastWrapperState extends State<ToastWrapper>
               borderRadius: BorderRadius.circular(25.0),
               child: TweenAnimationBuilder<double>(
                 tween: Tween<double>(
-                    begin: reverse ? 10.0 : 0.1, end: reverse ? 0.001 : 10.0),
+                  begin: reverse ? 10.0 : 0.1,
+                  end: reverse ? 0.001 : 10.0,
+                ),
                 duration: Duration(milliseconds: (reverse ? 500 : 700)),
                 builder: (_, value, child) {
                   if (reverse && value < 0.1) return child!;
@@ -117,11 +119,14 @@ class _ToastWrapperState extends State<ToastWrapper>
                   curve: Curves.easeInOut,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 24.0, vertical: 12.0),
+                      horizontal: 24.0,
+                      vertical: 12.0,
+                    ),
                     decoration: BoxDecoration(
-                        color: Settings.themeWhat.value
-                            ? Colors.black.withOpacity(0.6)
-                            : Colors.grey.withOpacity(0.1)),
+                      color: Settings.themeWhat.value
+                          ? Colors.black.withOpacity(0.6)
+                          : Colors.grey.withOpacity(0.1),
+                    ),
                     // decoration: BoxDecoration(
                     //   borderRadius: BorderRadius.circular(25.0),
                     //   color: widget.isCheck
@@ -138,13 +143,11 @@ class _ToastWrapperState extends State<ToastWrapper>
                               (widget.isCheck
                                   ? Icons.check
                                   : widget.isWarning
-                                      ? Icons.warning
-                                      : Icons.cancel),
+                                  ? Icons.warning
+                                  : Icons.cancel),
                           color: color,
                         ),
-                        const SizedBox(
-                          width: 12.0,
-                        ),
+                        const SizedBox(width: 12.0),
                         Text(widget.msg, style: TextStyle(color: color)),
                       ],
                     ),

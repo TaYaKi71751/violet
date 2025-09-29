@@ -70,7 +70,8 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                   if (LDI.ldi == null) await LDI.init();
 
                   final rr = await QueryManager.queryIds(
-                      LDI.ldi!.map((e) => e.$1).take(1500).toList());
+                    LDI.ldi!.map((e) => e.$1).take(1500).toList(),
+                  );
 
                   _navigate(ArticleListPage(name: 'LDI DESC', cc: rr));
                 },
@@ -84,7 +85,8 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                   if (LDI.ldi == null) await LDI.init();
 
                   final rr = await QueryManager.queryIds(
-                      LDI.ldi!.reversed.map((e) => e.$1).take(1500).toList());
+                    LDI.ldi!.reversed.map((e) => e.$1).take(1500).toList(),
+                  );
 
                   _navigate(ArticleListPage(name: 'LDI ASC', cc: rr));
                 },
@@ -95,8 +97,9 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                 'User Read Count DESC',
                 null,
                 () async {
-                  final userLog = await User.getInstance()
-                      .then((value) => value.getUserLog());
+                  final userLog = await User.getInstance().then(
+                    (value) => value.getUserLog(),
+                  );
                   final articleCount = <String, int>{};
 
                   for (var element in userLog) {
@@ -111,10 +114,12 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                   ll.sort((x, y) => y.value.compareTo(x.value));
 
                   final rr = await QueryManager.queryIds(
-                      ll.map((e) => e.key).take(1500).toList());
+                    ll.map((e) => e.key).take(1500).toList(),
+                  );
 
                   _navigate(
-                      ArticleListPage(name: 'User Read Count DESC', cc: rr));
+                    ArticleListPage(name: 'User Read Count DESC', cc: rr),
+                  );
                 },
               ),
               _buildItem(
@@ -123,8 +128,9 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                 'User Reverse Read Record',
                 null,
                 () async {
-                  final userLog = await User.getInstance()
-                      .then((value) => value.getUserLog());
+                  final userLog = await User.getInstance().then(
+                    (value) => value.getUserLog(),
+                  );
                   final articleCount = <String, int>{};
 
                   for (var element in userLog) {
@@ -137,15 +143,20 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                   ll.sort((x, y) => y.value.compareTo(x.value));
 
                   final qm = await QueryManager.queryIds(
-                      ll.map((e) => e.key).take(1500).toList());
+                    ll.map((e) => e.key).take(1500).toList(),
+                  );
 
                   _navigate(
-                      ArticleListPage(name: 'User Read Count DESC', cc: qm));
+                    ArticleListPage(name: 'User Read Count DESC', cc: qm),
+                  );
                 },
               ),
               _buildItem(
-                const Icon(MdiIcons.commentTextMultiple,
-                    size: 40, color: Colors.red),
+                const Icon(
+                  MdiIcons.commentTextMultiple,
+                  size: 40,
+                  color: Colors.red,
+                ),
                 '#005 Comments',
                 'Recent Artist Comments',
                 null,
@@ -154,8 +165,11 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                 },
               ),
               _buildItem(
-                const Icon(MdiIcons.accessPointNetwork,
-                    size: 40, color: Colors.orange),
+                const Icon(
+                  MdiIcons.accessPointNetwork,
+                  size: 40,
+                  color: Colors.orange,
+                ),
                 '#006 Articles',
                 'Real-Time User Article Record',
                 null,
@@ -164,8 +178,11 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                 },
               ),
               _buildItem(
-                const Icon(MdiIcons.accessPointNetwork,
-                    size: 40, color: Colors.red),
+                const Icon(
+                  MdiIcons.accessPointNetwork,
+                  size: 40,
+                  color: Colors.red,
+                ),
                 '#007 Articles',
                 'Real-Time User Article Record Picking User',
                 null,
@@ -174,8 +191,11 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                 },
               ),
               _buildItem(
-                Icon(MdiIcons.incognito,
-                    size: 40, color: Colors.brown.shade700),
+                Icon(
+                  MdiIcons.incognito,
+                  size: 40,
+                  color: Colors.brown.shade700,
+                ),
                 '#008 Bookmarks',
                 'User Bookmark List',
                 null,
@@ -184,15 +204,19 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                 },
               ),
               _buildItem(
-                Icon(MdiIcons.keyChainVariant,
-                    size: 40, color: Colors.yellow.shade700),
+                Icon(
+                  MdiIcons.keyChainVariant,
+                  size: 40,
+                  color: Colors.yellow.shade700,
+                ),
                 '#009 Unlock',
                 'Unlock Master Mode',
                 null,
                 () async {
                   Widget yesButton = TextButton(
                     style: TextButton.styleFrom(
-                        foregroundColor: Settings.majorColor.value),
+                      foregroundColor: Settings.majorColor.value,
+                    ),
                     child: Text(Translations.instance!.trans('ok')),
                     onPressed: () {
                       Navigator.pop(context, true);
@@ -200,7 +224,8 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                   );
                   Widget noButton = TextButton(
                     style: TextButton.styleFrom(
-                        foregroundColor: Settings.majorColor.value),
+                      foregroundColor: Settings.majorColor.value,
+                    ),
                     child: Text(Translations.instance!.trans('cancel')),
                     onPressed: () {
                       Navigator.pop(context, false);
@@ -213,10 +238,7 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                     builder: (BuildContext context) => AlertDialog(
                       contentPadding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
                       title: const Text('Input Unlock Key'),
-                      content: TextField(
-                        controller: text,
-                        autofocus: true,
-                      ),
+                      content: TextField(controller: text, autofocus: true),
                       actions: [yesButton, noButton],
                     ),
                   );
@@ -249,8 +271,11 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                 },
               ),
               _buildItem(
-                const Icon(MdiIcons.commentSearch,
-                    size: 40, color: Colors.grey),
+                const Icon(
+                  MdiIcons.commentSearch,
+                  size: 40,
+                  color: Colors.grey,
+                ),
                 '#011 Search Comment',
                 'Search ExHentai Comment',
                 null,
@@ -266,10 +291,9 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                 () async {
                   if (CommentsCount.counts == null) await CommentsCount.init();
 
-                  final rr = await QueryManager.queryIds(CommentsCount.counts!
-                      .map((e) => e.$1)
-                      .take(1500)
-                      .toList());
+                  final rr = await QueryManager.queryIds(
+                    CommentsCount.counts!.map((e) => e.$1).take(1500).toList(),
+                  );
 
                   _navigate(ArticleListPage(name: 'Comment Counts', cc: rr));
                 },
@@ -284,8 +308,11 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                 },
               ),
               _buildItem(
-                Icon(MdiIcons.incognito,
-                    size: 40, color: Colors.brown.shade700),
+                Icon(
+                  MdiIcons.incognito,
+                  size: 40,
+                  color: Colors.brown.shade700,
+                ),
                 '#014 Bookmark Spy',
                 'User\'s Bookmark List',
                 null,
@@ -341,15 +368,23 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                       await SharedPreferences.getInstance();
 
                   VioletServer.uploadString(
-                      'prefs.json',
-                      jsonEncode(Map.fromEntries(prefs
-                          .getKeys()
-                          .where((String key) =>
-                              key != 'lib_cached_image_data' &&
-                              key != 'lib_cached_image_data')
-                          .map((key) {
-                        return MapEntry(key, prefs.get(key).toString());
-                      }).toList(growable: false))));
+                    'prefs.json',
+                    jsonEncode(
+                      Map.fromEntries(
+                        prefs
+                            .getKeys()
+                            .where(
+                              (String key) =>
+                                  key != 'lib_cached_image_data' &&
+                                  key != 'lib_cached_image_data',
+                            )
+                            .map((key) {
+                              return MapEntry(key, prefs.get(key).toString());
+                            })
+                            .toList(growable: false),
+                      ),
+                    ),
+                  );
 
                   final dir = await getApplicationDocumentsDirectory();
                   await VioletServer.uploadFile('${dir.path}/user.db');
@@ -358,8 +393,11 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                 },
               ),
               _buildItem(
-                const Icon(MdiIcons.accountSearch,
-                    size: 40, color: Colors.amber),
+                const Icon(
+                  MdiIcons.accountSearch,
+                  size: 40,
+                  color: Colors.amber,
+                ),
                 '#019 Artist Search',
                 'Custom Tag Group Relation Search',
                 null,
@@ -382,10 +420,7 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                     'assets/icons/llm-search.svg',
                     width: 40,
                     height: 40,
-                    colorFilter: ColorFilter.mode(
-                      Colors.blue,
-                      BlendMode.srcIn,
-                    ),
+                    colorFilter: ColorFilter.mode(Colors.blue, BlendMode.srcIn),
                   ),
                 ),
                 '#021 LLM Search',
@@ -405,14 +440,17 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                 },
               ),
               _buildItem(
-                const Icon(Icons.article_outlined,
-                    size: 40, color: Colors.purple),
+                const Icon(
+                  Icons.article_outlined,
+                  size: 40,
+                  color: Colors.purple,
+                ),
                 '#023 Floating Article View',
                 'Floating article view',
                 const FloatingArticleView(),
                 null,
               ),
-              SizedBox.fromSize(size: const Size.fromHeight(8.0))
+              SizedBox.fromSize(size: const Size.fromHeight(8.0)),
             ],
           ),
         ),
@@ -436,9 +474,7 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
         child: Column(
           children: <Widget>[
             const Icon(MdiIcons.flask, size: 100, color: Color(0xFF73BE1E)),
-            const Padding(
-              padding: EdgeInsets.only(top: 12),
-            ),
+            const Padding(padding: EdgeInsets.only(top: 12)),
             Text(
               'Violet Laboratory',
               style: TextStyle(
@@ -461,10 +497,11 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
       decoration: BoxDecoration(
         color: Settings.themeWhat.value ? Colors.black26 : Colors.white,
         borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(8),
-            topRight: Radius.circular(8),
-            bottomLeft: Radius.circular(8),
-            bottomRight: Radius.circular(8)),
+          topLeft: Radius.circular(8),
+          topRight: Radius.circular(8),
+          bottomLeft: Radius.circular(8),
+          bottomRight: Radius.circular(8),
+        ),
         boxShadow: [
           BoxShadow(
             color: Settings.themeWhat.value
@@ -481,12 +518,14 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
         child: Material(
           color: Settings.themeWhat.value
               ? Settings.themeBlack.value
-                  ? Palette.blackThemeBackground
-                  : Colors.black38
+                    ? Palette.blackThemeBackground
+                    : Colors.black38
               : Colors.white,
           child: ListTile(
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 0.0,
+              horizontal: 16.0,
+            ),
             leading: image,
             title: Text(title, style: const TextStyle(fontSize: 16.0)),
             subtitle: Text(subtitle),

@@ -50,7 +50,9 @@ class HentaiDonwloadManager {
   }
 
   Future<List<DownloadTask>?> createTask(
-      String url, GeneralDownloadProgress gdp) async {
+    String url,
+    GeneralDownloadProgress gdp,
+  ) async {
     final query = (await HentaiManager.idSearch(url)).results;
 
     if (query.isEmpty) {
@@ -61,7 +63,9 @@ class HentaiDonwloadManager {
   }
 
   Future<List<DownloadTask>?> createTaskFromQueryResult(
-      QueryResult target, GeneralDownloadProgress gdp) async {
+    QueryResult target,
+    GeneralDownloadProgress gdp,
+  ) async {
     gdp.simpleInfoCallback('[${target.id()}] ${target.title()}');
 
     var provider = await HentaiManager.getImageProvider(target);
@@ -92,12 +96,26 @@ class HentaiDonwloadManager {
             uploadDate: target.getDateTime().toString(),
             filenameWithoutExtension: intToString(i, pad: 3),
             artist: target.artists() != null
-                ? target.artists().split('|').firstWhere(
-                    (artist) => artist != null && (artist as String).isNotEmpty)
-                : target.groups()?.split('|').firstWhere(
-                    (group) => group != null && (group as String).isNotEmpty),
-            group: target.groups()?.split('|').firstWhere(
-                (group) => group != null && (group as String).isNotEmpty),
+                ? target
+                      .artists()
+                      .split('|')
+                      .firstWhere(
+                        (artist) =>
+                            artist != null && (artist as String).isNotEmpty,
+                      )
+                : target
+                      .groups()
+                      ?.split('|')
+                      .firstWhere(
+                        (group) =>
+                            group != null && (group as String).isNotEmpty,
+                      ),
+            group: target
+                .groups()
+                ?.split('|')
+                .firstWhere(
+                  (group) => group != null && (group as String).isNotEmpty,
+                ),
             extension: page.contains('fullimg.php')
                 ? 'jpg'
                 : path.extension(page.split('/').last).replaceAll('.', ''),

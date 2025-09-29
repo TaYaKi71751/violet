@@ -24,35 +24,26 @@ final patches = [
   PatchModel(
     dateTime: DateTime(2025, 9, 13),
     version: '1.34.1 Patch',
-    contents: [
-      'fix series/character view',
-      'fix real time ranking',
-    ],
+    contents: ['fix series/character view', 'fix real time ranking'],
   ),
   PatchModel(
     dateTime: DateTime(2025, 8, 31),
     version: '1.34.0 Minor',
     isMinor: true,
-    contents: [
-      'enable server only for real-time ranking',
-      'fix some bugs',
-    ],
+    contents: ['enable server only for real-time ranking', 'fix some bugs'],
   ),
   PatchModel(
     dateTime: DateTime(2025, 3, 23),
     version: '1.33.0 Minor',
     isMinor: true,
-    contents: [
-      'fix hitomi url not found',
-      'add float view (experimental)',
-    ],
+    contents: ['fix hitomi url not found', 'add float view (experimental)'],
   ),
   PatchModel(
     dateTime: DateTime(2025, 2, 3),
     version: '1.32.3 Patch',
     contents: [
       'fix bug that thumbnail not shown',
-      'fix stcuk at loading index'
+      'fix stcuk at loading index',
     ],
   ),
   PatchModel(
@@ -61,16 +52,13 @@ final patches = [
     contents: [
       'auto reload hitomi script',
       'enhance ui for desktop, tablet',
-      'remove lite-mode'
+      'remove lite-mode',
     ],
   ),
   PatchModel(
     dateTime: DateTime(2024, 9, 14),
     version: '1.32.1 Patch',
-    contents: [
-      'user crop bookmark',
-      'stability and performance optimization',
-    ],
+    contents: ['user crop bookmark', 'stability and performance optimization'],
   ),
   PatchModel(
     dateTime: DateTime(2024, 5, 26),
@@ -85,19 +73,13 @@ final patches = [
   PatchModel(
     dateTime: DateTime(2024, 2, 9),
     version: '1.31.1 Patch',
-    contents: [
-      'improve tablet ui',
-      'fix two page viewer',
-    ],
+    contents: ['improve tablet ui', 'fix two page viewer'],
   ),
   PatchModel(
     dateTime: DateTime(2024, 2, 3),
     version: '1.31 Minor',
     isMinor: true,
-    contents: [
-      'supports table(landspace) ui',
-      'supports two page viewer',
-    ],
+    contents: ['supports table(landspace) ui', 'supports two page viewer'],
   ),
   PatchModel(
     dateTime: DateTime(2024, 1, 26),
@@ -111,50 +93,34 @@ final patches = [
   PatchModel(
     dateTime: DateTime(2024, 1, 22),
     version: '1.30.1 Patch',
-    contents: [
-      'fix some performance issues',
-    ],
+    contents: ['fix some performance issues'],
   ),
   PatchModel(
     dateTime: DateTime(2024, 1, 1),
     version: '1.30 Minor',
     isMinor: true,
-    contents: [
-      'fix load ehentai bookmark',
-      'fix ios status font color',
-    ],
+    contents: ['fix load ehentai bookmark', 'fix ios status font color'],
   ),
   PatchModel(
     dateTime: DateTime(2023, 12, 10),
     version: '1.29.2 Patch (HotFix)',
-    contents: [
-      'fix large bookmark group loading error',
-    ],
+    contents: ['fix large bookmark group loading error'],
   ),
   PatchModel(
     dateTime: DateTime(2023, 12, 3),
     version: '1.29.1 Patch',
-    contents: [
-      'fix ios ui',
-      'fix bookmark import',
-    ],
+    contents: ['fix ios ui', 'fix bookmark import'],
   ),
   PatchModel(
     dateTime: DateTime(2023, 11, 4),
     version: '1.29 Minor',
     isMinor: true,
-    contents: [
-      'supports android saf',
-      'make message search to main feature',
-    ],
+    contents: ['supports android saf', 'make message search to main feature'],
   ),
   PatchModel(
     dateTime: DateTime(2023, 7, 7),
     version: '1.28.5 Patch',
-    contents: [
-      'fix script load error',
-      'upgrade flutter-sdk',
-    ],
+    contents: ['fix script load error', 'upgrade flutter-sdk'],
   ),
   PatchModel(
     dateTime: DateTime(2023, 4, 8),
@@ -241,9 +207,7 @@ final patches = [
   PatchModel(
     dateTime: DateTime(2022, 6, 28),
     version: '1.26.2 Patch (HotFix)',
-    contents: [
-      'fix viewer button error',
-    ],
+    contents: ['fix viewer button error'],
   ),
   PatchModel(
     dateTime: DateTime(2022, 6, 27),
@@ -257,10 +221,7 @@ final patches = [
     dateTime: DateTime(2022, 6, 27),
     version: '1.26 Minor Update',
     isMinor: true,
-    contents: [
-      'refactoring viewer code base',
-      'fix statistics act-log',
-    ],
+    contents: ['refactoring viewer code base', 'fix statistics act-log'],
   ),
   PatchModel(
     dateTime: DateTime(2022, 6, 22),
@@ -351,10 +312,7 @@ final patches = [
   PatchModel(
     dateTime: DateTime(2022, 2, 2),
     version: '1.20.1 Patch (HotFix)',
-    contents: [
-      'fix download button bug',
-      'fix grey thumbnail bug',
-    ],
+    contents: ['fix download button bug', 'fix grey thumbnail bug'],
   ),
   PatchModel(
     dateTime: DateTime(2022, 2, 2),
@@ -370,9 +328,7 @@ final patches = [
     dateTime: DateTime(2022, 01, 23),
     version: '1.19 Minor Update',
     isMinor: true,
-    contents: [
-      'support download on ios device',
-    ],
+    contents: ['support download on ios device'],
   ),
   PatchModel(
     dateTime: DateTime(2022, 01, 16),
@@ -387,46 +343,32 @@ final patches = [
   PatchModel(
     dateTime: DateTime(2022, 01, 08),
     version: '1.17.10 Patch Update',
-    contents: [
-      'fix',
-    ],
+    contents: ['fix'],
   ),
   PatchModel(
     dateTime: DateTime(2022, 01, 05),
     version: '1.17.9 Patch Update',
-    contents: [
-      'fix',
-    ],
+    contents: ['fix'],
   ),
   PatchModel(
     dateTime: DateTime(2022, 01, 04),
     version: '1.17.8 Patch Update',
-    contents: [
-      'fix',
-    ],
+    contents: ['fix'],
   ),
   PatchModel(
     dateTime: DateTime(2022, 01, 03),
     version: '1.17.7 Patch Update',
-    contents: [
-      'fix',
-    ],
+    contents: ['fix'],
   ),
   PatchModel(
     dateTime: DateTime(2022, 01, 02),
     version: '1.17.6 Patch Update',
-    contents: [
-      'fix hitomi.la downloader',
-      'add live thread count setter',
-    ],
+    contents: ['fix hitomi.la downloader', 'add live thread count setter'],
   ),
   PatchModel(
     dateTime: DateTime(2021, 12, 31),
     version: '1.17.5 Patch Update',
-    contents: [
-      'enhance script runner',
-      'happy new year!',
-    ],
+    contents: ['enhance script runner', 'happy new year!'],
   ),
   PatchModel(
     dateTime: DateTime(2021, 12, 0),
@@ -439,23 +381,17 @@ final patches = [
   PatchModel(
     dateTime: DateTime(2021, 10, 29),
     version: '1.17.3 Patch Update',
-    contents: [
-      'implements bookmark restore page',
-    ],
+    contents: ['implements bookmark restore page'],
   ),
   PatchModel(
     dateTime: DateTime(2021, 10, 29),
     version: '1.17.2 Patch Update',
-    contents: [
-      'update hitomi image rule (apply builtin javascript engine)',
-    ],
+    contents: ['update hitomi image rule (apply builtin javascript engine)'],
   ),
   PatchModel(
     dateTime: DateTime(2021, 10, 26),
     version: '1.17.1 Patch Update',
-    contents: [
-      'update hitomi image rule',
-    ],
+    contents: ['update hitomi image rule'],
   ),
   PatchModel(
     dateTime: DateTime(2021, 10, 23),
@@ -497,33 +433,22 @@ final patches = [
   PatchModel(
     dateTime: DateTime(2021, 9, 24),
     version: '1.16.1 Patch Update',
-    contents: [
-      'optimize critical ui processes-2',
-      'replace sync info url',
-    ],
+    contents: ['optimize critical ui processes-2', 'replace sync info url'],
   ),
   PatchModel(
     dateTime: DateTime(2021, 9, 22),
     version: '1.16 Minor Update',
-    contents: [
-      'optimize critical ui processes',
-      'add hisoki.me router',
-    ],
+    contents: ['optimize critical ui processes', 'add hisoki.me router'],
   ),
   PatchModel(
     dateTime: DateTime(2021, 9, 19),
     version: '1.15 Minor Update',
-    contents: [
-      'apply flutter 2.5',
-      'add dialog search (beta)',
-    ],
+    contents: ['apply flutter 2.5', 'add dialog search (beta)'],
   ),
   PatchModel(
     dateTime: DateTime(2021, 9, 8),
     version: '1.14.1 Patch Update',
-    contents: [
-      'change some uis',
-    ],
+    contents: ['change some uis'],
   ),
   PatchModel(
     dateTime: DateTime(2021, 8, 21),
@@ -541,9 +466,7 @@ final patches = [
   PatchModel(
     dateTime: DateTime(2021, 8, 11),
     version: '1.13.2 Patch Update',
-    contents: [
-      'fix hitomi routing error',
-    ],
+    contents: ['fix hitomi routing error'],
   ),
   PatchModel(
     dateTime: DateTime(2021, 8, 5),
@@ -588,33 +511,23 @@ final patches = [
   PatchModel(
     dateTime: DateTime(2021, 6, 20),
     version: '1.10.2 Patch Update',
-    contents: [
-      'add related tag viewer',
-      'fix article info paddings error',
-    ],
+    contents: ['add related tag viewer', 'fix article info paddings error'],
   ),
   PatchModel(
     dateTime: DateTime(2021, 6, 18),
     version: '1.10.1 Patch Update',
-    contents: [
-      'fix hitomi get image list method',
-    ],
+    contents: ['fix hitomi get image list method'],
   ),
   PatchModel(
     dateTime: DateTime(2021, 6, 16),
     version: '1.10 Minor Update',
     isMinor: true,
-    contents: [
-      'add korean search',
-      'ehance viewer',
-    ],
+    contents: ['add korean search', 'ehance viewer'],
   ),
   PatchModel(
     dateTime: DateTime(2021, 6, 8),
     version: '1.9.2 Patch',
-    contents: [
-      'fix hitomi image rule',
-    ],
+    contents: ['fix hitomi image rule'],
   ),
   PatchModel(
     dateTime: DateTime(2021, 5, 20),
@@ -629,9 +542,7 @@ final patches = [
     dateTime: DateTime(2021, 5, 19),
     version: '1.9 Minor Update',
     isMinor: true,
-    contents: [
-      'add view tabs',
-    ],
+    contents: ['add view tabs'],
   ),
   PatchModel(
     dateTime: DateTime(2021, 5, 19),
@@ -652,10 +563,7 @@ final patches = [
   PatchModel(
     dateTime: DateTime(2021, 5, 18),
     version: '1.8.6 Patch',
-    contents: [
-      'add viewer timer',
-      'redesign info page (faq, manual, etc...)',
-    ],
+    contents: ['add viewer timer', 'redesign info page (faq, manual, etc...)'],
   ),
   PatchModel(
     dateTime: DateTime(2021, 5, 17),
@@ -673,7 +581,7 @@ final patches = [
     contents: [
       'fix bug that seriesCharacter inner loop use mismatched list during tag rebuilding',
       'fix an issue where the actual images storage path and the path recorded in the DB did not match',
-      'fix an error where the innerstorage option is initialized every time the app is started.'
+      'fix an error where the innerstorage option is initialized every time the app is started.',
     ],
   ),
   PatchModel(
@@ -692,7 +600,7 @@ final patches = [
     contents: [
       'add search log',
       'add search filter to search filter page',
-      'enhance log view'
+      'enhance log view',
     ],
   ),
   PatchModel(
@@ -731,7 +639,7 @@ final patches = [
     version: '1.7.8 Patch',
     contents: [
       'update crashlytics plugin version',
-      'upload user bookmark database'
+      'upload user bookmark database',
     ],
   ),
   PatchModel(
@@ -744,7 +652,7 @@ final patches = [
     version: '1.7.6 Patch',
     contents: [
       'fix bookmark state not changed',
-      'searching random with conditions'
+      'searching random with conditions',
     ],
   ),
   PatchModel(
@@ -754,22 +662,18 @@ final patches = [
       'apply anti-aliasing to horizontal view (upscale filter quality)',
       'change selected bookmark style',
       'fix exhentai login error',
-      'fix intact bug artist bookmark'
+      'fix intact bug artist bookmark',
     ],
   ),
   PatchModel(
     dateTime: DateTime(2020, 10, 25),
     version: '1.7.4 Patch (HotFix)',
-    contents: [
-      'fix hiyobi routing error',
-    ],
+    contents: ['fix hiyobi routing error'],
   ),
   PatchModel(
     dateTime: DateTime(2020, 10, 21),
     version: '1.7.3 Patch',
-    contents: [
-      'fix critical error related with app',
-    ],
+    contents: ['fix critical error related with app'],
   ),
   PatchModel(
     dateTime: DateTime(2020, 10, 21),
@@ -786,9 +690,7 @@ final patches = [
   PatchModel(
     dateTime: DateTime(2020, 10, 17),
     version: '1.7.1 Patch (HotFix)',
-    contents: [
-      'fix database downloading error when first start',
-    ],
+    contents: ['fix database downloading error when first start'],
   ),
   PatchModel(
     dateTime: DateTime(2020, 10, 17),
@@ -805,9 +707,7 @@ final patches = [
   PatchModel(
     dateTime: DateTime(2020, 10, 16),
     version: '1.6.4 Patch (Rollback)',
-    contents: [
-      'rollback 1.6.3 viewer patch',
-    ],
+    contents: ['rollback 1.6.3 viewer patch'],
   ),
   PatchModel(
     dateTime: DateTime(2020, 10, 16),
@@ -830,9 +730,7 @@ final patches = [
   PatchModel(
     dateTime: DateTime(2020, 10, 6),
     version: '1.6.1 Patch (HotFix)',
-    contents: [
-      'fix downloader error',
-    ],
+    contents: ['fix downloader error'],
   ),
   PatchModel(
     dateTime: DateTime(2020, 10, 5),
@@ -853,9 +751,7 @@ final patches = [
   PatchModel(
     dateTime: DateTime(2020, 10, 2),
     version: '1.5.1 Patch',
-    contents: [
-      'enhance e/ex-hentai image loading',
-    ],
+    contents: ['enhance e/ex-hentai image loading'],
   ),
   PatchModel(
     dateTime: DateTime(2020, 10, 0),
@@ -875,9 +771,7 @@ final patches = [
   PatchModel(
     dateTime: DateTime(2020, 09, 26),
     version: '1.4.1 Patch (HotFix)',
-    contents: [
-      'fix e/exhentai parsing error (images are doubled)',
-    ],
+    contents: ['fix e/exhentai parsing error (images are doubled)'],
   ),
   PatchModel(
     dateTime: DateTime(2020, 09, 25),
@@ -912,9 +806,7 @@ final patches = [
     dateTime: DateTime(2020, 09, 21),
     version: '1.3 Minor Update',
     isMinor: true,
-    contents: [
-      'implements Character, Series Info Page',
-    ],
+    contents: ['implements Character, Series Info Page'],
   ),
   PatchModel(
     dateTime: DateTime(2020, 09, 21),
@@ -935,7 +827,7 @@ final patches = [
     contents: [
       '''My goal for version 1.0.0 was to improve the viewer completely. Now that I have achieved my goal, I am releasing this version.\n
 There are still features to be improved, such as web search, but I will improve this in a minor version.\n
-Thank you so much for using the beta version until now.'''
+Thank you so much for using the beta version until now.''',
     ],
   ),
   PatchModel(
@@ -944,7 +836,7 @@ Thank you so much for using the beta version until now.'''
     contents: [
       'fix cannot select bookmark item',
       'add search on web experimentally',
-      'Android 29+ Supports (exec, saf)'
+      'Android 29+ Supports (exec, saf)',
     ],
   ),
   PatchModel(
@@ -1075,16 +967,16 @@ class _PatchNotePageState extends State<PatchNotePage> {
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.only(
-            top: statusBarHeight + 16, bottom: mediaQuery.padding.bottom),
+          top: statusBarHeight + 16,
+          bottom: mediaQuery.padding.bottom,
+        ),
         child: Column(
           children: [
             const Text(
               'Patch Note',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            Container(
-              height: 16,
-            ),
+            Container(height: 16),
             Expanded(
               child: ListView.separated(
                 physics: const BouncingScrollPhysics(),
@@ -1094,40 +986,46 @@ class _PatchNotePageState extends State<PatchNotePage> {
                   var ii = patches[i];
                   return Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 24.0, vertical: 12.0),
+                      horizontal: 24.0,
+                      vertical: 12.0,
+                    ),
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        color: i == 0
-                            ? Colors.greenAccent.withOpacity(0.8)
-                            : ii.isMajor
-                                ? Colors.lightBlueAccent.withOpacity(0.8)
-                                : ii.isMinor
-                                    ? Colors.orange.withOpacity(0.8)
-                                    : Colors.redAccent.withOpacity(0.8)),
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: i == 0
+                          ? Colors.greenAccent.withOpacity(0.8)
+                          : ii.isMajor
+                          ? Colors.lightBlueAccent.withOpacity(0.8)
+                          : ii.isMinor
+                          ? Colors.orange.withOpacity(0.8)
+                          : Colors.redAccent.withOpacity(0.8),
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(ii.isMajor
-                                ? MdiIcons.chevronTripleUp
-                                : ii.isMinor
-                                    ? MdiIcons.chevronDoubleUp
-                                    : MdiIcons.trendingUp),
-                            const SizedBox(
-                              width: 12.0,
+                            Icon(
+                              ii.isMajor
+                                  ? MdiIcons.chevronTripleUp
+                                  : ii.isMinor
+                                  ? MdiIcons.chevronDoubleUp
+                                  : MdiIcons.trendingUp,
                             ),
+                            const SizedBox(width: 12.0),
                             Text(
                               ii.version,
                               style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 15),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
                             ),
                             Expanded(
                               child: Align(
                                 alignment: Alignment.centerRight,
                                 child: Text(
-                                    '${ii.dateTime.year}.${ii.dateTime.month}.${ii.dateTime.day}'),
+                                  '${ii.dateTime.year}.${ii.dateTime.month}.${ii.dateTime.day}',
+                                ),
                               ),
                             ),
                             // ii.detail != null
@@ -1166,9 +1064,7 @@ class _PatchNotePageState extends State<PatchNotePage> {
                   //   height: 2,
                   // );
 
-                  return Container(
-                    height: 8,
-                  );
+                  return Container(height: 8);
                 },
               ),
             ),

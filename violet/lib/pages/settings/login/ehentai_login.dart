@@ -43,9 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageFinished: (url) => _checkCookie(),
-        ),
+        NavigationDelegate(onPageFinished: (url) => _checkCookie()),
       )
       ..loadRequest(Uri.parse(_loginUrl));
   }
@@ -53,16 +51,15 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
+      appBar: AppBar(title: const Text('Login')),
       body: WebViewWidget(controller: _controller),
     );
   }
 
   Future<void> _checkCookie() async {
-    var cookieString =
-        await _controller.runJavaScriptReturningResult('document.cookie');
+    var cookieString = await _controller.runJavaScriptReturningResult(
+      'document.cookie',
+    );
     try {
       cookieString = jsonDecode(cookieString as String) as String;
     } catch (e) {}

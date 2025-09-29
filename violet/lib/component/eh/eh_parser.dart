@@ -56,12 +56,14 @@ class EHResultArticle {
 // E-Hentai, EX-Hentai Parser
 // You can use both of the previous.
 class EHParser {
-  static final RegExp _thumbnailPattern =
-      RegExp(r'https://(s\.)?(exhentai|ehgt).org/.*?(?=\))');
+  static final RegExp _thumbnailPattern = RegExp(
+    r'https://(s\.)?(exhentai|ehgt).org/.*?(?=\))',
+  );
 
   static bool validHtml(String html) {
-    final removed =
-        html.contains('This gallery has been removed or is unavailable.');
+    final removed = html.contains(
+      'This gallery has been removed or is unavailable.',
+    );
     return !removed;
   }
 
@@ -85,7 +87,8 @@ class EHParser {
   // ex: https://exhentai.org/g/1212168/421ef300a8/?inline_set=ts_l
   static List<String> getThumbnailImages(String html) {
     final RegExp regex = RegExp(
-        r'\"(https://e[-x]hentai.org/t/.*?|https://ehgt.org/.{2}/.{2}/.*?)\"');
+      r'\"(https://e[-x]hentai.org/t/.*?|https://ehgt.org/.{2}/.{2}/.*?)\"',
+    );
     return regex.allMatches(html).map((e) => e.group(1)!).toList();
   }
 
@@ -97,8 +100,9 @@ class EHParser {
 
   // ex: https://exhentai.org/s/df24b19548/1212549-2
   static String getOriginalImageAddress(String html) {
-    final RegExp regex =
-        RegExp(r'\<a href="(https://e[-x]hentai.org/fullimg\.php.*?)"\>');
+    final RegExp regex = RegExp(
+      r'\<a href="(https://e[-x]hentai.org/fullimg\.php.*?)"\>',
+    );
     return regex.allMatches(html).first.group(1)!;
   }
 
@@ -110,7 +114,8 @@ class EHParser {
     try {
       article.thumbnail = _thumbnailPattern
           .stringMatch(
-              doc!.querySelector('div[id=gleft] div div')!.attributes['style']!)
+            doc!.querySelector('div[id=gleft] div div')!.attributes['style']!,
+          )
           .toString();
     } catch (e) {
       rethrow;
@@ -119,7 +124,8 @@ class EHParser {
     final imagesPerPageRegex = RegExp(r'(\d+)\s*-\s*(\d+)\s*of\s*(\d+)');
 
     final imagesPerPageMatch = imagesPerPageRegex.firstMatch(
-        parse(html).querySelector('[class="gtb"] > [class="gpc"]')!.text);
+      parse(html).querySelector('[class="gtb"] > [class="gpc"]')!.text,
+    );
     int firstIndex = imagesPerPageMatch!.group(1) != null
         ? int.parse(imagesPerPageMatch.group(1)!) - 1
         : 0;
@@ -135,28 +141,34 @@ class EHParser {
     var tryUploader = doc.querySelector("div[id='gmid'] div[id='gdn']");
     if (tryUploader != null) article.uploader = tryUploader.text;
 
-    var nodeStatic =
-        doc.querySelectorAll("div[id='gmid'] div[id='gdd'] table tr");
+    var nodeStatic = doc.querySelectorAll(
+      "div[id='gmid'] div[id='gdd'] table tr",
+    );
 
     article.posted = nodeStatic[0].querySelector("td[class='gdt2']")!.text;
     article.parent = nodeStatic[1].querySelector("td[class='gdt2']")!.text;
     article.visible = nodeStatic[2].querySelector("td[class='gdt2']")!.text;
     article.language = nodeStatic[3].querySelector("td[class='gdt2']")!.text;
     article.fileSize = nodeStatic[4].querySelector("td[class='gdt2']")!.text;
-    article.length = int.parse(nodeStatic[5]
-        .querySelector("td[class='gdt2']")!
-        .text
-        .replaceAll('pages', '')
-        .trim());
-    article.favorited = int.parse(nodeStatic[6]
-        .querySelector("td[class='gdt2']")!
-        .text
-        .replaceAll('times', '')
-        .replaceAll('Once', '1')
-        .trim());
+    article.length = int.parse(
+      nodeStatic[5]
+          .querySelector("td[class='gdt2']")!
+          .text
+          .replaceAll('pages', '')
+          .trim(),
+    );
+    article.favorited = int.parse(
+      nodeStatic[6]
+          .querySelector("td[class='gdt2']")!
+          .text
+          .replaceAll('times', '')
+          .replaceAll('Once', '1')
+          .trim(),
+    );
 
-    var nodesData =
-        doc.querySelectorAll("div[id='gmid'] div[id='taglist'] table tr");
+    var nodesData = doc.querySelectorAll(
+      "div[id='gmid'] div[id='taglist'] table tr",
+    );
     var info = <String, List<String>>{};
 
     for (var element in nodesData) {
@@ -167,8 +179,10 @@ class EHParser {
             .map((x) => x.querySelector('a')!.text)
             .toList();
       } catch (e, st) {
-        Logger.error('[eh-parser] E: $e\n'
-            '$st');
+        Logger.error(
+          '[eh-parser] E: $e\n'
+          '$st',
+        );
       }
     }
 
@@ -187,28 +201,32 @@ class EHParser {
     var hu = HtmlUnescape();
     var df = DateFormat('dd MMMM yyyy, H:m');
     for (var element in nodeComments) {
-      var date =
-          hu.convert(element.querySelector('div.c2 div.c3')!.text.trim());
+      var date = hu.convert(
+        element.querySelector('div.c2 div.c3')!.text.trim(),
+      );
       var author = hu.convert(
-          (element.querySelector('div.c2 div.c3 > a')?.text ??
-                  ((element.querySelector('div.c4.nosel')?.text ?? '').trim() ==
-                          'Uploader Comment'
-                      ? article.uploader
-                      : ''))
-              .trim());
-      var contents = hu.convert(element
-          .querySelector('div.c6')!
-          .innerHtml
-          .replaceAll('<br>', '\r\n'));
+        (element.querySelector('div.c2 div.c3 > a')?.text ??
+                ((element.querySelector('div.c4.nosel')?.text ?? '').trim() ==
+                        'Uploader Comment'
+                    ? article.uploader
+                    : ''))
+            .trim(),
+      );
+      var contents = hu.convert(
+        element.querySelector('div.c6')!.innerHtml.replaceAll('<br>', '\r\n'),
+      );
       comments.add((
         df.parse(
-            date
-                .substring(
-                    0, date.contains(' by') ? date.indexOf(' by') : date.length)
-                .substring('Posted on '.length),
-            true),
+          date
+              .substring(
+                0,
+                date.contains(' by') ? date.indexOf(' by') : date.length,
+              )
+              .substring('Posted on '.length),
+          true,
+        ),
         author,
-        contents
+        contents,
       ));
     }
 
@@ -231,8 +249,9 @@ class EHParser {
         article.url = element.querySelector('div.id2 a')!.attributes['href'];
 
         try {
-          article.thumbnail =
-              element.querySelector('div.id3 a img')!.attributes['src'];
+          article.thumbnail = element
+              .querySelector('div.id3 a img')!
+              .attributes['src'];
         } catch (_) {}
         article.title = element.querySelector('div.id2 a')!.text;
 
@@ -262,8 +281,9 @@ class EHParser {
         article.url = tds[2].querySelector('div.it5 a')!.attributes['href'];
 
         try {
-          article.thumbnail =
-              tds[2].querySelector('div.it2 img')!.attributes['src'];
+          article.thumbnail = tds[2]
+              .querySelector('div.it2 img')!
+              .attributes['src'];
         } catch (_) {}
         article.title = tds[2].querySelector('div.it5 a')!.text;
 
@@ -284,9 +304,9 @@ class EHParser {
     var result = <EHResultArticle>[];
 
     var q = <Element>[];
-    parse(html)
-        .querySelectorAll('table.itg.glte')
-        .forEach((element) => q.add(element));
+    parse(
+      html,
+    ).querySelectorAll('table.itg.glte').forEach((element) => q.add(element));
 
     while (q.isNotEmpty) {
       var node = q[0];
@@ -308,18 +328,18 @@ class EHParser {
         article.uploader = g13div[3].text;
         article.files = g13div[4].text;
 
-        var gref =
-            node.querySelectorAll('td')[1].querySelector('div > a > div');
+        var gref = node
+            .querySelectorAll('td')[1]
+            .querySelector('div > a > div');
 
         article.title = gref!.querySelector('div')!.text;
 
         try {
           var dict = <String, List<String>>{};
 
-          gref
-              .querySelector('div > table')!
-              .querySelectorAll('tr')
-              .forEach((element) {
+          gref.querySelector('div > table')!.querySelectorAll('tr').forEach((
+            element,
+          ) {
             var cont = element.querySelector('td')!.text.trim();
             cont = cont.substring(0, cont.length - 1);
 
@@ -362,12 +382,16 @@ class EHParser {
     for (var element in nodes) {
       var article = EHResultArticle();
 
-      article.type =
-          element.querySelector('td > div')!.text.trim().toLowerCase();
+      article.type = element
+          .querySelector('td > div')!
+          .text
+          .trim()
+          .toLowerCase();
       article.thumbnail = element.querySelector('img')!.attributes['src'];
       if (article.thumbnail!.startsWith('data')) {
-        article.thumbnail =
-            element.querySelector('img')!.attributes['data-src'];
+        article.thumbnail = element
+            .querySelector('img')!
+            .attributes['data-src'];
       }
       article.published = element
           .querySelectorAll('td')[1]
@@ -395,8 +419,11 @@ class EHParser {
           .querySelector('a  div')!
           .text
           .trim();
-      article.uploader =
-          element.querySelectorAll('td')[5].querySelector('div a')!.text.trim();
+      article.uploader = element
+          .querySelectorAll('td')[5]
+          .querySelector('div a')!
+          .text
+          .trim();
 
       result.add(article);
     }

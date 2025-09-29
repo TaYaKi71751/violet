@@ -12,20 +12,18 @@ import 'package:violet/settings/settings.dart';
 import 'package:violet/settings/settings_wrapper.dart';
 import 'package:violet/pages/viewer/image/image_crop_bookmark.dart';
 
-typedef VImageWidgetBuilder = Widget Function(
-    BuildContext context, Widget child);
+typedef VImageWidgetBuilder =
+    Widget Function(BuildContext context, Widget child);
 
-typedef VProgressIndicatorBuilder = Widget Function(
-  BuildContext context,
-  String url,
-  DownloadProgress progress,
-);
+typedef VProgressIndicatorBuilder =
+    Widget Function(
+      BuildContext context,
+      String url,
+      DownloadProgress progress,
+    );
 
-typedef VLoadingErrorWidgetBuilder = Widget Function(
-  BuildContext context,
-  String url,
-  dynamic error,
-);
+typedef VLoadingErrorWidgetBuilder =
+    Widget Function(BuildContext context, String url, dynamic error);
 
 class ProviderImage extends StatefulWidget {
   final String getxId;
@@ -104,14 +102,12 @@ class _ProviderImageState extends State<ProviderImage> {
   Widget _loadStateChanged(ExtendedImageState state) {
     if (state.extendedImageLoadState == LoadState.failed) {
       Logger.error(
-          '[viewer-provider_image] URL: ${widget.imgUrl}\nE: ${state.lastException}');
+        '[viewer-provider_image] URL: ${widget.imgUrl}\nE: ${state.lastException}',
+      );
       state.reLoadImage();
 
       final iconButton = IconButton(
-        icon: Icon(
-          Icons.refresh,
-          color: Settings.majorColor.value,
-        ),
+        icon: Icon(Icons.refresh, color: Settings.majorColor.value),
         onPressed: () => setState(() {
           c.imgKeys[widget.index] = GlobalKey();
         }),
@@ -122,11 +118,7 @@ class _ProviderImageState extends State<ProviderImage> {
             ? c.estimatedImgHeight[widget.index]
             : 300,
         child: Center(
-          child: SizedBox(
-            width: 50,
-            height: 50,
-            child: iconButton,
-          ),
+          child: SizedBox(width: 50, height: 50, child: iconButton),
         ),
       );
     }
@@ -137,10 +129,7 @@ class _ProviderImageState extends State<ProviderImage> {
         !_loaded) {
       _loaded = true;
       c.isImageLoaded[widget.index] = true;
-      return widget.imageWidgetBuilder(
-        context,
-        state.completedWidget,
-      );
+      return widget.imageWidgetBuilder(context, state.completedWidget);
     } else if (state.extendedImageLoadState == LoadState.loading) {
       return SizedBox(
         height: c.estimatedImgHeight[widget.index] != 0
@@ -154,7 +143,7 @@ class _ProviderImageState extends State<ProviderImage> {
               value: state.loadingProgress == null
                   ? null
                   : state.loadingProgress!.cumulativeBytesLoaded /
-                      state.loadingProgress!.expectedTotalBytes!,
+                        state.loadingProgress!.expectedTotalBytes!,
             ),
           ),
         ),

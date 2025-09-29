@@ -10,8 +10,8 @@ import 'package:violet/pages/viewer/others/preload_page_view.dart';
 typedef PhotoViewGalleryPageChangedCallback = void Function(int index);
 
 /// A type definition for a [Function] that defines a page in [PhotoViewGallery.build]
-typedef PhotoViewGalleryBuilder = PhotoViewGalleryPageOptions Function(
-    BuildContext context, int index);
+typedef PhotoViewGalleryBuilder =
+    PhotoViewGalleryPageOptions Function(BuildContext context, int index);
 
 /// A [StatefulWidget] that shows multiple [PhotoView] widgets in a [PageView]
 ///
@@ -104,8 +104,8 @@ class VPhotoViewGallery extends StatefulWidget {
     required this.scrollPhysics,
     this.scrollDirection = Axis.horizontal,
     this.customSize,
-  })  : itemCount = null,
-        builder = null;
+  }) : itemCount = null,
+       builder = null;
 
   /// Construct a gallery with dynamic items.
   ///
@@ -125,9 +125,9 @@ class VPhotoViewGallery extends StatefulWidget {
     required this.scrollPhysics,
     this.scrollDirection = Axis.horizontal,
     this.customSize,
-  })  : pageOptions = null,
-        assert(itemCount != null),
-        assert(builder != null);
+  }) : pageOptions = null,
+       assert(itemCount != null),
+       assert(builder != null);
 
   /// A list of options to describe the items in the gallery
   final List<PhotoViewGalleryPageOptions>? pageOptions;
@@ -277,13 +277,13 @@ class _VPhotoViewGalleryState extends State<VPhotoViewGallery> {
             errorBuilder: pageOption.errorBuilder,
           );
 
-    return ClipRect(
-      child: photoView,
-    );
+    return ClipRect(child: photoView);
   }
 
   PhotoViewGalleryPageOptions _buildPageOption(
-      BuildContext context, int index) {
+    BuildContext context,
+    int index,
+  ) {
     if (widget._isBuilder) {
       return widget.builder!(context, index);
     }

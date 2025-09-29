@@ -38,13 +38,14 @@ abstract class Api extends ChopperService {
     }
 
     final newClient = ChopperClient(
-        services: [_$Api()],
-        converter: converter ?? $JsonSerializableConverter(),
-        interceptors: interceptors ?? [],
-        client: httpClient,
-        authenticator: authenticator,
-        errorConverter: errorConverter,
-        baseUrl: baseUrl ?? Uri.parse('http://'));
+      services: [_$Api()],
+      converter: converter ?? $JsonSerializableConverter(),
+      interceptors: interceptors ?? [],
+      client: httpClient,
+      authenticator: authenticator,
+      errorConverter: errorConverter,
+      baseUrl: baseUrl ?? Uri.parse('http://'),
+    );
     return _$Api(newClient);
   }
 
@@ -68,10 +69,13 @@ abstract class Api extends ChopperService {
 
   ///Get Comment
   ///@param where Where to get
-  Future<chopper.Response<CommentGetResponseDto>> apiV2CommentGet(
-      {required String? where}) {
+  Future<chopper.Response<CommentGetResponseDto>> apiV2CommentGet({
+    required String? where,
+  }) {
     generatedMapping.putIfAbsent(
-        CommentGetResponseDto, () => CommentGetResponseDto.fromJsonFactory);
+      CommentGetResponseDto,
+      () => CommentGetResponseDto.fromJsonFactory,
+    );
 
     return _apiV2CommentGet(where: where);
   }
@@ -79,8 +83,9 @@ abstract class Api extends ChopperService {
   ///Get Comment
   ///@param where Where to get
   @Get(path: '/api/v2/comment')
-  Future<chopper.Response<CommentGetResponseDto>> _apiV2CommentGet(
-      {@Query('where') required String? where});
+  Future<chopper.Response<CommentGetResponseDto>> _apiV2CommentGet({
+    @Query('where') required String? where,
+  });
 
   ///Post Comment
   Future<chopper.Response> apiV2CommentPost({required CommentPostDto? body}) {
@@ -88,12 +93,10 @@ abstract class Api extends ChopperService {
   }
 
   ///Post Comment
-  @Post(
-    path: '/api/v2/comment',
-    optionalBody: true,
-  )
-  Future<chopper.Response> _apiV2CommentPost(
-      {@Body() required CommentPostDto? body});
+  @Post(path: '/api/v2/comment', optionalBody: true)
+  Future<chopper.Response> _apiV2CommentPost({
+    @Body() required CommentPostDto? body,
+  });
 
   ///Toggle comment hidden status
   ///@param id
@@ -103,12 +106,10 @@ abstract class Api extends ChopperService {
 
   ///Toggle comment hidden status
   ///@param id
-  @Patch(
-    path: '/api/v2/comment/{id}/hidden',
-    optionalBody: true,
-  )
-  Future<chopper.Response> _apiV2CommentIdHiddenPatch(
-      {@Path('id') required num? id});
+  @Patch(path: '/api/v2/comment/{id}/hidden', optionalBody: true)
+  Future<chopper.Response> _apiV2CommentIdHiddenPatch({
+    @Path('id') required num? id,
+  });
 
   ///Get current user information
   Future<chopper.Response<User>> apiV2UserGet() {
@@ -127,12 +128,10 @@ abstract class Api extends ChopperService {
   }
 
   ///Register User
-  @Post(
-    path: '/api/v2/user',
-    optionalBody: true,
-  )
-  Future<chopper.Response> _apiV2UserPost(
-      {@Body() required UserRegisterDTO? body});
+  @Post(path: '/api/v2/user', optionalBody: true)
+  Future<chopper.Response> _apiV2UserPost({
+    @Body() required UserRegisterDTO? body,
+  });
 
   ///Get all users
   Future<chopper.Response<List<User>>> apiV2UserListGet() {
@@ -147,9 +146,11 @@ abstract class Api extends ChopperService {
 
   ///Get userAppIds registered by discord id
   Future<chopper.Response<ListDiscordUserAppIdsResponseDto>>
-      apiV2UserDiscordGet() {
-    generatedMapping.putIfAbsent(ListDiscordUserAppIdsResponseDto,
-        () => ListDiscordUserAppIdsResponseDto.fromJsonFactory);
+  apiV2UserDiscordGet() {
+    generatedMapping.putIfAbsent(
+      ListDiscordUserAppIdsResponseDto,
+      () => ListDiscordUserAppIdsResponseDto.fromJsonFactory,
+    );
 
     return _apiV2UserDiscordGet();
   }
@@ -157,23 +158,22 @@ abstract class Api extends ChopperService {
   ///Get userAppIds registered by discord id
   @Get(path: '/api/v2/user/discord')
   Future<chopper.Response<ListDiscordUserAppIdsResponseDto>>
-      _apiV2UserDiscordGet();
+  _apiV2UserDiscordGet();
 
   ///Login
-  Future<chopper.Response<Tokens>> apiV2AuthPost(
-      {required UserRegisterDTO? body}) {
+  Future<chopper.Response<Tokens>> apiV2AuthPost({
+    required UserRegisterDTO? body,
+  }) {
     generatedMapping.putIfAbsent(Tokens, () => Tokens.fromJsonFactory);
 
     return _apiV2AuthPost(body: body);
   }
 
   ///Login
-  @Post(
-    path: '/api/v2/auth',
-    optionalBody: true,
-  )
-  Future<chopper.Response<Tokens>> _apiV2AuthPost(
-      {@Body() required UserRegisterDTO? body});
+  @Post(path: '/api/v2/auth', optionalBody: true)
+  Future<chopper.Response<Tokens>> _apiV2AuthPost({
+    @Body() required UserRegisterDTO? body,
+  });
 
   ///Logout
   Future<chopper.Response> apiV2AuthDelete() {
@@ -187,7 +187,9 @@ abstract class Api extends ChopperService {
   ///Get refresh token
   Future<chopper.Response<ResLoginUser>> apiV2AuthRefreshGet() {
     generatedMapping.putIfAbsent(
-        ResLoginUser, () => ResLoginUser.fromJsonFactory);
+      ResLoginUser,
+      () => ResLoginUser.fromJsonFactory,
+    );
 
     return _apiV2AuthRefreshGet();
   }
@@ -224,7 +226,9 @@ abstract class Api extends ChopperService {
     String? type,
   }) {
     generatedMapping.putIfAbsent(
-        ViewGetResponseDto, () => ViewGetResponseDto.fromJsonFactory);
+      ViewGetResponseDto,
+      () => ViewGetResponseDto.fromJsonFactory,
+    );
 
     return _apiV2ViewGet(offset: offset, count: count, type: type);
   }
@@ -250,17 +254,17 @@ abstract class Api extends ChopperService {
     required String? userAppId,
   }) {
     return _apiV2ViewPost(
-        articleId: articleId, viewSeconds: viewSeconds, userAppId: userAppId);
+      articleId: articleId,
+      viewSeconds: viewSeconds,
+      userAppId: userAppId,
+    );
   }
 
   ///Post article read data
   ///@param articleId ArticleId
   ///@param viewSeconds Count
   ///@param userAppId User App Id
-  @Post(
-    path: '/api/v2/view',
-    optionalBody: true,
-  )
+  @Post(path: '/api/v2/view', optionalBody: true)
   Future<chopper.Response> _apiV2ViewPost({
     @Query('articleId') required int? articleId,
     @Query('viewSeconds') required int? viewSeconds,
@@ -277,17 +281,17 @@ abstract class Api extends ChopperService {
     required String? userAppId,
   }) {
     return _apiV2ViewLoginedPost(
-        articleId: articleId, viewSeconds: viewSeconds, userAppId: userAppId);
+      articleId: articleId,
+      viewSeconds: viewSeconds,
+      userAppId: userAppId,
+    );
   }
 
   ///Post article read data
   ///@param articleId ArticleId
   ///@param viewSeconds Count
   ///@param userAppId User App Id
-  @Post(
-    path: '/api/v2/view/logined',
-    optionalBody: true,
-  )
+  @Post(path: '/api/v2/view/logined', optionalBody: true)
   Future<chopper.Response> _apiV2ViewLoginedPost({
     @Query('articleId') required int? articleId,
     @Query('viewSeconds') required int? viewSeconds,
@@ -297,7 +301,9 @@ abstract class Api extends ChopperService {
   ///통계 데이터 조회
   Future<chopper.Response<StatsResponseDto>> apiV2StatsGet() {
     generatedMapping.putIfAbsent(
-        StatsResponseDto, () => StatsResponseDto.fromJsonFactory);
+      StatsResponseDto,
+      () => StatsResponseDto.fromJsonFactory,
+    );
 
     return _apiV2StatsGet();
   }
@@ -312,10 +318,7 @@ abstract class Api extends ChopperService {
   }
 
   ///Create Bookmark Backup
-  @Post(
-    path: '/api/v2/bookmark/backup',
-    optionalBody: true,
-  )
+  @Post(path: '/api/v2/bookmark/backup', optionalBody: true)
   Future<chopper.Response> _apiV2BookmarkBackupPost();
 
   ///Get User Bookmarks
@@ -363,13 +366,17 @@ class CommentGetResponseDtoElement {
             (identical(other.id, id) ||
                 const DeepCollectionEquality().equals(other.id, id)) &&
             (identical(other.userAppId, userAppId) ||
-                const DeepCollectionEquality()
-                    .equals(other.userAppId, userAppId)) &&
+                const DeepCollectionEquality().equals(
+                  other.userAppId,
+                  userAppId,
+                )) &&
             (identical(other.body, body) ||
                 const DeepCollectionEquality().equals(other.body, body)) &&
             (identical(other.dateTime, dateTime) ||
-                const DeepCollectionEquality()
-                    .equals(other.dateTime, dateTime)) &&
+                const DeepCollectionEquality().equals(
+                  other.dateTime,
+                  dateTime,
+                )) &&
             (identical(other.parent, parent) ||
                 const DeepCollectionEquality().equals(other.parent, parent)));
   }
@@ -389,40 +396,42 @@ class CommentGetResponseDtoElement {
 
 extension $CommentGetResponseDtoElementExtension
     on CommentGetResponseDtoElement {
-  CommentGetResponseDtoElement copyWith(
-      {int? id,
-      String? userAppId,
-      String? body,
-      DateTime? dateTime,
-      int? parent}) {
+  CommentGetResponseDtoElement copyWith({
+    int? id,
+    String? userAppId,
+    String? body,
+    DateTime? dateTime,
+    int? parent,
+  }) {
     return CommentGetResponseDtoElement(
-        id: id ?? this.id,
-        userAppId: userAppId ?? this.userAppId,
-        body: body ?? this.body,
-        dateTime: dateTime ?? this.dateTime,
-        parent: parent ?? this.parent);
+      id: id ?? this.id,
+      userAppId: userAppId ?? this.userAppId,
+      body: body ?? this.body,
+      dateTime: dateTime ?? this.dateTime,
+      parent: parent ?? this.parent,
+    );
   }
 
-  CommentGetResponseDtoElement copyWithWrapped(
-      {Wrapped<int>? id,
-      Wrapped<String>? userAppId,
-      Wrapped<String>? body,
-      Wrapped<DateTime>? dateTime,
-      Wrapped<int?>? parent}) {
+  CommentGetResponseDtoElement copyWithWrapped({
+    Wrapped<int>? id,
+    Wrapped<String>? userAppId,
+    Wrapped<String>? body,
+    Wrapped<DateTime>? dateTime,
+    Wrapped<int?>? parent,
+  }) {
     return CommentGetResponseDtoElement(
-        id: (id != null ? id.value : this.id),
-        userAppId: (userAppId != null ? userAppId.value : this.userAppId),
-        body: (body != null ? body.value : this.body),
-        dateTime: (dateTime != null ? dateTime.value : this.dateTime),
-        parent: (parent != null ? parent.value : this.parent));
+      id: (id != null ? id.value : this.id),
+      userAppId: (userAppId != null ? userAppId.value : this.userAppId),
+      body: (body != null ? body.value : this.body),
+      dateTime: (dateTime != null ? dateTime.value : this.dateTime),
+      parent: (parent != null ? parent.value : this.parent),
+    );
   }
 }
 
 @JsonSerializable(explicitToJson: true)
 class CommentGetResponseDto {
-  const CommentGetResponseDto({
-    required this.elements,
-  });
+  const CommentGetResponseDto({required this.elements});
 
   factory CommentGetResponseDto.fromJson(Map<String, dynamic> json) =>
       _$CommentGetResponseDtoFromJson(json);
@@ -439,8 +448,10 @@ class CommentGetResponseDto {
     return identical(this, other) ||
         (other is CommentGetResponseDto &&
             (identical(other.elements, elements) ||
-                const DeepCollectionEquality()
-                    .equals(other.elements, elements)));
+                const DeepCollectionEquality().equals(
+                  other.elements,
+                  elements,
+                )));
   }
 
   @override
@@ -452,25 +463,24 @@ class CommentGetResponseDto {
 }
 
 extension $CommentGetResponseDtoExtension on CommentGetResponseDto {
-  CommentGetResponseDto copyWith(
-      {List<CommentGetResponseDtoElement>? elements}) {
+  CommentGetResponseDto copyWith({
+    List<CommentGetResponseDtoElement>? elements,
+  }) {
     return CommentGetResponseDto(elements: elements ?? this.elements);
   }
 
-  CommentGetResponseDto copyWithWrapped(
-      {Wrapped<List<CommentGetResponseDtoElement>>? elements}) {
+  CommentGetResponseDto copyWithWrapped({
+    Wrapped<List<CommentGetResponseDtoElement>>? elements,
+  }) {
     return CommentGetResponseDto(
-        elements: (elements != null ? elements.value : this.elements));
+      elements: (elements != null ? elements.value : this.elements),
+    );
   }
 }
 
 @JsonSerializable(explicitToJson: true)
 class CommentPostDto {
-  const CommentPostDto({
-    required this.where,
-    required this.body,
-    this.parent,
-  });
+  const CommentPostDto({required this.where, required this.body, this.parent});
 
   factory CommentPostDto.fromJson(Map<String, dynamic> json) =>
       _$CommentPostDtoFromJson(json);
@@ -512,17 +522,22 @@ class CommentPostDto {
 extension $CommentPostDtoExtension on CommentPostDto {
   CommentPostDto copyWith({String? where, String? body, int? parent}) {
     return CommentPostDto(
-        where: where ?? this.where,
-        body: body ?? this.body,
-        parent: parent ?? this.parent);
+      where: where ?? this.where,
+      body: body ?? this.body,
+      parent: parent ?? this.parent,
+    );
   }
 
-  CommentPostDto copyWithWrapped(
-      {Wrapped<String>? where, Wrapped<String>? body, Wrapped<int?>? parent}) {
+  CommentPostDto copyWithWrapped({
+    Wrapped<String>? where,
+    Wrapped<String>? body,
+    Wrapped<int?>? parent,
+  }) {
     return CommentPostDto(
-        where: (where != null ? where.value : this.where),
-        body: (body != null ? body.value : this.body),
-        parent: (parent != null ? parent.value : this.parent));
+      where: (where != null ? where.value : this.where),
+      body: (body != null ? body.value : this.body),
+      parent: (parent != null ? parent.value : this.parent),
+    );
   }
 }
 
@@ -552,11 +567,7 @@ class User {
   final DateTime updatedAt;
   @JsonKey(name: 'userAppId')
   final String userAppId;
-  @JsonKey(
-    name: 'role',
-    toJson: userRoleToJson,
-    fromJson: userRoleRoleFromJson,
-  )
+  @JsonKey(name: 'role', toJson: userRoleToJson, fromJson: userRoleRoleFromJson)
   final enums.UserRole role;
   static enums.UserRole userRoleRoleFromJson(Object? value) =>
       userRoleFromJson(value, enums.UserRole.user);
@@ -576,24 +587,34 @@ class User {
             (identical(other.id, id) ||
                 const DeepCollectionEquality().equals(other.id, id)) &&
             (identical(other.createdAt, createdAt) ||
-                const DeepCollectionEquality()
-                    .equals(other.createdAt, createdAt)) &&
+                const DeepCollectionEquality().equals(
+                  other.createdAt,
+                  createdAt,
+                )) &&
             (identical(other.updatedAt, updatedAt) ||
-                const DeepCollectionEquality()
-                    .equals(other.updatedAt, updatedAt)) &&
+                const DeepCollectionEquality().equals(
+                  other.updatedAt,
+                  updatedAt,
+                )) &&
             (identical(other.userAppId, userAppId) ||
-                const DeepCollectionEquality()
-                    .equals(other.userAppId, userAppId)) &&
+                const DeepCollectionEquality().equals(
+                  other.userAppId,
+                  userAppId,
+                )) &&
             (identical(other.role, role) ||
                 const DeepCollectionEquality().equals(other.role, role)) &&
             (identical(other.discordId, discordId) ||
-                const DeepCollectionEquality()
-                    .equals(other.discordId, discordId)) &&
+                const DeepCollectionEquality().equals(
+                  other.discordId,
+                  discordId,
+                )) &&
             (identical(other.avatar, avatar) ||
                 const DeepCollectionEquality().equals(other.avatar, avatar)) &&
             (identical(other.nickname, nickname) ||
-                const DeepCollectionEquality()
-                    .equals(other.nickname, nickname)));
+                const DeepCollectionEquality().equals(
+                  other.nickname,
+                  nickname,
+                )));
   }
 
   @override
@@ -613,52 +634,54 @@ class User {
 }
 
 extension $UserExtension on User {
-  User copyWith(
-      {double? id,
-      DateTime? createdAt,
-      DateTime? updatedAt,
-      String? userAppId,
-      enums.UserRole? role,
-      String? discordId,
-      String? avatar,
-      String? nickname}) {
+  User copyWith({
+    double? id,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? userAppId,
+    enums.UserRole? role,
+    String? discordId,
+    String? avatar,
+    String? nickname,
+  }) {
     return User(
-        id: id ?? this.id,
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-        userAppId: userAppId ?? this.userAppId,
-        role: role ?? this.role,
-        discordId: discordId ?? this.discordId,
-        avatar: avatar ?? this.avatar,
-        nickname: nickname ?? this.nickname);
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      userAppId: userAppId ?? this.userAppId,
+      role: role ?? this.role,
+      discordId: discordId ?? this.discordId,
+      avatar: avatar ?? this.avatar,
+      nickname: nickname ?? this.nickname,
+    );
   }
 
-  User copyWithWrapped(
-      {Wrapped<double>? id,
-      Wrapped<DateTime>? createdAt,
-      Wrapped<DateTime>? updatedAt,
-      Wrapped<String>? userAppId,
-      Wrapped<enums.UserRole>? role,
-      Wrapped<String>? discordId,
-      Wrapped<String>? avatar,
-      Wrapped<String>? nickname}) {
+  User copyWithWrapped({
+    Wrapped<double>? id,
+    Wrapped<DateTime>? createdAt,
+    Wrapped<DateTime>? updatedAt,
+    Wrapped<String>? userAppId,
+    Wrapped<enums.UserRole>? role,
+    Wrapped<String>? discordId,
+    Wrapped<String>? avatar,
+    Wrapped<String>? nickname,
+  }) {
     return User(
-        id: (id != null ? id.value : this.id),
-        createdAt: (createdAt != null ? createdAt.value : this.createdAt),
-        updatedAt: (updatedAt != null ? updatedAt.value : this.updatedAt),
-        userAppId: (userAppId != null ? userAppId.value : this.userAppId),
-        role: (role != null ? role.value : this.role),
-        discordId: (discordId != null ? discordId.value : this.discordId),
-        avatar: (avatar != null ? avatar.value : this.avatar),
-        nickname: (nickname != null ? nickname.value : this.nickname));
+      id: (id != null ? id.value : this.id),
+      createdAt: (createdAt != null ? createdAt.value : this.createdAt),
+      updatedAt: (updatedAt != null ? updatedAt.value : this.updatedAt),
+      userAppId: (userAppId != null ? userAppId.value : this.userAppId),
+      role: (role != null ? role.value : this.role),
+      discordId: (discordId != null ? discordId.value : this.discordId),
+      avatar: (avatar != null ? avatar.value : this.avatar),
+      nickname: (nickname != null ? nickname.value : this.nickname),
+    );
   }
 }
 
 @JsonSerializable(explicitToJson: true)
 class UserRegisterDTO {
-  const UserRegisterDTO({
-    required this.userAppId,
-  });
+  const UserRegisterDTO({required this.userAppId});
 
   factory UserRegisterDTO.fromJson(Map<String, dynamic> json) =>
       _$UserRegisterDTOFromJson(json);
@@ -675,8 +698,10 @@ class UserRegisterDTO {
     return identical(this, other) ||
         (other is UserRegisterDTO &&
             (identical(other.userAppId, userAppId) ||
-                const DeepCollectionEquality()
-                    .equals(other.userAppId, userAppId)));
+                const DeepCollectionEquality().equals(
+                  other.userAppId,
+                  userAppId,
+                )));
   }
 
   @override
@@ -694,19 +719,18 @@ extension $UserRegisterDTOExtension on UserRegisterDTO {
 
   UserRegisterDTO copyWithWrapped({Wrapped<String>? userAppId}) {
     return UserRegisterDTO(
-        userAppId: (userAppId != null ? userAppId.value : this.userAppId));
+      userAppId: (userAppId != null ? userAppId.value : this.userAppId),
+    );
   }
 }
 
 @JsonSerializable(explicitToJson: true)
 class ListDiscordUserAppIdsResponseDto {
-  const ListDiscordUserAppIdsResponseDto({
-    required this.userAppIds,
-  });
+  const ListDiscordUserAppIdsResponseDto({required this.userAppIds});
 
   factory ListDiscordUserAppIdsResponseDto.fromJson(
-          Map<String, dynamic> json) =>
-      _$ListDiscordUserAppIdsResponseDtoFromJson(json);
+    Map<String, dynamic> json,
+  ) => _$ListDiscordUserAppIdsResponseDtoFromJson(json);
 
   static const toJsonFactory = _$ListDiscordUserAppIdsResponseDtoToJson;
   Map<String, dynamic> toJson() =>
@@ -721,8 +745,10 @@ class ListDiscordUserAppIdsResponseDto {
     return identical(this, other) ||
         (other is ListDiscordUserAppIdsResponseDto &&
             (identical(other.userAppIds, userAppIds) ||
-                const DeepCollectionEquality()
-                    .equals(other.userAppIds, userAppIds)));
+                const DeepCollectionEquality().equals(
+                  other.userAppIds,
+                  userAppIds,
+                )));
   }
 
   @override
@@ -737,22 +763,22 @@ extension $ListDiscordUserAppIdsResponseDtoExtension
     on ListDiscordUserAppIdsResponseDto {
   ListDiscordUserAppIdsResponseDto copyWith({List<String>? userAppIds}) {
     return ListDiscordUserAppIdsResponseDto(
-        userAppIds: userAppIds ?? this.userAppIds);
+      userAppIds: userAppIds ?? this.userAppIds,
+    );
   }
 
-  ListDiscordUserAppIdsResponseDto copyWithWrapped(
-      {Wrapped<List<String>>? userAppIds}) {
+  ListDiscordUserAppIdsResponseDto copyWithWrapped({
+    Wrapped<List<String>>? userAppIds,
+  }) {
     return ListDiscordUserAppIdsResponseDto(
-        userAppIds: (userAppIds != null ? userAppIds.value : this.userAppIds));
+      userAppIds: (userAppIds != null ? userAppIds.value : this.userAppIds),
+    );
   }
 }
 
 @JsonSerializable(explicitToJson: true)
 class Tokens {
-  const Tokens({
-    required this.accessToken,
-    required this.refreshToken,
-  });
+  const Tokens({required this.accessToken, required this.refreshToken});
 
   factory Tokens.fromJson(Map<String, dynamic> json) => _$TokensFromJson(json);
 
@@ -770,11 +796,15 @@ class Tokens {
     return identical(this, other) ||
         (other is Tokens &&
             (identical(other.accessToken, accessToken) ||
-                const DeepCollectionEquality()
-                    .equals(other.accessToken, accessToken)) &&
+                const DeepCollectionEquality().equals(
+                  other.accessToken,
+                  accessToken,
+                )) &&
             (identical(other.refreshToken, refreshToken) ||
-                const DeepCollectionEquality()
-                    .equals(other.refreshToken, refreshToken)));
+                const DeepCollectionEquality().equals(
+                  other.refreshToken,
+                  refreshToken,
+                )));
   }
 
   @override
@@ -790,17 +820,21 @@ class Tokens {
 extension $TokensExtension on Tokens {
   Tokens copyWith({String? accessToken, String? refreshToken}) {
     return Tokens(
-        accessToken: accessToken ?? this.accessToken,
-        refreshToken: refreshToken ?? this.refreshToken);
+      accessToken: accessToken ?? this.accessToken,
+      refreshToken: refreshToken ?? this.refreshToken,
+    );
   }
 
-  Tokens copyWithWrapped(
-      {Wrapped<String>? accessToken, Wrapped<String>? refreshToken}) {
+  Tokens copyWithWrapped({
+    Wrapped<String>? accessToken,
+    Wrapped<String>? refreshToken,
+  }) {
     return Tokens(
-        accessToken:
-            (accessToken != null ? accessToken.value : this.accessToken),
-        refreshToken:
-            (refreshToken != null ? refreshToken.value : this.refreshToken));
+      accessToken: (accessToken != null ? accessToken.value : this.accessToken),
+      refreshToken: (refreshToken != null
+          ? refreshToken.value
+          : this.refreshToken),
+    );
   }
 }
 
@@ -847,8 +881,10 @@ class ViewGetResponseDtoElement {
     return identical(this, other) ||
         (other is ViewGetResponseDtoElement &&
             (identical(other.articleId, articleId) ||
-                const DeepCollectionEquality()
-                    .equals(other.articleId, articleId)) &&
+                const DeepCollectionEquality().equals(
+                  other.articleId,
+                  articleId,
+                )) &&
             (identical(other.count, count) ||
                 const DeepCollectionEquality().equals(other.count, count)));
   }
@@ -866,22 +902,25 @@ class ViewGetResponseDtoElement {
 extension $ViewGetResponseDtoElementExtension on ViewGetResponseDtoElement {
   ViewGetResponseDtoElement copyWith({int? articleId, int? count}) {
     return ViewGetResponseDtoElement(
-        articleId: articleId ?? this.articleId, count: count ?? this.count);
+      articleId: articleId ?? this.articleId,
+      count: count ?? this.count,
+    );
   }
 
-  ViewGetResponseDtoElement copyWithWrapped(
-      {Wrapped<int>? articleId, Wrapped<int>? count}) {
+  ViewGetResponseDtoElement copyWithWrapped({
+    Wrapped<int>? articleId,
+    Wrapped<int>? count,
+  }) {
     return ViewGetResponseDtoElement(
-        articleId: (articleId != null ? articleId.value : this.articleId),
-        count: (count != null ? count.value : this.count));
+      articleId: (articleId != null ? articleId.value : this.articleId),
+      count: (count != null ? count.value : this.count),
+    );
   }
 }
 
 @JsonSerializable(explicitToJson: true)
 class ViewGetResponseDto {
-  const ViewGetResponseDto({
-    required this.elements,
-  });
+  const ViewGetResponseDto({required this.elements});
 
   factory ViewGetResponseDto.fromJson(Map<String, dynamic> json) =>
       _$ViewGetResponseDtoFromJson(json);
@@ -898,8 +937,10 @@ class ViewGetResponseDto {
     return identical(this, other) ||
         (other is ViewGetResponseDto &&
             (identical(other.elements, elements) ||
-                const DeepCollectionEquality()
-                    .equals(other.elements, elements)));
+                const DeepCollectionEquality().equals(
+                  other.elements,
+                  elements,
+                )));
   }
 
   @override
@@ -915,10 +956,12 @@ extension $ViewGetResponseDtoExtension on ViewGetResponseDto {
     return ViewGetResponseDto(elements: elements ?? this.elements);
   }
 
-  ViewGetResponseDto copyWithWrapped(
-      {Wrapped<List<ViewGetResponseDtoElement>>? elements}) {
+  ViewGetResponseDto copyWithWrapped({
+    Wrapped<List<ViewGetResponseDtoElement>>? elements,
+  }) {
     return ViewGetResponseDto(
-        elements: (elements != null ? elements.value : this.elements));
+      elements: (elements != null ? elements.value : this.elements),
+    );
   }
 }
 
@@ -952,17 +995,25 @@ class StatsResponseDto {
     return identical(this, other) ||
         (other is StatsResponseDto &&
             (identical(other.totalUsers, totalUsers) ||
-                const DeepCollectionEquality()
-                    .equals(other.totalUsers, totalUsers)) &&
+                const DeepCollectionEquality().equals(
+                  other.totalUsers,
+                  totalUsers,
+                )) &&
             (identical(other.totalComments, totalComments) ||
-                const DeepCollectionEquality()
-                    .equals(other.totalComments, totalComments)) &&
+                const DeepCollectionEquality().equals(
+                  other.totalComments,
+                  totalComments,
+                )) &&
             (identical(other.userGrowth, userGrowth) ||
-                const DeepCollectionEquality()
-                    .equals(other.userGrowth, userGrowth)) &&
+                const DeepCollectionEquality().equals(
+                  other.userGrowth,
+                  userGrowth,
+                )) &&
             (identical(other.commentGrowth, commentGrowth) ||
-                const DeepCollectionEquality()
-                    .equals(other.commentGrowth, commentGrowth)));
+                const DeepCollectionEquality().equals(
+                  other.commentGrowth,
+                  commentGrowth,
+                )));
   }
 
   @override
@@ -978,30 +1029,36 @@ class StatsResponseDto {
 }
 
 extension $StatsResponseDtoExtension on StatsResponseDto {
-  StatsResponseDto copyWith(
-      {int? totalUsers,
-      int? totalComments,
-      Object? userGrowth,
-      Object? commentGrowth}) {
+  StatsResponseDto copyWith({
+    int? totalUsers,
+    int? totalComments,
+    Object? userGrowth,
+    Object? commentGrowth,
+  }) {
     return StatsResponseDto(
-        totalUsers: totalUsers ?? this.totalUsers,
-        totalComments: totalComments ?? this.totalComments,
-        userGrowth: userGrowth ?? this.userGrowth,
-        commentGrowth: commentGrowth ?? this.commentGrowth);
+      totalUsers: totalUsers ?? this.totalUsers,
+      totalComments: totalComments ?? this.totalComments,
+      userGrowth: userGrowth ?? this.userGrowth,
+      commentGrowth: commentGrowth ?? this.commentGrowth,
+    );
   }
 
-  StatsResponseDto copyWithWrapped(
-      {Wrapped<int>? totalUsers,
-      Wrapped<int>? totalComments,
-      Wrapped<Object>? userGrowth,
-      Wrapped<Object>? commentGrowth}) {
+  StatsResponseDto copyWithWrapped({
+    Wrapped<int>? totalUsers,
+    Wrapped<int>? totalComments,
+    Wrapped<Object>? userGrowth,
+    Wrapped<Object>? commentGrowth,
+  }) {
     return StatsResponseDto(
-        totalUsers: (totalUsers != null ? totalUsers.value : this.totalUsers),
-        totalComments:
-            (totalComments != null ? totalComments.value : this.totalComments),
-        userGrowth: (userGrowth != null ? userGrowth.value : this.userGrowth),
-        commentGrowth:
-            (commentGrowth != null ? commentGrowth.value : this.commentGrowth));
+      totalUsers: (totalUsers != null ? totalUsers.value : this.totalUsers),
+      totalComments: (totalComments != null
+          ? totalComments.value
+          : this.totalComments),
+      userGrowth: (userGrowth != null ? userGrowth.value : this.userGrowth),
+      commentGrowth: (commentGrowth != null
+          ? commentGrowth.value
+          : this.commentGrowth),
+    );
   }
 }
 
@@ -1114,7 +1171,8 @@ class $CustomJsonDecoder {
 class $JsonSerializableConverter extends chopper.JsonConverter {
   @override
   FutureOr<chopper.Response<ResultType>> convertResponse<ResultType, Item>(
-      chopper.Response response) async {
+    chopper.Response response,
+  ) async {
     if (response.bodyString.isEmpty) {
       // In rare cases, when let's say 204 (no content) is returned -
       // we cannot decode the missing json with the result type specified
@@ -1127,13 +1185,16 @@ class $JsonSerializableConverter extends chopper.JsonConverter {
 
     if (ResultType == DateTime) {
       return response.copyWith(
-          body: DateTime.parse((response.body as String).replaceAll('"', ''))
-              as ResultType);
+        body:
+            DateTime.parse((response.body as String).replaceAll('"', ''))
+                as ResultType,
+      );
     }
 
     final jsonRes = await super.convertResponse(response);
     return jsonRes.copyWith<ResultType>(
-        body: $jsonDecoder.decode<Item>(jsonRes.body) as ResultType);
+      body: $jsonDecoder.decode<Item>(jsonRes.body) as ResultType,
+    );
   }
 }
 

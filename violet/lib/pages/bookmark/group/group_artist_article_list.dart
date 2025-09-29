@@ -40,8 +40,9 @@ class _GroupArtistArticleListState extends State<GroupArtistArticleList>
     final columnCount =
         MediaQuery.of(context).orientation == Orientation.landscape ? 4 : 3;
     return FutureBuilder(
-      future:
-          Future.delayed(const Duration(milliseconds: 1)).then((value) async {
+      future: Future.delayed(const Duration(milliseconds: 1)).then((
+        value,
+      ) async {
         final artists = (await (await Bookmark.getInstance()).getArtist())
             .where((element) => element.group() == widget.groupId)
             .toList()
@@ -50,10 +51,14 @@ class _GroupArtistArticleListState extends State<GroupArtistArticleList>
 
         if (artists.isEmpty) return <QueryResult>[];
 
-        final queryString = translate2query(artists
-            .map((e) =>
-                '${e.type().name}:${e.artist().toLowerCase().replaceAll(' ', '_')} ${Settings.includeTags.value}')
-            .join(' or '));
+        final queryString = translate2query(
+          artists
+              .map(
+                (e) =>
+                    '${e.type().name}:${e.artist().toLowerCase().replaceAll(' ', '_')} ${Settings.includeTags.value}',
+              )
+              .join(' or '),
+        );
 
         final qm = QueryManager.queryPagination(queryString, 100);
         return await qm.next();
@@ -61,9 +66,13 @@ class _GroupArtistArticleListState extends State<GroupArtistArticleList>
       builder: (context, AsyncSnapshot<List<QueryResult>> snapshot) {
         if (!snapshot.hasData) {
           return const Align(
-              alignment: Alignment.center,
-              child: SizedBox(
-                  width: 64, height: 64, child: CircularProgressIndicator()));
+            alignment: Alignment.center,
+            child: SizedBox(
+              width: 64,
+              height: 64,
+              child: CircularProgressIndicator(),
+            ),
+          );
         }
         return PrimaryScrollController(
           controller: ScrollController(),
@@ -78,11 +87,14 @@ class _GroupArtistArticleListState extends State<GroupArtistArticleList>
                   floating: true,
                   delegate: AnimatedOpacitySliver(
                     searchBar: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Stack(children: <Widget>[
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Stack(
+                        children: <Widget>[
                           // _filter(),
                           _title(),
-                        ])),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
                 SliverPadding(
@@ -96,38 +108,35 @@ class _GroupArtistArticleListState extends State<GroupArtistArticleList>
                       childAspectRatio: 3 / 4,
                     ),
                     delegate: SliverChildListDelegate(
-                      snapshot.data!.map(
-                        (e) {
-                          return DebounceWidget(
-                            child: Padding(
-                              key: Key('gaal/${e.id()}'),
-                              padding: EdgeInsets.zero,
-                              child: Align(
-                                alignment: Alignment.bottomCenter,
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: <Widget>[
-                                    Provider<ArticleListItem>.value(
-                                      value:
-                                          ArticleListItem.fromArticleListItem(
-                                        queryResult: e,
-                                        addBottomPadding: false,
-                                        showDetail: false,
-                                        width: (windowWidth - 4.0 - 52) /
-                                            columnCount,
-                                        thumbnailTag: const Uuid().v4(),
-                                        usableTabList: snapshot.data,
-                                      ),
-                                      child: const ArticleListItemWidget(),
-                                    )
-                                  ],
-                                ),
+                      snapshot.data!.map((e) {
+                        return DebounceWidget(
+                          child: Padding(
+                            key: Key('gaal/${e.id()}'),
+                            padding: EdgeInsets.zero,
+                            child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: <Widget>[
+                                  Provider<ArticleListItem>.value(
+                                    value: ArticleListItem.fromArticleListItem(
+                                      queryResult: e,
+                                      addBottomPadding: false,
+                                      showDetail: false,
+                                      width:
+                                          (windowWidth - 4.0 - 52) /
+                                          columnCount,
+                                      thumbnailTag: const Uuid().v4(),
+                                      usableTabList: snapshot.data,
+                                    ),
+                                    child: const ArticleListItemWidget(),
+                                  ),
+                                ],
                               ),
                             ),
-                          );
-                        },
-                      ).toList(),
+                          ),
+                        );
+                      }).toList(),
                     ),
                   ),
                 ),
@@ -142,8 +151,10 @@ class _GroupArtistArticleListState extends State<GroupArtistArticleList>
   Widget _title() {
     return const Padding(
       padding: EdgeInsets.only(top: 24, left: 12),
-      child: Text('Artists Article Collection',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      child: Text(
+        'Artists Article Collection',
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
     );
   }
 }

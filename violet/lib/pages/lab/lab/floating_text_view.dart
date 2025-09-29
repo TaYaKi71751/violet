@@ -48,14 +48,16 @@ class _FloatingTextViewState extends State<FloatingTextView>
 
     // 초기 노드 생성
     for (int i = 0; i < nodeCount; i++) {
-      _nodes.add(NodeText(
-        // 원점 주변 영역에 노드 배치 (-spreadRadius ~ +spreadRadius)
-        x: (math.Random().nextDouble() * 2 - 1) * spreadRadius,
-        y: (math.Random().nextDouble() * 2 - 1) * spreadRadius,
-        maxWidth: _virtualSize.width,
-        maxHeight: _virtualSize.height,
-        useBoundary: useBoundary,
-      ));
+      _nodes.add(
+        NodeText(
+          // 원점 주변 영역에 노드 배치 (-spreadRadius ~ +spreadRadius)
+          x: (math.Random().nextDouble() * 2 - 1) * spreadRadius,
+          y: (math.Random().nextDouble() * 2 - 1) * spreadRadius,
+          maxWidth: _virtualSize.width,
+          maxHeight: _virtualSize.height,
+          useBoundary: useBoundary,
+        ),
+      );
     }
 
     // 변환 컨트롤러 초기화 - 화면 중앙을 기준점으로 설정
@@ -142,8 +144,12 @@ class _FloatingTextViewState extends State<FloatingTextView>
 
                     return CustomPaint(
                       size: _virtualSize,
-                      painter: InfiniteGridPainter(_gridSize, _gridColor,
-                          getOffsetFromTransform(), getScaleFromTransform()),
+                      painter: InfiniteGridPainter(
+                        _gridSize,
+                        _gridColor,
+                        getOffsetFromTransform(),
+                        getScaleFromTransform(),
+                      ),
                       foregroundPainter: NodeEdgePainter(_nodes, maxDistance),
                       child: Stack(
                         children: _nodes.map((node) {
@@ -156,18 +162,24 @@ class _FloatingTextViewState extends State<FloatingTextView>
                                   _draggedNode = node;
                                   // 현재 변환을 고려한 위치 계산
                                   final invertedMatrix = Matrix4.inverted(
-                                      _transformationController.value);
+                                    _transformationController.value,
+                                  );
                                   _dragPosition = MatrixUtils.transformPoint(
-                                      invertedMatrix, details.globalPosition);
+                                    invertedMatrix,
+                                    details.globalPosition,
+                                  );
                                 });
                               },
                               onPanUpdate: (details) {
                                 if (_draggedNode == node) {
                                   final invertedMatrix = Matrix4.inverted(
-                                      _transformationController.value);
+                                    _transformationController.value,
+                                  );
                                   final localPosition =
-                                      MatrixUtils.transformPoint(invertedMatrix,
-                                          details.globalPosition);
+                                      MatrixUtils.transformPoint(
+                                        invertedMatrix,
+                                        details.globalPosition,
+                                      );
 
                                   final dx =
                                       localPosition.dx - _dragPosition!.dx;
@@ -286,7 +298,9 @@ class _FloatingTextViewState extends State<FloatingTextView>
                       foregroundColor: Colors.white,
                       visualDensity: VisualDensity.compact,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       textStyle: const TextStyle(fontSize: 12),
                     ),
                   ),
@@ -324,13 +338,18 @@ class NodeEdgePainter extends CustomPainter {
     // 노드 사이에 엣지 그리기
     for (int i = 0; i < nodes.length; i++) {
       for (int j = i + 1; j < nodes.length; j++) {
-        final distance = math.sqrt(math.pow(nodes[i].x - nodes[j].x, 2) +
-            math.pow(nodes[i].y - nodes[j].y, 2));
+        final distance = math.sqrt(
+          math.pow(nodes[i].x - nodes[j].x, 2) +
+              math.pow(nodes[i].y - nodes[j].y, 2),
+        );
 
         if (distance < maxDistance) {
           final opacity = 1.0 - (distance / maxDistance);
-          final blendedColor = Color.lerp(nodes[i].color, nodes[j].color, 0.5)!
-              .withOpacity(opacity * 0.5);
+          final blendedColor = Color.lerp(
+            nodes[i].color,
+            nodes[j].color,
+            0.5,
+          )!.withOpacity(opacity * 0.5);
 
           final paint = Paint()
             ..color = blendedColor
@@ -380,8 +399,11 @@ class InfiniteGridPainter extends CustomPainter {
     final endY = ((visibleBottom ~/ scaledGridSize) + 1) * scaledGridSize;
 
     for (double y = startY; y <= endY; y += scaledGridSize) {
-      canvas.drawLine(Offset(visibleLeft - 10000, y),
-          Offset(visibleRight + 10000, y), paint);
+      canvas.drawLine(
+        Offset(visibleLeft - 10000, y),
+        Offset(visibleRight + 10000, y),
+        paint,
+      );
     }
 
     // 세로 격자선 - 보이는 부분만 그리기
@@ -389,8 +411,11 @@ class InfiniteGridPainter extends CustomPainter {
     final endX = ((visibleRight ~/ scaledGridSize) + 1) * scaledGridSize;
 
     for (double x = startX; x <= endX; x += scaledGridSize) {
-      canvas.drawLine(Offset(x, visibleTop - 10000),
-          Offset(x, visibleBottom + 10000), paint);
+      canvas.drawLine(
+        Offset(x, visibleTop - 10000),
+        Offset(x, visibleBottom + 10000),
+        paint,
+      );
     }
 
     // 원점 표시
@@ -399,12 +424,18 @@ class InfiniteGridPainter extends CustomPainter {
       ..strokeWidth = 2.0;
 
     // 가로선
-    canvas.drawLine(Offset(visibleLeft - 10000, 0),
-        Offset(visibleRight + 10000, 0), centerPaint);
+    canvas.drawLine(
+      Offset(visibleLeft - 10000, 0),
+      Offset(visibleRight + 10000, 0),
+      centerPaint,
+    );
 
     // 세로선
-    canvas.drawLine(Offset(0, visibleTop - 10000),
-        Offset(0, visibleBottom + 10000), centerPaint);
+    canvas.drawLine(
+      Offset(0, visibleTop - 10000),
+      Offset(0, visibleBottom + 10000),
+      centerPaint,
+    );
   }
 
   @override
@@ -446,7 +477,7 @@ class NodeText {
     '기술',
     '창의성',
     'Data',
-    '설계'
+    '설계',
   ];
 
   NodeText({

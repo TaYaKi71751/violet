@@ -11,13 +11,13 @@ class Palette {
 
   static Color get themeColor => Settings.themeWhat.value
       ? Settings.themeBlack.value
-          ? Palette.blackThemeBackground
-          : Palette.darkThemeBackground
+            ? Palette.blackThemeBackground
+            : Palette.darkThemeBackground
       : Palette.lightThemeBackground;
 
   static Color get themeColorLightShallow => Settings.themeWhat.value
       ? Settings.themeBlack.value
-          ? Palette.blackThemeBackground
-          : Palette.darkThemeBackground
+            ? Palette.blackThemeBackground
+            : Palette.darkThemeBackground
       : Colors.grey.shade200;
 }

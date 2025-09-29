@@ -87,6 +87,8 @@ class MainActivity : FlutterFragmentActivity() {
             when (call.method) {
                 "finishMainActivity" -> finishMainActivity(call, result)
                 "exportFile" -> exportFile(call, result)
+                "setWindowSecure" -> setWindowSecure(call, result)
+                "setWindowInsecure" -> setWindowInsecure(call, result)
                 else -> result.notImplemented()
             }
         }
@@ -179,6 +181,24 @@ class MainActivity : FlutterFragmentActivity() {
             }
         } finally {
             exportFileRequestMap.remove(requestCode)
+        }
+    }
+
+    private fun setWindowSecure(call: MethodCall, result: MethodChannel.Result) {
+        try {
+            window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+            result.success(null)
+        } catch (e: Exception) {
+            result.error(e.javaClass.simpleName, e.localizedMessage, null)
+        }
+    }
+
+    private fun setWindowInsecure(call: MethodCall, result: MethodChannel.Result) {
+        try {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+            result.success(null)
+        } catch (e: Exception) {
+            result.error(e.javaClass.simpleName, e.localizedMessage, null)
         }
     }
 }

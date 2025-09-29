@@ -17,8 +17,9 @@ class Population {
     String data;
 
     if (Platform.environment.containsKey('FLUTTER_TEST')) {
-      final file =
-          File(join(Directory.current.path, 'assets/rank/population.json'));
+      final file = File(
+        join(Directory.current.path, 'assets/rank/population.json'),
+      );
       data = await file.readAsString();
     } else {
       data = await rootBundle.loadString('assets/rank/population.json');

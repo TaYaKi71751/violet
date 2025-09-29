@@ -48,9 +48,7 @@ import 'package:violet/widgets/article_item/article_list_item_widget.dart';
 import 'package:violet/widgets/article_item/image_provider_manager.dart';
 
 class ArticleInfoPage extends StatelessWidget {
-  const ArticleInfoPage({
-    super.key,
-  });
+  const ArticleInfoPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +58,8 @@ class ArticleInfoPage extends StatelessWidget {
     final mediaQuery = MediaQuery.of(context);
 
     Variables.setArticleInfoHeight(
-        height - 36 - (mediaQuery.padding + mediaQuery.viewInsets).bottom);
+      height - 36 - (mediaQuery.padding + mediaQuery.viewInsets).bottom,
+    );
 
     return Container(
       color: Palette.themeColorLightShallow,
@@ -89,9 +88,7 @@ class ArticleInfoPage extends StatelessWidget {
                 buttonArea(context),
                 TagInfoAreaWidget(queryResult: data.queryResult),
                 const DividerWidget(),
-                _CommentArea(
-                  queryResult: data.queryResult,
-                ),
+                _CommentArea(queryResult: data.queryResult),
                 const DividerWidget(),
                 ExpandableNotifier(
                   initialExpanded: true,
@@ -102,11 +99,11 @@ class ArticleInfoPage extends StatelessWidget {
                       scrollOnCollapse: false,
                       child: ExpandablePanel(
                         theme: ExpandableThemeData(
-                            iconColor: Settings.themeWhat.value
-                                ? Colors.white
-                                : Colors.grey,
-                            animationDuration:
-                                const Duration(milliseconds: 500)),
+                          iconColor: Settings.themeWhat.value
+                              ? Colors.white
+                              : Colors.grey,
+                          animationDuration: const Duration(milliseconds: 500),
+                        ),
                         header: Padding(
                           padding: const EdgeInsets.fromLTRB(12, 12, 0, 0),
                           child: Text(Translations.instance!.trans('preview')),
@@ -132,19 +129,24 @@ class ArticleInfoPage extends StatelessWidget {
                         scrollOnCollapse: false,
                         child: ExpandablePanel(
                           theme: ExpandableThemeData(
-                              iconColor: Settings.themeWhat.value
-                                  ? Colors.white
-                                  : Colors.grey,
-                              animationDuration:
-                                  const Duration(milliseconds: 500)),
+                            iconColor: Settings.themeWhat.value
+                                ? Colors.white
+                                : Colors.grey,
+                            animationDuration: const Duration(
+                              milliseconds: 500,
+                            ),
+                          ),
                           header: Padding(
                             padding: const EdgeInsets.fromLTRB(12, 12, 0, 0),
                             child: Text(
-                                '${Translations.instance!.trans('related')} ${Translations.instance!.trans('articles')}'),
+                              '${Translations.instance!.trans('related')} ${Translations.instance!.trans('articles')}',
+                            ),
                           ),
                           expanded: _RelatedArea(
-                              relatedIds:
-                                  Related.getRelated(data.queryResult.id())),
+                            relatedIds: Related.getRelated(
+                              data.queryResult.id(),
+                            ),
+                          ),
                           collapsed: Container(),
                         ),
                       ),
@@ -210,7 +212,8 @@ class ArticleInfoPage extends StatelessWidget {
         const SizedBox(width: 4.0),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-              backgroundColor: Settings.majorColor.value),
+            backgroundColor: Settings.majorColor.value,
+          ),
           onPressed: data.lockRead
               ? null
               : () async => await readButtonEvent(context, data),
@@ -228,8 +231,10 @@ class ArticleInfoPage extends StatelessWidget {
         !await Permission.manageExternalStorage.isGranted) {
       if (await Permission.manageExternalStorage.request() ==
           PermissionStatus.denied) {
-        await showOkDialog(context,
-            'If you do not allow file permissions, you cannot continue :(');
+        await showOkDialog(
+          context,
+          'If you do not allow file permissions, you cannot continue :(',
+        );
         return;
       }
     }
@@ -241,8 +246,10 @@ class ArticleInfoPage extends StatelessWidget {
       return;
     }
 
-    if ((await Download.getInstance())
-        .isDownloadedArticle(data.queryResult.id(), false)) {
+    if ((await Download.getInstance()).isDownloadedArticle(
+      data.queryResult.id(),
+      false,
+    )) {
       if (await showYesNoDialog(context, '이미 다운로드된 작품입니다. 그래도 다운로드할까요?') !=
           true) {
         return;
@@ -293,25 +300,28 @@ class ArticleInfoPage extends StatelessWidget {
         fullscreenDialog: true,
         builder: (context) {
           return Provider<ViewerPageProvider>.value(
-              value: ViewerPageProvider(
-                // uris: ThumbnailManager.get(queryResult.id())
-                //     .$1,
-                // useWeb: true,
-                uris: List<String>.filled(prov.length(), ''),
-                useProvider: true,
-                provider: prov,
-                headers: data.headers,
-                id: data.queryResult.id(),
-                title: data.queryResult.title(),
-                usableTabList: data.usableTabList,
-                jumpPage: page,
-              ),
-              child: const ViewerPage());
+            value: ViewerPageProvider(
+              // uris: ThumbnailManager.get(queryResult.id())
+              //     .$1,
+              // useWeb: true,
+              uris: List<String>.filled(prov.length(), ''),
+              useProvider: true,
+              provider: prov,
+              headers: data.headers,
+              id: data.queryResult.id(),
+              title: data.queryResult.title(),
+              usableTabList: data.usableTabList,
+              jumpPage: page,
+            ),
+            child: const ViewerPage(),
+          );
         },
       ),
     ).then((value) async {
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-          overlays: SystemUiOverlay.values);
+      SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.manual,
+        overlays: SystemUiOverlay.values,
+      );
     });
   }
 }
@@ -322,9 +332,7 @@ class DividerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(
-        horizontal: 8.0,
-      ),
+      margin: const EdgeInsets.symmetric(horizontal: 8.0),
       width: double.infinity,
       height: 1.0,
       color: Settings.themeWhat.value
@@ -346,70 +354,90 @@ class TagInfoAreaWidget extends StatelessWidget {
       shrinkWrap: true,
       children: [
         MultiChipWidget(
-            queryResult.tags(),
-            Translations.instance!.trans('tags'),
-            queryResult.tags() != null
-                ? (queryResult.tags() as String)
+          queryResult.tags(),
+          Translations.instance!.trans('tags'),
+          queryResult.tags() != null
+              ? (queryResult.tags() as String)
                     .split('|')
                     .where((element) => element != '')
-                    .map((e) => (
-                          e.contains(':') ? e.split(':')[0] : 'tags',
-                          e.contains(':') ? e.split(':')[1] : e
-                        ))
+                    .map(
+                      (e) => (
+                        e.contains(':') ? e.split(':')[0] : 'tags',
+                        e.contains(':') ? e.split(':')[1] : e,
+                      ),
+                    )
                     .toList()
-                : []),
+              : [],
+        ),
         SingleChipWidget(
-            queryResult.language(),
-            Translations.instance!.trans('language').split(' ')[0].trim(),
-            'language'),
+          queryResult.language(),
+          Translations.instance!.trans('language').split(' ')[0].trim(),
+          'language',
+        ),
         MultiChipWidget(
-            queryResult.artists(),
-            Translations.instance!.trans('artist'),
-            queryResult.artists() != null
-                ? (queryResult.artists() as String)
+          queryResult.artists(),
+          Translations.instance!.trans('artist'),
+          queryResult.artists() != null
+              ? (queryResult.artists() as String)
                     .split('|')
                     .where((element) => element != '')
                     .map((e) => ('artist', e))
                     .toList()
-                : []),
+              : [],
+        ),
         MultiChipWidget(
-            queryResult.groups(),
-            Translations.instance!.trans('group'),
-            queryResult.groups() != null
-                ? (queryResult.groups() as String)
+          queryResult.groups(),
+          Translations.instance!.trans('group'),
+          queryResult.groups() != null
+              ? (queryResult.groups() as String)
                     .split('|')
                     .where((element) => element != '')
                     .map((e) => ('group', e))
                     .toList()
-                : []),
+              : [],
+        ),
         MultiChipWidget(
-            queryResult.series(),
-            Translations.instance!.trans('series'),
-            queryResult.series() != null
-                ? (queryResult.series() as String)
+          queryResult.series(),
+          Translations.instance!.trans('series'),
+          queryResult.series() != null
+              ? (queryResult.series() as String)
                     .split('|')
                     .where((element) => element != '')
                     .map((e) => ('series', e))
                     .toList()
-                : []),
+              : [],
+        ),
         MultiChipWidget(
-            queryResult.characters(),
-            Translations.instance!.trans('character'),
-            queryResult.characters() != null
-                ? (queryResult.characters() as String)
+          queryResult.characters(),
+          Translations.instance!.trans('character'),
+          queryResult.characters() != null
+              ? (queryResult.characters() as String)
                     .split('|')
                     .where((element) => element != '')
                     .map((e) => ('character', e))
                     .toList()
-                : []),
+              : [],
+        ),
         SingleChipWidget(
-            queryResult.type(), Translations.instance!.trans('type'), 'type'),
-        SingleChipWidget(queryResult.uploader(),
-            Translations.instance!.trans('uploader'), 'uploader'),
-        SingleChipWidget(queryResult.id().toString(),
-            Translations.instance!.trans('id'), 'id'),
-        SingleChipWidget(queryResult.classname(),
-            Translations.instance!.trans('class'), 'class'),
+          queryResult.type(),
+          Translations.instance!.trans('type'),
+          'type',
+        ),
+        SingleChipWidget(
+          queryResult.uploader(),
+          Translations.instance!.trans('uploader'),
+          'uploader',
+        ),
+        SingleChipWidget(
+          queryResult.id().toString(),
+          Translations.instance!.trans('id'),
+          'id',
+        ),
+        SingleChipWidget(
+          queryResult.classname(),
+          Translations.instance!.trans('class'),
+          'class',
+        ),
         Container(height: 10),
       ],
     );
@@ -427,13 +455,7 @@ class TagInfoAreaWidget extends StatelessWidget {
             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
           ),
         ),
-        Expanded(
-          child: Wrap(
-            spacing: 1.0,
-            runSpacing: -12.0,
-            children: wrap,
-          ),
-        ),
+        Expanded(child: Wrap(spacing: 1.0, runSpacing: -12.0, children: wrap)),
       ],
     );
   }
@@ -449,18 +471,21 @@ class SingleChipWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (target == null) return Container();
-    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-      Padding(
-        padding: const EdgeInsets.only(top: 10.0),
-        child: Text(
-          '    $name: ',
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(top: 10.0),
+          child: Text(
+            '    $name: ',
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+          ),
         ),
-      ),
-      Wrap(
-        children: <Widget>[_Chip(group: raw.toLowerCase(), name: target!)],
-      ),
-    ]);
+        Wrap(
+          children: <Widget>[_Chip(group: raw.toLowerCase(), name: target!)],
+        ),
+      ],
+    );
   }
 }
 
@@ -488,8 +513,9 @@ class MultiChipWidget extends StatelessWidget {
           child: Wrap(
             spacing: 3.0,
             runSpacing: -9.0,
-            children:
-                groupName.map((x) => _Chip(group: x.$1, name: x.$2)).toList(),
+            children: groupName
+                .map((x) => _Chip(group: x.$1, name: x.$2))
+                .toList(),
           ),
         ),
       ],
@@ -501,8 +527,9 @@ const String urlPattern = r'http';
 const String emailPattern = r'\S+@\S+';
 const String phonePattern = r'[\d-]{9,}';
 final RegExp linkRegExp = RegExp(
-    '($urlPattern)|($emailPattern)|($phonePattern)',
-    caseSensitive: false);
+  '($urlPattern)|($emailPattern)|($phonePattern)',
+  caseSensitive: false,
+);
 
 class _CommentArea extends StatefulWidget {
   final QueryResult queryResult;
@@ -526,7 +553,9 @@ class __CommentAreaState extends State<_CommentArea> {
       }
 
       final article = await EHSession.fetchArticle(
-          widget.queryResult.id(), widget.queryResult.ehash());
+        widget.queryResult.id(),
+        widget.queryResult.ehash(),
+      );
       if (article != null) {
         setState(() {
           comments.addAll(article.comment ?? []);
@@ -538,10 +567,7 @@ class __CommentAreaState extends State<_CommentArea> {
 
   @override
   Widget build(BuildContext context) {
-    return _InfoAreaWidget(
-      queryResult: widget.queryResult,
-      comments: comments,
-    );
+    return _InfoAreaWidget(queryResult: widget.queryResult, comments: comments);
   }
 }
 
@@ -549,10 +575,7 @@ class _InfoAreaWidget extends StatefulWidget {
   final QueryResult queryResult;
   final List<(DateTime, String, String)> comments;
 
-  const _InfoAreaWidget({
-    required this.queryResult,
-    required this.comments,
-  });
+  const _InfoAreaWidget({required this.queryResult, required this.comments});
 
   @override
   __InfoAreaWidgetState createState() => __InfoAreaWidgetState();
@@ -567,13 +590,14 @@ class __InfoAreaWidgetState extends State<_InfoAreaWidget> {
         child: ScrollOnExpand(
           child: ExpandablePanel(
             theme: ExpandableThemeData(
-                iconColor:
-                    Settings.themeWhat.value ? Colors.white : Colors.grey,
-                animationDuration: const Duration(milliseconds: 500)),
+              iconColor: Settings.themeWhat.value ? Colors.white : Colors.grey,
+              animationDuration: const Duration(milliseconds: 500),
+            ),
             header: Padding(
               padding: const EdgeInsets.fromLTRB(12, 12, 0, 0),
               child: Text(
-                  '${Translations.instance!.trans('comment')} (${widget.comments.length})'),
+                '${Translations.instance!.trans('comment')} (${widget.comments.length})',
+              ),
             ),
             expanded: commentArea(context),
             collapsed: Container(),
@@ -596,43 +620,43 @@ class __InfoAreaWidgetState extends State<_InfoAreaWidget> {
                 width: 100,
                 height: 100,
                 child: Align(
-                  child: Text(
-                    'No Comments',
-                    textAlign: TextAlign.center,
-                  ),
+                  child: Text('No Comments', textAlign: TextAlign.center),
                 ),
-              )
+              ),
             ],
           ),
           comment(context),
         ],
       );
     } else {
-      var children = List<Widget>.from(widget.comments.map((e) {
-        return InkWell(
-          onTap: () async {
-            // showOkDialog(context, e.$3, 'Comments');
-            AlertDialog alert = AlertDialog(
-              content: SelectableText(e.$3),
-              // actions: [
-              //   okButton,
-              // ],
-            );
-            await showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return alert;
-              },
-            );
-          },
-          onLongPress: () async {
-            PlatformNavigator.navigateSlide(
-                context, LabSearchCommentsAuthor(e.$2));
-          },
-          splashColor: Colors.white,
-          child: ListTile(
-            // dense: true,
-            title: Row(
+      var children = List<Widget>.from(
+        widget.comments.map((e) {
+          return InkWell(
+            onTap: () async {
+              // showOkDialog(context, e.$3, 'Comments');
+              AlertDialog alert = AlertDialog(
+                content: SelectableText(e.$3),
+                // actions: [
+                //   okButton,
+                // ],
+              );
+              await showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return alert;
+                },
+              );
+            },
+            onLongPress: () async {
+              PlatformNavigator.navigateSlide(
+                context,
+                LabSearchCommentsAuthor(e.$2),
+              );
+            },
+            splashColor: Colors.white,
+            child: ListTile(
+              // dense: true,
+              title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   Text(e.$2),
@@ -640,30 +664,34 @@ class __InfoAreaWidgetState extends State<_InfoAreaWidget> {
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Text(
-                          DateFormat('yyyy-MM-dd HH:mm').format(e.$1.toLocal()),
-                          style: const TextStyle(fontSize: 12)),
+                        DateFormat('yyyy-MM-dd HH:mm').format(e.$1.toLocal()),
+                        style: const TextStyle(fontSize: 12),
+                      ),
                     ),
                   ),
-                ]),
-            subtitle: buildTextWithLinks(e.$3),
-          ),
-        );
-      }));
+                ],
+              ),
+              subtitle: buildTextWithLinks(e.$3),
+            ),
+          );
+        }),
+      );
 
       return Padding(
         padding: const EdgeInsets.only(top: 8, bottom: 8),
         child: Column(
-            // mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            // children: AnimationConfiguration.toStaggeredList(
-            //     duration: const Duration(milliseconds: 900),
-            //     childAnimationBuilder: (widget) => SlideAnimation(
-            //           horizontalOffset: 50.0,
-            //           child: FadeInAnimation(
-            //             child: widget,
-            //           ),
-            //         ),
-            children: children + [comment(context)]),
+          // mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          // children: AnimationConfiguration.toStaggeredList(
+          //     duration: const Duration(milliseconds: 900),
+          //     childAnimationBuilder: (widget) => SlideAnimation(
+          //           horizontalOffset: 50.0,
+          //           child: FadeInAnimation(
+          //             child: widget,
+          //           ),
+          //         ),
+          children: children + [comment(context)],
+        ),
         // ),
       );
     }
@@ -688,25 +716,29 @@ class __InfoAreaWidgetState extends State<_InfoAreaWidget> {
 
         TextEditingController text = TextEditingController();
         Widget okButton = TextButton(
-          style:
-              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
+          style: TextButton.styleFrom(
+            foregroundColor: Settings.majorColor.value,
+          ),
           child: Text(Translations.instance!.trans('ok')),
           onPressed: () async {
             if ((await EHSession.postComment(
-                        'https://exhentai.org/g/${widget.queryResult.id()}/${widget.queryResult.ehash()}',
-                        text.text))
-                    .trim() !=
+                  'https://exhentai.org/g/${widget.queryResult.id()}/${widget.queryResult.ehash()}',
+                  text.text,
+                )).trim() !=
                 '') {
               await showOkDialog(
-                  context, 'Too short, or Not a valid session! Try Again!');
+                context,
+                'Too short, or Not a valid session! Try Again!',
+              );
               return;
             }
             Navigator.pop(context, true);
           },
         );
         Widget cancelButton = TextButton(
-          style:
-              TextButton.styleFrom(foregroundColor: Settings.majorColor.value),
+          style: TextButton.styleFrom(
+            foregroundColor: Settings.majorColor.value,
+          ),
           child: Text(Translations.instance!.trans('cancel')),
           onPressed: () {
             Navigator.pop(context, false);
@@ -718,10 +750,7 @@ class __InfoAreaWidgetState extends State<_InfoAreaWidget> {
           builder: (BuildContext context) => AlertDialog(
             contentPadding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
             title: const Text('Write Comment'),
-            content: TextField(
-              controller: text,
-              autofocus: true,
-            ),
+            content: TextField(controller: text, autofocus: true),
             actions: [okButton, cancelButton],
           ),
         );
@@ -740,20 +769,21 @@ class __InfoAreaWidgetState extends State<_InfoAreaWidget> {
   }
 
   TextSpan buildLinkComponent(String text, String linkToOpen) => TextSpan(
-        text: text,
-        style: const TextStyle(
-          color: Colors.blueAccent,
-          decoration: TextDecoration.underline,
-        ),
-        recognizer: TapGestureRecognizer()
-          ..onTap = () {
-            openUrl(linkToOpen);
-          },
-      );
+    text: text,
+    style: const TextStyle(
+      color: Colors.blueAccent,
+      decoration: TextDecoration.underline,
+    ),
+    recognizer: TapGestureRecognizer()
+      ..onTap = () {
+        openUrl(linkToOpen);
+      },
+  );
 
   Future<void> openUrl(String url) async {
-    final ehPattern =
-        RegExp(r'^(https?://)?e(-|x)hentai.org/g/(?<id>\d+)/(?<hash>\w+)/?$');
+    final ehPattern = RegExp(
+      r'^(https?://)?e(-|x)hentai.org/g/(?<id>\d+)/(?<hash>\w+)/?$',
+    );
     if (ehPattern.stringMatch(url) == url) {
       var match = ehPattern.allMatches(url);
       var id = match.first.namedGroup('id')!.trim();
@@ -765,8 +795,9 @@ class __InfoAreaWidgetState extends State<_InfoAreaWidget> {
 
   List<InlineSpan> linkify(String text) {
     final List<InlineSpan> list = <InlineSpan>[];
-    final RegExpMatch? match =
-        RegExp(r'(https?://.*?)([\<"\n\r ]|$)').firstMatch(text);
+    final RegExpMatch? match = RegExp(
+      r'(https?://.*?)([\<"\n\r ]|$)',
+    ).firstMatch(text);
     if (match == null) {
       list.add(TextSpan(text: text));
       return list;
@@ -798,8 +829,9 @@ class __InfoAreaWidgetState extends State<_InfoAreaWidget> {
   Widget previewArea() {
     if (ProviderManager.isExists(widget.queryResult.id())) {
       return FutureBuilder(
-        future: ProviderManager.get(widget.queryResult.id())
-            .then((value) => value.getSmallImagesUrl()),
+        future: ProviderManager.get(
+          widget.queryResult.id(),
+        ).then((value) => value.getSmallImagesUrl()),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return const CircularProgressIndicator();
@@ -813,29 +845,25 @@ class __InfoAreaWidgetState extends State<_InfoAreaWidget> {
             crossAxisSpacing: 8,
             mainAxisSpacing: 8,
             children: (snapshot.data as List<String>)
-                .map((e) => CachedNetworkImage(
-                      imageUrl: e,
-                    ))
+                .map((e) => CachedNetworkImage(imageUrl: e))
                 .toList(),
           );
         },
       );
     }
     return const Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          SizedBox(
-            width: 100,
-            height: 100,
-            child: Align(
-              child: Text(
-                '??? Unknown Error!',
-                textAlign: TextAlign.center,
-              ),
-            ),
-          )
-        ]);
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        SizedBox(
+          width: 100,
+          height: 100,
+          child: Align(
+            child: Text('??? Unknown Error!', textAlign: TextAlign.center),
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -860,8 +888,9 @@ class _Chip extends StatelessWidget {
     Color color = Colors.grey;
 
     if (Settings.translateTags.value) {
-      tagDisplayed =
-          TagTranslate.ofAny(tagDisplayed).split(':').last.split('|').first;
+      tagDisplayed = TagTranslate.ofAny(
+        tagDisplayed,
+      ).split(':').last.split('|').first;
     }
 
     if (group == 'female') {
@@ -875,8 +904,10 @@ class _Chip extends StatelessWidget {
     }
 
     var mustHasMorePad = true;
-    Widget avatar = Text(group[0].toUpperCase(),
-        style: const TextStyle(color: Colors.white));
+    Widget avatar = Text(
+      group[0].toUpperCase(),
+      style: const TextStyle(color: Colors.white),
+    );
 
     if (group == 'female') {
       mustHasMorePad = false;
@@ -887,25 +918,13 @@ class _Chip extends StatelessWidget {
       );
     } else if (group == 'male') {
       mustHasMorePad = false;
-      avatar = const Icon(
-        MdiIcons.genderMale,
-        size: 18.0,
-        color: Colors.white,
-      );
+      avatar = const Icon(MdiIcons.genderMale, size: 18.0, color: Colors.white);
     } else if (group == 'language') {
       mustHasMorePad = false;
-      avatar = const Icon(
-        Icons.language,
-        size: 18.0,
-        color: Colors.white,
-      );
+      avatar = const Icon(Icons.language, size: 18.0, color: Colors.white);
     } else if (group == 'artist') {
       mustHasMorePad = false;
-      avatar = const Icon(
-        MdiIcons.account,
-        size: 18.0,
-        color: Colors.white,
-      );
+      avatar = const Icon(MdiIcons.account, size: 18.0, color: Colors.white);
     } else if (group == 'group') {
       mustHasMorePad = false;
       avatar = const Icon(
@@ -922,15 +941,14 @@ class _Chip extends StatelessWidget {
           children: [
             Padding(
               padding: EdgeInsets.only(
-                  left: 2.0 + (mustHasMorePad ? 4.0 : 0),
-                  right: (mustHasMorePad ? 4.0 : 0)),
+                left: 2.0 + (mustHasMorePad ? 4.0 : 0),
+                right: (mustHasMorePad ? 4.0 : 0),
+              ),
               child: avatar,
             ),
             Text(
               ' $tagDisplayed ',
-              style: const TextStyle(
-                color: Colors.white,
-              ),
+              style: const TextStyle(color: Colors.white),
             ),
           ],
         ),
@@ -950,12 +968,14 @@ class _Chip extends StatelessWidget {
         padding: const EdgeInsets.all(6.0),
       ),
       onLongPress: () async {
-        if (!Settings.excludeTags.value
-            .contains('${normalize(group)}:${name.replaceAll(' ', '_')}')) {
+        if (!Settings.excludeTags.value.contains(
+          '${normalize(group)}:${name.replaceAll(' ', '_')}',
+        )) {
           final yn = await showYesNoDialog(context, '이 태그를 제외태그에 추가할까요?');
           if (yn) {
-            Settings.excludeTags.value
-                .add('${normalize(group)}:${name.replaceAll(' ', '_')}');
+            Settings.excludeTags.value.add(
+              '${normalize(group)}:${name.replaceAll(' ', '_')}',
+            );
             await Settings.excludeTags.setValue(Settings.excludeTags.value);
             if (!context.mounted) return;
             await showOkDialog(context, '제외태그에 성공적으로 추가했습니다!');
@@ -981,10 +1001,7 @@ class _Chip extends StatelessWidget {
       },
     );
 
-    return SizedBox(
-      height: 44,
-      child: FittedBox(child: fc),
-    );
+    return SizedBox(height: 44, child: FittedBox(child: fc));
   }
 }
 
@@ -999,19 +1016,22 @@ class _RelatedArea extends StatelessWidget {
       builder: (context, AsyncSnapshot<List<QueryResult>> snapshot) {
         if (!snapshot.hasData) return Container();
 
-        return Column(children: <Widget>[
-          articleArea(context, snapshot.data!),
-          Visibility(
-            visible: relatedIds.length > 6,
-            child: more(
-              context,
-              () => ArticleListPage(
+        return Column(
+          children: <Widget>[
+            articleArea(context, snapshot.data!),
+            Visibility(
+              visible: relatedIds.length > 6,
+              child: more(
+                context,
+                () => ArticleListPage(
                   cc: snapshot.data!,
                   name:
-                      '${Translations.instance!.trans('related')} ${Translations.instance!.trans('articles')}'),
+                      '${Translations.instance!.trans('related')} ${Translations.instance!.trans('articles')}',
+                ),
+              ),
             ),
-          ),
-        ]);
+          ],
+        );
       },
     );
   }
@@ -1050,10 +1070,7 @@ class _RelatedArea extends StatelessWidget {
       ),
       itemBuilder: (context, index, animation) {
         return FadeTransition(
-          opacity: Tween<double>(
-            begin: 0,
-            end: 1,
-          ).animate(animation),
+          opacity: Tween<double>(begin: 0, end: 1).animate(animation),
           child: SlideTransition(
             position: Tween<Offset>(
               begin: const Offset(0, -0.1),

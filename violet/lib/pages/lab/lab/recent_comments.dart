@@ -29,12 +29,14 @@ class _LabRecentCommentsState extends State<LabRecentComments> {
           (await VioletCommunityAnonymous.getArtistCommentsRecent())['result']
               as List<dynamic>;
       comments = tcomments
-          .map((e) => (
-                DateTime.parse(e['TimeStamp']),
-                e['UserAppId'] as String,
-                e['Body'] as String,
-                e['ArtistName'] as String
-              ))
+          .map(
+            (e) => (
+              DateTime.parse(e['TimeStamp']),
+              e['UserAppId'] as String,
+              e['Body'] as String,
+              e['ArtistName'] as String,
+            ),
+          )
           .where((x) => x.$2 != 'test')
           .toList();
       setState(() {});
@@ -55,27 +57,30 @@ class _LabRecentCommentsState extends State<LabRecentComments> {
             onTap: () async {
               final group = e.$4.split(':').first;
               final name = e.$4.split(':').last;
-              _navigate(ArtistInfoPage(
-                type: ArtistTypeHelper.fromString(group)!,
-                name: name,
-              ));
+              _navigate(
+                ArtistInfoPage(
+                  type: ArtistTypeHelper.fromString(group)!,
+                  name: name,
+                ),
+              );
             },
             splashColor: Colors.white,
             child: ListTile(
               title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Text(e.$4),
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(
-                            DateFormat('yyyy-MM-dd HH:mm')
-                                .format(e.$1.toLocal()),
-                            style: const TextStyle(fontSize: 12)),
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  Text(e.$4),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        DateFormat('yyyy-MM-dd HH:mm').format(e.$1.toLocal()),
+                        style: const TextStyle(fontSize: 12),
                       ),
                     ),
-                  ]),
+                  ),
+                ],
+              ),
               subtitle: Text(e.$3),
             ),
           );

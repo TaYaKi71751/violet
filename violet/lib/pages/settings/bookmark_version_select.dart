@@ -85,10 +85,11 @@ class _BookmarkVersionSelectPageState extends State<BookmarkVersionSelectPage> {
       decoration: BoxDecoration(
         color: Settings.themeWhat.value ? Colors.black26 : Colors.white,
         borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(8),
-            topRight: Radius.circular(8),
-            bottomLeft: Radius.circular(8),
-            bottomRight: Radius.circular(8)),
+          topLeft: Radius.circular(8),
+          topRight: Radius.circular(8),
+          bottomLeft: Radius.circular(8),
+          bottomRight: Radius.circular(8),
+        ),
         boxShadow: [
           BoxShadow(
             color: Settings.themeWhat.value
@@ -106,17 +107,21 @@ class _BookmarkVersionSelectPageState extends State<BookmarkVersionSelectPage> {
           color: Settings.themeWhat.value ? Colors.black38 : Colors.white,
           child: ListTile(
             title: Text(
-                timeago.format(DateTime.parse(data['dt']).toLocal(),
-                    locale: Translations.instance!.locale.languageCode),
-                style: const TextStyle(fontSize: 16.0)),
+              timeago.format(
+                DateTime.parse(data['dt']).toLocal(),
+                locale: Translations.instance!.locale.languageCode,
+              ),
+              style: const TextStyle(fontSize: 16.0),
+            ),
             subtitle: Text(formatBytes(data['size'] as int, 2)),
             onTap: () async {
               await PlatformNavigator.navigateSlide(
-                  context,
-                  LabBookmarkPage(
-                    userAppId: widget.userAppId,
-                    version: data['vid'] as String,
-                  ));
+                context,
+                LabBookmarkPage(
+                  userAppId: widget.userAppId,
+                  version: data['vid'] as String,
+                ),
+              );
 
               if (!mounted) return;
               if (await showYesNoDialog(context, '이 북마크 버전을 선택할까요?')) {

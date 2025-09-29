@@ -18,10 +18,7 @@ import 'package:violet/server/violet.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/widgets/article_item/image_provider_manager.dart';
 
-enum ViewType {
-  vertical,
-  horizontal,
-}
+enum ViewType { vertical, horizontal }
 
 class ViewerController extends GetxController {
   /// viewer target options
@@ -94,7 +91,7 @@ class ViewerController extends GetxController {
   var horizontalPageController = PreloadPageController();
   var thumbController = ScrollController();
   final searchText = TextEditingController(text: '');
-  SuggestionsBoxController? suggestionsBoxController;
+  SuggestionsController<(String, String, int)>? suggestionsController;
 
   /// Is enabled search?
   var messages = <MessageSearchResult>[];
@@ -127,12 +124,15 @@ class ViewerController extends GetxController {
     articleId = provider.id;
     maxPage = provider.uris.length;
     thumb = provider.useFileSystem.obs;
-    isImageLoaded =
-        List.filled(provider.uris.length, provider.useFileSystem).obs;
+    isImageLoaded = List.filled(
+      provider.uris.length,
+      provider.useFileSystem,
+    ).obs;
 
-    onTwoPage = (!Settings.disableTwoPageView.value &&
-            MediaQuery.of(context).orientation == Orientation.landscape)
-        .obs;
+    onTwoPage =
+        (!Settings.disableTwoPageView.value &&
+                MediaQuery.of(context).orientation == Orientation.landscape)
+            .obs;
 
     headerCache = List<Map<String, String>?>.filled(maxPage, null);
     urlCache = List<RxString?>.filled(maxPage, null);
@@ -140,8 +140,10 @@ class ViewerController extends GetxController {
     estimatedImgHeight = List<double>.filled(maxPage, 0);
     realImgHeight = List<double>.filled(maxPage, 0);
     realImgHeight = List<double>.filled(maxPage, 0);
-    imgKeys =
-        List<GlobalKey>.generate(provider.uris.length, (index) => GlobalKey());
+    imgKeys = List<GlobalKey>.generate(
+      provider.uris.length,
+      (index) => GlobalKey(),
+    );
     loadingEstimaed = List<bool>.filled(maxPage, false);
   }
 
@@ -189,11 +191,10 @@ class ViewerController extends GetxController {
             alignment: 0.12,
           )
           .then(
-            (value) => Future.delayed(const Duration(milliseconds: 300)).then(
-              (value) {
-                sliderOnChange = false;
-              },
-            ),
+            (value) =>
+                Future.delayed(const Duration(milliseconds: 300)).then((value) {
+                  sliderOnChange = false;
+                }),
           );
     } else {
       horizontalPageController.animateToPage(
@@ -251,18 +252,19 @@ class ViewerController extends GetxController {
       overlay.value = !overlay.value;
       opacity.value = 1.0;
       if (!Settings.disableFullScreen.value) {
-        SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
-          SystemUiOverlay.top,
-          SystemUiOverlay.bottom,
-        ]);
+        SystemChrome.setEnabledSystemUIMode(
+          SystemUiMode.manual,
+          overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
+        );
       }
     } else {
       if (!Settings.disableFullScreen.value) {
         SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
       }
       opacity.value = 0.0;
-      Future.delayed(const Duration(milliseconds: 300))
-          .then((value) => overlay.value = !overlay.value);
+      Future.delayed(
+        const Duration(milliseconds: 300),
+      ).then((value) => overlay.value = !overlay.value);
     }
   }
 
@@ -289,11 +291,13 @@ class ViewerController extends GetxController {
   }
 
   onModifiedText() async {
-    suggestionsBoxController!.close();
+    suggestionsController!.close();
     if (latestSearch == searchText.text) return;
     latestSearch == searchText.text;
-    messages =
-        (await VioletServer.searchMessageWord(articleId, searchText.text))!;
+    messages = (await VioletServer.searchMessageWord(
+      articleId,
+      searchText.text,
+    ))!;
     messages = messages.where((e) => e.matchScore >= 80.0).toList();
     messages.sort((a, b) => a.page.compareTo(b.page));
 
@@ -305,7 +309,9 @@ class ViewerController extends GetxController {
   refreshImgUrlWhenRequired() async {
     if (ProviderManager.dirty(articleId)) {
       await ProviderManager.refresh(
-          articleId, isImageLoaded.map((element) => !element).toList());
+        articleId,
+        isImageLoaded.map((element) => !element).toList(),
+      );
       for (var i = 0; i < isImageLoaded.length; i++) {
         if (!isImageLoaded[i]) {
           if (urlCache[i] == null) {

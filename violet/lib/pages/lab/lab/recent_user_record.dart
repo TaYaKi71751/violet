@@ -46,11 +46,15 @@ class _LabUserRecentRecordsState extends State<LabUserRecentRecords> {
 
   Future<void> updateRercord(dummy) async {
     try {
-      isBookmarked =
-          await (await Bookmark.getInstance()).isBookmarkUser(widget.userAppId);
+      isBookmarked = await (await Bookmark.getInstance()).isBookmarkUser(
+        widget.userAppId,
+      );
 
-      var trecords =
-          await VioletServer.userRecent(widget.userAppId, 100, limit);
+      var trecords = await VioletServer.userRecent(
+        widget.userAppId,
+        100,
+        limit,
+      );
       if (trecords is int || trecords == null || trecords.length == 0) return;
 
       var xrecords = trecords as List<(int, int, int)>;
@@ -80,17 +84,17 @@ class _LabUserRecentRecordsState extends State<LabUserRecentRecords> {
             .split('|')
             .where((element) => element != '')
             .forEach((element) {
-          if (element.startsWith('female:')) {
-            femaleTags += 1;
-          } else if (element.startsWith('male:')) {
-            maleTags += 1;
-          } else {
-            tags += 1;
-          }
+              if (element.startsWith('female:')) {
+                femaleTags += 1;
+              } else if (element.startsWith('male:')) {
+                maleTags += 1;
+              } else {
+                tags += 1;
+              }
 
-          if (!ffstat.containsKey(element)) ffstat[element] = 0;
-          ffstat[element] = ffstat[element]! + 1;
-        });
+              if (!ffstat.containsKey(element)) ffstat[element] = 0;
+              ffstat[element] = ffstat[element]! + 1;
+            });
       }
 
       ffstat.forEach((key, value) {
@@ -122,8 +126,10 @@ class _LabUserRecentRecordsState extends State<LabUserRecentRecords> {
 
       setState(() {});
     } catch (e, st) {
-      Logger.error('[lab-recent_record] E: $e\n'
-          '$st');
+      Logger.error(
+        '[lab-recent_record] E: $e\n'
+        '$st',
+      );
     }
   }
 
@@ -192,16 +198,18 @@ class _LabUserRecentRecordsState extends State<LabUserRecentRecords> {
                         activeTrackColor: Colors.blue,
                         inactiveTrackColor: Color(0xffd0d2d3),
                         trackHeight: 3,
-                        thumbShape:
-                            RoundSliderThumbShape(enabledThumbRadius: 6.0),
+                        thumbShape: RoundSliderThumbShape(
+                          enabledThumbRadius: 6.0,
+                        ),
                       ),
                       child: Slider(
                         value: limit.toDouble(),
                         max: 180,
                         min: 0,
                         divisions: (180 - 0),
-                        inactiveColor:
-                            Settings.majorColor.value.withOpacity(0.7),
+                        inactiveColor: Settings.majorColor.value.withOpacity(
+                          0.7,
+                        ),
                         activeColor: Settings.majorColor.value,
                         onChangeEnd: (value) async {
                           limit = value.toInt();
@@ -238,131 +246,141 @@ class _LabUserRecentRecordsState extends State<LabUserRecentRecords> {
   _tagChart() {
     final width = MediaQuery.of(context).size.width;
     var axis1 = charts.AxisSpec<String>(
-        renderSpec: charts.GridlineRendererSpec(
-            labelStyle: charts.TextStyleSpec(
-                fontSize: isExpanded ? 10 : 14,
-                color: charts.MaterialPalette.white),
-            lineStyle: const charts.LineStyleSpec(
-                color: charts.MaterialPalette.transparent)));
-    var axis2 = const charts.NumericAxisSpec(
-        renderSpec: charts.GridlineRendererSpec(
-      labelStyle: charts.TextStyleSpec(
-          fontSize: 10, color: charts.MaterialPalette.white),
-    ));
-    return Column(children: [
-      Container(
-        height: 16,
-      ),
-      GestureDetector(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 28,
-              height: 28,
-              child: FlareActor(
-                'assets/flare/likeUtsua.flr',
-                animation: isBookmarked ? 'Like' : 'IdleUnlike',
-                controller: flareController,
-              ),
-            ),
-            Text(widget.userAppId.substring(0, 16),
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          ],
+      renderSpec: charts.GridlineRendererSpec(
+        labelStyle: charts.TextStyleSpec(
+          fontSize: isExpanded ? 10 : 14,
+          color: charts.MaterialPalette.white,
         ),
-        onTap: () async {
-          isBookmarked = !isBookmarked;
-
-          if (!isBookmarked) {
-            await (await Bookmark.getInstance())
-                .unbookmarkUser(widget.userAppId);
-            flareController.play('Unlike');
-          } else {
-            await (await Bookmark.getInstance()).bookmarkUser(widget.userAppId);
-            flareController.play('Like');
-          }
-          setState(() {});
-        },
+        lineStyle: const charts.LineStyleSpec(
+          color: charts.MaterialPalette.transparent,
+        ),
       ),
-      Padding(
-        padding: const EdgeInsets.fromLTRB(64, 16, 64, 0),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8.0),
+    );
+    var axis2 = const charts.NumericAxisSpec(
+      renderSpec: charts.GridlineRendererSpec(
+        labelStyle: charts.TextStyleSpec(
+          fontSize: 10,
+          color: charts.MaterialPalette.white,
+        ),
+      ),
+    );
+    return Column(
+      children: [
+        Container(height: 16),
+        GestureDetector(
           child: Row(
-            children: <Widget>[
-              Expanded(
-                  flex: femaleTags,
-                  child: Container(
-                    height: 8,
-                    color: Colors.pink,
-                  )),
-              Expanded(
-                  flex: maleTags,
-                  child: Container(
-                    height: 8,
-                    color: Colors.blue,
-                  )),
-              Expanded(
-                  flex: tags,
-                  child: Container(
-                    height: 8,
-                    color: Colors.grey,
-                  )),
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 28,
+                height: 28,
+                child: FlareActor(
+                  'assets/flare/likeUtsua.flr',
+                  animation: isBookmarked ? 'Like' : 'IdleUnlike',
+                  controller: flareController,
+                ),
+              ),
+              Text(
+                widget.userAppId.substring(0, 16),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
+          onTap: () async {
+            isBookmarked = !isBookmarked;
+
+            if (!isBookmarked) {
+              await (await Bookmark.getInstance()).unbookmarkUser(
+                widget.userAppId,
+              );
+              flareController.play('Unlike');
+            } else {
+              await (await Bookmark.getInstance()).bookmarkUser(
+                widget.userAppId,
+              );
+              flareController.play('Like');
+            }
+            setState(() {});
+          },
         ),
-      ),
-      Container(
-        padding: const EdgeInsets.all(4),
-      ),
-      InkWell(
-        child: SizedBox(
+        Padding(
+          padding: const EdgeInsets.fromLTRB(64, 16, 64, 0),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8.0),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  flex: femaleTags,
+                  child: Container(height: 8, color: Colors.pink),
+                ),
+                Expanded(
+                  flex: maleTags,
+                  child: Container(height: 8, color: Colors.blue),
+                ),
+                Expanded(
+                  flex: tags,
+                  child: Container(height: 8, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Container(padding: const EdgeInsets.all(4)),
+        InkWell(
+          child: SizedBox(
             width: width - 16 - 32,
-            height:
-                isExpanded ? lff.length * 14.0 + 10 : lff.length * 22.0 + 10,
+            height: isExpanded
+                ? lff.length * 14.0 + 10
+                : lff.length * 22.0 + 10,
             child: charts.BarChart(
               [
                 charts.Series<(String, int), String>(
-                    id: 'Sales',
-                    data: lff,
-                    domainFn: ((String, int) sales, f) => sales.$1.contains(':')
-                        ? sales.$1.split(':')[1]
-                        : sales.$1,
-                    measureFn: ((String, int) sales, _) => sales.$2,
-                    colorFn: ((String, int) sales, _) {
-                      if (sales.$1.startsWith('female:')) {
-                        return charts.MaterialPalette.pink.shadeDefault;
-                      } else if (sales.$1.startsWith('male:')) {
-                        return charts.MaterialPalette.blue.shadeDefault;
-                      } else {
-                        return charts.MaterialPalette.gray.shadeDefault;
-                      }
-                    }),
+                  id: 'Sales',
+                  data: lff,
+                  domainFn: ((String, int) sales, f) => sales.$1.contains(':')
+                      ? sales.$1.split(':')[1]
+                      : sales.$1,
+                  measureFn: ((String, int) sales, _) => sales.$2,
+                  colorFn: ((String, int) sales, _) {
+                    if (sales.$1.startsWith('female:')) {
+                      return charts.MaterialPalette.pink.shadeDefault;
+                    } else if (sales.$1.startsWith('male:')) {
+                      return charts.MaterialPalette.blue.shadeDefault;
+                    } else {
+                      return charts.MaterialPalette.gray.shadeDefault;
+                    }
+                  },
+                ),
               ],
               primaryMeasureAxis: Settings.themeWhat.value ? axis2 : null,
               domainAxis: Settings.themeWhat.value ? axis1 : null,
               animate: true,
               vertical: false,
-            )),
-        onTap: () {},
-        onTapCancel: () {
-          isExpanded = !isExpanded;
-          if (isExpanded) {
-            lff = lffOrigin!;
-          } else {
-            lff = lffOrigin!.take(5).toList();
-          }
-          setState(() {});
-          Future.delayed(const Duration(milliseconds: 100)).then((value) =>
-              _controller.animateTo(0.0,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.fastOutSlowIn));
-        },
-      ),
-      Container(
-        padding: const EdgeInsets.all(8),
-      ),
-    ]);
+            ),
+          ),
+          onTap: () {},
+          onTapCancel: () {
+            isExpanded = !isExpanded;
+            if (isExpanded) {
+              lff = lffOrigin!;
+            } else {
+              lff = lffOrigin!.take(5).toList();
+            }
+            setState(() {});
+            Future.delayed(const Duration(milliseconds: 100)).then(
+              (value) => _controller.animateTo(
+                0.0,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.fastOutSlowIn,
+              ),
+            );
+          },
+        ),
+        Container(padding: const EdgeInsets.all(8)),
+      ],
+    );
   }
 }

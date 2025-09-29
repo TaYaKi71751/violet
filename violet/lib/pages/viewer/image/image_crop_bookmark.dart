@@ -35,13 +35,16 @@ class ImageCropBookmark extends StatelessWidget {
             padding: const EdgeInsets.all(20.0),
             child: Crop(
               key: cropKey,
-              image: isNetworkImage
-                  ? NetworkImage(url, headers: headers)
-                  : FileImage(File(url)) as ImageProvider
-                ..resolve(ImageConfiguration.empty)
-                    .addListener(ImageStreamListener((imageInfo, _) {
-                  aspectRatio = imageInfo.image.width / imageInfo.image.height;
-                })),
+              image:
+                  isNetworkImage
+                        ? NetworkImage(url, headers: headers)
+                        : FileImage(File(url)) as ImageProvider
+                    ..resolve(ImageConfiguration.empty).addListener(
+                      ImageStreamListener((imageInfo, _) {
+                        aspectRatio =
+                            imageInfo.image.width / imageInfo.image.height;
+                      }),
+                    ),
             ),
           ),
         ),
@@ -52,7 +55,7 @@ class ImageCropBookmark extends StatelessWidget {
           ),
           onPressed: () => bookmarkImage(context),
         ),
-        SizedBox.fromSize(size: const Size.fromHeight(24.0))
+        SizedBox.fromSize(size: const Size.fromHeight(24.0)),
       ],
     );
   }
@@ -64,8 +67,12 @@ class ImageCropBookmark extends StatelessWidget {
       return;
     }
 
-    await (await Bookmark.getInstance()).insertCropImage(articleId, page,
-        '${area.left},${area.top},${area.right},${area.bottom}', aspectRatio);
+    await (await Bookmark.getInstance()).insertCropImage(
+      articleId,
+      page,
+      '${area.left},${area.top},${area.right},${area.bottom}',
+      aspectRatio,
+    );
 
     showToast(
       level: ToastLevel.check,

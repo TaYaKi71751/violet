@@ -170,7 +170,7 @@ void main() {
       'https://tn.hitomi.la/avifsmalltn/e/69/4bee8bf49269363c5cec22cc7448f406db72ba56c138d554defe8c195ca1369e.avif',
       'https://tn.hitomi.la/avifsmalltn/5/30/ade340febf8a8a5d6b2af62e4eb176f8778c4adbb72315becdd224341b879305.avif',
       'https://tn.hitomi.la/avifsmalltn/9/cb/843020159cfb5550a2d17db2c249ba3fdd89d14897b125952ad6c5390a32ecb9.avif',
-      'https://tn.hitomi.la/avifsmalltn/7/11/a2b2b56a43124cb96d699140da697be6ce69697259757f505e50cec497cf4117.avif'
+      'https://tn.hitomi.la/avifsmalltn/7/11/a2b2b56a43124cb96d699140da697be6ce69697259757f505e50cec497cf4117.avif',
     ];
 
     final downloader = IsolateDownloader();

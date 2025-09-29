@@ -44,10 +44,7 @@ class VersionViewPage extends StatelessWidget {
                   child: Column(
                     children: <Widget>[
                       const Text(''),
-                      const Text(
-                        'Violet',
-                        style: TextStyle(fontSize: 30),
-                      ),
+                      const Text('Violet', style: TextStyle(fontSize: 30)),
                       const Text(
                         '${UpdateSyncManager.majorVersion}.${UpdateSyncManager.minorVersion}.${UpdateSyncManager.patchVersion}',
                         style: TextStyle(fontSize: 20),

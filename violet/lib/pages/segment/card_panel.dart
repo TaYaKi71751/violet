@@ -35,7 +35,9 @@ class CardPanel {
     return Container(
       color: enableBackgroundColor || Platform.isIOS ? color : null,
       padding: EdgeInsets.only(
-          top: MediaQuery.of(context).padding.top, bottom: bottomPadding),
+        top: MediaQuery.of(context).padding.top,
+        bottom: bottomPadding,
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,

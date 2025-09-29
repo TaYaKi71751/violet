@@ -48,7 +48,8 @@ class VioletServerV2 {
 class HmacInterceptor implements Interceptor {
   @override
   FutureOr<Response<BodyType>> intercept<BodyType>(
-      Chain<BodyType> chain) async {
+    Chain<BodyType> chain,
+  ) async {
     final request = applyHeaders(chain.request, hmacHeader());
     return chain.proceed(request);
   }
@@ -60,7 +61,7 @@ class HmacInterceptor implements Interceptor {
     return {
       'v-token': vToken.toString(),
       'v-valid': vValid,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     };
   }
 }

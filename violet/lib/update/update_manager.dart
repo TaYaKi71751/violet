@@ -35,77 +35,92 @@ class UpdateManager {
 
   @pragma('vm:entry-point')
   static void downloadCallback(String id, int status, int progress) {
-    final SendPort send =
-        IsolateNameServer.lookupPortByName('downloader_send_port')!;
+    final SendPort send = IsolateNameServer.lookupPortByName(
+      'downloader_send_port',
+    )!;
     send.send([id, status, progress]);
   }
 
   static void updateCheckAndDownload(BuildContext context) {
     bool updateContinued = false;
-    Future.delayed(const Duration(milliseconds: 100)).then((value) async {
-      if (UpdateSyncManager.updateRequire) {
-        var bb = await showYesNoDialog(context,
-            '${Translations.instance!.trans('newupdate')} ${UpdateSyncManager.updateMessage} ${Translations.instance!.trans('wouldyouupdate')}');
-        if (bb == false) return;
-      } else {
-        return;
-      }
+    Future.delayed(const Duration(milliseconds: 100))
+        .then((value) async {
+          if (UpdateSyncManager.updateRequire) {
+            var bb = await showYesNoDialog(
+              context,
+              '${Translations.instance!.trans('newupdate')} ${UpdateSyncManager.updateMessage} ${Translations.instance!.trans('wouldyouupdate')}',
+            );
+            if (bb == false) return;
+          } else {
+            return;
+          }
 
-      if (!await Permission.manageExternalStorage.isGranted) {
-        if (await Permission.manageExternalStorage.request() ==
-            PermissionStatus.denied) {
+          if (!await Permission.manageExternalStorage.isGranted) {
+            if (await Permission.manageExternalStorage.request() ==
+                PermissionStatus.denied) {
+              if (!context.mounted) return;
+              await showOkDialog(
+                context,
+                'If you do not allow file permissions, you cannot continue :(',
+              );
+              return;
+            }
+          }
+          updateContinued = true;
+
+          final ext = await AndroidExternalStorageDirectory.instance
+              .getExternalStorageDownloadsDirectory();
+
+          bool once = false;
+          IsolateNameServer.registerPortWithName(
+            _port.sendPort,
+            'downloader_send_port',
+          );
+          _port.listen((dynamic data) {
+            int progress = data[2];
+            if (progress == 100 && !once) {
+              OpenFile.open(
+                '$ext/${UpdateSyncManager.updateUrl.split('/').last}',
+              );
+              once = true;
+            }
+          });
+
+          if (await File(
+            '$ext/${UpdateSyncManager.updateUrl.split('/').last}',
+          ).exists()) {
+            await File(
+              '$ext/${UpdateSyncManager.updateUrl.split('/').last}',
+            ).delete();
+          }
+
+          FlutterDownloader.registerCallback(downloadCallback);
+          await FlutterDownloader.enqueue(
+            url: UpdateSyncManager.updateUrl,
+            savedDir: ext,
+            fileName: UpdateSyncManager.updateUrl.split('/').last,
+            showNotification: true,
+            openFileFromNotification: true,
+          );
+        })
+        .then((value) async {
+          if (updateContinued) return;
+
+          final prefs = await SharedPreferences.getInstance();
+          if (prefs.getBool('usevioletserver_check') != null) return;
+
           if (!context.mounted) return;
-          await showOkDialog(context,
-              'If you do not allow file permissions, you cannot continue :(');
-          return;
-        }
-      }
-      updateContinued = true;
+          final bb = await showYesNoDialog(
+            context,
+            Translations.instance!.trans('violetservermsg'),
+          );
+          if (bb == false) {
+            await prefs.setBool('usevioletserver_check', false);
+            return;
+          }
 
-      final ext = await AndroidExternalStorageDirectory.instance
-          .getExternalStorageDownloadsDirectory();
-
-      bool once = false;
-      IsolateNameServer.registerPortWithName(
-          _port.sendPort, 'downloader_send_port');
-      _port.listen((dynamic data) {
-        int progress = data[2];
-        if (progress == 100 && !once) {
-          OpenFile.open('$ext/${UpdateSyncManager.updateUrl.split('/').last}');
-          once = true;
-        }
-      });
-
-      if (await File('$ext/${UpdateSyncManager.updateUrl.split('/').last}')
-          .exists()) {
-        await File('$ext/${UpdateSyncManager.updateUrl.split('/').last}')
-            .delete();
-      }
-
-      FlutterDownloader.registerCallback(downloadCallback);
-      await FlutterDownloader.enqueue(
-        url: UpdateSyncManager.updateUrl,
-        savedDir: ext,
-        fileName: UpdateSyncManager.updateUrl.split('/').last,
-        showNotification: true,
-        openFileFromNotification: true,
-      );
-    }).then((value) async {
-      if (updateContinued) return;
-
-      final prefs = await SharedPreferences.getInstance();
-      if (prefs.getBool('usevioletserver_check') != null) return;
-
-      if (!context.mounted) return;
-      final bb = await showYesNoDialog(
-          context, Translations.instance!.trans('violetservermsg'));
-      if (bb == false) {
-        await prefs.setBool('usevioletserver_check', false);
-        return;
-      }
-
-      await Settings.useVioletServer.setValue(true);
-      await prefs.setBool('usevioletserver_check', false);
-    });
+          await Settings.useVioletServer.setValue(true);
+          await prefs.setBool('usevioletserver_check', false);
+        });
   }
 }

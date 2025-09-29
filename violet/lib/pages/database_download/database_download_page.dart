@@ -30,11 +30,7 @@ class DataBaseDownloadPage extends StatefulWidget {
   final String? dbType;
   final bool isSync;
 
-  const DataBaseDownloadPage({
-    super.key,
-    this.dbType,
-    this.isSync = false,
-  });
+  const DataBaseDownloadPage({super.key, this.dbType, this.isSync = false});
 
   @override
   State<DataBaseDownloadPage> createState() => DataBaseDownloadPageState();
@@ -51,8 +47,9 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
   void initState() {
     super.initState();
     FToast().init(this.context);
-    SchedulerBinding.instance
-        .addPostFrameCallback((_) async => checkDownload());
+    SchedulerBinding.instance.addPostFrameCallback(
+      (_) async => checkDownload(),
+    );
   }
 
   Future checkDownload() async {
@@ -62,8 +59,8 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
         final dbPath = Platform.isAndroid
             ? '${(await getApplicationDocumentsDirectory()).path}/data/data.db'
             : Platform.isIOS
-                ? '${await getDatabasesPath()}/data.db'
-                : join(dirname(Platform.resolvedExecutable), 'data/data.db');
+            ? '${await getDatabasesPath()}/data.db'
+            : join(dirname(Platform.resolvedExecutable), 'data/data.db');
         if (await File(dbPath).exists()) await File(dbPath).delete();
         final dir = Platform.isAndroid || Platform.isIOS
             ? await getApplicationDocumentsDirectory()
@@ -75,8 +72,10 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
         }
       }
     } catch (e, st) {
-      Logger.error('[DBDownload-Check] E: $e\n'
-          '$st');
+      Logger.error(
+        '[DBDownload-Check] E: $e\n'
+        '$st',
+      );
     }
 
     downloadFile();
@@ -123,33 +122,34 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
           }
       }
       Timer timer = Timer.periodic(
-          const Duration(seconds: 1),
-          (Timer timer) => setState(() {
-                final speed = tlatest / 1024;
-                speedString = '${_formatNumberWithComma(speed)} KB/s';
-                tlatest = tnu;
-                tnu = 0;
-              }));
+        const Duration(seconds: 1),
+        (Timer timer) => setState(() {
+          final speed = tlatest / 1024;
+          speedString = '${_formatNumberWithComma(speed)} KB/s';
+          tlatest = tnu;
+          tnu = 0;
+        }),
+      );
       await dio.download(
-          SyncManager.getLatestDB().getDBDownloadUrl(widget.dbType!),
-          '${dir.path}/db.sql.7z', onReceiveProgress: (rec, total) {
-        nu += rec - latest;
-        tnu += rec - latest;
-        latest = rec;
-        if (nu <= oneMega) return;
+        SyncManager.getLatestDB().getDBDownloadUrl(widget.dbType!),
+        '${dir.path}/db.sql.7z',
+        onReceiveProgress: (rec, total) {
+          nu += rec - latest;
+          tnu += rec - latest;
+          latest = rec;
+          if (nu <= oneMega) return;
 
-        nu = 0;
+          nu = 0;
 
-        setState(
-          () {
+          setState(() {
             downloading = true;
             final progressPercent = (rec / total) * 100;
             progressString = '${_formatNumberWithComma(progressPercent)}%';
             downString =
                 '[${_formatNumberWithComma(rec)}/${_formatNumberWithComma(total)}]';
-          },
-        );
-      });
+          });
+        },
+      );
       timer.cancel();
 
       setState(() {
@@ -164,15 +164,18 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
         }
       }
       await decompress7Z(
-          src: '${dir.path}/db.sql.7z',
-          dest: Platform.isAndroid ? '${dir.path}/data' : dir.path);
+        src: '${dir.path}/db.sql.7z',
+        dest: Platform.isAndroid ? '${dir.path}/data' : dir.path,
+      );
       await File('${dir.path}/db.sql.7z').delete();
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt('db_exists', 1);
       await prefs.setString('databasetype', widget.dbType!);
       await prefs.setString(
-          'databasesync', SyncManager.getLatestDB().getDateTime().toString());
+        'databasesync',
+        SyncManager.getLatestDB().getDateTime().toString(),
+      );
       await prefs.setInt('synclatest', SyncManager.getLatestDB().timestamp);
 
       await DataBaseManager.reloadInstance();
@@ -181,14 +184,18 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
         try {
           await deleteUnused();
         } catch (e1, st1) {
-          Logger.error('[deleteUnused] E: $e1\n'
-              '$st1');
+          Logger.error(
+            '[deleteUnused] E: $e1\n'
+            '$st1',
+          );
         }
         try {
           await indexing();
         } catch (e1, st1) {
-          Logger.error('[indexing] E: $e1\n'
-              '$st1');
+          Logger.error(
+            '[indexing] E: $e1\n'
+            '$st1',
+          );
         }
       }
 
@@ -202,8 +209,10 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
 
       return;
     } catch (e, st) {
-      Logger.error('[DBDownload] E: $e\n'
-          '$st');
+      Logger.error(
+        '[DBDownload] E: $e\n'
+        '$st',
+      );
       if (propagateException) rethrow;
     }
 
@@ -215,10 +224,13 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
 
   Future deleteUnused() async {
     var sql = translate2query(
-            '${Settings.includeTags.value} ${Settings.serializedExcludeTags}')
-        .replaceAll(' AND ExistOnHitomi=1', '');
-    await (await DataBaseManager.getInstance()).delete('HitomiColumnModel',
-        'NOT (${sql.substring(sql.indexOf('WHERE') + 6)})', []);
+      '${Settings.includeTags.value} ${Settings.serializedExcludeTags}',
+    ).replaceAll(' AND ExistOnHitomi=1', '');
+    await (await DataBaseManager.getInstance()).delete(
+      'HitomiColumnModel',
+      'NOT (${sql.substring(sql.indexOf('WHERE') + 6)})',
+      [],
+    );
   }
 
   void insert(Map<String, int> map, dynamic qr) {
@@ -241,8 +253,12 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
     }
   }
 
-  void tagIndexing(QueryResult item, Map<String, int> tagIndex,
-      Map<String, Map<String, int>> tagMap, TagIndexingCallback callback) {
+  void tagIndexing(
+    QueryResult item,
+    Map<String, int> tagIndex,
+    Map<String, Map<String, int>> tagMap,
+    TagIndexingCallback callback,
+  ) {
     if (callback(item) == null) return;
 
     for (var target in callback(item).split('|')) {
@@ -268,8 +284,10 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
   }
 
   Future indexing() async {
-    final qm =
-        QueryManager.queryPagination('SELECT * FROM HitomiColumnModel', 50000);
+    final qm = QueryManager.queryPagination(
+      'SELECT * FROM HitomiColumnModel',
+      50000,
+    );
 
     var tags = <String, int>{};
     var languages = <String, int>{};
@@ -474,36 +492,26 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       const CircularProgressIndicator(),
-                      const SizedBox(
-                        height: 20.0,
-                      ),
+                      const SizedBox(height: 20.0),
                       Text(
                         "${Translations.instance!.trans('dbddownloading')} $progressString",
-                        style: const TextStyle(
-                          color: Colors.white,
-                        ),
+                        style: const TextStyle(color: Colors.white),
                       ),
                       Text(
                         downString,
-                        style: const TextStyle(
-                          color: Colors.white,
-                        ),
+                        style: const TextStyle(color: Colors.white),
                       ),
                       Text(
                         speedString,
-                        style: const TextStyle(
-                          color: Colors.white,
-                        ),
-                      )
+                        style: const TextStyle(color: Colors.white),
+                      ),
                     ],
                   ),
                 ),
               )
             : Column(
                 mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(baseString),
-                ],
+                children: [Text(baseString)],
               ),
       ),
     );

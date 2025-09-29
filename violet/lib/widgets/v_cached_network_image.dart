@@ -6,32 +6,32 @@ import 'package:octo_image/octo_image.dart';
 
 /// Builder function to create an image widget. The function is called after
 /// the ImageProvider completes the image loading.
-typedef ImageWidgetBuilder = Widget Function(
-    BuildContext context, ImageProvider imageProvider, Widget child);
+typedef ImageWidgetBuilder =
+    Widget Function(
+      BuildContext context,
+      ImageProvider imageProvider,
+      Widget child,
+    );
 
 /// Builder function to create a placeholder widget. The function is called
 /// once while the ImageProvider is loading the image.
-typedef PlaceholderWidgetBuilder = Widget Function(
-  BuildContext context,
-  String url,
-);
+typedef PlaceholderWidgetBuilder =
+    Widget Function(BuildContext context, String url);
 
 /// Builder function to create a progress indicator widget. The function is
 /// called every time a chuck of the image is downloaded from the web, but at
 /// least once during image loading.
-typedef ProgressIndicatorBuilder = Widget Function(
-  BuildContext context,
-  String url,
-  DownloadProgress progress,
-);
+typedef ProgressIndicatorBuilder =
+    Widget Function(
+      BuildContext context,
+      String url,
+      DownloadProgress progress,
+    );
 
 /// Builder function to create an error widget. This builder is called when
 /// the image failed loading, for example due to a 404 NotFound exception.
-typedef LoadingErrorWidgetBuilder = Widget Function(
-  BuildContext context,
-  String url,
-  dynamic error,
-);
+typedef LoadingErrorWidgetBuilder =
+    Widget Function(BuildContext context, String url, dynamic error);
 
 /// Image widget to show NetworkImage with caching functionality.
 class VCachedNetworkImage extends StatelessWidget {
@@ -225,20 +225,22 @@ class VCachedNetworkImage extends StatelessWidget {
     this.maxWidthDiskCache,
     this.maxHeightDiskCache,
   }) : _image = CachedNetworkImageProvider(
-          imageUrl,
-          headers: httpHeaders,
-          cacheManager: cacheManager,
-          cacheKey: cacheKey,
-          maxWidth: maxWidthDiskCache,
-          maxHeight: maxHeightDiskCache,
-        );
+         imageUrl,
+         headers: httpHeaders,
+         cacheManager: cacheManager,
+         cacheKey: cacheKey,
+         maxWidth: maxWidthDiskCache,
+         maxHeight: maxHeightDiskCache,
+       );
 
   @override
   Widget build(BuildContext context) {
-    var octoPlaceholderBuilder =
-        placeholder != null ? _octoPlaceholderBuilder : null;
-    var octoProgressIndicatorBuilder =
-        progressIndicatorBuilder != null ? _octoProgressIndicatorBuilder : null;
+    var octoPlaceholderBuilder = placeholder != null
+        ? _octoPlaceholderBuilder
+        : null;
+    var octoProgressIndicatorBuilder = progressIndicatorBuilder != null
+        ? _octoProgressIndicatorBuilder
+        : null;
 
     ///If there is no placeholer OctoImage does not fade, so always set an
     ///(empty) placeholder as this always used to be the behaviour of
@@ -293,7 +295,10 @@ class VCachedNetworkImage extends StatelessWidget {
       downloaded = progress.cumulativeBytesLoaded;
     }
     return progressIndicatorBuilder!(
-        context, imageUrl, DownloadProgress(imageUrl, totalSize, downloaded));
+      context,
+      imageUrl,
+      DownloadProgress(imageUrl, totalSize, downloaded),
+    );
   }
 
   Widget _octoErrorBuilder(

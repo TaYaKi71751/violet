@@ -36,11 +36,7 @@ class _InfoPageState extends State<InfoPage> {
               _buildTitle(),
               // Container(height: 30),
               _buildItem(
-                Image.asset(
-                  'assets/images/logo.png',
-                  width: 45,
-                  height: 45,
-                ),
+                Image.asset('assets/images/logo.png', width: 45, height: 45),
                 // 'Violet History',
                 // 'What is violet?',
                 'Violet이란?',
@@ -56,8 +52,11 @@ class _InfoPageState extends State<InfoPage> {
                 },
               ),
               _buildItem(
-                const Icon(MdiIcons.bookOpenPageVariant,
-                    size: 40, color: Colors.brown),
+                const Icon(
+                  MdiIcons.bookOpenPageVariant,
+                  size: 40,
+                  color: Colors.brown,
+                ),
                 // 'User Manual',
                 // 'Check out the user manual here!',
                 '유저 메뉴얼',
@@ -65,8 +64,11 @@ class _InfoPageState extends State<InfoPage> {
                 const UserManualPage(),
               ),
               _buildItem(
-                const Icon(MdiIcons.frequentlyAskedQuestions,
-                    size: 40, color: Colors.orange),
+                const Icon(
+                  MdiIcons.frequentlyAskedQuestions,
+                  size: 40,
+                  color: Colors.orange,
+                ),
                 'FAQ',
                 // 'Frequently Asked Questions',
                 '자주 묻는 질문',
@@ -79,7 +81,8 @@ class _InfoPageState extends State<InfoPage> {
                 null,
                 () async {
                   final url = Uri.parse(
-                      'https://www.notion.so/Violet-WalkRoad-1bd9b8bf4bbf48dd81525f2acd19da45');
+                    'https://www.notion.so/Violet-WalkRoad-1bd9b8bf4bbf48dd81525f2acd19da45',
+                  );
                   if (await canLaunchUrl(url)) {
                     await launchUrl(url);
                   }
@@ -101,9 +104,7 @@ class _InfoPageState extends State<InfoPage> {
                   final url = Uri(
                     scheme: 'mailto',
                     path: 'violet.dev.master@gmail.com',
-                    queryParameters: {
-                      'subject': '[App Issue] ',
-                    },
+                    queryParameters: {'subject': '[App Issue] '},
                   );
                   if (await canLaunchUrl(url)) {
                     await launchUrl(url);
@@ -111,8 +112,11 @@ class _InfoPageState extends State<InfoPage> {
                 },
               ),
               _buildItem(
-                const Icon(MdiIcons.discord,
-                    size: 40, color: Color(0xFF7189da)),
+                const Icon(
+                  MdiIcons.discord,
+                  size: 40,
+                  color: Color(0xFF7189da),
+                ),
                 // 'Discord Channel',
                 // 'Communicate with developers',
                 '디스코드 채널',
@@ -133,8 +137,9 @@ class _InfoPageState extends State<InfoPage> {
                 '프로젝트에 기여해보세요!',
                 null,
                 () async {
-                  final url =
-                      Uri.parse('https://github.com/project-violet/violet');
+                  final url = Uri.parse(
+                    'https://github.com/project-violet/violet',
+                  );
                   if (await canLaunchUrl(url)) {
                     await launchUrl(url);
                   }
@@ -160,9 +165,7 @@ class _InfoPageState extends State<InfoPage> {
                 height: 100,
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.only(top: 12),
-            ),
+            const Padding(padding: EdgeInsets.only(top: 12)),
             Text(
               'Project Violet',
               style: TextStyle(
@@ -194,10 +197,11 @@ class _InfoPageState extends State<InfoPage> {
       decoration: BoxDecoration(
         color: Settings.themeWhat.value ? Colors.black26 : Colors.white,
         borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(8),
-            topRight: Radius.circular(8),
-            bottomLeft: Radius.circular(8),
-            bottomRight: Radius.circular(8)),
+          topLeft: Radius.circular(8),
+          topRight: Radius.circular(8),
+          bottomLeft: Radius.circular(8),
+          bottomRight: Radius.circular(8),
+        ),
         boxShadow: [
           BoxShadow(
             color: Settings.themeWhat.value
@@ -214,12 +218,14 @@ class _InfoPageState extends State<InfoPage> {
         child: Material(
           color: Settings.themeWhat.value
               ? Settings.themeBlack.value
-                  ? Palette.blackThemeBackground
-                  : Colors.black38
+                    ? Palette.blackThemeBackground
+                    : Colors.black38
               : Colors.white,
           child: ListTile(
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 0.0,
+              horizontal: 16.0,
+            ),
             leading: image,
             title: Text(title, style: const TextStyle(fontSize: 16.0)),
             subtitle: Text(subtitle),

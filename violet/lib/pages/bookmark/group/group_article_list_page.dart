@@ -44,9 +44,7 @@ class GroupArticleListPage extends StatefulWidget {
 }
 
 class _GroupArticleListPageState extends State<GroupArticleListPage> {
-  final PageController _controller = PageController(
-    initialPage: 0,
-  );
+  final PageController _controller = PageController(initialPage: 0);
 
   static const _kDuration = Duration(milliseconds: 300);
   static const _kCurve = Curves.ease;
@@ -60,8 +58,9 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
   ObjectKey sliverKey = ObjectKey(const Uuid().v4());
   SearchResultType alignType = SearchResultType.detail;
 
-  final FilterController _filterController =
-      FilterController(heroKey: 'searchtype2');
+  final FilterController _filterController = FilterController(
+    heroKey: 'searchtype2',
+  );
 
   bool isFilterUsed = false;
 
@@ -95,7 +94,8 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
     // https://github.com/fluttercommunity/chewie/blob/09659cc32a898c1c308a53e7461ac405fa36b615/lib/src/cupertino_controls.dart#L603
     if (!mounted) {
       Logger.warning(
-          '[_GroupArticleListPageState][_rebuild] _element was null don\'t do setState');
+        '[_GroupArticleListPageState][_rebuild] _element was null don\'t do setState',
+      );
       return;
     }
     setState(() {
@@ -130,14 +130,19 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
     }
 
     final queryIds = await QueryManager.queryIds(
-        articleList.map((e) => int.parse(e.article())).toList());
-    final queryResultById = Map<String, QueryResult>.fromIterable(queryIds,
-        key: (e) => e.id().toString());
+      articleList.map((e) => int.parse(e.article())).toList(),
+    );
+    final queryResultById = Map<String, QueryResult>.fromIterable(
+      queryIds,
+      key: (e) => e.id().toString(),
+    );
 
     queryResult = articleList
-        .map((e) =>
-            queryResultById[e.article()] ??
-            QueryResult(result: {'Id': int.parse(e.article())}))
+        .map(
+          (e) =>
+              queryResultById[e.article()] ??
+              QueryResult(result: {'Id': int.parse(e.article())}),
+        )
         .toList();
 
     _applyFilter();
@@ -176,14 +181,12 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
           floating: true,
           delegate: AnimatedOpacitySliver(
             searchBar: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Stack(children: <Widget>[
-                  _filter(),
-                  _title(),
-                ])),
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Stack(children: <Widget>[_filter(), _title()]),
+            ),
           ),
         ),
-        _cachedList!
+        _cachedList!,
       ],
     );
 
@@ -196,8 +199,8 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
             child: CupertinoScrollbar(
               scrollbarOrientation:
                   Settings.bookmarkScrollbarPositionToLeft.value
-                      ? ScrollbarOrientation.left
-                      : ScrollbarOrientation.right,
+                  ? ScrollbarOrientation.left
+                  : ScrollbarOrientation.right,
               child: scrollView,
             ),
           );
@@ -228,7 +231,9 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
               ),
               GroupArtistList(name: widget.name, groupId: widget.groupId),
               GroupArtistArticleList(
-                  name: widget.name, groupId: widget.groupId),
+                name: widget.name,
+                groupId: widget.groupId,
+              ),
             ],
           ),
           Positioned(
@@ -278,11 +283,12 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
         FloatingActionButton(
           onPressed: () async {
             if (await showYesNoDialog(
-                context,
-                Translations.instance!
-                    .trans('deletebookmarkmsg')
-                    .replaceAll('%s', checked.length.toString()),
-                Translations.instance!.trans('bookmark'))) {
+              context,
+              Translations.instance!
+                  .trans('deletebookmarkmsg')
+                  .replaceAll('%s', checked.length.toString()),
+              Translations.instance!.trans('bookmark'),
+            )) {
               var bookmark = await Bookmark.getInstance();
               for (var element in checked) {
                 await bookmark.unbookmark(element);
@@ -329,9 +335,7 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
         child: Card(
           color: Palette.themeColor,
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(8.0),
-            ),
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
           ),
           elevation: !Settings.themeFlat.value ? 100 : 0,
           clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -344,10 +348,7 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
               child: Stack(
                 alignment: Alignment.center,
                 children: <Widget>[
-                  Icon(
-                    MdiIcons.formatListText,
-                    color: Colors.grey,
-                  ),
+                  Icon(MdiIcons.formatListText, color: Colors.grey),
                 ],
               ),
             ),
@@ -360,20 +361,27 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
   alignOnTap() async {
     if (checkMode) return;
 
-    final newAlignType = await Navigator.of(context).push(PageRouteBuilder(
-      opaque: false,
-      transitionDuration: const Duration(milliseconds: 500),
-      transitionsBuilder: (BuildContext context, Animation<double> animation,
-          Animation<double> secondaryAnimation, Widget wi) {
-        return FadeTransition(opacity: animation, child: wi);
-      },
-      pageBuilder: (_, __, ___) => SearchType(
-        heroTag: 'searchtype\$bookmark',
-        previousType: alignType,
+    final newAlignType = await Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: false,
+        transitionDuration: const Duration(milliseconds: 500),
+        transitionsBuilder:
+            (
+              BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget wi,
+            ) {
+              return FadeTransition(opacity: animation, child: wi);
+            },
+        pageBuilder: (_, __, ___) => SearchType(
+          heroTag: 'searchtype\$bookmark',
+          previousType: alignType,
+        ),
+        barrierColor: Colors.black12,
+        barrierDismissible: true,
       ),
-      barrierColor: Colors.black12,
-      barrierDismissible: true,
-    ));
+    );
 
     if (newAlignType == null || alignType == newAlignType) return;
     alignType = newAlignType;
@@ -397,9 +405,7 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
       context,
       Provider<FilterController>.value(
         value: _filterController,
-        child: FilterPage(
-          queryResult: queryResult,
-        ),
+        child: FilterPage(queryResult: queryResult),
       ),
     );
 
@@ -414,8 +420,10 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
   Widget _title() {
     return Padding(
       padding: const EdgeInsets.only(top: 24, left: 12),
-      child: Text(widget.name,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      child: Text(
+        widget.name,
+        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
     );
   }
 
@@ -468,8 +476,9 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
   Future<void> moveChecked() async {
     var groups = await (await Bookmark.getInstance()).getGroup();
     var currentGroup = widget.groupId;
-    groups =
-        groups.where((e) => e.id() != currentGroup && e.id() != 1).toList();
+    groups = groups
+        .where((e) => e.id() != currentGroup && e.id() != 1)
+        .toList();
 
     if (!mounted) return;
     final whereToMove = await showDialog<int>(
@@ -479,7 +488,8 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
         actions: <Widget>[
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-                backgroundColor: Settings.majorColor.value),
+              backgroundColor: Settings.majorColor.value,
+            ),
             child: Text(Translations.instance!.trans('cancel')),
             onPressed: () {
               Navigator.pop(context, 0);
@@ -507,12 +517,13 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
 
     if (whereToMove == null || !mounted) return;
     if (await showYesNoDialog(
-        context,
-        Translations.instance!
-            .trans('movetoto')
-            .replaceAll('%1', groups[whereToMove].name())
-            .replaceAll('%2', checked.length.toString()),
-        Translations.instance!.trans('movebookmark'))) {
+      context,
+      Translations.instance!
+          .trans('movetoto')
+          .replaceAll('%1', groups[whereToMove].name())
+          .replaceAll('%2', checked.length.toString()),
+      Translations.instance!.trans('movebookmark'),
+    )) {
       // There is a way to change only the group, but there is also re-register a new bookmark.
       // I chose the latter to suit the user's intentions.
 
@@ -541,7 +552,10 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
         await bm.unbookmark(e);
         // 4. Add src bookmarks with new groupid
         await bm.insertArticle(
-            e.toString(), DateTime.now(), groups[whereToMove].id());
+          e.toString(),
+          DateTime.now(),
+          groups[whereToMove].id(),
+        );
       }
 
       // 5. Update UI

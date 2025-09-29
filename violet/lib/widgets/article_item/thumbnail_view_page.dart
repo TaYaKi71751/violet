@@ -59,38 +59,39 @@ class _ThumbnailViewPageState extends State<ThumbnailViewPage> {
         child: Transform.scale(
           scale: scale,
           child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Hero(
-                  tag: widget.heroKey,
-                  child: CachedNetworkImage(
-                    imageUrl: widget.thumbnail ?? '',
-                    fit: !widget.showUltra ? BoxFit.cover : BoxFit.contain,
-                    httpHeaders: widget.headers,
-                    placeholder: (b, c) {
-                      if (!Settings.simpleItemWidgetLoadingIcon.value) {
-                        return const FlareActor(
-                          'assets/flare/Loading2.flr',
-                          alignment: Alignment.center,
-                          fit: BoxFit.fitHeight,
-                          animation: 'Alarm',
-                        );
-                      } else {
-                        return Center(
-                          child: SizedBox(
-                            width: 30,
-                            height: 30,
-                            child: CircularProgressIndicator(
-                              color: Settings.majorColor.value.withAlpha(150),
-                            ),
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Hero(
+                tag: widget.heroKey,
+                child: CachedNetworkImage(
+                  imageUrl: widget.thumbnail ?? '',
+                  fit: !widget.showUltra ? BoxFit.cover : BoxFit.contain,
+                  httpHeaders: widget.headers,
+                  placeholder: (b, c) {
+                    if (!Settings.simpleItemWidgetLoadingIcon.value) {
+                      return const FlareActor(
+                        'assets/flare/Loading2.flr',
+                        alignment: Alignment.center,
+                        fit: BoxFit.fitHeight,
+                        animation: 'Alarm',
+                      );
+                    } else {
+                      return Center(
+                        child: SizedBox(
+                          width: 30,
+                          height: 30,
+                          child: CircularProgressIndicator(
+                            color: Settings.majorColor.value.withAlpha(150),
                           ),
-                        );
-                      }
-                    },
-                  ),
+                        ),
+                      );
+                    }
+                  },
                 ),
-              ]),
+              ),
+            ],
+          ),
         ),
       ),
       onScaleStart: (detail) {

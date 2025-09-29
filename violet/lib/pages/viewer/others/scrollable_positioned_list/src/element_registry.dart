@@ -37,10 +37,8 @@ class _RegistryWidgetState extends State<RegistryWidget> {
   final Set<Element> registeredElements = {};
 
   @override
-  Widget build(BuildContext context) => _InheritedRegistryWidget(
-        state: this,
-        child: widget.child,
-      );
+  Widget build(BuildContext context) =>
+      _InheritedRegistryWidget(state: this, child: widget.child);
 }
 
 class _InheritedRegistryWidget extends InheritedWidget {

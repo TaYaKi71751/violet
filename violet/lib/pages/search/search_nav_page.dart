@@ -14,9 +14,6 @@ class SearchNavPage extends StatefulWidget {
 class _SearchNavPageState extends State<SearchNavPage> {
   @override
   Widget build(BuildContext context) {
-    return CardPanel.build(
-      context,
-      child: Container(),
-    );
+    return CardPanel.build(context, child: Container());
   }
 }

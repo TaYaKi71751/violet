@@ -59,7 +59,9 @@ class SyncManager {
 
   static Future<void> checkSyncOld(bool propagateException) async {
     await checkSync(
-        'd2bd5ae068efb26eb4689e5d6281a590e59fc4e2', propagateException);
+      'd2bd5ae068efb26eb4689e5d6281a590e59fc4e2',
+      propagateException,
+    );
   }
 
   static Future<void> checkSync(String branch, bool propagateException) async {
@@ -117,12 +119,14 @@ class SyncManager {
         if (type == 'chunk' && timestamp <= latest) continue;
 
         requestSize += size;
-        _rows!.add(SyncInfoRecord(
-          type: type,
-          timestamp: timestamp,
-          url: url,
-          size: size,
-        ));
+        _rows!.add(
+          SyncInfoRecord(
+            type: type,
+            timestamp: timestamp,
+            url: url,
+            size: size,
+          ),
+        );
       }
 
       /*
@@ -133,8 +137,10 @@ class SyncManager {
       if (requestSize > ignoreUserAcceptThreshold) syncRequire = true;
       if (_rows!.any((element) => element.type == 'chunk')) chunkRequire = true;
     } catch (e, st) {
-      Logger.error('[Sync-check] E: $e\n'
-          '$st');
+      Logger.error(
+        '[Sync-check] E: $e\n'
+        '$st',
+      );
       if (propagateException) rethrow;
     }
   }
@@ -165,8 +171,9 @@ class SyncManager {
 
   static Future<void> doChunkSync(DoubleIntCallback progressCallback) async {
     // Only chunk
-    var filteredIter =
-        _rows!.where((element) => element.type == 'chunk').toList();
+    var filteredIter = _rows!
+        .where((element) => element.type == 'chunk')
+        .toList();
 
     // Download Jsons
     var res = <Response>[];
@@ -179,12 +186,16 @@ class SyncManager {
       var starts = i * 16;
       var ends = min((i + 1) * 16, filteredIter.length);
 
-      var resi = await Future.wait(filteredIter
-          .sublist(starts, ends)
-          .map((e) => http.get(e.url).then((value) async {
+      var resi = await Future.wait(
+        filteredIter
+            .sublist(starts, ends)
+            .map(
+              (e) => http.get(e.url).then((value) async {
                 await progressCallback(0, filteredIter.length);
                 return value;
-              })));
+              }),
+            ),
+      );
 
       res.addAll(resi);
     }
@@ -223,8 +234,11 @@ class SyncManager {
         await dbraw.transaction((txn) async {
           final batch = txn.batch();
           for (var query in quries) {
-            batch.insert('HitomiColumnModel', query.result,
-                conflictAlgorithm: ConflictAlgorithm.replace);
+            batch.insert(
+              'HitomiColumnModel',
+              query.result,
+              conflictAlgorithm: ConflictAlgorithm.replace,
+            );
           }
           await batch.commit();
         });
@@ -239,13 +253,18 @@ class SyncManager {
           filter: false,
         );
 
-        await (await DataBaseManager.getInstance()).delete('HitomiColumnModel',
-            'NOT (${sql.substring(sql.indexOf('WHERE') + 6)})', []);
+        await (await DataBaseManager.getInstance()).delete(
+          'HitomiColumnModel',
+          'NOT (${sql.substring(sql.indexOf('WHERE') + 6)})',
+          [],
+        );
       }
     } catch (e, st) {
       // If an error occurs, stops synchronization immediately.
-      Logger.error('[Sync-chunk] E: $e\n'
-          '$st');
+      Logger.error(
+        '[Sync-chunk] E: $e\n'
+        '$st',
+      );
       if (Platform.isAndroid || Platform.isIOS) {
         FirebaseCrashlytics.instance.recordError(e, st);
       }

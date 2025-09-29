@@ -21,8 +21,11 @@ class ArtistListPage extends StatelessWidget {
   final List<String> artists;
   final bool isLast;
 
-  const ArtistListPage(
-      {super.key, required this.artists, required this.isLast});
+  const ArtistListPage({
+    super.key,
+    required this.artists,
+    required this.isLast,
+  });
 
   static final RegExp _chDot = RegExp('[cC]h\\.');
 
@@ -33,7 +36,8 @@ class ArtistListPage extends StatelessWidget {
 
     final postfix = e.trim().toLowerCase().replaceAll(' ', '_');
     final queryString = translate2query(
-        '${isLast ? '' : 'artist:'}$postfix ${Settings.includeTags.value} ${Settings.serializedExcludeTags}');
+      '${isLast ? '' : 'artist:'}$postfix ${Settings.includeTags.value} ${Settings.serializedExcludeTags}',
+    );
 
     final queryManager = QueryManager.queryPagination(queryString, 10);
 
@@ -132,8 +136,10 @@ class ArtistListPage extends StatelessWidget {
                   }
 
                   final queryResults = snapshot.data!;
-                  final articleCount =
-                      HentaiIndex.getArticleCount(classification, name);
+                  final articleCount = HentaiIndex.getArticleCount(
+                    classification,
+                    name,
+                  );
 
                   late final ArtistType type;
                   if (isLast && classification == 'group') {
@@ -146,10 +152,7 @@ class ArtistListPage extends StatelessWidget {
                     onTap: () async {
                       PlatformNavigator.navigateSlide(
                         context,
-                        ArtistInfoPage(
-                          type: type,
-                          name: name,
-                        ),
+                        ArtistInfoPage(type: type, name: name),
                       );
                     },
                     child: Container(

@@ -2,8 +2,10 @@
 // Copyright (C) 2020-2024. violet-team. Licensed under the Apache-2.0 License.
 
 // Suppress excepction
-Future catchUnwind(Future Function() body,
-    [Future Function(Object, Object)? err]) async {
+Future catchUnwind(
+  Future Function() body, [
+  Future Function(Object, Object)? err,
+]) async {
   try {
     await body();
   } catch (e, st) {

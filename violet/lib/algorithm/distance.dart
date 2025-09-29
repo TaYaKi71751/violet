@@ -34,8 +34,10 @@ class Distance {
     for (i = 0; i < x; i++) {
       v0[y + 1] = i + 1;
       for (j = 0; j < y; j++) {
-        v0[y + j + 2] = min(min(v0[y + j + 1], v0[j + 1]) + 1,
-            v0[j] + ((l1[i] == l2[j]) ? 0 : 1));
+        v0[y + j + 2] = min(
+          min(v0[y + j + 1], v0[j + 1]) + 1,
+          v0[j] + ((l1[i] == l2[j]) ? 0 : 1),
+        );
       }
       for (j = 0; j < y + 1; j++) {
         v0[j] = v0[y + j + 1];
@@ -46,7 +48,9 @@ class Distance {
   }
 
   static int levenshteinDistanceComparable<T extends Comparable<T>>(
-      List<T> l1, List<T> l2) {
+    List<T> l1,
+    List<T> l2,
+  ) {
     int x = l1.length;
     int y = l2.length;
     int i, j;
@@ -61,8 +65,10 @@ class Distance {
     for (i = 0; i < x; i++) {
       v0[y + 1] = i + 1;
       for (j = 0; j < y; j++) {
-        v0[y + j + 2] = min(min(v0[y + j + 1], v0[j + 1]) + 1,
-            v0[j] + ((l1[i] == l2[j]) ? 0 : 1));
+        v0[y + j + 2] = min(
+          min(v0[y + j + 1], v0[j + 1]) + 1,
+          v0[j] + ((l1[i] == l2[j]) ? 0 : 1),
+        );
       }
       for (j = 0; j < y + 1; j++) {
         v0[j] = v0[y + j + 1];
@@ -79,10 +85,14 @@ class Distance {
   }
 
   static List<int> levenshteinDistanceRoute<T extends num>(
-      List<T> l1, List<T> l2) {
+    List<T> l1,
+    List<T> l2,
+  ) {
     List<List<int>> dist = List.generate(
-        l1.length + 1, (i) => List.filled(l2.length + 1, 0),
-        growable: false);
+      l1.length + 1,
+      (i) => List.filled(l2.length + 1, 0),
+      growable: false,
+    );
 
     for (int i = 0; i <= l1.length; i++) {
       dist[i][0] = i;
@@ -96,8 +106,10 @@ class Distance {
         if (l1[i - 1] == l2[j - 1]) {
           dist[i][j] = dist[i - 1][j - 1];
         } else {
-          dist[i][j] = min(dist[i - 1][j - 1] + 1,
-              min(dist[i][j - 1] + 1, dist[i - 1][j] + 1));
+          dist[i][j] = min(
+            dist[i - 1][j - 1] + 1,
+            min(dist[i][j - 1] + 1, dist[i - 1][j] + 1),
+          );
         }
       }
     }
@@ -128,7 +140,9 @@ class Distance {
 
   // dynamic must be double, int
   static double cosineDistance(
-      Map<String, dynamic> l1, Map<String, dynamic> l2) {
+    Map<String, dynamic> l1,
+    Map<String, dynamic> l2,
+  ) {
     double xx = 0;
     double yy = 0;
 

@@ -59,8 +59,8 @@ class _BookmarkPageState extends ThemeSwitchableState<BookmarkPage>
         heroTag: 'speed-dial-hero-tag',
         backgroundColor: Settings.themeWhat.value
             ? Settings.themeBlack.value
-                ? Palette.blackThemeBackground
-                : Colors.grey.shade800
+                  ? Palette.blackThemeBackground
+                  : Colors.grey.shade800
             : Colors.white,
         foregroundColor: Settings.majorColor.value,
         elevation: 1.0,
@@ -73,9 +73,10 @@ class _BookmarkPageState extends ThemeSwitchableState<BookmarkPage>
           }),
           _dialButton(MdiIcons.group, 'newgroup', () async {
             (await Bookmark.getInstance()).createGroup(
-                Translations.instance!.trans('newgroup'),
-                Translations.instance!.trans('newgroup'),
-                Colors.orange);
+              Translations.instance!.trans('newgroup'),
+              Translations.instance!.trans('newgroup'),
+              Colors.orange,
+            );
             setState(() {});
           }),
         ],
@@ -88,8 +89,8 @@ class _BookmarkPageState extends ThemeSwitchableState<BookmarkPage>
       child: Icon(icon, color: Settings.majorColor.value),
       backgroundColor: Settings.themeWhat.value
           ? Settings.themeBlack.value
-              ? Palette.blackThemeBackground
-              : Colors.grey.shade800
+                ? Palette.blackThemeBackground
+                : Colors.grey.shade800
           : Colors.white,
       label: Translations.instance!.trans(label),
       labelStyle: TextStyle(
@@ -98,25 +99,25 @@ class _BookmarkPageState extends ThemeSwitchableState<BookmarkPage>
       ),
       labelBackgroundColor: Settings.themeWhat.value
           ? Settings.themeBlack.value
-              ? Palette.blackThemeBackground
-              : Colors.grey.shade800
+                ? Palette.blackThemeBackground
+                : Colors.grey.shade800
           : Colors.white,
       onTap: onTap,
     );
   }
 
   Widget _reorderFutureBuilder(
-      BuildContext context, AsyncSnapshot<List<BookmarkGroup>> snapshot) {
+    BuildContext context,
+    AsyncSnapshot<List<BookmarkGroup>> snapshot,
+  ) {
     if (!snapshot.hasData) {
-      return const Center(
-        child: Text('Loading ...'),
-      );
+      return const Center(child: Text('Loading ...'));
     }
 
     final double statusBarHeight = MediaQuery.of(context).padding.top;
 
-    final scrollController =
-        doubleTapToTopScrollController = PrimaryScrollController.of(context);
+    final scrollController = doubleTapToTopScrollController =
+        PrimaryScrollController.of(context);
 
     final rows = _buildRowItems(snapshot.data!, reorder);
 
@@ -143,10 +144,11 @@ class _BookmarkPageState extends ThemeSwitchableState<BookmarkPage>
             itemCount: snapshot.data!.length + _kReservedPreIndex,
             itemBuilder: (BuildContext ctxt, int index) {
               return _buildItem(
-                  index,
-                  index < _kReservedPreIndex
-                      ? null
-                      : snapshot.data![index - _kReservedPreIndex]);
+                index,
+                index < _kReservedPreIndex
+                    ? null
+                    : snapshot.data![index - _kReservedPreIndex],
+              );
             },
           );
   }
@@ -155,17 +157,16 @@ class _BookmarkPageState extends ThemeSwitchableState<BookmarkPage>
     if (oldIndex * newIndex <= _kReservedPreIndex ||
         oldIndex <= _kReservedPreIndex ||
         newIndex <= _kReservedPreIndex) {
-      showToast(
-        level: ToastLevel.error,
-        message: 'You cannot move like that!',
-      );
+      showToast(level: ToastLevel.error, message: 'You cannot move like that!');
       return;
     }
 
     var bookmark = await Bookmark.getInstance();
     if (oldIndex < newIndex) newIndex -= _kReservedPreIndex;
     await bookmark.positionSwap(
-        oldIndex - _kReservedPreIndex, newIndex - _kReservedPreIndex);
+      oldIndex - _kReservedPreIndex,
+      newIndex - _kReservedPreIndex,
+    );
     setState(() {});
   }
 
@@ -214,10 +215,11 @@ class _BookmarkPageState extends ThemeSwitchableState<BookmarkPage>
           decoration: BoxDecoration(
             color: Settings.themeWhat.value ? Colors.black26 : Colors.white,
             borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(8),
-                topRight: Radius.circular(8),
-                bottomLeft: Radius.circular(8),
-                bottomRight: Radius.circular(8)),
+              topLeft: Radius.circular(8),
+              topRight: Radius.circular(8),
+              bottomLeft: Radius.circular(8),
+              bottomRight: Radius.circular(8),
+            ),
             boxShadow: [
               BoxShadow(
                 color: Settings.themeWhat.value
@@ -234,8 +236,8 @@ class _BookmarkPageState extends ThemeSwitchableState<BookmarkPage>
             child: Material(
               color: Settings.themeWhat.value
                   ? Settings.themeBlack.value
-                      ? Palette.blackThemeBackground
-                      : Colors.black38
+                        ? Palette.blackThemeBackground
+                        : Colors.black38
                   : Colors.white,
               child: ListTile(
                 title: Text(name, style: const TextStyle(fontSize: 16.0)),
@@ -249,9 +251,8 @@ class _BookmarkPageState extends ThemeSwitchableState<BookmarkPage>
                           id == -2
                               ? const RecordViewPage()
                               : id == -1
-                                  ? const CropBookmarkPage()
-                                  : GroupArticleListPage(
-                                      groupId: id, name: name),
+                              ? const CropBookmarkPage()
+                              : GroupArticleListPage(groupId: id, name: name),
                           opaque: false,
                         );
                       },
@@ -269,12 +270,17 @@ class _BookmarkPageState extends ThemeSwitchableState<BookmarkPage>
   }
 
   _onLongPressBookmarkItem(
-      int index, String oname, String name, BookmarkGroup? data) async {
+    int index,
+    String oname,
+    String name,
+    BookmarkGroup? data,
+  ) async {
     if (index < 0 || (oname == 'violet_default' && index == 0)) {
       await showOkDialog(
-          context,
-          Translations.instance!.trans('cannotmodifydefaultgroup'),
-          Translations.instance!.trans('bookmark'));
+        context,
+        Translations.instance!.trans('cannotmodifydefaultgroup'),
+        Translations.instance!.trans('bookmark'),
+      );
       return;
     }
 
@@ -297,8 +303,9 @@ class _BookmarkPageState extends ThemeSwitchableState<BookmarkPage>
       rrt['Name'] = nname;
       rrt['Description'] = ndesc;
 
-      await (await Bookmark.getInstance())
-          .modfiyGroup(BookmarkGroup(result: rrt));
+      await (await Bookmark.getInstance()).modfiyGroup(
+        BookmarkGroup(result: rrt),
+      );
     }
 
     setState(() {});

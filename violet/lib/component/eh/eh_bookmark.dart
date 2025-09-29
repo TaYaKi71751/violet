@@ -15,10 +15,7 @@ class EHBookmark {
 
     var result = <HashSet<int>>[];
 
-    const candidateHosts = [
-      'https://exhentai.org',
-      'https://e-hentai.org',
-    ];
+    const candidateHosts = ['https://exhentai.org', 'https://e-hentai.org'];
     for (final host in candidateHosts) {
       for (int i = 0; i < 10; i++) {
         await catchUnwind(() async {
@@ -27,7 +24,8 @@ class EHBookmark {
           int? next;
           while (next != -1) {
             final html = await EHSession.requestString(
-                '$host/favorites.php?favcat=$i&inline_set=fs_p${next == null ? '' : '&next=$next'}');
+              '$host/favorites.php?favcat=$i&inline_set=fs_p${next == null ? '' : '&next=$next'}',
+            );
             parse(html).querySelectorAll('a[href*="/g/"]').forEach((element) {
               final href = element.attributes['href'];
               if (href == null) return;

@@ -39,19 +39,13 @@ class SimilarListPage extends StatelessWidget {
           var e = similarsAll[index];
           return FutureBuilder<List<QueryResult>>(
             future: queryDedupedArtistArticles(type, e.$1),
-            builder: (BuildContext context,
-                AsyncSnapshot<List<QueryResult>> snapshot) {
+            builder: (BuildContext context, AsyncSnapshot<List<QueryResult>> snapshot) {
               if (!snapshot.hasData) {
-                return Container(
-                  height: 195,
-                );
+                return Container(height: 195);
               }
 
               return ThreeArticlePanel(
-                tappedRoute: () => ArtistInfoPage(
-                  type: type,
-                  name: e.$1,
-                ),
+                tappedRoute: () => ArtistInfoPage(type: type, name: e.$1),
                 title:
                     ' ${e.$1} (${HentaiIndex.getArticleCount(type.name, e.$1)})',
                 count:
@@ -67,10 +61,13 @@ class SimilarListPage extends StatelessWidget {
 }
 
 Future<List<QueryResult>> queryDedupedArtistArticles(
-    ArtistType type, String e) async {
+  ArtistType type,
+  String e,
+) async {
   final postfix = e.toLowerCase().replaceAll(' ', '_');
   final queryString = translate2query(
-      '${type.name}:$postfix ${Settings.includeTags.value} ${Settings.serializedExcludeTags}');
+    '${type.name}:$postfix ${Settings.includeTags.value} ${Settings.serializedExcludeTags}',
+  );
   final qm = QueryManager.queryPagination(queryString, 10);
   final quries = await qm.next();
 
@@ -86,8 +83,9 @@ Future<List<QueryResult>> queryDedupedArtistArticles(
     final target = removeChapter(query.title() as String);
     final hasSimilar = titles.any((source) {
       return Distance.levenshteinDistanceComparable(
-              source.runes.map((e) => e.toString()).toList(),
-              target.runes.map((e) => e.toString()).toList()) <
+            source.runes.map((e) => e.toString()).toList(),
+            target.runes.map((e) => e.toString()).toList(),
+          ) <
           3;
     });
 

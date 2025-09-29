@@ -44,8 +44,9 @@ class DownloadRoutine {
     await _setState(6);
   }
 
-  Future<void> createTasks(
-      {required DoubleIntCallback progressCallback}) async {
+  Future<void> createTasks({
+    required DoubleIntCallback progressCallback,
+  }) async {
     try {
       final generalDownloadProgress = GeneralDownloadProgress(
         simpleInfoCallback: (info) async {
@@ -61,11 +62,11 @@ class DownloadRoutine {
       );
 
       if (item.queryResult != null) {
-        tasks =
-            await HentaiDonwloadManager.instance().createTaskFromQueryResult(
-          item.queryResult!,
-          generalDownloadProgress,
-        );
+        tasks = await HentaiDonwloadManager.instance()
+            .createTaskFromQueryResult(
+              item.queryResult!,
+              generalDownloadProgress,
+            );
       } else {
         tasks = await HentaiDonwloadManager.instance().createTask(
           item.url(),
@@ -77,8 +78,9 @@ class DownloadRoutine {
       for (var task in tasks!) {
         task.downloadPath = join(
           basepath,
-          task.format!
-              .formatting(HentaiDonwloadManager.instance().defaultFormat()),
+          task.format!.formatting(
+            HentaiDonwloadManager.instance().defaultFormat(),
+          ),
         );
       }
     } catch (e) {
@@ -124,17 +126,19 @@ class DownloadRoutine {
   }) async {
     final downloader = await IsolateDownloader.getInstance();
 
-    downloader.appendTasks(tasks!.map((e) {
-      e.startCallback = () {};
-      e.completeCallback = completeCallback;
+    downloader.appendTasks(
+      tasks!.map((e) {
+        e.startCallback = () {};
+        e.completeCallback = completeCallback;
 
-      e.sizeCallback = (byte) {};
-      e.downloadCallback = downloadCallback;
+        e.sizeCallback = (byte) {};
+        e.downloadCallback = downloadCallback;
 
-      e.errorCallback = errorCallback;
+        e.errorCallback = errorCallback;
 
-      return e;
-    }).toList());
+        return e;
+      }).toList(),
+    );
 
     await _setState(3);
   }
@@ -169,24 +173,28 @@ class DownloadRoutine {
   }) async {
     final downloader = await IsolateDownloader.getInstance();
 
-    downloader.appendTasks(invalidIndex.map((e) => tasks![e]).map((e) {
-      e.startCallback = () {};
-      e.completeCallback = completeCallback;
+    downloader.appendTasks(
+      invalidIndex.map((e) => tasks![e]).map((e) {
+        e.startCallback = () {};
+        e.completeCallback = completeCallback;
 
-      e.sizeCallback = (byte) {};
-      e.downloadCallback = downloadCallback;
+        e.sizeCallback = (byte) {};
+        e.downloadCallback = downloadCallback;
 
-      e.errorCallback = errorCallback;
+        e.errorCallback = errorCallback;
 
-      return e;
-    }).toList());
+        return e;
+      }).toList(),
+    );
 
     await _setState(3);
   }
 
   Future<void> setDownloadComplete() async {
-    (await Download.getInstance())
-        .appendDownloaded(int.parse(item.url()), item);
+    (await Download.getInstance()).appendDownloaded(
+      int.parse(item.url()),
+      item,
+    );
     await _setState(0);
   }
 

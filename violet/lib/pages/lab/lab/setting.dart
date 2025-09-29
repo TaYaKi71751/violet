@@ -37,8 +37,9 @@ class _LabSettingState extends State<LabSetting> {
               ),
             ),
             onTap: () async {
-              await Settings.simpleItemWidgetLoadingIcon
-                  .setValue(!Settings.simpleItemWidgetLoadingIcon.value);
+              await Settings.simpleItemWidgetLoadingIcon.setValue(
+                !Settings.simpleItemWidgetLoadingIcon.value,
+              );
               setState(() {});
             },
           ),
@@ -48,7 +49,8 @@ class _LabSettingState extends State<LabSetting> {
               leading: Icon(MdiIcons.flask, color: Settings.majorColor.value),
               title: const Text('Artist article list tap option'),
               subtitle: const Text(
-                  'show new viewer when artist article list item tapped'),
+                'show new viewer when artist article list item tapped',
+              ),
               trailing: Switch(
                 value: Settings.showNewViewerWhenArtistArticleListItemTap.value,
                 onChanged: (newValue) async {
@@ -62,7 +64,8 @@ class _LabSettingState extends State<LabSetting> {
             ),
             onTap: () async {
               await Settings.showNewViewerWhenArtistArticleListItemTap.setValue(
-                  !Settings.showNewViewerWhenArtistArticleListItemTap.value);
+                !Settings.showNewViewerWhenArtistArticleListItemTap.value,
+              );
               setState(() {});
             },
           ),
@@ -72,12 +75,14 @@ class _LabSettingState extends State<LabSetting> {
               leading: Icon(MdiIcons.flask, color: Settings.majorColor.value),
               title: const Text('Enable viewer function backdrop filter'),
               subtitle: const Text(
-                  'apply ios style blur effect to viewer functions. this blur effect may decrease performance.'),
+                'apply ios style blur effect to viewer functions. this blur effect may decrease performance.',
+              ),
               trailing: Switch(
                 value: Settings.enableViewerFunctionBackdropFilter.value,
                 onChanged: (newValue) async {
-                  await Settings.enableViewerFunctionBackdropFilter
-                      .setValue(newValue);
+                  await Settings.enableViewerFunctionBackdropFilter.setValue(
+                    newValue,
+                  );
                   setState(() {});
                 },
                 activeTrackColor: Settings.majorColor.value,
@@ -85,8 +90,9 @@ class _LabSettingState extends State<LabSetting> {
               ),
             ),
             onTap: () async {
-              await Settings.enableViewerFunctionBackdropFilter
-                  .setValue(!Settings.enableViewerFunctionBackdropFilter.value);
+              await Settings.enableViewerFunctionBackdropFilter.setValue(
+                !Settings.enableViewerFunctionBackdropFilter.value,
+              );
               setState(() {});
             },
           ),
@@ -96,12 +102,14 @@ class _LabSettingState extends State<LabSetting> {
               leading: Icon(MdiIcons.flask, color: Settings.majorColor.value),
               title: const Text('Using PushReplacement On Article Read'),
               subtitle: const Text(
-                  'when tap Read button in the article-info, the article-info closes.'),
+                'when tap Read button in the article-info, the article-info closes.',
+              ),
               trailing: Switch(
                 value: Settings.usingPushReplacementOnArticleRead.value,
                 onChanged: (newValue) async {
-                  await Settings.usingPushReplacementOnArticleRead
-                      .setValue(newValue);
+                  await Settings.usingPushReplacementOnArticleRead.setValue(
+                    newValue,
+                  );
                   setState(() {});
                 },
                 activeTrackColor: Settings.majorColor.value,
@@ -109,8 +117,9 @@ class _LabSettingState extends State<LabSetting> {
               ),
             ),
             onTap: () async {
-              await Settings.usingPushReplacementOnArticleRead
-                  .setValue(!Settings.usingPushReplacementOnArticleRead.value);
+              await Settings.usingPushReplacementOnArticleRead.setValue(
+                !Settings.usingPushReplacementOnArticleRead.value,
+              );
               setState(() {});
             },
           ),
@@ -120,7 +129,8 @@ class _LabSettingState extends State<LabSetting> {
               leading: Icon(MdiIcons.flask, color: Settings.majorColor.value),
               title: const Text('Download E(x)hentai Raw Image'),
               subtitle: const Text(
-                  'download the original image. many network errors (connection reset ... etc) can occur during this operation.'),
+                'download the original image. many network errors (connection reset ... etc) can occur during this operation.',
+              ),
               trailing: Switch(
                 value: Settings.downloadEhRawImage.value,
                 onChanged: (newValue) async {
@@ -132,8 +142,9 @@ class _LabSettingState extends State<LabSetting> {
               ),
             ),
             onTap: () async {
-              await Settings.downloadEhRawImage
-                  .setValue(!Settings.downloadEhRawImage.value);
+              await Settings.downloadEhRawImage.setValue(
+                !Settings.downloadEhRawImage.value,
+              );
               setState(() {});
             },
           ),
@@ -146,8 +157,9 @@ class _LabSettingState extends State<LabSetting> {
               trailing: Switch(
                 value: Settings.bookmarkScrollbarPositionToLeft.value,
                 onChanged: (newValue) async {
-                  await Settings.bookmarkScrollbarPositionToLeft
-                      .setValue(newValue);
+                  await Settings.bookmarkScrollbarPositionToLeft.setValue(
+                    newValue,
+                  );
                   setState(() {});
                 },
                 activeTrackColor: Settings.majorColor.value,
@@ -155,8 +167,9 @@ class _LabSettingState extends State<LabSetting> {
               ),
             ),
             onTap: () async {
-              await Settings.bookmarkScrollbarPositionToLeft
-                  .setValue(!Settings.bookmarkScrollbarPositionToLeft.value);
+              await Settings.bookmarkScrollbarPositionToLeft.setValue(
+                !Settings.bookmarkScrollbarPositionToLeft.value,
+              );
               setState(() {});
             },
           ),
@@ -177,8 +190,9 @@ class _LabSettingState extends State<LabSetting> {
               ),
             ),
             onTap: () async {
-              await Settings.inViewerMessageSearch
-                  .setValue(!Settings.inViewerMessageSearch.value);
+              await Settings.inViewerMessageSearch.setValue(
+                !Settings.inViewerMessageSearch.value,
+              );
               setState(() {});
             },
           ),
@@ -189,9 +203,7 @@ class _LabSettingState extends State<LabSetting> {
 
   Container _buildDivider() {
     return Container(
-      margin: const EdgeInsets.symmetric(
-        horizontal: 8.0,
-      ),
+      margin: const EdgeInsets.symmetric(horizontal: 8.0),
       width: double.infinity,
       height: 1.0,
       color: Settings.themeWhat.value

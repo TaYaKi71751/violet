@@ -34,17 +34,21 @@ class ScriptManager {
   static Future<void> init() async {
     Future fallbackFail(Future Function() fn) async {
       await catchUnwind(fn, (e, st) async {
-        await Logger.warning('[ScriptManager-init] W: $e\n'
-            '$st');
+        await Logger.warning(
+          '[ScriptManager-init] W: $e\n'
+          '$st',
+        );
         debugPrint(e.toString());
       });
     }
 
     await fallbackFail(() async {
       final scriptHtml = (await http.get(scriptNoCDNUrl)).body;
-      scriptCache = json.decode(parse(scriptHtml)
-          .querySelector("script[data-target='react-app.embeddedData']")!
-          .text)['payload']['blob']['rawBlob'];
+      scriptCache = json.decode(
+        parse(
+          scriptHtml,
+        ).querySelector("script[data-target='react-app.embeddedData']")!.text,
+      )['payload']['blob']['rawBlob'];
     });
 
     if (scriptCache == null) {
@@ -98,14 +102,15 @@ class ScriptManager {
 
   static Future<bool> refreshV4NoWebView() async {
     var success = false;
-    await catchUnwind(() async {
-      final ggBody =
-          (await http.get('https://ltn.gold-usergeneratedcontent.net/gg.js'))
-              .body;
-      final ggRuntime = getJavascriptRuntime();
-      // TODO: 이유는 잘 모르겠으나 use strict를 삭제하지 않으면 gg instance를 찾을 수 없어서 실패함
-      ggRuntime.evaluate(ggBody.split("'use strict';")[1]);
-      final gg = ggRuntime.evaluate('''
+    await catchUnwind(
+      () async {
+        final ggBody = (await http.get(
+          'https://ltn.gold-usergeneratedcontent.net/gg.js',
+        )).body;
+        final ggRuntime = getJavascriptRuntime();
+        // TODO: 이유는 잘 모르겠으나 use strict를 삭제하지 않으면 gg instance를 찾을 수 없어서 실패함
+        ggRuntime.evaluate(ggBody.split("'use strict';")[1]);
+        final gg = ggRuntime.evaluate('''
               var r = "";
               for (var i = 0; i < 4096; i++) {
                 r += gg.m(i).toString();
@@ -113,13 +118,17 @@ class ScriptManager {
               }
               r + '|' + gg.b
               ''').stringResult;
-      await refreshV4(gg.split('|')[0], gg.split('|')[1]);
-      success = true;
-    }, (e, st) async {
-      await Logger.warning('[ScriptManager-refreshV4NoWebView] W: $e\n'
-          '$st');
-      debugPrint(e.toString());
-    });
+        await refreshV4(gg.split('|')[0], gg.split('|')[1]);
+        success = true;
+      },
+      (e, st) async {
+        await Logger.warning(
+          '[ScriptManager-refreshV4NoWebView] W: $e\n'
+          '$st',
+        );
+        debugPrint(e.toString());
+      },
+    );
     return success;
   }
 
@@ -127,8 +136,9 @@ class ScriptManager {
   static Future<void> refreshV4(String ggM, String ggB) async {
     enableV4 = true;
     v4Cache ??= (await http.get(scriptV4Url)).body;
-    final scriptTemp =
-        v4Cache!.replaceAll('%%gg.m%', ggM).replaceAll('%%gg.b%', ggB);
+    final scriptTemp = v4Cache!
+        .replaceAll('%%gg.m%', ggM)
+        .replaceAll('%%gg.b%', ggB);
     replaceScriptCacheIfRequired(scriptTemp);
   }
 
@@ -151,8 +161,9 @@ class ScriptManager {
   }
 
   static Future<String?> getGalleryInfoRaw(String id) async {
-    final downloadUrl =
-        runtime.evaluate("create_download_url('$id')").stringResult;
+    final downloadUrl = runtime
+        .evaluate("create_download_url('$id')")
+        .stringResult;
     final headers = await runHitomiGetHeaderContent(id.toString());
     final galleryInfo = await http.get(downloadUrl, headers: headers);
     if (galleryInfo.statusCode != 200) return null;
@@ -175,32 +186,40 @@ class ScriptManager {
         smallThumbnails: jResultImageList.stresult,
       );
     } catch (e, st) {
-      Logger.error('[script-HitomiGetImageList] E: $e\n'
-          'Id: $id\n'
-          '$st');
+      Logger.error(
+        '[script-HitomiGetImageList] E: $e\n'
+        'Id: $id\n'
+        '$st',
+      );
       return null;
     }
   }
 
   static Future<Map<String, String>> runHitomiGetHeaderContent(
-      String id) async {
+    String id,
+  ) async {
     if (scriptCache == null) return <String, String>{};
     try {
-      final jResult =
-          runtime.evaluate("hitomi_get_header_content('$id')").stringResult;
+      final jResult = runtime
+          .evaluate("hitomi_get_header_content('$id')")
+          .stringResult;
       final jResultObject = jsonDecode(jResult);
 
       if (jResultObject is Map<dynamic, dynamic>) {
         return Map<String, String>.from(jResultObject);
       } else {
-        throw Exception('[script-HitomiGetHeaderContent] E: JSError\n'
-            'Id: $id\n'
-            'Message: $jResult');
+        throw Exception(
+          '[script-HitomiGetHeaderContent] E: JSError\n'
+          'Id: $id\n'
+          'Message: $jResult',
+        );
       }
     } catch (e, st) {
-      Logger.error('[script-HitomiGetHeaderContent] E: $e\n'
-          'Id: $id\n'
-          '$st');
+      Logger.error(
+        '[script-HitomiGetHeaderContent] E: $e\n'
+        'Id: $id\n'
+        '$st',
+      );
       rethrow;
     }
   }

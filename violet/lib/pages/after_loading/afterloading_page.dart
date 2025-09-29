@@ -6,12 +6,12 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:app_links/app_links.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:uni_links/uni_links.dart';
 import 'package:violet/locale/locale.dart';
 import 'package:violet/log/act_log.dart';
 import 'package:violet/other/named_color.dart';
@@ -49,11 +49,12 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
     FToast().init(context);
 
     if (Platform.isAndroid || Platform.isIOS) {
-      uriLinkStream.listen(handleDeeplink);
+      AppLinks().uriLinkStream.listen(handleDeeplink);
     }
 
-    Future.delayed(const Duration(milliseconds: 200))
-        .then((value) => UpdateManager.updateCheck(context));
+    Future.delayed(
+      const Duration(milliseconds: 200),
+    ).then((value) => UpdateManager.updateCheck(context));
   }
 
   bool _alreadyLocked = false;
@@ -68,11 +69,11 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
             !_alreadyLocked) {
           _alreadyLocked = true;
           Navigator.of(context)
-              .push(MaterialPageRoute(
-                builder: (context) => const LockScreen(
-                  isSecureMode: true,
+              .push(
+                MaterialPageRoute(
+                  builder: (context) => const LockScreen(isSecureMode: true),
                 ),
-              ))
+              )
               .then((value) => _alreadyLocked = false);
         }
         ActLogger.log(ActLogEvent(type: ActLogType.appResume));
@@ -100,8 +101,9 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
     }
   }
 
-  final PageController _pageController =
-      PageController(initialPage: defaultInitialPage);
+  final PageController _pageController = PageController(
+    initialPage: defaultInitialPage,
+  );
   final FocusNode _focusNode = FocusNode();
   final FocusNode nestedFocusNode = FocusNode();
 
@@ -117,8 +119,10 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
 
   bool _isDoubleTap = false;
 
-  late final List<GlobalKey<State>> _widgetKeys =
-      List.generate(5, (index) => GlobalKey());
+  late final List<GlobalKey<State>> _widgetKeys = List.generate(
+    5,
+    (index) => GlobalKey(),
+  );
 
   Widget _buildBottomNavigationBar(BuildContext context) {
     final translations = Translations.instance!;
@@ -127,8 +131,8 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
       return BottomNavigationBarItem(
         backgroundColor: Settings.themeWhat.value
             ? Settings.themeBlack.value
-                ? const Color(0xFF060606)
-                : Colors.grey.shade900.withOpacity(0.90)
+                  ? const Color(0xFF060606)
+                  : Colors.grey.shade900.withOpacity(0.90)
             : Colors.grey.shade50,
         icon: Icon(iconData),
         label: translations.trans(key),
@@ -145,8 +149,9 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
         showUnselectedLabels: false,
         type: BottomNavigationBarType.shifting,
         fixedColor: Settings.majorColor.value,
-        unselectedItemColor:
-            Settings.themeWhat.value ? Colors.white : Colors.black,
+        unselectedItemColor: Settings.themeWhat.value
+            ? Colors.white
+            : Colors.black,
         backgroundColor: Settings.themeWhat.value && Settings.themeBlack.value
             ? const Color(0xFF060606)
             : null,
@@ -170,7 +175,9 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
 
             _isDoubleTap = true;
             Timer(
-                const Duration(milliseconds: 200), () => _isDoubleTap = false);
+              const Duration(milliseconds: 200),
+              () => _isDoubleTap = false,
+            );
           }
         },
         items: <BottomNavigationBarItem>[
@@ -187,7 +194,8 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
       final mediaQuery = MediaQuery.of(context);
       result = MediaQuery(
         data: mediaQuery.copyWith(
-          padding: mediaQuery.padding +
+          padding:
+              mediaQuery.padding +
               mediaQuery.viewInsets +
               const EdgeInsets.only(bottom: 6),
         ),
@@ -210,11 +218,13 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
         height: 54,
         child: Container(
           decoration: BoxDecoration(
-              color: page == _currentPage ? color.withOpacity(0.4) : null,
-              borderRadius: const BorderRadius.all(Radius.circular(10))),
+            color: page == _currentPage ? color.withOpacity(0.4) : null,
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
+          ),
           child: InkWell(
             customBorder: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10))),
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+            ),
             hoverColor: color,
             highlightColor: color.withOpacity(0.2),
             focusColor: color,
@@ -309,8 +319,10 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-    Variables.updatePadding((mediaQuery.padding + mediaQuery.viewInsets).top,
-        (mediaQuery.padding + mediaQuery.viewInsets).bottom);
+    Variables.updatePadding(
+      (mediaQuery.padding + mediaQuery.viewInsets).top,
+      (mediaQuery.padding + mediaQuery.viewInsets).bottom,
+    );
 
     return PopScope(
       canPop: false,
@@ -376,16 +388,14 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
                 if (kReleaseMode && !Platform.isWindows) const ScriptWebView(),
                 PageView(
                   controller: _pageController,
-                  physics:
-                      _usesDrawer ? const NeverScrollableScrollPhysics() : null,
+                  physics: _usesDrawer
+                      ? const NeverScrollableScrollPhysics()
+                      : null,
                   onPageChanged: (newPage) {
                     setState(() {});
                   },
                   children: <Widget>[
-                    SearchPage(
-                      key: _widgetKeys[0],
-                      focusNode: nestedFocusNode,
-                    ),
+                    SearchPage(key: _widgetKeys[0], focusNode: nestedFocusNode),
                     HotPage(key: _widgetKeys[1]),
                     BookmarkPage(key: _widgetKeys[2]),
                     DownloadPage(key: _widgetKeys[3]),

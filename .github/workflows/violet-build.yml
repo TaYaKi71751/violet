@@ -49,9 +49,12 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           channel: "stable"
-          flutter-version: 3.27.4
+          flutter-version: 3.35.4
 
       - uses: dtolnay/rust-toolchain@stable
+
+      - name: Get Dart dependencies
+        run: dart pub get
 
       - name: Formatting
         run: dart format --output=none --set-exit-if-changed .
@@ -80,7 +83,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-          flutter-version: 3.27.4
+          flutter-version: 3.35.4
 
       - uses: actions/setup-python@v2
         with:
@@ -138,7 +141,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-          flutter-version: 3.27.4
+          flutter-version: 3.35.4
 
       - uses: actions/setup-python@v2
         with:
@@ -183,7 +186,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-          flutter-version: 3.27.4
+          flutter-version: 3.35.4
 
       - uses: actions/setup-python@v2
         with:

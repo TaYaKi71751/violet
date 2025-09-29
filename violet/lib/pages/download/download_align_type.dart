@@ -13,11 +13,11 @@ class DownloadAlignType extends StatelessWidget {
   Color getColor(int i) {
     return Settings.themeWhat.value
         ? Settings.downloadAlignType.value == i
-            ? Colors.grey.shade200
-            : Colors.grey.shade400
+              ? Colors.grey.shade200
+              : Colors.grey.shade400
         : Settings.downloadAlignType.value == i
-            ? Colors.grey.shade900
-            : Colors.grey.shade400;
+        ? Colors.grey.shade900
+        : Colors.grey.shade400;
   }
 
   @override
@@ -35,16 +35,36 @@ class DownloadAlignType extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 child: Column(
                   children: <Widget>[
-                    _typeItem(context, MdiIcons.clipboardListOutline,
-                        Translations.instance!.trans('alignnone'), 0),
-                    _typeItem(context, MdiIcons.accountOutline,
-                        Translations.instance!.trans('alignartist'), 1),
-                    _typeItem(context, MdiIcons.accountMultipleOutline,
-                        Translations.instance!.trans('aligngroup'), 2),
-                    _typeItem(context, MdiIcons.fileOutline,
-                        Translations.instance!.trans('alignpage'), 3),
-                    _typeItem(context, MdiIcons.calendarClockOutline,
-                        Translations.instance!.trans('alignrecentread'), 4),
+                    _typeItem(
+                      context,
+                      MdiIcons.clipboardListOutline,
+                      Translations.instance!.trans('alignnone'),
+                      0,
+                    ),
+                    _typeItem(
+                      context,
+                      MdiIcons.accountOutline,
+                      Translations.instance!.trans('alignartist'),
+                      1,
+                    ),
+                    _typeItem(
+                      context,
+                      MdiIcons.accountMultipleOutline,
+                      Translations.instance!.trans('aligngroup'),
+                      2,
+                    ),
+                    _typeItem(
+                      context,
+                      MdiIcons.fileOutline,
+                      Translations.instance!.trans('alignpage'),
+                      3,
+                    ),
+                    _typeItem(
+                      context,
+                      MdiIcons.calendarClockOutline,
+                      Translations.instance!.trans('alignrecentread'),
+                      4,
+                    ),
                   ],
                 ),
               ),
@@ -56,11 +76,18 @@ class DownloadAlignType extends StatelessWidget {
   }
 
   Widget _typeItem(
-      BuildContext context, IconData icon, String text, int selection) {
+    BuildContext context,
+    IconData icon,
+    String text,
+    int selection,
+  ) {
     return ListTile(
       leading: Icon(icon, color: getColor(selection)),
-      title: Text(text,
-          softWrap: false, style: TextStyle(color: getColor(selection))),
+      title: Text(
+        text,
+        softWrap: false,
+        style: TextStyle(color: getColor(selection)),
+      ),
       onTap: () async {
         await Settings.downloadAlignType.setValue(selection);
 

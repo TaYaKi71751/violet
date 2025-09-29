@@ -13,12 +13,14 @@ class VioletCommunityAnonymous {
   static Future<dynamic> _getV(String api, String params) async {
     var vToken = DateTime.now().toUtc().millisecondsSinceEpoch;
     var vValid = getValid(vToken.toString());
-    var gg =
-        await http.get(Uri.parse('${VioletServer.api}$api?$params'), headers: {
-      'v-token': vToken.toString(),
-      'v-valid': vValid,
-      'Content-Type': 'application/json'
-    });
+    var gg = await http.get(
+      Uri.parse('${VioletServer.api}$api?$params'),
+      headers: {
+        'v-token': vToken.toString(),
+        'v-valid': vValid,
+        'Content-Type': 'application/json',
+      },
+    );
 
     if (gg.statusCode != 200) {
       return gg.statusCode;
@@ -32,17 +34,21 @@ class VioletCommunityAnonymous {
     var vValid = getValid(vToken.toString());
 
     try {
-      var res = await http.post(Uri.parse(VioletServer.api + api),
-          headers: {
-            'v-token': vToken.toString(),
-            'v-valid': vValid,
-            'Content-Type': 'application/json'
-          },
-          body: jsonEncode(body));
+      var res = await http.post(
+        Uri.parse(VioletServer.api + api),
+        headers: {
+          'v-token': vToken.toString(),
+          'v-valid': vValid,
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
       return res;
     } catch (e, st) {
-      Logger.error('[API-postv] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-postv] E: $e\n'
+        '$st',
+      );
     }
     return null;
   }
@@ -60,18 +66,27 @@ class VioletCommunityAnonymous {
   static Future<dynamic> getArtistComments(String artistName) async {
     // artistName = group:<name> | artist:<name>
     return await _getV(
-        '/community/anon/artistcomment/read', 'name=$artistName');
+      '/community/anon/artistcomment/read',
+      'name=$artistName',
+    );
   }
 
-  static Future<dynamic> getArtistCommentsRecent(
-      [int offset = 0, int count = 10]) async {
+  static Future<dynamic> getArtistCommentsRecent([
+    int offset = 0,
+    int count = 10,
+  ]) async {
     // artistName = group:<name> | artist:<name>
     return await _getV(
-        '/community/anon/artistcomment/recent', 'count=$count&offset=$offset');
+      '/community/anon/artistcomment/recent',
+      'count=$count&offset=$offset',
+    );
   }
 
   static Future<dynamic> postArtistComment(
-      int? parent, String artistName, String commentBody) async {
+    int? parent,
+    String artistName,
+    String commentBody,
+  ) async {
     if (parent == null) {
       return await _postV('/community/anon/artistcomment/write', {
         'UserAppId': await _getUserAppId(),

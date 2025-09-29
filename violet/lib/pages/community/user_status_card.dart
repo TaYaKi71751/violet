@@ -92,13 +92,15 @@ class _UserStatusCardState extends ThemeSwitchableState<UserStatusCard>
           decoration: !Settings.themeFlat.value
               ? BoxDecoration(
                   // color: Colors.white,
-                  color:
-                      Settings.themeWhat.value ? Colors.black26 : Colors.white,
+                  color: Settings.themeWhat.value
+                      ? Colors.black26
+                      : Colors.white,
                   borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      topRight: Radius.circular(8),
-                      bottomLeft: Radius.circular(8),
-                      bottomRight: Radius.circular(8)),
+                    topLeft: Radius.circular(8),
+                    topRight: Radius.circular(8),
+                    bottomLeft: Radius.circular(8),
+                    bottomRight: Radius.circular(8),
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Settings.themeWhat.value
@@ -114,8 +116,8 @@ class _UserStatusCardState extends ThemeSwitchableState<UserStatusCard>
           color: !Settings.themeFlat.value
               ? null
               : Settings.themeWhat.value
-                  ? Colors.black26
-                  : Colors.white,
+              ? Colors.black26
+              : Colors.white,
           // decoration:
           child: Ink(
             child: !Settings.themeFlat.value
@@ -126,7 +128,8 @@ class _UserStatusCardState extends ThemeSwitchableState<UserStatusCard>
                           ? Colors.black38
                           : Colors.white,
                       child: _statusCardContent(),
-                    ))
+                    ),
+                  )
                 : _statusCardContent(),
           ),
         ),
@@ -141,8 +144,9 @@ class _UserStatusCardState extends ThemeSwitchableState<UserStatusCard>
           child: InkWell(
             customBorder: const RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10.0),
-                  bottomLeft: Radius.circular(10.0)),
+                topLeft: Radius.circular(10.0),
+                bottomLeft: Radius.circular(10.0),
+              ),
             ),
             child: Container(
               padding: const EdgeInsets.all(20.0),
@@ -185,9 +189,10 @@ class _UserStatusCardState extends ThemeSwitchableState<UserStatusCard>
             ),
             onTap: () async {
               await showOkDialog(
-                  context,
-                  '$_userAppId\n\n${Translations.instance!.trans('userappmsg')}',
-                  Translations.instance!.trans('uruserappid'));
+                context,
+                '$_userAppId\n\n${Translations.instance!.trans('userappmsg')}',
+                Translations.instance!.trans('uruserappid'),
+              );
             },
           ),
         ),
@@ -215,8 +220,9 @@ class _UserStatusCardState extends ThemeSwitchableState<UserStatusCard>
               : InkWell(
                   customBorder: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(10.0),
-                        bottomRight: Radius.circular(10.0)),
+                      topRight: Radius.circular(10.0),
+                      bottomRight: Radius.circular(10.0),
+                    ),
                   ),
                   child: const Align(
                     alignment: Alignment.center,
@@ -247,9 +253,10 @@ class _UserStatusCardState extends ThemeSwitchableState<UserStatusCard>
                             .inMinutes >
                         3) {
                       await showOkDialog(
-                          context,
-                          'Please try again in a few minutes!',
-                          'Bookmark Backup');
+                        context,
+                        'Please try again in a few minutes!',
+                        'Bookmark Backup',
+                      );
                       return;
                     }
                     _latestBackup = DateTime.now();

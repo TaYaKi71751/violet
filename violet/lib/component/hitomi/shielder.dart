@@ -68,10 +68,7 @@ class MinorShielderFilter {
 }
 
 class MaleShielderFilter {
-  static List<String> tags = [
-    'male:yaoi',
-    'male:male_only',
-  ];
+  static List<String> tags = ['male:yaoi', 'male:male_only'];
 }
 
 class FemaleShielderFilter {}

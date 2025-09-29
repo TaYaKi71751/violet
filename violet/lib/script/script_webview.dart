@@ -43,8 +43,9 @@ class _ScriptWebViewState extends State<ScriptWebView>
     timer = Timer.periodic(const Duration(minutes: 1), timerCallback);
 
     // run script readiness probe
-    Future.delayed(const Duration(seconds: 10))
-        .then((value) => v4FailCheckProbe());
+    Future.delayed(
+      const Duration(seconds: 10),
+    ).then((value) => v4FailCheckProbe());
 
     ScriptWebViewProxy.reload = () => webViewController?.reload();
   }
@@ -84,31 +85,32 @@ class _ScriptWebViewState extends State<ScriptWebView>
       child: SizedBox(
         height: 1,
         child: InAppWebView(
-          initialUrlRequest: URLRequest(
-            url: WebUri('https://hitomi.la/'),
-          ),
+          initialUrlRequest: URLRequest(url: WebUri('https://hitomi.la/')),
           initialOptions: InAppWebViewGroupOptions(
-              crossPlatform: InAppWebViewOptions(
-                  useOnLoadResource: true,
-                  userAgent:
-                      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36')),
+            crossPlatform: InAppWebViewOptions(
+              useOnLoadResource: true,
+              userAgent:
+                  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36',
+            ),
+          ),
           onWebViewCreated: (controller) {
             webViewController = controller;
 
             controller.addJavaScriptHandler(
-                handlerName: 'gg',
-                callback: (args) {
-                  ggM = args[0];
-                  ggB = args[1];
+              handlerName: 'gg',
+              callback: (args) {
+                ggM = args[0];
+                ggB = args[1];
 
-                  return {};
-                });
+                return {};
+              },
+            );
           },
           onLoadResource: (controller, resource) async {
             if (resource.url == null) return;
-            if (resource.url!
-                .toString()
-                .contains('ltn.gold-usergeneratedcontent.net/gg.js')) {
+            if (resource.url!.toString().contains(
+              'ltn.gold-usergeneratedcontent.net/gg.js',
+            )) {
               controller.stopLoading();
               doUpdateSync(controller);
             }
@@ -120,8 +122,9 @@ class _ScriptWebViewState extends State<ScriptWebView>
             if (code == -6 || code == -999 || code == -1200) {
               if (!ScriptManager.enableV4 && !reloadWaitAlreadyPending) {
                 reloadWaitAlreadyPending = true;
-                Future.delayed(const Duration(seconds: 1))
-                    .then((value) => reloadIfScriptNotLoaded());
+                Future.delayed(
+                  const Duration(seconds: 1),
+                ).then((value) => reloadIfScriptNotLoaded());
               }
 
               return;
@@ -148,7 +151,8 @@ class _ScriptWebViewState extends State<ScriptWebView>
             }
 
             Logger.error(
-                '[Script Webview] Http Error $statusCode\n$description');
+              '[Script Webview] Http Error $statusCode\n$description',
+            );
           },
           onLoadStop: (controller, url) async {
             if (isCurrentReload) {
@@ -166,7 +170,8 @@ class _ScriptWebViewState extends State<ScriptWebView>
   }
 
   doUpdateSync(InAppWebViewController controller) async {
-    await controller.evaluateJavascript(source: '''
+    await controller.evaluateJavascript(
+      source: '''
               var r = "";
               for (var i = 0; i < 4096; i++) {
                 r += gg.m(i).toString();
@@ -174,7 +179,8 @@ class _ScriptWebViewState extends State<ScriptWebView>
               }
               console.log(gg);
               window.flutter_inappwebview.callHandler('gg', ...[r, gg.b]);
-              ''');
+              ''',
+    );
 
     if (ggM == null || !(ggM!.startsWith('0') || ggM!.startsWith('1'))) {
       Logger.error('[Script Webview] Update Fail!\ngg_m: $ggM\ngg_b: $ggB');

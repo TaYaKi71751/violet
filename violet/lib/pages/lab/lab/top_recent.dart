@@ -46,11 +46,17 @@ class _LabTopRecentState extends State<LabTopRecent> {
       }
     });
 
-    Future.delayed(const Duration(milliseconds: 100)).then(updateRercord).then(
-        (value) => Future.delayed(const Duration(milliseconds: 100)).then(
-            (value) => _controller.animateTo(0.0,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.fastOutSlowIn)));
+    Future.delayed(const Duration(milliseconds: 100))
+        .then(updateRercord)
+        .then(
+          (value) => Future.delayed(const Duration(milliseconds: 100)).then(
+            (value) => _controller.animateTo(
+              0.0,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.fastOutSlowIn,
+            ),
+          ),
+        );
   }
 
   Future<void> updateRercord(dummy) async {
@@ -109,8 +115,10 @@ class _LabTopRecentState extends State<LabTopRecent> {
         }
       });
     } catch (e, st) {
-      Logger.error('[lab-top_recent] E: $e\n'
-          '$st');
+      Logger.error(
+        '[lab-top_recent] E: $e\n'
+        '$st',
+      );
     }
   }
 
@@ -160,16 +168,18 @@ class _LabTopRecentState extends State<LabTopRecent> {
                         activeTrackColor: Colors.blue,
                         inactiveTrackColor: Color(0xffd0d2d3),
                         trackHeight: 3,
-                        thumbShape:
-                            RoundSliderThumbShape(enabledThumbRadius: 6.0),
+                        thumbShape: RoundSliderThumbShape(
+                          enabledThumbRadius: 6.0,
+                        ),
                       ),
                       child: Slider(
                         value: limit.toDouble(),
                         max: 30000,
                         min: 1,
                         divisions: (30000 - 1),
-                        inactiveColor:
-                            Settings.majorColor.value.withOpacity(0.7),
+                        inactiveColor: Settings.majorColor.value.withOpacity(
+                          0.7,
+                        ),
                         activeColor: Settings.majorColor.value,
                         onChangeEnd: (value) async {
                           limit = value.toInt();

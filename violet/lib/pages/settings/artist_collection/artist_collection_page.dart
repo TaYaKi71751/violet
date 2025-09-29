@@ -35,13 +35,15 @@ class _ArtistCollectionPageState extends State<ArtistCollectionPage> {
           var name = item.key['default'];
 
           if (item.key.containsKey(
-              Translations.instance!.dbLanguageCode.split('_')[0])) {
+            Translations.instance!.dbLanguageCode.split('_')[0],
+          )) {
             name =
                 item.key[Translations.instance!.dbLanguageCode.split('_')[0]];
           }
 
-          final artists =
-              (item.value as List<String>).map((e) => e.trim()).join(', ');
+          final artists = (item.value as List<String>)
+              .map((e) => e.trim())
+              .join(', ');
 
           // https://imgur.com/a/dA2j0Za
           const images = [
@@ -72,17 +74,16 @@ class _ArtistCollectionPageState extends State<ArtistCollectionPage> {
                 borderRadius: BorderRadius.circular(4.0),
               ),
               child: ListTile(
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 0.0,
+                  horizontal: 16.0,
+                ),
                 leading: CircleAvatar(
                   radius: 28,
                   backgroundImage: CachedNetworkImageProvider(images[index]),
                 ),
                 title: Text(name, style: const TextStyle(fontSize: 16.0)),
-                subtitle: Text(
-                  artists,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                subtitle: Text(artists, overflow: TextOverflow.ellipsis),
               ),
               onTap: () {
                 PlatformNavigator.navigateSlide(
@@ -91,7 +92,8 @@ class _ArtistCollectionPageState extends State<ArtistCollectionPage> {
                     artists: (item.value as List<String>)
                         .map((e) => e.trim())
                         .toList(),
-                    isLast: index ==
+                    isLast:
+                        index ==
                         Artists.collection.entries
                                 .where((element) => element.value.length > 0)
                                 .length -

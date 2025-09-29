@@ -15,8 +15,9 @@ class Related {
     String data;
 
     if (Platform.environment.containsKey('FLUTTER_TEST')) {
-      final file =
-          File(join(Directory.current.path, 'assets/rank/related.json'));
+      final file = File(
+        join(Directory.current.path, 'assets/rank/related.json'),
+      );
       data = await file.readAsString();
     } else {
       data = await rootBundle.loadString('assets/rank/related.json');

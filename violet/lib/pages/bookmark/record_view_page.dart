@@ -30,20 +30,22 @@ class RecordViewPage extends StatelessWidget {
     final columnCount =
         MediaQuery.of(context).orientation == Orientation.landscape ? 4 : 3;
     return FutureBuilder(
-      future: User.getInstance()
-          .then((value) => value.getUserLog().then((value) async {
-                var overap = HashSet<String>();
-                var rr = <ArticleReadLog>[];
+      future: User.getInstance().then(
+        (value) => value.getUserLog().then((value) async {
+          var overap = HashSet<String>();
+          var rr = <ArticleReadLog>[];
 
-                for (var element in value) {
-                  if (overap.contains(element.articleId())) continue;
-                  rr.add(element);
-                  overap.add(element.articleId());
-                }
+          for (var element in value) {
+            if (overap.contains(element.articleId())) continue;
+            rr.add(element);
+            overap.add(element.articleId());
+          }
 
-                return await QueryManager.queryIds(
-                    rr.map((e) => e.articleId()).toList());
-              })),
+          return await QueryManager.queryIds(
+            rr.map((e) => e.articleId()).toList(),
+          );
+        }),
+      ),
       builder: (context, AsyncSnapshot<List<QueryResult>> snapshot) {
         if (!snapshot.hasData) return Container();
         return CustomScrollView(
@@ -59,37 +61,35 @@ class RecordViewPage extends StatelessWidget {
                   childAspectRatio: 3 / 4,
                 ),
                 delegate: SliverChildListDelegate(
-                  snapshot.data!.map(
-                    (e) {
-                      return Padding(
-                        key: Key('record/${e.id()}'),
-                        padding: EdgeInsets.zero,
-                        child: Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: <Widget>[
-                              snapshot.hasData
-                                  ? Provider<ArticleListItem>.value(
-                                      value:
-                                          ArticleListItem.fromArticleListItem(
-                                        queryResult: e,
-                                        addBottomPadding: false,
-                                        showDetail: false,
-                                        width: (windowWidth - 4.0 - 48) /
-                                            columnCount,
-                                        thumbnailTag: const Uuid().v4(),
-                                        usableTabList: snapshot.data,
-                                      ),
-                                      child: const ArticleListItemWidget(),
-                                    )
-                                  : Container()
-                            ],
-                          ),
+                  snapshot.data!.map((e) {
+                    return Padding(
+                      key: Key('record/${e.id()}'),
+                      padding: EdgeInsets.zero,
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            snapshot.hasData
+                                ? Provider<ArticleListItem>.value(
+                                    value: ArticleListItem.fromArticleListItem(
+                                      queryResult: e,
+                                      addBottomPadding: false,
+                                      showDetail: false,
+                                      width:
+                                          (windowWidth - 4.0 - 48) /
+                                          columnCount,
+                                      thumbnailTag: const Uuid().v4(),
+                                      usableTabList: snapshot.data,
+                                    ),
+                                    child: const ArticleListItemWidget(),
+                                  )
+                                : Container(),
+                          ],
                         ),
-                      );
-                    },
-                  ).toList(),
+                      ),
+                    );
+                  }).toList(),
                 ),
               ),
             ),

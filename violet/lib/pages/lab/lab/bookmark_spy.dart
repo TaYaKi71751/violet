@@ -33,9 +33,10 @@ class _LabBookmarkSpyPageState extends State<LabBookmarkSpyPage> {
 
     Future.delayed(const Duration(milliseconds: 100)).then((value) async {
       bookmarks = await VioletServer.bookmarkLists();
-      bookmarks!.removeWhere((element) =>
-          ((element as Map<String, dynamic>)['user'] as String)
-              .startsWith(dev));
+      bookmarks!.removeWhere(
+        (element) => ((element as Map<String, dynamic>)['user'] as String)
+            .startsWith(dev),
+      );
 
       setState(() {});
     });
@@ -74,10 +75,11 @@ class _LabBookmarkSpyPageState extends State<LabBookmarkSpyPage> {
       decoration: BoxDecoration(
         color: Settings.themeWhat.value ? Colors.black26 : Colors.white,
         borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(8),
-            topRight: Radius.circular(8),
-            bottomLeft: Radius.circular(8),
-            bottomRight: Radius.circular(8)),
+          topLeft: Radius.circular(8),
+          topRight: Radius.circular(8),
+          bottomLeft: Radius.circular(8),
+          bottomRight: Radius.circular(8),
+        ),
         boxShadow: [
           BoxShadow(
             color: Settings.themeWhat.value
@@ -94,19 +96,18 @@ class _LabBookmarkSpyPageState extends State<LabBookmarkSpyPage> {
         child: Material(
           color: Settings.themeWhat.value ? Colors.black38 : Colors.white,
           child: ListTile(
-            title: Text(data['user'].substring(0, 8),
-                style: const TextStyle(fontSize: 16.0)),
+            title: Text(
+              data['user'].substring(0, 8),
+              style: const TextStyle(fontSize: 16.0),
+            ),
             subtitle: Text(formatBytes(data['size'] as int, 2)),
             trailing: (_latestAccessUserAppId == data['user'] as String)
-                ? const Icon(
-                    MdiIcons.starCircle,
-                    color: Colors.green,
-                  )
+                ? const Icon(MdiIcons.starCircle, color: Colors.green)
                 : FutureBuilder(
                     future: Bookmark.getInstance().then((value) async {
                       return (
                         await value.isBookmarkUser(data['user'] as String),
-                        await value.isHistoryUser(data['user'] as String)
+                        await value.isHistoryUser(data['user'] as String),
                       );
                     }),
                     builder: (context, AsyncSnapshot<(bool, bool)> snapshot) {
@@ -137,19 +138,23 @@ class _LabBookmarkSpyPageState extends State<LabBookmarkSpyPage> {
 
               if (!mounted) return;
               await PlatformNavigator.navigateSlide(
-                  context, LabBookmarkPage(userAppId: data['user'] as String));
+                context,
+                LabBookmarkPage(userAppId: data['user'] as String),
+              );
 
               setState(() {});
             },
             onLongPress: () async {
               var bookmark = await Bookmark.getInstance();
               if (await bookmark.isBookmarkUser(data['user'] as String)) {
-                await (await Bookmark.getInstance())
-                    .unbookmarkUser(data['user'] as String);
+                await (await Bookmark.getInstance()).unbookmarkUser(
+                  data['user'] as String,
+                );
                 setState(() {});
               } else {
-                await (await Bookmark.getInstance())
-                    .bookmarkUser(data['user'] as String);
+                await (await Bookmark.getInstance()).bookmarkUser(
+                  data['user'] as String,
+                );
                 setState(() {});
               }
             },

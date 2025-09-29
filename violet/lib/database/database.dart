@@ -40,8 +40,8 @@ class DataBaseManager {
           dbPath = Platform.isAndroid
               ? '${(await getApplicationDocumentsDirectory()).path}/data/data.db'
               : Platform.isIOS
-                  ? '${await getDatabasesPath()}/data.db'
-                  : join(dirname(Platform.resolvedExecutable), 'data/data.db');
+              ? '${await getDatabasesPath()}/data.db'
+              : join(dirname(Platform.resolvedExecutable), 'data/data.db');
         }
         _instance = create(dbPath);
         await _instance!.open();
@@ -98,14 +98,25 @@ class DataBaseManager {
     return result;
   }
 
-  Future<void> update(String name, Map<String, dynamic> wh, String where,
-      List<dynamic> args) async {
+  Future<void> update(
+    String name,
+    Map<String, dynamic> wh,
+    String where,
+    List<dynamic> args,
+  ) async {
     await checkOpen();
     await db!.update(name, wh, where: where, whereArgs: args);
   }
 
-  Future<void> swap(String name, String key, String what, int key1, int key2,
-      int s1, int s2) async {
+  Future<void> swap(
+    String name,
+    String key,
+    String what,
+    int key1,
+    int key2,
+    int s1,
+    int s2,
+  ) async {
     await checkOpen();
     await db!.transaction((txn) async {
       await txn.rawUpdate('UPDATE $name SET $what=? WHERE $key=?', [s2, key1]);

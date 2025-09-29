@@ -10,20 +10,21 @@ class ExCountry extends Country {
   String? region;
   String? variant;
 
-  ExCountry(
-    String name,
-    String isoCode,
-    String iso3Code,
-    String phoneCode,
-  ) : super(
-          name: name,
-          isoCode: isoCode,
-          iso3Code: iso3Code,
-          phoneCode: phoneCode,
-        );
+  ExCountry(String name, String isoCode, String iso3Code, String phoneCode)
+    : super(
+        name: name,
+        isoCode: isoCode,
+        iso3Code: iso3Code,
+        phoneCode: phoneCode,
+      );
 
-  static ExCountry create(String iso,
-      {String? language, String? script, String? region, String? variant}) {
+  static ExCountry create(
+    String iso, {
+    String? language,
+    String? script,
+    String? region,
+    String? variant,
+  }) {
     var c = CountryPickerUtils.getCountryByIsoCode(iso);
     var country = ExCountry(c.name, c.isoCode, c.iso3Code, c.phoneCode);
     country.language = language;
@@ -66,7 +67,7 @@ class ExCountry extends Country {
       'RU': 'Русский',
       'IT': 'Italiano',
       'ES': 'Español',
-      'BR': 'Português'
+      'BR': 'Português',
     };
 
     if (dict.containsKey(isoCode)) return dict[isoCode]!;

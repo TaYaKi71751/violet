@@ -69,7 +69,6 @@ class _FileImageState extends State<FileImage> {
       cacheWidth: Settings.useLowPerf.value
           ? (MediaQuery.of(context).size.width * 2.0).toInt()
           : null,
-      enableMemoryCache: false,
       clearMemoryCacheWhenDispose: true,
       loadStateChanged: _loadStateChanged,
     );

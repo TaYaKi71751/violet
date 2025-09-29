@@ -35,7 +35,8 @@ class UnboundedViewport extends Viewport {
   RenderViewport createRenderObject(BuildContext context) {
     return UnboundedRenderViewport(
       axisDirection: axisDirection,
-      crossAxisDirection: crossAxisDirection ??
+      crossAxisDirection:
+          crossAxisDirection ??
           Viewport.getDefaultCrossAxisDirection(context, axisDirection),
       anchor: anchor,
       offset: offset,
@@ -160,8 +161,11 @@ class UnboundedRenderViewport extends RenderViewport {
     double correction;
     var count = 0;
     do {
-      correction = _attemptLayout(mainAxisExtent, crossAxisExtent,
-          offset.pixels + centerOffsetAdjustment);
+      correction = _attemptLayout(
+        mainAxisExtent,
+        crossAxisExtent,
+        offset.pixels + centerOffsetAdjustment,
+      );
       if (correction != 0.0) {
         offset.correctBy(correction);
       } else {
@@ -181,29 +185,33 @@ class UnboundedRenderViewport extends RenderViewport {
       if (count >= _maxLayoutCycles) {
         assert(count != 1);
         throw FlutterError(
-            'A RenderViewport exceeded its maximum number of layout cycles.\n'
-            'RenderViewport render objects, during layout, can retry if either their '
-            'slivers or their ViewportOffset decide that the offset should be corrected '
-            'to take into account information collected during that layout.\n'
-            'In the case of this RenderViewport object, however, this happened $count '
-            'times and still there was no consensus on the scroll offset. This usually '
-            'indicates a bug. Specifically, it means that one of the following three '
-            'problems is being experienced by the RenderViewport object:\n'
-            ' * One of the RenderSliver children or the ViewportOffset have a bug such'
-            ' that they always think that they need to correct the offset regardless.\n'
-            ' * Some combination of the RenderSliver children and the ViewportOffset'
-            ' have a bad interaction such that one applies a correction then another'
-            ' applies a reverse correction, leading to an infinite loop of corrections.\n'
-            ' * There is a pathological case that would eventually resolve, but it is'
-            ' so complicated that it cannot be resolved in any reasonable number of'
-            ' layout passes.');
+          'A RenderViewport exceeded its maximum number of layout cycles.\n'
+          'RenderViewport render objects, during layout, can retry if either their '
+          'slivers or their ViewportOffset decide that the offset should be corrected '
+          'to take into account information collected during that layout.\n'
+          'In the case of this RenderViewport object, however, this happened $count '
+          'times and still there was no consensus on the scroll offset. This usually '
+          'indicates a bug. Specifically, it means that one of the following three '
+          'problems is being experienced by the RenderViewport object:\n'
+          ' * One of the RenderSliver children or the ViewportOffset have a bug such'
+          ' that they always think that they need to correct the offset regardless.\n'
+          ' * Some combination of the RenderSliver children and the ViewportOffset'
+          ' have a bad interaction such that one applies a correction then another'
+          ' applies a reverse correction, leading to an infinite loop of corrections.\n'
+          ' * There is a pathological case that would eventually resolve, but it is'
+          ' so complicated that it cannot be resolved in any reasonable number of'
+          ' layout passes.',
+        );
       }
       return true;
     }());
   }
 
   double _attemptLayout(
-      double mainAxisExtent, double crossAxisExtent, double correctedOffset) {
+    double mainAxisExtent,
+    double crossAxisExtent,
+    double correctedOffset,
+  ) {
     assert(!mainAxisExtent.isNaN);
     assert(mainAxisExtent >= 0.0);
     assert(crossAxisExtent.isFinite);
@@ -217,8 +225,10 @@ class UnboundedRenderViewport extends RenderViewport {
     // to the zero scroll offset (the line between the forward slivers and the
     // reverse slivers).
     final double centerOffset = mainAxisExtent * anchor - correctedOffset;
-    final double reverseDirectionRemainingPaintExtent =
-        centerOffset.clamp(0.0, mainAxisExtent);
+    final double reverseDirectionRemainingPaintExtent = centerOffset.clamp(
+      0.0,
+      mainAxisExtent,
+    );
     final double forwardDirectionRemainingPaintExtent =
         (mainAxisExtent - centerOffset).clamp(0.0, mainAxisExtent);
 
@@ -233,8 +243,10 @@ class UnboundedRenderViewport extends RenderViewport {
 
     final double fullCacheExtent = mainAxisExtent + 2 * _calculatedCacheExtent!;
     final double centerCacheOffset = centerOffset + _calculatedCacheExtent!;
-    final double reverseDirectionRemainingCacheExtent =
-        centerCacheOffset.clamp(0.0, fullCacheExtent);
+    final double reverseDirectionRemainingCacheExtent = centerCacheOffset.clamp(
+      0.0,
+      fullCacheExtent,
+    );
     final double forwardDirectionRemainingCacheExtent =
         (fullCacheExtent - centerCacheOffset).clamp(0.0, fullCacheExtent);
 
@@ -253,8 +265,10 @@ class UnboundedRenderViewport extends RenderViewport {
         growthDirection: GrowthDirection.reverse,
         advance: childBefore,
         remainingCacheExtent: reverseDirectionRemainingCacheExtent,
-        cacheOrigin: (mainAxisExtent - centerOffset)
-            .clamp(-_calculatedCacheExtent!, 0.0),
+        cacheOrigin: (mainAxisExtent - centerOffset).clamp(
+          -_calculatedCacheExtent!,
+          0.0,
+        ),
       );
       if (result != 0.0) return -result;
     }
@@ -263,8 +277,9 @@ class UnboundedRenderViewport extends RenderViewport {
     return layoutChildSequence(
       child: center,
       scrollOffset: math.max(0.0, -centerOffset),
-      overlap:
-          leadingNegativeChild == null ? math.min(0.0, -centerOffset) : 0.0,
+      overlap: leadingNegativeChild == null
+          ? math.min(0.0, -centerOffset)
+          : 0.0,
       layoutOffset: centerOffset >= mainAxisExtent
           ? centerOffset
           : reverseDirectionRemainingPaintExtent,
@@ -283,7 +298,9 @@ class UnboundedRenderViewport extends RenderViewport {
 
   @override
   void updateOutOfBandData(
-      GrowthDirection growthDirection, SliverGeometry childLayoutGeometry) {
+    GrowthDirection growthDirection,
+    SliverGeometry childLayoutGeometry,
+  ) {
     switch (growthDirection) {
       case GrowthDirection.forward:
         _maxScrollExtent += childLayoutGeometry.scrollExtent;

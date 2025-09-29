@@ -37,12 +37,8 @@ class SearchBarPage extends StatefulWidget {
 
 class _SearchBarPageState extends State<SearchBarPage>
     with SingleTickerProviderStateMixin {
-  final PageController _bottomController = PageController(
-    initialPage: 0,
-  );
-  final PageController _topController = PageController(
-    initialPage: 0,
-  );
+  final PageController _bottomController = PageController(initialPage: 0);
+  final PageController _topController = PageController(initialPage: 0);
   static const _kDuration = Duration(milliseconds: 300);
   static const _kCurve = Curves.ease;
 
@@ -110,11 +106,15 @@ class _SearchBarPageState extends State<SearchBarPage>
     return Container(
       color: Settings.themeWhat.value
           ? Settings.themeBlack.value
-              ? Palette.blackThemeBackground
-              : Colors.grey.shade900
+                ? Palette.blackThemeBackground
+                : Colors.grey.shade900
           : Colors.white,
-      padding:
-          EdgeInsets.fromLTRB(2, statusBarHeight + 2, 0, _initBottomPadding!),
+      padding: EdgeInsets.fromLTRB(
+        2,
+        statusBarHeight + 2,
+        0,
+        _initBottomPadding!,
+      ),
       child: Stack(
         children: <Widget>[
           Hero(
@@ -122,7 +122,8 @@ class _SearchBarPageState extends State<SearchBarPage>
             child: Card(
               elevation: 100,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4)),
+                borderRadius: BorderRadius.circular(4),
+              ),
               color: Settings.themeWhat.value && Settings.themeBlack.value
                   ? Palette.blackThemeBackground
                   : null,
@@ -137,13 +138,9 @@ class _SearchBarPageState extends State<SearchBarPage>
                     _seperator(),
                     _searchButton(),
                     _seperator(),
-                    Expanded(
-                      child: _searchTopPanel(),
-                    ),
+                    Expanded(child: _searchTopPanel()),
                     _seperator(),
-                    Expanded(
-                      child: _searchBottomPanel(),
-                    ),
+                    Expanded(child: _searchBottomPanel()),
                   ],
                 ),
               ),
@@ -157,10 +154,7 @@ class _SearchBarPageState extends State<SearchBarPage>
   _seperator() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      child: Container(
-        height: 1.0,
-        color: Colors.black12,
-      ),
+      child: Container(height: 1.0, color: Colors.black12),
     );
   }
 
@@ -185,14 +179,20 @@ class _SearchBarPageState extends State<SearchBarPage>
             suffixIcon: IconButton(
               onPressed: () async {
                 _searchController.clear();
-                _searchController.selection =
-                    const TextSelection(baseOffset: 0, extentOffset: 0);
+                _searchController.selection = const TextSelection(
+                  baseOffset: 0,
+                  extentOffset: 0,
+                );
                 await searchProcess('', _searchController.selection);
               },
               icon: const Icon(Icons.clear),
             ),
-            contentPadding:
-                const EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
+            contentPadding: const EdgeInsets.only(
+              left: 15,
+              bottom: 11,
+              top: 11,
+              right: 15,
+            ),
             hintText: Translations.instance!.trans('search'),
           ),
         ),
@@ -208,8 +208,10 @@ class _SearchBarPageState extends State<SearchBarPage>
               shape: const CircleBorder(),
               child: Transform.scale(
                 scale: 0.65,
-                child: FlareActor.asset(widget.assetProvider,
-                    controller: widget.heroController),
+                child: FlareActor.asset(
+                  widget.assetProvider,
+                  controller: widget.heroController,
+                ),
               ),
             ),
           ),
@@ -240,52 +242,54 @@ class _SearchBarPageState extends State<SearchBarPage>
   }
 
   _searchTopPanel() {
-    return Stack(children: [
-      PageView(
-        controller: _topController,
-        children: [
-          _searchAutoCompletePanel(),
-          _searchRelatedPanel(),
-        ],
-      ),
-      FutureBuilder(
-        future: Future.value(1),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) return Container();
+    return Stack(
+      children: [
+        PageView(
+          controller: _topController,
+          children: [_searchAutoCompletePanel(), _searchRelatedPanel()],
+        ),
+        FutureBuilder(
+          future: Future.value(1),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return Container();
 
-          return Positioned(
-            bottom: 0.0,
-            left: 0.0,
-            right: 0.0,
-            child: Container(
-              color: null,
-              padding: const EdgeInsets.all(20.0),
-              child: Center(
-                child: DotsIndicator(
-                  controller: _topController,
-                  itemCount: 2,
-                  onPageSelected: (int page) {
-                    _topController.animateToPage(
-                      page,
-                      duration: _kDuration,
-                      curve: _kCurve,
-                    );
-                  },
+            return Positioned(
+              bottom: 0.0,
+              left: 0.0,
+              right: 0.0,
+              child: Container(
+                color: null,
+                padding: const EdgeInsets.all(20.0),
+                child: Center(
+                  child: DotsIndicator(
+                    controller: _topController,
+                    itemCount: 2,
+                    onPageSelected: (int page) {
+                      _topController.animateToPage(
+                        page,
+                        duration: _kDuration,
+                        curve: _kCurve,
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
-          );
-        },
-      ),
-    ]);
+            );
+          },
+        ),
+      ],
+    );
   }
 
   _searchAutoCompletePanel() {
     if (_searchLists.isEmpty || _nothing) {
       return Center(
-          child: Text(_nothing
+        child: Text(
+          _nothing
               ? Translations.instance!.trans('nosearchresult')
-              : Translations.instance!.trans('inputsearchtoken')));
+              : Translations.instance!.trans('inputsearchtoken'),
+        ),
+      );
     }
     return _chipListView(_searchLists.map((item) => chip(item)).toList());
   }
@@ -293,10 +297,12 @@ class _SearchBarPageState extends State<SearchBarPage>
   _searchRelatedPanel() {
     if (_relatedLists.isEmpty) {
       return Center(
-          child: Text(Translations.instance!.trans('nosearchresult')));
+        child: Text(Translations.instance!.trans('nosearchresult')),
+      );
     }
     return _chipListView(
-        _relatedLists.map((item) => chip(item, true)).toList());
+      _relatedLists.map((item) => chip(item, true)).toList(),
+    );
   }
 
   _chipListView(List<Widget> chips) {
@@ -307,11 +313,7 @@ class _SearchBarPageState extends State<SearchBarPage>
       padding: const EdgeInsets.symmetric(horizontal: 8),
       physics: const BouncingScrollPhysics(),
       children: [
-        Wrap(
-          spacing: spacing,
-          runSpacing: runSpacing,
-          children: chips,
-        ),
+        Wrap(spacing: spacing, runSpacing: runSpacing, children: chips),
       ],
     );
   }
@@ -321,10 +323,7 @@ class _SearchBarPageState extends State<SearchBarPage>
       children: [
         PageView(
           controller: _bottomController,
-          children: [
-            _searchOptionPage(),
-            _searchHistory(),
-          ],
+          children: [_searchOptionPage(), _searchHistory()],
         ),
         FutureBuilder(
           future: Future.value(1),
@@ -362,218 +361,230 @@ class _SearchBarPageState extends State<SearchBarPage>
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 4, 10, 4),
       child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-        return SingleChildScrollView(
-          controller: ScrollController(),
-          child: ConstrainedBox(
-            constraints: constraints.copyWith(
-              minHeight: constraints.maxHeight,
-              maxHeight: double.infinity,
-            ),
-            child: IntrinsicHeight(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  if (Settings.language.value == 'ko')
-                    ListTile(
-                      leading: Icon(Icons.translate,
-                          color: Settings.majorColor.value),
-                      title:
-                          Text(Translations.instance!.trans('tagtranslation')),
-                      trailing: Switch(
-                        value: Settings.searchTagTranslation.value,
-                        onChanged: (newValue) async {
-                          await Settings.searchTagTranslation
-                              .setValue(newValue);
-                          setState(() {});
-                        },
-                        activeTrackColor: Settings.majorColor.value,
-                        activeColor: Settings.majorAccentColor.value,
-                      ),
-                      onTap: () async {
-                        await Settings.searchTagTranslation
-                            .setValue(!Settings.searchTagTranslation.value);
-                        setState(() {});
-                      },
-                    ),
-                  if (Settings.language.value == 'ko')
-                    Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 8.0,
-                      ),
-                      width: double.infinity,
-                      height: 1.0,
-                      color: Colors.grey.shade400,
-                    ),
-                  if (Settings.language.value == 'ko')
-                    ListTile(
-                      leading: Icon(MdiIcons.layersSearch,
-                          color: Settings.majorColor.value),
-                      title: const Text('한글 검색'),
-                      trailing: Switch(
-                        value: Settings.searchUseTranslated.value,
-                        onChanged: (newValue) async {
-                          await Settings.searchUseTranslated.setValue(newValue);
-                          setState(() {});
-                        },
-                        activeTrackColor: Settings.majorColor.value,
-                        activeColor: Settings.majorAccentColor.value,
-                      ),
-                      onTap: () async {
-                        await Settings.searchUseTranslated
-                            .setValue(!Settings.searchUseTranslated.value);
-                        setState(() {});
-                      },
-                    ),
-                  if (Settings.language.value == 'ko')
-                    Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 8.0,
-                      ),
-                      width: double.infinity,
-                      height: 1.0,
-                      color: Colors.grey.shade400,
-                    ),
-                  ListTile(
-                    leading: Icon(MdiIcons.counter,
-                        color: Settings.majorColor.value),
-                    title: Text(Translations.instance!.trans('showcount')),
-                    trailing: Switch(
-                      value: Settings.searchShowCount.value,
-                      onChanged: (newValue) async {
-                        await Settings.searchShowCount.setValue(newValue);
-                        setState(() {});
-                      },
-                      activeTrackColor: Settings.majorColor.value,
-                      activeColor: Settings.majorAccentColor.value,
-                    ),
-                    onTap: () async {
-                      await Settings.searchShowCount
-                          .setValue(!Settings.searchShowCount.value);
-                      setState(() {});
-                    },
-                  ),
-                  Container(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 8.0,
-                    ),
-                    width: double.infinity,
-                    height: 1.0,
-                    color: Colors.grey.shade400,
-                  ),
-                  ListTile(
-                    leading: Icon(MdiIcons.chartBubble,
-                        color: Settings.majorColor.value),
-                    title: Text(Translations.instance!.trans('fuzzysearch')),
-                    trailing: Switch(
-                      value: Settings.searchUseFuzzy.value,
-                      onChanged: (newValue) async {
-                        await Settings.searchUseFuzzy.setValue(newValue);
-                        setState(() {});
-                      },
-                      activeTrackColor: Settings.majorColor.value,
-                      activeColor: Settings.majorAccentColor.value,
-                    ),
-                    onTap: () async {
-                      await Settings.searchUseFuzzy
-                          .setValue(!Settings.searchUseFuzzy.value);
-                      setState(() {});
-                    },
-                  ),
-                  // Container(
-                  //   margin: const EdgeInsets.symmetric(
-                  //     horizontal: 8.0,
-                  //   ),
-                  //   width: double.infinity,
-                  //   height: 1.0,
-                  //   color: Colors.grey.shade400,
-                  // ),
-                  // ListTile(
-                  //   leading: Icon(
-                  //       MdiIcons.viewGridPlusOutline,
-                  //       color: Settings.majorColor.value),
-                  //   title: Slider(
-                  //     activeColor: Settings.majorColor.value
-                  //     inactiveColor: Settings.majorColor.value
-                  //         .withOpacity(0.2),
-                  //     min: 60.0,
-                  //     max: 2000.0,
-                  //     divisions: (2000 - 60) ~/ 30,
-                  //     label:
-                  //         '$_searchResultMaximum${Translations.instance!.trans('tagdisplay')}',
-                  //     onChanged: (double value) {
-                  //       setState(() {
-                  //         _searchResultMaximum =
-                  //             value.toInt();
-                  //       });
-                  //     },
-                  //     value:
-                  //         _searchResultMaximum.toDouble(),
-                  //   ),
-                  // ),
-
-                  // GradientRangeSlider(),
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.bottomLeft,
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 2,
-                          vertical: 8,
+        builder: (BuildContext context, BoxConstraints constraints) {
+          return SingleChildScrollView(
+            controller: ScrollController(),
+            child: ConstrainedBox(
+              constraints: constraints.copyWith(
+                minHeight: constraints.maxHeight,
+                maxHeight: double.infinity,
+              ),
+              child: IntrinsicHeight(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    if (Settings.language.value == 'ko')
+                      ListTile(
+                        leading: Icon(
+                          Icons.translate,
+                          color: Settings.majorColor.value,
                         ),
+                        title: Text(
+                          Translations.instance!.trans('tagtranslation'),
+                        ),
+                        trailing: Switch(
+                          value: Settings.searchTagTranslation.value,
+                          onChanged: (newValue) async {
+                            await Settings.searchTagTranslation.setValue(
+                              newValue,
+                            );
+                            setState(() {});
+                          },
+                          activeTrackColor: Settings.majorColor.value,
+                          activeColor: Settings.majorAccentColor.value,
+                        ),
+                        onTap: () async {
+                          await Settings.searchTagTranslation.setValue(
+                            !Settings.searchTagTranslation.value,
+                          );
+                          setState(() {});
+                        },
+                      ),
+                    if (Settings.language.value == 'ko')
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 8.0),
                         width: double.infinity,
-                        height: 60,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: <Widget>[
-                            Expanded(
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: Colors.black,
-                                  backgroundColor: Settings.themeWhat.value
-                                      ? Colors.grey.shade800
-                                      : Colors.grey,
+                        height: 1.0,
+                        color: Colors.grey.shade400,
+                      ),
+                    if (Settings.language.value == 'ko')
+                      ListTile(
+                        leading: Icon(
+                          MdiIcons.layersSearch,
+                          color: Settings.majorColor.value,
+                        ),
+                        title: const Text('한글 검색'),
+                        trailing: Switch(
+                          value: Settings.searchUseTranslated.value,
+                          onChanged: (newValue) async {
+                            await Settings.searchUseTranslated.setValue(
+                              newValue,
+                            );
+                            setState(() {});
+                          },
+                          activeTrackColor: Settings.majorColor.value,
+                          activeColor: Settings.majorAccentColor.value,
+                        ),
+                        onTap: () async {
+                          await Settings.searchUseTranslated.setValue(
+                            !Settings.searchUseTranslated.value,
+                          );
+                          setState(() {});
+                        },
+                      ),
+                    if (Settings.language.value == 'ko')
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                        width: double.infinity,
+                        height: 1.0,
+                        color: Colors.grey.shade400,
+                      ),
+                    ListTile(
+                      leading: Icon(
+                        MdiIcons.counter,
+                        color: Settings.majorColor.value,
+                      ),
+                      title: Text(Translations.instance!.trans('showcount')),
+                      trailing: Switch(
+                        value: Settings.searchShowCount.value,
+                        onChanged: (newValue) async {
+                          await Settings.searchShowCount.setValue(newValue);
+                          setState(() {});
+                        },
+                        activeTrackColor: Settings.majorColor.value,
+                        activeColor: Settings.majorAccentColor.value,
+                      ),
+                      onTap: () async {
+                        await Settings.searchShowCount.setValue(
+                          !Settings.searchShowCount.value,
+                        );
+                        setState(() {});
+                      },
+                    ),
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                      width: double.infinity,
+                      height: 1.0,
+                      color: Colors.grey.shade400,
+                    ),
+                    ListTile(
+                      leading: Icon(
+                        MdiIcons.chartBubble,
+                        color: Settings.majorColor.value,
+                      ),
+                      title: Text(Translations.instance!.trans('fuzzysearch')),
+                      trailing: Switch(
+                        value: Settings.searchUseFuzzy.value,
+                        onChanged: (newValue) async {
+                          await Settings.searchUseFuzzy.setValue(newValue);
+                          setState(() {});
+                        },
+                        activeTrackColor: Settings.majorColor.value,
+                        activeColor: Settings.majorAccentColor.value,
+                      ),
+                      onTap: () async {
+                        await Settings.searchUseFuzzy.setValue(
+                          !Settings.searchUseFuzzy.value,
+                        );
+                        setState(() {});
+                      },
+                    ),
+                    // Container(
+                    //   margin: const EdgeInsets.symmetric(
+                    //     horizontal: 8.0,
+                    //   ),
+                    //   width: double.infinity,
+                    //   height: 1.0,
+                    //   color: Colors.grey.shade400,
+                    // ),
+                    // ListTile(
+                    //   leading: Icon(
+                    //       MdiIcons.viewGridPlusOutline,
+                    //       color: Settings.majorColor.value),
+                    //   title: Slider(
+                    //     activeColor: Settings.majorColor.value
+                    //     inactiveColor: Settings.majorColor.value
+                    //         .withOpacity(0.2),
+                    //     min: 60.0,
+                    //     max: 2000.0,
+                    //     divisions: (2000 - 60) ~/ 30,
+                    //     label:
+                    //         '$_searchResultMaximum${Translations.instance!.trans('tagdisplay')}',
+                    //     onChanged: (double value) {
+                    //       setState(() {
+                    //         _searchResultMaximum =
+                    //             value.toInt();
+                    //       });
+                    //     },
+                    //     value:
+                    //         _searchResultMaximum.toDouble(),
+                    //   ),
+                    // ),
+
+                    // GradientRangeSlider(),
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 2,
+                            vertical: 8,
+                          ),
+                          width: double.infinity,
+                          height: 60,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: <Widget>[
+                              Expanded(
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.black,
+                                    backgroundColor: Settings.themeWhat.value
+                                        ? Colors.grey.shade800
+                                        : Colors.grey,
+                                  ),
+                                  child: const Icon(MdiIcons.keyboardBackspace),
+                                  onPressed: () {
+                                    deleteProcess();
+                                  },
                                 ),
-                                child: const Icon(MdiIcons.keyboardBackspace),
-                                onPressed: () {
-                                  deleteProcess();
-                                },
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: Colors.black,
-                                  backgroundColor: Settings.themeWhat.value
-                                      ? Colors.grey.shade800
-                                      : Colors.grey,
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.black,
+                                    backgroundColor: Settings.themeWhat.value
+                                        ? Colors.grey.shade800
+                                        : Colors.grey,
+                                  ),
+                                  child: const Icon(MdiIcons.keyboardSpace),
+                                  onPressed: () {
+                                    spaceProcess();
+                                  },
                                 ),
-                                child: const Icon(MdiIcons.keyboardSpace),
-                                onPressed: () {
-                                  spaceProcess();
-                                },
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 
   _searchHistory() {
     return FutureBuilder(
-      future: SearchLogDatabase.getInstance()
-          .then((value) async => await value.getSearchLog()),
+      future: SearchLogDatabase.getInstance().then(
+        (value) async => await value.getSearchLog(),
+      ),
       builder: (context, snapshot) {
         if (!snapshot.hasData) return Container();
         var logs = (snapshot.data as List<SearchLog>)
@@ -649,8 +660,9 @@ class _SearchBarPageState extends State<SearchBarPage>
     }
 
     var last = target.indexOf(' ', pos);
-    var token =
-        target.substring(pos, last == -1 ? target.length : last + 1).trim();
+    var token = target
+        .substring(pos, last == -1 ? target.length : last + 1)
+        .trim();
 
     if (pos != target.length && (target[pos] == '-' || target[pos] == '(')) {
       token = token.substring(1);
@@ -666,26 +678,44 @@ class _SearchBarPageState extends State<SearchBarPage>
     if (token.startsWith('female:') ||
         token.startsWith('male:') ||
         token.startsWith('tag:')) {
-      _relatedLists = HentaiIndex.getRelatedTag(token.startsWith('tag:')
-              ? token.split(':').last.replaceAll('_', ' ')
-              : token.replaceAll('_', ' '))
-          .map((e) => (
-                DisplayedTag(
-                    group: e.$1.split(':').first, name: e.$1.split(':').last),
-                (e.$2 * 100).toInt()
-              ))
-          .toList();
+      _relatedLists =
+          HentaiIndex.getRelatedTag(
+                token.startsWith('tag:')
+                    ? token.split(':').last.replaceAll('_', ' ')
+                    : token.replaceAll('_', ' '),
+              )
+              .map(
+                (e) => (
+                  DisplayedTag(
+                    group: e.$1.split(':').first,
+                    name: e.$1.split(':').last,
+                  ),
+                  (e.$2 * 100).toInt(),
+                ),
+              )
+              .toList();
     } else if (token.startsWith('series:')) {
-      _relatedLists = HentaiIndex.getRelatedCharacters(
-              token.split(':').last.replaceAll('_', ' '))
-          .map((e) =>
-              (DisplayedTag(group: 'character', name: e.$1), e.$2.toInt()))
-          .toList();
+      _relatedLists =
+          HentaiIndex.getRelatedCharacters(
+                token.split(':').last.replaceAll('_', ' '),
+              )
+              .map(
+                (e) => (
+                  DisplayedTag(group: 'character', name: e.$1),
+                  e.$2.toInt(),
+                ),
+              )
+              .toList();
     } else if (token.startsWith('character:')) {
-      _relatedLists = HentaiIndex.getRelatedSeries(
-              token.split(':').last.replaceAll('_', ' '))
-          .map((e) => (DisplayedTag(group: 'series', name: e.$1), e.$2.toInt()))
-          .toList();
+      _relatedLists =
+          HentaiIndex.getRelatedSeries(
+                token.split(':').last.replaceAll('_', ' '),
+              )
+              .map(
+                (e) =>
+                    (DisplayedTag(group: 'series', name: e.$1), e.$2.toInt()),
+              )
+              .toList();
     } else {
       _relatedLists.clear();
     }
@@ -698,22 +728,30 @@ class _SearchBarPageState extends State<SearchBarPage>
     final result = <(DisplayedTag, int)>[];
 
     if (token == 'page') {
-      result.addAll(['>', '<', '>=', '<=', '=', '<>']
-          .map((e) => (DisplayedTag(group: 'page', name: e), 0)));
+      result.addAll(
+        [
+          '>',
+          '<',
+          '>=',
+          '<=',
+          '=',
+          '<>',
+        ].map((e) => (DisplayedTag(group: 'page', name: e), 0)),
+      );
     }
 
     if (!Settings.searchUseFuzzy.value) {
       final searchResult = (await HentaiIndex.queryAutoComplete(
-              token, Settings.searchUseTranslated.value))
-          .take(_searchResultMaximum)
-          .toList();
+        token,
+        Settings.searchUseTranslated.value,
+      )).take(_searchResultMaximum).toList();
       if (searchResult.isEmpty) _nothing = true;
       result.addAll(searchResult);
     } else {
       final searchResult = (await HentaiIndex.queryAutoCompleteFuzzy(
-              token, Settings.searchUseTranslated.value))
-          .take(_searchResultMaximum)
-          .toList();
+        token,
+        Settings.searchUseTranslated.value,
+      )).take(_searchResultMaximum).toList();
       if (searchResult.isEmpty) _nothing = true;
       result.addAll(searchResult);
     }
@@ -810,69 +848,81 @@ class _SearchBarPageState extends State<SearchBarPage>
         latestToken != '' &&
         tagDisplayed.contains(latestToken) &&
         !related) {
-      ts.add(TextSpan(
-          style: const TextStyle(
-            color: Colors.white,
-          ),
-          text: tagDisplayed.split(latestToken)[0]));
-      ts.add(TextSpan(
-          style: TextStyle(
-            color: accColor,
-            fontWeight: FontWeight.bold,
-          ),
-          text: latestToken));
-      ts.add(TextSpan(
-          style: const TextStyle(
-            color: Colors.white,
-          ),
-          text: tagDisplayed.split(latestToken)[1]));
+      ts.add(
+        TextSpan(
+          style: const TextStyle(color: Colors.white),
+          text: tagDisplayed.split(latestToken)[0],
+        ),
+      );
+      ts.add(
+        TextSpan(
+          style: TextStyle(color: accColor, fontWeight: FontWeight.bold),
+          text: latestToken,
+        ),
+      );
+      ts.add(
+        TextSpan(
+          style: const TextStyle(color: Colors.white),
+          text: tagDisplayed.split(latestToken)[1],
+        ),
+      );
     } else if (!Settings.searchUseFuzzy.value &&
         latestToken.contains(':') &&
         latestToken.split(':')[1] != '' &&
         tagDisplayed.contains(latestToken.split(':')[1]) &&
         !related) {
-      ts.add(TextSpan(
-          style: const TextStyle(
-            color: Colors.white,
-          ),
-          text: tagDisplayed.split(latestToken.split(':')[1])[0]));
-      ts.add(TextSpan(
-          style: TextStyle(
-            color: accColor,
-            fontWeight: FontWeight.bold,
-          ),
-          text: latestToken.split(':')[1]));
-      ts.add(TextSpan(
-          style: const TextStyle(
-            color: Colors.white,
-          ),
-          text: tagDisplayed.split(latestToken.split(':')[1])[1]));
+      ts.add(
+        TextSpan(
+          style: const TextStyle(color: Colors.white),
+          text: tagDisplayed.split(latestToken.split(':')[1])[0],
+        ),
+      );
+      ts.add(
+        TextSpan(
+          style: TextStyle(color: accColor, fontWeight: FontWeight.bold),
+          text: latestToken.split(':')[1],
+        ),
+      );
+      ts.add(
+        TextSpan(
+          style: const TextStyle(color: Colors.white),
+          text: tagDisplayed.split(latestToken.split(':')[1])[1],
+        ),
+      );
     } else if (!Settings.searchUseFuzzy.value &&
         !Settings.searchUseTranslated.value &&
         !related) {
-      ts.add(TextSpan(
-          style: const TextStyle(
-            color: Colors.white,
-          ),
-          text: tagDisplayed));
+      ts.add(
+        TextSpan(
+          style: const TextStyle(color: Colors.white),
+          text: tagDisplayed,
+        ),
+      );
     } else if (latestToken != '' && !related) {
       var route = Distance.levenshteinDistanceRoute(
-          tagDisplayed.runes.toList(), latestToken.runes.toList());
+        tagDisplayed.runes.toList(),
+        latestToken.runes.toList(),
+      );
       for (int i = 0; i < tagDisplayed.length; i++) {
-        ts.add(TextSpan(
+        ts.add(
+          TextSpan(
             style: TextStyle(
               color: route[i + 1] == 1 ? accColor : Colors.white,
-              fontWeight:
-                  route[i + 1] == 1 ? FontWeight.bold : FontWeight.normal,
+              fontWeight: route[i + 1] == 1
+                  ? FontWeight.bold
+                  : FontWeight.normal,
             ),
-            text: tagDisplayed[i]));
+            text: tagDisplayed[i],
+          ),
+        );
       }
     } else {
-      ts.add(TextSpan(
-          style: const TextStyle(
-            color: Colors.white,
-          ),
-          text: tagDisplayed));
+      ts.add(
+        TextSpan(
+          style: const TextStyle(color: Colors.white),
+          text: tagDisplayed,
+        ),
+      );
     }
 
     var fc = RawChip(
@@ -882,15 +932,15 @@ class _SearchBarPageState extends State<SearchBarPage>
         child: Text(info.$1.group![0].toUpperCase()),
       ),
       label: RichText(
-          text: TextSpan(
-              style: const TextStyle(
-                color: Colors.white,
-              ),
-              children: [
+        text: TextSpan(
+          style: const TextStyle(color: Colors.white),
+          children: [
             const TextSpan(text: ' '),
             TextSpan(children: ts),
             TextSpan(text: count),
-          ])),
+          ],
+        ),
+      ),
       backgroundColor: color,
       elevation: 6.0,
       shadowColor: Colors.grey[60],
@@ -900,10 +950,13 @@ class _SearchBarPageState extends State<SearchBarPage>
         if (info.$1.group != 'prefix') {
           final insert = info.$1.getTag().replaceAll(' ', '_');
 
-          _searchController.text = _searchText!.substring(0, _insertPos) +
+          _searchController.text =
+              _searchText!.substring(0, _insertPos) +
               insert +
-              _searchText!
-                  .substring(_insertPos! + _insertLength!, _searchText!.length);
+              _searchText!.substring(
+                _insertPos! + _insertLength!,
+                _searchText!.length,
+              );
           _searchController.selection = TextSelection(
             baseOffset: _insertPos! + insert.length,
             extentOffset: _insertPos! + insert.length,
@@ -912,35 +965,47 @@ class _SearchBarPageState extends State<SearchBarPage>
           if (info.$1.group == 'tag' ||
               info.$1.group == 'female' ||
               info.$1.group == 'male') {
-            _relatedLists = HentaiIndex.getRelatedTag(info.$1.group == 'tag'
-                    ? info.$1.name!.replaceAll('_', ' ')
-                    : info.$1.getTag().replaceAll('_', ' '))
-                .map((e) => (
-                      DisplayedTag(
+            _relatedLists =
+                HentaiIndex.getRelatedTag(
+                      info.$1.group == 'tag'
+                          ? info.$1.name!.replaceAll('_', ' ')
+                          : info.$1.getTag().replaceAll('_', ' '),
+                    )
+                    .map(
+                      (e) => (
+                        DisplayedTag(
                           group: e.$1.contains(':')
                               ? e.$1.split(':').first
                               : 'tag',
-                          name: e.$1.split(':').last),
-                      (e.$2 * 100).toInt()
-                    ))
-                .toList();
+                          name: e.$1.split(':').last,
+                        ),
+                        (e.$2 * 100).toInt(),
+                      ),
+                    )
+                    .toList();
             setState(() {});
           } else if (info.$1.group == 'series') {
-            _relatedLists = HentaiIndex.getRelatedCharacters(
-                    info.$1.name!.replaceAll('_', ' '))
-                .map((e) => (
-                      DisplayedTag(group: 'character', name: e.$1),
-                      e.$2.toInt()
-                    ))
-                .toList();
+            _relatedLists =
+                HentaiIndex.getRelatedCharacters(
+                      info.$1.name!.replaceAll('_', ' '),
+                    )
+                    .map(
+                      (e) => (
+                        DisplayedTag(group: 'character', name: e.$1),
+                        e.$2.toInt(),
+                      ),
+                    )
+                    .toList();
             setState(() {});
           } else if (info.$1.group == 'character') {
             _relatedLists =
                 HentaiIndex.getRelatedSeries(info.$1.name!.replaceAll('_', ' '))
-                    .map((e) => (
-                          DisplayedTag(group: 'series', name: e.$1),
-                          e.$2.toInt()
-                        ))
+                    .map(
+                      (e) => (
+                        DisplayedTag(group: 'series', name: e.$1),
+                        e.$2.toInt(),
+                      ),
+                    )
                     .toList();
             setState(() {});
           }
@@ -948,16 +1013,20 @@ class _SearchBarPageState extends State<SearchBarPage>
           var offset = _searchController.selection.baseOffset;
           if (offset != -1) {
             final noColon = info.$1.name == 'random' || info.$1.name == 'page';
-            _searchController.text = _searchController.text
-                    .substring(0, _searchController.selection.base.offset) +
+            _searchController.text =
+                _searchController.text.substring(
+                  0,
+                  _searchController.selection.base.offset,
+                ) +
                 info.$1.name! +
                 (info.$1.name == 'random'
                     ? ' '
                     : info.$1.name == 'page'
-                        ? ''
-                        : ':') +
-                _searchController.text
-                    .substring(_searchController.selection.base.offset);
+                    ? ''
+                    : ':') +
+                _searchController.text.substring(
+                  _searchController.selection.base.offset,
+                );
             _searchController.selection = TextSelection(
               baseOffset: offset + info.$1.name!.length + (noColon ? 0 : 1),
               extentOffset: offset + info.$1.name!.length + (noColon ? 0 : 1),
@@ -971,7 +1040,9 @@ class _SearchBarPageState extends State<SearchBarPage>
             );
           }
           await searchProcess(
-              _searchController.text, _searchController.selection);
+            _searchController.text,
+            _searchController.selection,
+          );
         }
       },
     );

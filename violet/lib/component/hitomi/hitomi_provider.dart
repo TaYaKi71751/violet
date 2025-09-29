@@ -66,16 +66,19 @@ class HitomiImageProvider extends VioletImageProvider {
     }
 
     if (_estimatedCache == null) {
-      _estimatedCache =
-          List<double>.filled(imageList.smallThumbnails!.length, 0);
+      _estimatedCache = List<double>.filled(
+        imageList.smallThumbnails!.length,
+        0,
+      );
     } else if (_estimatedCache![page] != 0) {
       return _estimatedCache![page];
     }
 
     final header = await getHeader(page);
-    final image =
-        (await http.get(imageList.smallThumbnails![page], headers: header))
-            .bodyBytes;
+    final image = (await http.get(
+      imageList.smallThumbnails![page],
+      headers: header,
+    )).bodyBytes;
     final thumbSize = ImageSizeGetter.getSize(MemoryInput(image));
 
     // w1:h1=w2:h2

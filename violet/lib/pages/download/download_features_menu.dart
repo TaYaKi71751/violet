@@ -24,10 +24,18 @@ class DownloadFeaturesMenu extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 child: Column(
                   children: <Widget>[
-                    _typeItem(context, MdiIcons.contentCopy,
-                        'Copy All URL(or Id)', 2),
                     _typeItem(
-                        context, MdiIcons.refresh, 'Retry Stopped Item', 0),
+                      context,
+                      MdiIcons.contentCopy,
+                      'Copy All URL(or Id)',
+                      2,
+                    ),
+                    _typeItem(
+                      context,
+                      MdiIcons.refresh,
+                      'Retry Stopped Item',
+                      0,
+                    ),
                     _typeItem(context, MdiIcons.rotateLeft, 'All Recovery', 1),
                   ],
                 ),
@@ -40,7 +48,11 @@ class DownloadFeaturesMenu extends StatelessWidget {
   }
 
   Widget _typeItem(
-      BuildContext context, IconData icon, String text, int selection) {
+    BuildContext context,
+    IconData icon,
+    String text,
+    int selection,
+  ) {
     return ListTile(
       leading: Icon(
         icon,
@@ -48,13 +60,15 @@ class DownloadFeaturesMenu extends StatelessWidget {
             ? Colors.grey.shade200
             : Colors.grey.shade900,
       ),
-      title: Text(text,
-          softWrap: false,
-          style: TextStyle(
-            color: Settings.themeWhat.value
-                ? Colors.grey.shade200
-                : Colors.grey.shade900,
-          )),
+      title: Text(
+        text,
+        softWrap: false,
+        style: TextStyle(
+          color: Settings.themeWhat.value
+              ? Colors.grey.shade200
+              : Colors.grey.shade900,
+        ),
+      ),
       onTap: () async {
         Navigator.pop(context, selection);
       },

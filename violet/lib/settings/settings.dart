@@ -6,7 +6,6 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -14,14 +13,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:violet/database/user/download.dart';
 import 'package:violet/log/log.dart';
 import 'package:violet/platform/android_external_storage_directory.dart';
+import 'package:violet/platform/misc.dart';
 import 'package:violet/settings/device_type.dart';
 
 class Settings {
   static late final SharedPreferences prefs;
 
   // Bookmark Git Settings
-  static final bookmarkRepository =
-      SettingItem<String>('bookmarkRepository', 'example/bookmark');
+  static final bookmarkRepository = SettingItem<String>(
+    'bookmarkRepository',
+    'example/bookmark',
+  );
   static final bookmarkHost = SettingItem<String>('bookmarkHost', 'gitee.com');
 
   // Timeout Settings
@@ -31,14 +33,20 @@ class Settings {
   static Color get themeColor => themeWhat.value ? Colors.white : Colors.black;
   static final themeWhat = SettingItem<bool>('themeColor', false);
   static final majorColor = SettingItem<Color>('majorColor', Colors.purple);
-  static final majorAccentColor =
-      SettingItem<Color>('majorAccentColor', Colors.purpleAccent);
+  static final majorAccentColor = SettingItem<Color>(
+    'majorAccentColor',
+    Colors.purpleAccent,
+  );
   static final searchResultType = EnumSettingItem<SearchResultType>(
-      'searchResultType', SearchResultType.values, SearchResultType.ultra);
+    'searchResultType',
+    SearchResultType.values,
+    SearchResultType.ultra,
+  );
   static final downloadResultType = EnumSettingItem<DownloadResultType>(
-      'downloadResultType',
-      DownloadResultType.values,
-      DownloadResultType.detail);
+    'downloadResultType',
+    DownloadResultType.values,
+    DownloadResultType.detail,
+  );
   static final downloadAlignType = SettingItem<int>('downloadAlignType', 0);
   static final themeFlat = SettingItem<bool>('themeFlat', false);
   static final themeBlack = SettingItem<bool>('themeBlack', false);
@@ -72,10 +80,14 @@ class Settings {
   static late List<String> routingRule; // image routing rule
   static late List<String> searchRule;
   static final searchNetwork = SettingItem<bool>('searchNetwork', false);
-  static final includeTagNetwork =
-      SettingItem<bool>('includeTagNetwork', false);
-  static final excludeTagNetwork =
-      SettingItem<bool>('excludeTagNetwork', false);
+  static final includeTagNetwork = SettingItem<bool>(
+    'includeTagNetwork',
+    false,
+  );
+  static final excludeTagNetwork = SettingItem<bool>(
+    'excludeTagNetwork',
+    false,
+  );
   static final searchExpunged = SettingItem<bool>('searchExpunged', false);
   static final searchCategory = SettingItem<int>('searchCategory', 993);
 
@@ -95,152 +107,213 @@ class Settings {
   static final scrollVertical = SettingItem<bool>('scrollvertical', false);
   static final animation = SettingItem<bool>('animation', false);
   static final padding = SettingItem<bool>('padding', false);
-  static final disableOverlayButton =
-      SettingItem<bool>('disableoverlaybutton', false);
-  static final disableFullScreen =
-      SettingItem<bool>('disablefullscreen', false);
+  static final disableOverlayButton = SettingItem<bool>(
+    'disableoverlaybutton',
+    false,
+  );
+  static final disableFullScreen = SettingItem<bool>(
+    'disablefullscreen',
+    false,
+  );
   static final enableTimer = SettingItem<bool>('enabletimer', false);
   static final timerTick = SettingItem<double>('timertick', 1.0);
-  static final disableTwoPageView =
-      SettingItem<bool>('disableTwoPageView', false);
-  static final secondPageToSecondPage =
-      SettingItem<bool>('secondPageToSecondPage', false);
-  static final moveToAppBarToBottom =
-      SettingItem<bool>('movetoappbartobottom', Platform.isIOS);
+  static final disableTwoPageView = SettingItem<bool>(
+    'disableTwoPageView',
+    false,
+  );
+  static final secondPageToSecondPage = SettingItem<bool>(
+    'secondPageToSecondPage',
+    false,
+  );
+  static final moveToAppBarToBottom = SettingItem<bool>(
+    'movetoappbartobottom',
+    Platform.isIOS,
+  );
   static final showSlider = SettingItem<bool>('showslider', false);
   static final imageQuality = SettingItem<int>('imagequality', 3);
   static final thumbSize = SettingItem<int>('thumbSize', 1);
-  static final enableThumbSlider =
-      SettingItem<bool>('enableThumbSlider', false);
-  static final showPageNumberIndicator =
-      SettingItem<bool>('showPageNumberIndicator', true);
-  static final showRecordJumpMessage =
-      SettingItem<bool>('showRecordJumpMessage', true);
+  static final enableThumbSlider = SettingItem<bool>(
+    'enableThumbSlider',
+    false,
+  );
+  static final showPageNumberIndicator = SettingItem<bool>(
+    'showPageNumberIndicator',
+    true,
+  );
+  static final showRecordJumpMessage = SettingItem<bool>(
+    'showRecordJumpMessage',
+    true,
+  );
 
   // Download Options
   static final threadCount = SettingItem<int>('thread_count', 4);
 
-  static final useInnerStorage =
-      FutureSettingItem<bool>('useinnerstorage', () async {
-    if (Platform.isAndroid) {
-      final androidInfo = await DeviceInfoPlugin().androidInfo;
-      return androidInfo.version.sdkInt >= 30;
-    }
-    return Platform.isIOS;
-  });
-  static final downloadBasePath =
-      FutureSettingItem<String>('downloadbasepath', () async {
-    if (Platform.isAndroid) {
-      final String path = await AndroidExternalStorageDirectory.instance
-          .getExternalStorageDirectory();
-      var downloadBasePath = join(path, '.violet');
-
-      final androidInfo = await DeviceInfoPlugin().androidInfo;
-      final sdkInt = androidInfo.version.sdkInt;
-
-      if (sdkInt >= 30 && prefs.getBool('android30downpath') == null) {
-        await prefs.setBool('android30downpath', true);
-        var ext = await getExternalStorageDirectory();
-        downloadBasePath = ext!.path;
-      } else if (sdkInt < 30 &&
-          downloadBasePath == join(path, 'Violet') &&
-          prefs.getBool('downloadbasepathcc1') == null) {
-        downloadBasePath = join(path, '.violet');
-        await prefs.setBool('downloadbasepathcc1', true);
-
-        try {
-          if (await Permission.manageExternalStorage.isGranted) {
-            var prevDir = Directory(join(path, 'Violet'));
-            if (await prevDir.exists()) {
-              await prevDir.rename(join(path, '.violet'));
-            }
-
-            var downloaded =
-                await (await Download.getInstance()).getDownloadItems();
-            for (var download in downloaded) {
-              Map<String, dynamic> result =
-                  Map<String, dynamic>.from(download.result);
-              if (download.files() != null) {
-                result['Files'] =
-                    download.files()!.replaceAll('/Violet/', '/.violet/');
-              }
-              if (download.path() != null) {
-                result['Path'] =
-                    download.path()!.replaceAll('/Violet/', '/.violet/');
-              }
-              download.result = result;
-              await download.update();
-            }
-          }
-        } catch (e, st) {
-          Logger.error('[Settings] E: $e\n'
-              '$st');
-          FirebaseCrashlytics.instance.recordError(e, st);
-        }
+  static final useInnerStorage = FutureSettingItem<bool>(
+    'useinnerstorage',
+    () async {
+      if (Platform.isAndroid) {
+        final androidInfo = await DeviceInfoPlugin().androidInfo;
+        return androidInfo.version.sdkInt >= 30;
       }
-      return downloadBasePath;
-    } else if (Platform.isIOS) {
-      return 'not supported';
-    } else {
-      // Desktop
-      return join(dirname(Platform.resolvedExecutable), 'download');
-    }
-  });
+      return Platform.isIOS;
+    },
+  );
+  static final downloadBasePath = FutureSettingItem<String>(
+    'downloadbasepath',
+    () async {
+      if (Platform.isAndroid) {
+        final String path = await AndroidExternalStorageDirectory.instance
+            .getExternalStorageDirectory();
+        var downloadBasePath = join(path, '.violet');
+
+        final androidInfo = await DeviceInfoPlugin().androidInfo;
+        final sdkInt = androidInfo.version.sdkInt;
+
+        if (sdkInt >= 30 && prefs.getBool('android30downpath') == null) {
+          await prefs.setBool('android30downpath', true);
+          var ext = await getExternalStorageDirectory();
+          downloadBasePath = ext!.path;
+        } else if (sdkInt < 30 &&
+            downloadBasePath == join(path, 'Violet') &&
+            prefs.getBool('downloadbasepathcc1') == null) {
+          downloadBasePath = join(path, '.violet');
+          await prefs.setBool('downloadbasepathcc1', true);
+
+          try {
+            if (await Permission.manageExternalStorage.isGranted) {
+              var prevDir = Directory(join(path, 'Violet'));
+              if (await prevDir.exists()) {
+                await prevDir.rename(join(path, '.violet'));
+              }
+
+              var downloaded = await (await Download.getInstance())
+                  .getDownloadItems();
+              for (var download in downloaded) {
+                Map<String, dynamic> result = Map<String, dynamic>.from(
+                  download.result,
+                );
+                if (download.files() != null) {
+                  result['Files'] = download.files()!.replaceAll(
+                    '/Violet/',
+                    '/.violet/',
+                  );
+                }
+                if (download.path() != null) {
+                  result['Path'] = download.path()!.replaceAll(
+                    '/Violet/',
+                    '/.violet/',
+                  );
+                }
+                download.result = result;
+                await download.update();
+              }
+            }
+          } catch (e, st) {
+            Logger.error(
+              '[Settings] E: $e\n'
+              '$st',
+            );
+            FirebaseCrashlytics.instance.recordError(e, st);
+          }
+        }
+        return downloadBasePath;
+      } else if (Platform.isIOS) {
+        return 'not supported';
+      } else {
+        // Desktop
+        return join(dirname(Platform.resolvedExecutable), 'download');
+      }
+    },
+  );
   static final downloadRule = SettingItem<String>(
-      'downloadrule', '%(extractor)s/%(id)s/%(file)s.%(ext)s');
+    'downloadrule',
+    '%(extractor)s/%(id)s/%(file)s.%(ext)s',
+  );
 
   static final searchMessageAPI = SettingItem<String>(
-      'searchmessageapi', 'https://koromo.cc/api/search/msg');
+    'searchmessageapi',
+    'https://koromo.cc/api/search/msg',
+  );
   static final useVioletServer = SettingItem<bool>('usevioletserver', false);
 
   static final useDrawer = SettingItem<bool>('usedrawer', false);
 
-  static final useOptimizeDatabase =
-      SettingItem<bool>('useoptimizedatabase', true);
+  static final useOptimizeDatabase = SettingItem<bool>(
+    'useoptimizedatabase',
+    true,
+  );
 
   static final useLowPerf = SettingItem<bool>('uselowperf', true);
 
   // View Option
-  static final showArticleProgress =
-      SettingItem<bool>('showarticleprogress', false);
+  static final showArticleProgress = SettingItem<bool>(
+    'showarticleprogress',
+    false,
+  );
 
   // Search Option
   static final searchUseFuzzy = SettingItem<bool>('searchusefuzzy', false);
-  static final searchTagTranslation =
-      SettingItem<bool>('searchtagtranslation', false);
-  static final searchUseTranslated =
-      SettingItem<bool>('searchusetranslated', false);
+  static final searchTagTranslation = SettingItem<bool>(
+    'searchtagtranslation',
+    false,
+  );
+  static final searchUseTranslated = SettingItem<bool>(
+    'searchusetranslated',
+    false,
+  );
   static final searchShowCount = SettingItem<bool>('searchshowcount', true);
   static final searchPure = SettingItem<bool>('searchPure', false);
 
   static late String userAppId;
 
-  static final autobackupBookmark =
-      SettingItem<bool>('autobackupbookmark', false);
+  static final autobackupBookmark = SettingItem<bool>(
+    'autobackupbookmark',
+    false,
+  );
 
   // Crop Bookmark
-  static final cropBookmarkAlign =
-      SettingItem<int>('cropBookmarkAlign', Device.get().isTablet ? 3 : 2);
-  static final cropBookmarkShowOverlay =
-      SettingItem<bool>('cropBookmarkShowOverlay', true);
-  static final cropBookmarkSortDesc =
-      SettingItem<bool>('cropBookmarkSortDesc', false);
+  static final cropBookmarkAlign = SettingItem<int>(
+    'cropBookmarkAlign',
+    Device.get().isTablet ? 3 : 2,
+  );
+  static final cropBookmarkShowOverlay = SettingItem<bool>(
+    'cropBookmarkShowOverlay',
+    true,
+  );
+  static final cropBookmarkSortDesc = SettingItem<bool>(
+    'cropBookmarkSortDesc',
+    false,
+  );
 
   // Lab
-  static final simpleItemWidgetLoadingIcon =
-      SettingItem<bool>('simpleItemWidgetLoadingIcon', true);
-  static final showNewViewerWhenArtistArticleListItemTap =
-      SettingItem<bool>('showNewViewerWhenArtistArticleListItemTap', true);
-  static final enableViewerFunctionBackdropFilter =
-      SettingItem<bool>('enableViewerFunctionBackdropFilter', true);
-  static final usingPushReplacementOnArticleRead =
-      SettingItem<bool>('usingPushReplacementOnArticleRead', true);
-  static final downloadEhRawImage =
-      SettingItem<bool>('downloadEhRawImage', false);
-  static final bookmarkScrollbarPositionToLeft =
-      SettingItem<bool>('bookmarkScrollbarPositionToLeft', false);
-  static final inViewerMessageSearch =
-      SettingItem<bool>('inViewerMessageSearch', false);
+  static final simpleItemWidgetLoadingIcon = SettingItem<bool>(
+    'simpleItemWidgetLoadingIcon',
+    true,
+  );
+  static final showNewViewerWhenArtistArticleListItemTap = SettingItem<bool>(
+    'showNewViewerWhenArtistArticleListItemTap',
+    true,
+  );
+  static final enableViewerFunctionBackdropFilter = SettingItem<bool>(
+    'enableViewerFunctionBackdropFilter',
+    true,
+  );
+  static final usingPushReplacementOnArticleRead = SettingItem<bool>(
+    'usingPushReplacementOnArticleRead',
+    true,
+  );
+  static final downloadEhRawImage = SettingItem<bool>(
+    'downloadEhRawImage',
+    false,
+  );
+  static final bookmarkScrollbarPositionToLeft = SettingItem<bool>(
+    'bookmarkScrollbarPositionToLeft',
+    false,
+  );
+  static final inViewerMessageSearch = SettingItem<bool>(
+    'inViewerMessageSearch',
+    false,
+  );
 
   static final useLockScreen = SettingItem<bool>('useLockScreen', false);
   static final useSecureMode = SettingItem<bool>('useSecureMode', false);
@@ -254,20 +327,22 @@ class Settings {
   static Future<void> setSecureMode() async {
     if (Platform.isAndroid) {
       if (Settings.useSecureMode.value) {
-        await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
+        await PlatformMiscMethods.instance.setWindowSecure();
       } else {
-        await FlutterWindowManager.clearFlags(FlutterWindowManager.FLAG_SECURE);
+        await PlatformMiscMethods.instance.setWindowInsecure();
       }
     }
   }
 
   static Future<void> init() async {
     routingRule = (await _getString(
-            'routingrule', 'Hitomi|EHentai|ExHentai|Hiyobi|NHentai'))
-        .split('|');
-    searchRule =
-        (await _getString('searchrule', 'Hitomi|EHentai|ExHentai|NHentai'))
-            .split('|');
+      'routingrule',
+      'Hitomi|EHentai|ExHentai|Hiyobi|NHentai',
+    )).split('|');
+    searchRule = (await _getString(
+      'searchrule',
+      'Hitomi|EHentai|ExHentai|NHentai',
+    )).split('|');
 
     if (!routingRule.contains('Hiyobi')) {
       routingRule.add('Hiyobi');
@@ -298,8 +373,10 @@ class Settings {
     await includeTags.setValue('($language)');
   }
 
-  static Future<String> _getString(String key,
-      [String defaultValue = '']) async {
+  static Future<String> _getString(
+    String key, [
+    String defaultValue = '',
+  ]) async {
     var nn = prefs.getString(key);
     if (nn == null) {
       nn = defaultValue;
@@ -389,7 +466,8 @@ class FutureSettingItem<T> {
   T get value {
     if (!_initialized) {
       throw StateError(
-          'FutureSettingItem<$T> not initialized. Call `load()` first.');
+        'FutureSettingItem<$T> not initialized. Call `load()` first.',
+      );
     }
     return _value!;
   }
@@ -472,13 +550,7 @@ class EnumSettingItem<T extends Enum> {
   }
 }
 
-enum SearchResultType {
-  threeGrid,
-  twoGrid,
-  bigLine,
-  detail,
-  ultra,
-}
+enum SearchResultType { threeGrid, twoGrid, bigLine, detail, ultra }
 
 extension SearchResultTypeExtension on SearchResultType {
   bool get isUltra {
@@ -508,12 +580,7 @@ extension SearchResultTypeExtension on SearchResultType {
   }
 }
 
-enum DownloadResultType {
-  threeGrid,
-  twoGrid,
-  bigLine,
-  detail,
-}
+enum DownloadResultType { threeGrid, twoGrid, bigLine, detail }
 
 extension DownloadResultTypeExtension on DownloadResultType {
   bool get isThreeGrid => this == DownloadResultType.threeGrid;

@@ -53,10 +53,11 @@ class Device {
     }
 
     return _device = Device(
-        isTablet: isTablet,
-        isPhone: isPhone,
-        isAndroid: isAndroid,
-        isIos: isIos,
-        isIphoneX: isIphoneX);
+      isTablet: isTablet,
+      isPhone: isPhone,
+      isAndroid: isAndroid,
+      isIos: isIos,
+      isIphoneX: isIphoneX,
+    );
   }
 }

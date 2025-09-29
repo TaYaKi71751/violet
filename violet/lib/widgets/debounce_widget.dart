@@ -21,8 +21,9 @@ class _DebounceWidgetState extends State<DebounceWidget> {
     if (isLoaded) return widget.child;
 
     return FutureBuilder(
-      future:
-          Future.delayed(const Duration(milliseconds: 300)).then((value) => 1),
+      future: Future.delayed(
+        const Duration(milliseconds: 300),
+      ).then((value) => 1),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           isLoaded = true;

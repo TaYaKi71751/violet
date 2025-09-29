@@ -47,8 +47,12 @@ class _RestoreBookmarkPageState extends State<RestoreBookmarkPage> {
         var bookmark = await Bookmark.getInstance();
         for (var group in groups) {
           var ref = BookmarkGroup(result: group);
-          var gid = await bookmark.createGroup(ref.name(), ref.description(),
-              Colors.black, DateTime.parse(ref.datetime()));
+          var gid = await bookmark.createGroup(
+            ref.name(),
+            ref.description(),
+            Colors.black,
+            DateTime.parse(ref.datetime()),
+          );
           groupInv[ref.id()] = gid;
           setState(() => progress++);
         }
@@ -60,14 +64,11 @@ class _RestoreBookmarkPageState extends State<RestoreBookmarkPage> {
           final batch = txn.batch();
           for (var article in articles) {
             var ref = BookmarkArticle(result: article);
-            batch.insert(
-                'BookmarkArticle',
-                {
-                  'Article': ref.article(),
-                  'DateTime': ref.datetime(),
-                  'GroupId': groupInv[ref.group()],
-                },
-                conflictAlgorithm: ConflictAlgorithm.fail);
+            batch.insert('BookmarkArticle', {
+              'Article': ref.article(),
+              'DateTime': ref.datetime(),
+              'GroupId': groupInv[ref.group()],
+            }, conflictAlgorithm: ConflictAlgorithm.fail);
             setState(() => progress++);
           }
           await batch.commit();
@@ -76,15 +77,12 @@ class _RestoreBookmarkPageState extends State<RestoreBookmarkPage> {
           final batch = txn.batch();
           for (var artist in artists) {
             var ref = BookmarkArtist(result: artist);
-            batch.insert(
-                'BookmarkArtist',
-                {
-                  'Artist': ref.artist(),
-                  'IsGroup': ref.type(),
-                  'DateTime': ref.datetime(),
-                  'GroupId': groupInv[ref.group()],
-                },
-                conflictAlgorithm: ConflictAlgorithm.fail);
+            batch.insert('BookmarkArtist', {
+              'Artist': ref.artist(),
+              'IsGroup': ref.type(),
+              'DateTime': ref.datetime(),
+              'GroupId': groupInv[ref.group()],
+            }, conflictAlgorithm: ConflictAlgorithm.fail);
             setState(() => progress++);
           }
           await batch.commit();
@@ -96,16 +94,13 @@ class _RestoreBookmarkPageState extends State<RestoreBookmarkPage> {
             final batch = txn.batch();
             for (var record in records) {
               var ref = ArticleReadLog(result: record);
-              batch.insert(
-                  'ArticleReadLog',
-                  {
-                    'Article': ref.articleId(),
-                    'DateTimeStart': ref.datetimeStart(),
-                    'DateTimeEnd': ref.datetimeEnd(),
-                    'LastPage': ref.lastPage(),
-                    'Type': ref.type(),
-                  },
-                  conflictAlgorithm: ConflictAlgorithm.fail);
+              batch.insert('ArticleReadLog', {
+                'Article': ref.articleId(),
+                'DateTimeStart': ref.datetimeStart(),
+                'DateTimeEnd': ref.datetimeEnd(),
+                'LastPage': ref.lastPage(),
+                'Type': ref.type(),
+              }, conflictAlgorithm: ConflictAlgorithm.fail);
               setState(() => progress++);
             }
             await batch.commit();
@@ -113,8 +108,10 @@ class _RestoreBookmarkPageState extends State<RestoreBookmarkPage> {
         }
         await dbraw.close();
       } catch (e, st) {
-        Logger.error('[Restore Bookmark] $e\n'
-            '$st');
+        Logger.error(
+          '[Restore Bookmark] $e\n'
+          '$st',
+        );
         showToast(
           level: ToastLevel.error,
           message: 'Bookmark Restoring Error!',
@@ -174,25 +171,19 @@ class _RestoreBookmarkPageState extends State<RestoreBookmarkPage> {
                     // ),
                     child: Stack(
                       children: [
-                        const Center(
-                          child: CircularProgressIndicator(),
-                        ),
+                        const Center(child: CircularProgressIndicator()),
                         const Align(
                           alignment: Alignment.bottomCenter,
                           child: Padding(
                             padding: EdgeInsets.only(bottom: 33),
-                            child: Text(
-                              '북마크 복원중...',
-                            ),
+                            child: Text('북마크 복원중...'),
                           ),
                         ),
                         Align(
                           alignment: Alignment.bottomCenter,
                           child: Padding(
                             padding: const EdgeInsets.only(bottom: 15),
-                            child: Text(
-                              '$progress/$total',
-                            ),
+                            child: Text('$progress/$total'),
                           ),
                         ),
                       ],

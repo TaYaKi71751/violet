@@ -45,7 +45,9 @@ class HitomiTitleCluster {
     bstr = bstr.split('|')[0];
 
     return Distance.levenshteinDistance(
-        astr.runes.toList(), bstr.runes.toList());
+      astr.runes.toList(),
+      bstr.runes.toList(),
+    );
   }
 
   // This function compares and clusters the similarity of titles.

@@ -20,11 +20,11 @@ class SearchType extends StatelessWidget {
   Color getColor(SearchResultType type) {
     return Settings.themeWhat.value
         ? previousType == type
-            ? Colors.grey.shade200
-            : Colors.grey.shade400
+              ? Colors.grey.shade200
+              : Colors.grey.shade400
         : previousType == type
-            ? Colors.grey.shade900
-            : Colors.grey.shade400;
+        ? Colors.grey.shade900
+        : Colors.grey.shade400;
   }
 
   @override
@@ -42,17 +42,37 @@ class SearchType extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 child: Column(
                   children: <Widget>[
-                    _typeItem(context, Icons.grid_on, 'srt0',
-                        SearchResultType.threeGrid),
-                    _typeItem(context, MdiIcons.gridLarge, 'srt1',
-                        SearchResultType.twoGrid),
-                    _typeItem(context, MdiIcons.viewAgendaOutline, 'srt2',
-                        SearchResultType.bigLine),
-                    _typeItem(context, MdiIcons.formatListText, 'srt3',
-                        SearchResultType.detail),
-                    _typeItem(context, MdiIcons.viewSplitVertical, 'srt4',
-                        SearchResultType.ultra,
-                        flip: true),
+                    _typeItem(
+                      context,
+                      Icons.grid_on,
+                      'srt0',
+                      SearchResultType.threeGrid,
+                    ),
+                    _typeItem(
+                      context,
+                      MdiIcons.gridLarge,
+                      'srt1',
+                      SearchResultType.twoGrid,
+                    ),
+                    _typeItem(
+                      context,
+                      MdiIcons.viewAgendaOutline,
+                      'srt2',
+                      SearchResultType.bigLine,
+                    ),
+                    _typeItem(
+                      context,
+                      MdiIcons.formatListText,
+                      'srt3',
+                      SearchResultType.detail,
+                    ),
+                    _typeItem(
+                      context,
+                      MdiIcons.viewSplitVertical,
+                      'srt4',
+                      SearchResultType.ultra,
+                      flip: true,
+                    ),
                   ],
                 ),
               ),
@@ -63,14 +83,23 @@ class SearchType extends StatelessWidget {
     );
   }
 
-  Widget _typeItem(BuildContext context, IconData icon, String text,
-      SearchResultType selection,
-      {bool flip = false}) {
+  Widget _typeItem(
+    BuildContext context,
+    IconData icon,
+    String text,
+    SearchResultType selection, {
+    bool flip = false,
+  }) {
     return ListTile(
       leading: Transform.scale(
-          scaleX: flip ? -1 : 1, child: Icon(icon, color: getColor(selection))),
-      title: Text(Translations.instance!.trans(text),
-          softWrap: false, style: TextStyle(color: getColor(selection))),
+        scaleX: flip ? -1 : 1,
+        child: Icon(icon, color: getColor(selection)),
+      ),
+      title: Text(
+        Translations.instance!.trans(text),
+        softWrap: false,
+        style: TextStyle(color: getColor(selection)),
+      ),
       onTap: () async {
         if (!context.mounted) return;
         Navigator.pop(context, selection);

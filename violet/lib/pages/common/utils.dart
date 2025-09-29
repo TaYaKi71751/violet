@@ -30,10 +30,7 @@ Future showArticleInfoById(BuildContext context, int id) async {
   }
 
   if (!context.mounted) return;
-  showArticleInfoRaw(
-    context: context,
-    queryResult: search.results.first,
-  );
+  showArticleInfoRaw(context: context, queryResult: search.results.first);
 }
 
 Future showArticleInfoRaw({
@@ -43,7 +40,8 @@ Future showArticleInfoRaw({
   bool lockRead = false,
 }) async {
   final id = queryResult.id();
-  final hasNoValidQuery = queryResult.result.keys.length == 1 &&
+  final hasNoValidQuery =
+      queryResult.result.keys.length == 1 &&
       queryResult.result.keys.lastOrNull == 'Id';
 
   if (hasNoValidQuery) {
@@ -54,8 +52,9 @@ Future showArticleInfoRaw({
   final thumbnail = await provider.getThumbnailUrl();
   final headers = await provider.getHeader(0);
 
-  final isBookmarked =
-      await (await Bookmark.getInstance()).isBookmark(queryResult.id());
+  final isBookmarked = await (await Bookmark.getInstance()).isBookmark(
+    queryResult.id(),
+  );
 
   if (!context.mounted) return;
   final height = MediaQuery.of(context).size.height;
@@ -88,9 +87,7 @@ Future showArticleInfoRaw({
               usableTabList: usableTabList,
               lockRead: lockRead,
             ),
-            child: const ArticleInfoPage(
-              key: ObjectKey(pageKey),
-            ),
+            child: const ArticleInfoPage(key: ObjectKey(pageKey)),
           );
           return cache!;
         },
@@ -143,20 +140,23 @@ Future<void> showViewer(BuildContext context, int articleId, int page) async {
       fullscreenDialog: true,
       builder: (context) {
         return Provider<ViewerPageProvider>.value(
-            value: ViewerPageProvider(
-              uris: List<String>.filled(prov.length(), ''),
-              useProvider: true,
-              provider: prov,
-              headers: headers,
-              id: articleId,
-              title: '<No Query>',
-              jumpPage: page,
-            ),
-            child: const ViewerPage());
+          value: ViewerPageProvider(
+            uris: List<String>.filled(prov.length(), ''),
+            useProvider: true,
+            provider: prov,
+            headers: headers,
+            id: articleId,
+            title: '<No Query>',
+            jumpPage: page,
+          ),
+          child: const ViewerPage(),
+        );
       },
     ),
   ).then((value) async {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-        overlays: SystemUiOverlay.values);
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
   });
 }

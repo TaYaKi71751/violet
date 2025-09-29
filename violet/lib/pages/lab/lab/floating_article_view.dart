@@ -91,8 +91,9 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
     final centerY = _virtualSize.height / 2;
 
     // 사용할 아티클 수 계산
-    final articlesToUse =
-        _queryResults.length < nodeCount ? _queryResults.length : nodeCount;
+    final articlesToUse = _queryResults.length < nodeCount
+        ? _queryResults.length
+        : nodeCount;
 
     // ID % 10 기준으로 그룹화
     Map<int, List<QueryResult>> groups = {};
@@ -247,8 +248,12 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
   Widget _buildGrid() {
     return CustomPaint(
       size: _virtualSize,
-      painter: InfiniteGridPainter(_gridSize, _gridColor,
-          getOffsetFromTransform(), getScaleFromTransform()),
+      painter: InfiniteGridPainter(
+        _gridSize,
+        _gridColor,
+        getOffsetFromTransform(),
+        getScaleFromTransform(),
+      ),
     );
   }
 
@@ -527,9 +532,7 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
                 onPanStart: _handleGlobalPanStart,
                 onPanUpdate: _handleGlobalPanUpdate,
                 onPanEnd: _handleGlobalPanEnd,
-                child: Container(
-                  color: Colors.transparent,
-                ),
+                child: Container(color: Colors.transparent),
               ),
             ),
           ],
@@ -556,8 +559,10 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
         final currentCount = groupCounts[node.groupId]!;
 
         // 누적 합계 갱신
-        groupCenters[node.groupId] =
-            Offset(currentCenter.dx + node.x, currentCenter.dy + node.y);
+        groupCenters[node.groupId] = Offset(
+          currentCenter.dx + node.x,
+          currentCenter.dy + node.y,
+        );
         groupCounts[node.groupId] = currentCount + 1;
       }
     }
@@ -568,8 +573,10 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
     // 평균 계산
     groupCenters.forEach((groupId, totalOffset) {
       final count = groupCounts[groupId]!;
-      groupCenters[groupId] =
-          Offset(totalOffset.dx / count, totalOffset.dy / count);
+      groupCenters[groupId] = Offset(
+        totalOffset.dx / count,
+        totalOffset.dy / count,
+      );
     });
 
     // 속도 감쇠 계수 설정 (진동 방지)
@@ -610,8 +617,9 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
           List<int> adjacentGroups = [];
 
           // 이전 그룹 (순환 구조 고려)
-          int prevGroupIdx =
-              (groupIndex - 1 < 0) ? sortedGroupIds.length - 1 : groupIndex - 1;
+          int prevGroupIdx = (groupIndex - 1 < 0)
+              ? sortedGroupIds.length - 1
+              : groupIndex - 1;
           adjacentGroups.add(sortedGroupIds[prevGroupIdx]);
 
           // 다음 그룹 (순환 구조 고려)
@@ -684,7 +692,7 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
 
                 isAdjacent =
                     otherNode.groupId == sortedGroupIds[prevGroupIdx] ||
-                        otherNode.groupId == sortedGroupIds[nextGroupIdx];
+                    otherNode.groupId == sortedGroupIds[nextGroupIdx];
               }
 
               // 인접 그룹은 약한 반발력, 비인접 그룹은 강한 반발력
@@ -732,8 +740,10 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
   void _findNodeUnderTap(TapDownDetails details) {
     // 화면 좌표를 가상 공간 좌표로 변환
     final invertedMatrix = Matrix4.inverted(_transformationController.value);
-    final virtualPosition =
-        MatrixUtils.transformPoint(invertedMatrix, details.globalPosition);
+    final virtualPosition = MatrixUtils.transformPoint(
+      invertedMatrix,
+      details.globalPosition,
+    );
 
     print('Tap detected at: ${virtualPosition.dx}, ${virtualPosition.dy}');
 
@@ -771,8 +781,10 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
   void _handleGlobalPanStart(DragStartDetails details) {
     // 화면 좌표를 가상 공간 좌표로 변환
     final invertedMatrix = Matrix4.inverted(_transformationController.value);
-    final virtualPosition =
-        MatrixUtils.transformPoint(invertedMatrix, details.globalPosition);
+    final virtualPosition = MatrixUtils.transformPoint(
+      invertedMatrix,
+      details.globalPosition,
+    );
 
     print('Pan start at: ${virtualPosition.dx}, ${virtualPosition.dy}');
 
@@ -782,8 +794,12 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
       final nodeBounds = node.bounds;
 
       // 확장된 히트 테스트 영역 (약간 더 큰 영역으로 체크)
-      final expandedBounds = Rect.fromLTWH(nodeBounds.left - 20,
-          nodeBounds.top - 20, nodeBounds.width + 40, nodeBounds.height + 40);
+      final expandedBounds = Rect.fromLTWH(
+        nodeBounds.left - 20,
+        nodeBounds.top - 20,
+        nodeBounds.width + 40,
+        nodeBounds.height + 40,
+      );
 
       // 터치 위치가 확장된 노드 영역 내부에 있는지 확인
       if (expandedBounds.contains(virtualPosition)) {
@@ -803,8 +819,10 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
     if (_draggedNode != null && _dragPosition != null) {
       // 화면 좌표를 가상 공간 좌표로 변환
       final invertedMatrix = Matrix4.inverted(_transformationController.value);
-      final virtualPosition =
-          MatrixUtils.transformPoint(invertedMatrix, details.globalPosition);
+      final virtualPosition = MatrixUtils.transformPoint(
+        invertedMatrix,
+        details.globalPosition,
+      );
 
       final dx = virtualPosition.dx - _dragPosition!.dx;
       final dy = virtualPosition.dy - _dragPosition!.dy;
@@ -851,8 +869,9 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
           setState(() {
             // 패널 위치 업데이트 (dx는 오른쪽에서부터의 거리이므로 음수로 계산)
             _nodeInfoPanelPosition = Offset(
-                _nodeInfoPanelPosition.dx - details.delta.dx,
-                _nodeInfoPanelPosition.dy + details.delta.dy);
+              _nodeInfoPanelPosition.dx - details.delta.dx,
+              _nodeInfoPanelPosition.dy + details.delta.dy,
+            );
           });
         },
         // 드래그 종료 처리
@@ -897,8 +916,11 @@ class _FloatingArticleViewState extends State<FloatingArticleView>
                     ],
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close,
-                        color: Colors.white70, size: 18),
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.white70,
+                      size: 18,
+                    ),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                     onPressed: () {
@@ -1057,8 +1079,9 @@ class ArticleEdgePainter extends CustomPainter {
             final node1 = groupNodes[i];
             final node2 = groupNodes[j];
 
-            final distance = math.sqrt(math.pow(node1.x - node2.x, 2) +
-                math.pow(node1.y - node2.y, 2));
+            final distance = math.sqrt(
+              math.pow(node1.x - node2.x, 2) + math.pow(node1.y - node2.y, 2),
+            );
 
             // 거리에 따른 선 그리기
             final maxGroupDistance = maxDistance * 8.0;
@@ -1105,8 +1128,9 @@ class ArticleEdgePainter extends CustomPainter {
         // 인접 그룹 노드와 연결
         for (var node1 in currentGroupNodes) {
           for (var node2 in adjacentGroupNodes) {
-            final distance = math.sqrt(math.pow(node1.x - node2.x, 2) +
-                math.pow(node1.y - node2.y, 2));
+            final distance = math.sqrt(
+              math.pow(node1.x - node2.x, 2) + math.pow(node1.y - node2.y, 2),
+            );
 
             // 인접 그룹 간 최대 거리는 더 짧게 설정 (더 가까운 노드만 연결)
             final maxAdjacentDistance = maxDistance * 4.0;
@@ -1157,11 +1181,7 @@ class ArticleEdgePainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     // 엣지 그리기
-    canvas.drawLine(
-      Offset(node1.x, node1.y),
-      Offset(node2.x, node2.y),
-      paint,
-    );
+    canvas.drawLine(Offset(node1.x, node1.y), Offset(node2.x, node2.y), paint);
 
     // 가까운 노드들 사이에는 연결 표시 (강도에 따라 크기와 투명도 조정)
     if (distance < maxDistance * 0.5) {
@@ -1231,8 +1251,11 @@ class InfiniteGridPainter extends CustomPainter {
     final endY = ((visibleBottom ~/ scaledGridSize) + 1) * scaledGridSize;
 
     for (double y = startY; y <= endY; y += scaledGridSize) {
-      canvas.drawLine(Offset(visibleLeft - 10000, y),
-          Offset(visibleRight + 10000, y), paint);
+      canvas.drawLine(
+        Offset(visibleLeft - 10000, y),
+        Offset(visibleRight + 10000, y),
+        paint,
+      );
     }
 
     // 세로 격자선 - 보이는 부분만 그리기
@@ -1240,8 +1263,11 @@ class InfiniteGridPainter extends CustomPainter {
     final endX = ((visibleRight ~/ scaledGridSize) + 1) * scaledGridSize;
 
     for (double x = startX; x <= endX; x += scaledGridSize) {
-      canvas.drawLine(Offset(x, visibleTop - 10000),
-          Offset(x, visibleBottom + 10000), paint);
+      canvas.drawLine(
+        Offset(x, visibleTop - 10000),
+        Offset(x, visibleBottom + 10000),
+        paint,
+      );
     }
 
     // 원점 표시
@@ -1250,12 +1276,18 @@ class InfiniteGridPainter extends CustomPainter {
       ..strokeWidth = 2.0;
 
     // 가로선
-    canvas.drawLine(Offset(visibleLeft - 10000, size.height / 2),
-        Offset(visibleRight + 10000, size.height / 2), centerPaint);
+    canvas.drawLine(
+      Offset(visibleLeft - 10000, size.height / 2),
+      Offset(visibleRight + 10000, size.height / 2),
+      centerPaint,
+    );
 
     // 세로선
-    canvas.drawLine(Offset(size.width / 2, visibleTop - 10000),
-        Offset(size.width / 2, visibleBottom + 10000), centerPaint);
+    canvas.drawLine(
+      Offset(size.width / 2, visibleTop - 10000),
+      Offset(size.width / 2, visibleBottom + 10000),
+      centerPaint,
+    );
   }
 
   @override
@@ -1386,8 +1418,9 @@ class ArticleNode {
 
       // 충돌 반응 계수 - 같은 그룹일 때와 다른 그룹일 때 다르게 설정
       double positionFactor = sameGroup ? 0.5 : 0.3; // 위치 조정 계수
-      double velocityRestitution =
-          sameGroup ? restitution : restitution * 1.2; // 속도 반발 계수
+      double velocityRestitution = sameGroup
+          ? restitution
+          : restitution * 1.2; // 속도 반발 계수
 
       // 드래그 상태에 따라 위치 조정
       if (!isDragging() && !other.isDragging()) {

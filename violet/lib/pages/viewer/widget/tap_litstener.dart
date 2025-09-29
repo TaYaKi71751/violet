@@ -23,11 +23,11 @@ class CustomDelayTapListener extends StatelessWidget {
       gestures: <Type, GestureRecognizerFactory>{
         _FastTapGestureRecognizer:
             GestureRecognizerFactoryWithHandlers<_FastTapGestureRecognizer>(
-          () => _FastTapGestureRecognizer(delay),
-          (_FastTapGestureRecognizer instance) {
-            instance.onTap = onTap;
-          },
-        ),
+              () => _FastTapGestureRecognizer(delay),
+              (_FastTapGestureRecognizer instance) {
+                instance.onTap = onTap;
+              },
+            ),
       },
     );
   }
@@ -49,13 +49,10 @@ class _FastTapGestureRecognizer extends TapGestureRecognizer {
       _lastTapUpEvent = null;
     }
     if (event is PointerUpEvent) {
-      _lastTapUpEvent = Timer(
-        delay,
-        () {
-          resolve(GestureDisposition.accepted);
-          // acceptGesture(event.pointer);
-        },
-      );
+      _lastTapUpEvent = Timer(delay, () {
+        resolve(GestureDisposition.accepted);
+        // acceptGesture(event.pointer);
+      });
     }
     super.handleEvent(event);
   }

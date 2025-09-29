@@ -42,7 +42,8 @@ class _RadioTileState<T> extends State<RadioTile<T>> {
         elevation: 4,
         child: InkWell(
           customBorder: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(3.0))),
+            borderRadius: BorderRadius.all(Radius.circular(3.0)),
+          ),
           child: ListTile(
             leading: ConstrainedBox(
               constraints: const BoxConstraints(

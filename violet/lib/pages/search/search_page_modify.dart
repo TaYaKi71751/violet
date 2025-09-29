@@ -39,22 +39,22 @@ class _SearchPageModifyPageState extends State<SearchPageModifyPage> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Row(children: [
-            Text('${Translations.instance!.trans('position')}: '),
-            Expanded(
-              child: TextField(
-                controller: _pageController,
-                keyboardType: TextInputType.number,
-                inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.digitsOnly
-                ], // Only numbers can be entered
+          Row(
+            children: [
+              Text('${Translations.instance!.trans('position')}: '),
+              Expanded(
+                child: TextField(
+                  controller: _pageController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly,
+                  ], // Only numbers can be entered
+                ),
               ),
-            ),
-            Text(' / ${widget.maxPage}'),
-          ]),
-          Container(
-            height: 16,
+              Text(' / ${widget.maxPage}'),
+            ],
           ),
+          Container(height: 16),
           Row(
             children: <Widget>[
               const Spacer(),
@@ -65,24 +65,20 @@ class _SearchPageModifyPageState extends State<SearchPageModifyPage> {
                 child: Text(Translations.instance!.trans('ok')),
                 onPressed: () async {
                   if (_pageController.text == '') {
-                    Navigator.pop(context, [
-                      1,
-                      0,
-                    ]);
+                    Navigator.pop(context, [1, 0]);
                     return;
                   }
                   if (int.parse(_pageController.text.trim()) >=
                       widget.maxPage) {
                     await showOkDialog(
-                        context,
-                        Translations.instance!
-                            .trans('setlowerthanmaxitemposition'));
+                      context,
+                      Translations.instance!.trans(
+                        'setlowerthanmaxitemposition',
+                      ),
+                    );
                     return;
                   }
-                  Navigator.pop(context, [
-                    1,
-                    int.parse(_pageController.text),
-                  ]);
+                  Navigator.pop(context, [1, int.parse(_pageController.text)]);
                 },
               ),
               const SizedBox(width: 8),
@@ -96,7 +92,7 @@ class _SearchPageModifyPageState extends State<SearchPageModifyPage> {
                 },
               ),
             ],
-          )
+          ),
         ],
       ),
     );

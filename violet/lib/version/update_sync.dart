@@ -68,8 +68,10 @@ class UpdateSyncManager {
       }
       latestVersion = info['version'] as String;
     } catch (e, st) {
-      Logger.error('[Update-check] E: $e\n'
-          '$st');
+      Logger.error(
+        '[Update-check] E: $e\n'
+        '$st',
+      );
     }
   }
 }

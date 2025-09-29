@@ -24,27 +24,31 @@ class _UserManualPageState extends State<UserManualPage> {
       child: FutureBuilder(
         future: http
             .get(
-                'https://raw.githubusercontent.com/project-violet/violet/dev/manual/ko.md')
+              'https://raw.githubusercontent.com/project-violet/violet/dev/manual/ko.md',
+            )
             .then((value) => value.body),
         builder: (context, snapshot) {
           if (!snapshot.hasData) return Container();
           return Markdown(
-              physics: const BouncingScrollPhysics(),
-              selectable: true,
-              onTapLink: (text, href, title) async {
-                if (href == null) {
-                  return;
-                }
-                final url = Uri.tryParse(href);
-                if (url == null) {
-                  return;
-                }
-                if (await canLaunchUrl(url)) {
-                  await launchUrl(url);
-                }
-              },
-              data: (snapshot.data as String).replaceAll('![](',
-                  '![](https://github.com/project-violet/violet/raw/dev/manual/'));
+            physics: const BouncingScrollPhysics(),
+            selectable: true,
+            onTapLink: (text, href, title) async {
+              if (href == null) {
+                return;
+              }
+              final url = Uri.tryParse(href);
+              if (url == null) {
+                return;
+              }
+              if (await canLaunchUrl(url)) {
+                await launchUrl(url);
+              }
+            },
+            data: (snapshot.data as String).replaceAll(
+              '![](',
+              '![](https://github.com/project-violet/violet/raw/dev/manual/',
+            ),
+          );
         },
       ),
     );

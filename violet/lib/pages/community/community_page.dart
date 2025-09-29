@@ -51,8 +51,9 @@ class _CommunityPageState extends State<CommunityPage>
         sess = VioletCommunitySession.lastSession != null
             ? VioletCommunitySession.lastSession!
             : (await VioletCommunitySession.signIn(id, pw));
-        _userNickName =
-            (await VioletCommunitySession.getUserInfo(id))['NickName'];
+        _userNickName = (await VioletCommunitySession.getUserInfo(
+          id,
+        ))['NickName'];
         setState(() {
           _logining = false;
         });
@@ -89,10 +90,7 @@ class _CommunityPageState extends State<CommunityPage>
         physics: const BouncingScrollPhysics(),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(height: 16),
-            _userStatusCard(),
-          ],
+          children: <Widget>[Container(height: 16), _userStatusCard()],
         ),
       ),
     );
@@ -127,8 +125,9 @@ class _CommunityPageState extends State<CommunityPage>
                   child: InkWell(
                     customBorder: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(10.0),
-                          bottomLeft: Radius.circular(10.0)),
+                        topLeft: Radius.circular(10.0),
+                        bottomLeft: Radius.circular(10.0),
+                      ),
                     ),
                     child: Container(
                       padding: const EdgeInsets.all(20.0),
@@ -137,33 +136,44 @@ class _CommunityPageState extends State<CommunityPage>
                         children: [
                           Row(
                             children: [
-                              const Text('User: ',
-                                  style: TextStyle(
-                                      color: Colors.grey, fontSize: 16)),
-                              Text(' $_userNickName ($_userId)',
-                                  style: const TextStyle(fontSize: 16)),
+                              const Text(
+                                'User: ',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              Text(
+                                ' $_userNickName ($_userId)',
+                                style: const TextStyle(fontSize: 16),
+                              ),
                             ],
                           ),
-                          Container(
-                            height: 2,
-                          ),
+                          Container(height: 2),
                           Row(
                             children: [
-                              const Text('User App Id: ',
-                                  style: TextStyle(
-                                      color: Colors.grey, fontSize: 16)),
-                              Text(' ${_userAppId.substring(0, 16)}...',
-                                  style: const TextStyle(fontSize: 16)),
+                              const Text(
+                                'User App Id: ',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              Text(
+                                ' ${_userAppId.substring(0, 16)}...',
+                                style: const TextStyle(fontSize: 16),
+                              ),
                             ],
-                          )
+                          ),
                         ],
                       ),
                     ),
                     onTap: () async {
                       await showOkDialog(
-                          context,
-                          '$_userAppId\n\nThis user app id has a unique value on a per app session. If you have any problems using the app, please contact us with above user app id.',
-                          'Your User App Id');
+                        context,
+                        '$_userAppId\n\nThis user app id has a unique value on a per app session. If you have any problems using the app, please contact us with above user app id.',
+                        'Your User App Id',
+                      );
                     },
                   ),
                 ),
@@ -176,35 +186,45 @@ class _CommunityPageState extends State<CommunityPage>
                           height: 48,
                           width: 48,
                           child: Stack(
-                              alignment: Alignment.center,
-                              children: <Widget>[
-                                SizedBox(
-                                    height: 30,
-                                    width: 30,
-                                    child: CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          Colors.grey),
-                                    ))
-                              ]))
+                            alignment: Alignment.center,
+                            children: <Widget>[
+                              SizedBox(
+                                height: 30,
+                                width: 30,
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.grey,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
                       : InkWell(
                           customBorder: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(10.0),
-                                bottomRight: Radius.circular(10.0)),
+                              topRight: Radius.circular(10.0),
+                              bottomRight: Radius.circular(10.0),
+                            ),
                           ),
                           child: Align(
                             alignment: Alignment.center,
                             child: badges.Badge(
                               showBadge: false,
-                              badgeContent: const Text('N',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 12.0)),
+                              badgeContent: const Text(
+                                'N',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12.0,
+                                ),
+                              ),
                               // badgeColor: Settings.majorAccentColor.value,
                               child: Icon(
-                                  sess == null
-                                      ? MdiIcons.accountCancel
-                                      : MdiIcons.accountCheck,
-                                  size: 30),
+                                sess == null
+                                    ? MdiIcons.accountCancel
+                                    : MdiIcons.accountCheck,
+                                size: 30,
+                              ),
                             ),
                           ),
                           onTap: () async {
@@ -213,13 +233,14 @@ class _CommunityPageState extends State<CommunityPage>
                             }
 
                             var ync = await showYesNoCancelDialog(
-                                context,
-                                'You need to log in to use the community feature.'
-                                    ' If you have an existing id,'
-                                    ' press "YES" to log in.'
-                                    ' If you do not have an existing id,'
-                                    ' press "NO" to register for a new one.',
-                                'Sign In/Up');
+                              context,
+                              'You need to log in to use the community feature.'
+                                  ' If you have an existing id,'
+                                  ' press "YES" to log in.'
+                                  ' If you do not have an existing id,'
+                                  ' press "NO" to register for a new one.',
+                              'Sign In/Up',
+                            );
 
                             if (ync == null) return;
 
@@ -229,53 +250,71 @@ class _CommunityPageState extends State<CommunityPage>
                               // signin
                               if (!mounted) return;
                               var r = await showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return const SignInDialog();
-                                  });
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return const SignInDialog();
+                                },
+                              );
                               if (r == null) return;
                               id = r[0];
                               pw = r[1];
                             } else {
                               // signup
                               if (await VioletCommunitySession.checkUserAppId(
-                                      _userAppId) !=
+                                    _userAppId,
+                                  ) !=
                                   'success') {
                                 if (!mounted) return;
                                 await showOkDialog(
-                                    context,
-                                    'You cannot continue,'
-                                    ' there is an account registered with your UserAppId.'
-                                    ' If you have already registered as a member,'
-                                    ' please sign in with your existing id.'
-                                    ' If you forgot your login information,'
-                                    ' please contact developer.');
+                                  context,
+                                  'You cannot continue,'
+                                  ' there is an account registered with your UserAppId.'
+                                  ' If you have already registered as a member,'
+                                  ' please sign in with your existing id.'
+                                  ' If you forgot your login information,'
+                                  ' please contact developer.',
+                                );
                                 return;
                               }
                               if (!mounted) return;
                               var r = await showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return const SignUpDialog();
-                                  });
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return const SignUpDialog();
+                                },
+                              );
 
                               if (r == null) return;
 
-                              print(await VioletCommunitySession.signUp(
-                                  r[0], r[1], _userAppId, r[2]));
+                              print(
+                                await VioletCommunitySession.signUp(
+                                  r[0],
+                                  r[1],
+                                  _userAppId,
+                                  r[2],
+                                ),
+                              );
 
                               if (await VioletCommunitySession.signUp(
-                                      r[0], r[1], _userAppId, r[2]) ==
+                                    r[0],
+                                    r[1],
+                                    _userAppId,
+                                    r[2],
+                                  ) ==
                                   'success') {
                                 if (!mounted) return;
                                 await showOkDialog(
-                                    context, 'Sign up is complete!');
+                                  context,
+                                  'Sign up is complete!',
+                                );
                                 id = r[0];
                                 pw = r[1];
                               } else {
                                 if (!mounted) return;
                                 await showOkDialog(
-                                    context, 'Registration has been declined!');
+                                  context,
+                                  'Registration has been declined!',
+                                );
                                 return;
                               }
                             }

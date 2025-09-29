@@ -12,7 +12,8 @@ part of 'script_model.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 ScriptImageList _$ScriptImageListFromJson(Map<String, dynamic> json) {
   return _ScriptImageList.fromJson(json);
@@ -37,11 +38,15 @@ mixin _$ScriptImageList {
 /// @nodoc
 abstract class $ScriptImageListCopyWith<$Res> {
   factory $ScriptImageListCopyWith(
-          ScriptImageList value, $Res Function(ScriptImageList) then) =
-      _$ScriptImageListCopyWithImpl<$Res, ScriptImageList>;
+    ScriptImageList value,
+    $Res Function(ScriptImageList) then,
+  ) = _$ScriptImageListCopyWithImpl<$Res, ScriptImageList>;
   @useResult
-  $Res call(
-      {List<String> result, List<String> btresult, List<String> stresult});
+  $Res call({
+    List<String> result,
+    List<String> btresult,
+    List<String> stresult,
+  });
 }
 
 /// @nodoc
@@ -63,33 +68,40 @@ class _$ScriptImageListCopyWithImpl<$Res, $Val extends ScriptImageList>
     Object? btresult = null,
     Object? stresult = null,
   }) {
-    return _then(_value.copyWith(
-      result: null == result
-          ? _value.result
-          : result // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      btresult: null == btresult
-          ? _value.btresult
-          : btresult // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      stresult: null == stresult
-          ? _value.stresult
-          : stresult // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            result: null == result
+                ? _value.result
+                : result // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+            btresult: null == btresult
+                ? _value.btresult
+                : btresult // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+            stresult: null == stresult
+                ? _value.stresult
+                : stresult // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+          )
+          as $Val,
+    );
   }
 }
 
 /// @nodoc
 abstract class _$$ScriptImageListImplCopyWith<$Res>
     implements $ScriptImageListCopyWith<$Res> {
-  factory _$$ScriptImageListImplCopyWith(_$ScriptImageListImpl value,
-          $Res Function(_$ScriptImageListImpl) then) =
-      __$$ScriptImageListImplCopyWithImpl<$Res>;
+  factory _$$ScriptImageListImplCopyWith(
+    _$ScriptImageListImpl value,
+    $Res Function(_$ScriptImageListImpl) then,
+  ) = __$$ScriptImageListImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {List<String> result, List<String> btresult, List<String> stresult});
+  $Res call({
+    List<String> result,
+    List<String> btresult,
+    List<String> stresult,
+  });
 }
 
 /// @nodoc
@@ -97,8 +109,9 @@ class __$$ScriptImageListImplCopyWithImpl<$Res>
     extends _$ScriptImageListCopyWithImpl<$Res, _$ScriptImageListImpl>
     implements _$$ScriptImageListImplCopyWith<$Res> {
   __$$ScriptImageListImplCopyWithImpl(
-      _$ScriptImageListImpl _value, $Res Function(_$ScriptImageListImpl) _then)
-      : super(_value, _then);
+    _$ScriptImageListImpl _value,
+    $Res Function(_$ScriptImageListImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of ScriptImageList
   /// with the given fields replaced by the non-null parameter values.
@@ -109,20 +122,22 @@ class __$$ScriptImageListImplCopyWithImpl<$Res>
     Object? btresult = null,
     Object? stresult = null,
   }) {
-    return _then(_$ScriptImageListImpl(
-      result: null == result
-          ? _value._result
-          : result // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      btresult: null == btresult
-          ? _value._btresult
-          : btresult // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      stresult: null == stresult
-          ? _value._stresult
-          : stresult // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-    ));
+    return _then(
+      _$ScriptImageListImpl(
+        result: null == result
+            ? _value._result
+            : result // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+        btresult: null == btresult
+            ? _value._btresult
+            : btresult // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+        stresult: null == stresult
+            ? _value._stresult
+            : stresult // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+      ),
+    );
   }
 }
 
@@ -131,13 +146,13 @@ class __$$ScriptImageListImplCopyWithImpl<$Res>
 class _$ScriptImageListImpl
     with DiagnosticableTreeMixin
     implements _ScriptImageList {
-  const _$ScriptImageListImpl(
-      {required final List<String> result,
-      required final List<String> btresult,
-      required final List<String> stresult})
-      : _result = result,
-        _btresult = btresult,
-        _stresult = stresult;
+  const _$ScriptImageListImpl({
+    required final List<String> result,
+    required final List<String> btresult,
+    required final List<String> stresult,
+  }) : _result = result,
+       _btresult = btresult,
+       _stresult = stresult;
 
   factory _$ScriptImageListImpl.fromJson(Map<String, dynamic> json) =>
       _$$ScriptImageListImplFromJson(json);
@@ -194,10 +209,11 @@ class _$ScriptImageListImpl
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(_result),
-      const DeepCollectionEquality().hash(_btresult),
-      const DeepCollectionEquality().hash(_stresult));
+    runtimeType,
+    const DeepCollectionEquality().hash(_result),
+    const DeepCollectionEquality().hash(_btresult),
+    const DeepCollectionEquality().hash(_stresult),
+  );
 
   /// Create a copy of ScriptImageList
   /// with the given fields replaced by the non-null parameter values.
@@ -206,21 +222,22 @@ class _$ScriptImageListImpl
   @pragma('vm:prefer-inline')
   _$$ScriptImageListImplCopyWith<_$ScriptImageListImpl> get copyWith =>
       __$$ScriptImageListImplCopyWithImpl<_$ScriptImageListImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ScriptImageListImplToJson(
-      this,
-    );
+    return _$$ScriptImageListImplToJson(this);
   }
 }
 
 abstract class _ScriptImageList implements ScriptImageList {
-  const factory _ScriptImageList(
-      {required final List<String> result,
-      required final List<String> btresult,
-      required final List<String> stresult}) = _$ScriptImageListImpl;
+  const factory _ScriptImageList({
+    required final List<String> result,
+    required final List<String> btresult,
+    required final List<String> stresult,
+  }) = _$ScriptImageListImpl;
 
   factory _ScriptImageList.fromJson(Map<String, dynamic> json) =
       _$ScriptImageListImpl.fromJson;

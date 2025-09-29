@@ -22,8 +22,9 @@ class VioletServer {
   static const api = '$protocol://$host';
 
   static Future<dynamic> top(int offset, int count, String type) async {
-    final gg =
-        await http.get('$api/top?offset=$offset&count=$count&type=$type');
+    final gg = await http.get(
+      '$api/top?offset=$offset&count=$count&type=$type',
+    );
 
     if (gg.statusCode != 200) {
       return gg.statusCode;
@@ -35,8 +36,10 @@ class VioletServer {
           .toList();
       return result;
     } catch (e, st) {
-      Logger.error('[API-top] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-top] E: $e\n'
+        '$st',
+      );
 
       return 900;
     }
@@ -55,8 +58,10 @@ class VioletServer {
           .toList();
       return result;
     } catch (e, st) {
-      Logger.error('[API-top-recent] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-top-recent] E: $e\n'
+        '$st',
+      );
 
       return 900;
     }
@@ -70,12 +75,15 @@ class VioletServer {
     }
 
     try {
-      final result =
-          DateTime.parse(jsonDecode(gg.body)['result'] as String).toLocal();
+      final result = DateTime.parse(
+        jsonDecode(gg.body)['result'] as String,
+      ).toLocal();
       return result;
     } catch (e, st) {
-      Logger.error('[API-top-ts] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-top-ts] E: $e\n'
+        '$st',
+      );
 
       return 900;
     }
@@ -89,12 +97,15 @@ class VioletServer {
     }
 
     try {
-      final result =
-          DateTime.parse(jsonDecode(gg.body)['result'] as String).toLocal();
+      final result = DateTime.parse(
+        jsonDecode(gg.body)['result'] as String,
+      ).toLocal();
       return result;
     } catch (e, st) {
-      Logger.error('[API-cur-ts] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-cur-ts] E: $e\n'
+        '$st',
+      );
 
       return 900;
     }
@@ -107,14 +118,13 @@ class VioletServer {
       await http.post(
         '$api/view',
         headers: _vHeader(),
-        body: jsonEncode({
-          'no': articleid.toString(),
-          'user': userId,
-        }),
+        body: jsonEncode({'no': articleid.toString(), 'user': userId}),
       );
     } catch (e, st) {
-      Logger.error('[API-view] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-view] E: $e\n'
+        '$st',
+      );
     }
   }
 
@@ -132,8 +142,10 @@ class VioletServer {
         }),
       );
     } catch (e, st) {
-      Logger.error('[API-close] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-close] E: $e\n'
+        '$st',
+      );
     }
   }
 
@@ -158,8 +170,10 @@ class VioletServer {
         body: jsonEncode(body),
       );
     } catch (e, st) {
-      Logger.error('[API-report] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-report] E: $e\n'
+        '$st',
+      );
     }
   }
 
@@ -170,17 +184,15 @@ class VioletServer {
       final res = await http.post(
         '$api/fupload',
         headers: _vHeader(),
-        body: jsonEncode({
-          'user': userId,
-          'fn': fn,
-          'data': data,
-        }),
+        body: jsonEncode({'user': userId, 'fn': fn, 'data': data}),
       );
 
       return res.statusCode == 200;
     } catch (e, st) {
-      Logger.error('[API-fupload] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-fupload] E: $e\n'
+        '$st',
+      );
     }
     return false;
   }
@@ -189,16 +201,18 @@ class VioletServer {
     final filePath = filename;
 
     final dio = Dio();
-    final formData =
-        FormData.fromMap({'file': await MultipartFile.fromFile(filePath)});
+    final formData = FormData.fromMap({
+      'file': await MultipartFile.fromFile(filePath),
+    });
 
     await dio.post('$api/fupload', data: formData);
   }
 
   static Future<void> uploadString(String filename, String data) async {
     final dio = Dio();
-    final formData = FormData.fromMap(
-        {'file': MultipartFile.fromString(data, filename: filename)});
+    final formData = FormData.fromMap({
+      'file': MultipartFile.fromString(data, filename: filename),
+    });
 
     await dio.post('$api/fupload', data: formData);
   }
@@ -210,17 +224,15 @@ class VioletServer {
       final res = await http.post(
         '$api/fupload',
         headers: _vHeader(),
-        body: jsonEncode({
-          'user': userId,
-          'fn': fn,
-          'data': data,
-        }),
+        body: jsonEncode({'user': userId, 'fn': fn, 'data': data}),
       );
 
       return res.statusCode == 200;
     } catch (e, st) {
-      Logger.error('[API-fupload] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-fupload] E: $e\n'
+        '$st',
+      );
     }
     return false;
   }
@@ -257,10 +269,7 @@ class VioletServer {
       final res = await http.post(
         '$api/bookmarks/v2/upload',
         headers: _vHeader(),
-        body: jsonEncode({
-          'user': userId,
-          'data': uploadData,
-        }),
+        body: jsonEncode({'user': userId, 'data': uploadData}),
       );
 
       // final prefs = await SharedPreferences.getInstance();
@@ -268,8 +277,10 @@ class VioletServer {
 
       return res.statusCode == 200;
     } catch (e, st) {
-      Logger.error('[API-upload] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-upload] E: $e\n'
+        '$st',
+      );
     }
     return false;
   }
@@ -284,10 +295,14 @@ class VioletServer {
   }
 
   // https://koromo.cc/api/record/recent?count=10&limit=180
-  static Future<dynamic> record(
-      [int offset = 0, int count = 10, int limit = 0]) async {
-    final gg = await http
-        .get('$api/record/recent?offset=$offset&count=$count&limit=$limit');
+  static Future<dynamic> record([
+    int offset = 0,
+    int count = 10,
+    int limit = 0,
+  ]) async {
+    final gg = await http.get(
+      '$api/record/recent?offset=$offset&count=$count&limit=$limit',
+    );
 
     if (gg.statusCode != 200) {
       return gg.statusCode;
@@ -295,20 +310,27 @@ class VioletServer {
 
     try {
       final result = (jsonDecode(gg.body)['result'] as List<dynamic>)
-          .map((e) =>
-              ((e as List<dynamic>)[0] as int, (e)[1] as int, (e)[2] as int))
+          .map(
+            (e) =>
+                ((e as List<dynamic>)[0] as int, (e)[1] as int, (e)[2] as int),
+          )
           .toList();
       return result;
     } catch (e, st) {
-      Logger.error('[API-record] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-record] E: $e\n'
+        '$st',
+      );
 
       return 900;
     }
   }
 
-  static Future<dynamic> recordU(
-      [int offset = 0, int count = 10, int limit = 0]) async {
+  static Future<dynamic> recordU([
+    int offset = 0,
+    int count = 10,
+    int limit = 0,
+  ]) async {
     final gg = await http.get(
       '$api/record/recent_u?offset=$offset&count=$count&limit=$limit',
       headers: _vwHeader(),
@@ -320,24 +342,31 @@ class VioletServer {
 
     try {
       final result = (jsonDecode(gg.body)['result'] as List<dynamic>)
-          .map((e) => (
-                (e as List<dynamic>)[0] as int,
-                (e)[1] as int,
-                (e)[2] as int,
-                (e)[3] as String
-              ))
+          .map(
+            (e) => (
+              (e as List<dynamic>)[0] as int,
+              (e)[1] as int,
+              (e)[2] as int,
+              (e)[3] as String,
+            ),
+          )
           .toList();
       return result;
     } catch (e, st) {
-      Logger.error('[API-record] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-record] E: $e\n'
+        '$st',
+      );
 
       return 900;
     }
   }
 
-  static Future<dynamic> userRecent(String userAppId,
-      [int count = 10, int limit = 0]) async {
+  static Future<dynamic> userRecent(
+    String userAppId, [
+    int count = 10,
+    int limit = 0,
+  ]) async {
     final gg = await http.get(
       '$api/record/user_recent?userid=$userAppId&count=$count&limit=$limit',
       headers: _vwHeader(),
@@ -349,13 +378,17 @@ class VioletServer {
 
     try {
       final result = (jsonDecode(gg.body)['result'] as List<dynamic>)
-          .map((e) =>
-              ((e as List<dynamic>)[0] as int, (e)[1] as int, (e)[2] as int))
+          .map(
+            (e) =>
+                ((e as List<dynamic>)[0] as int, (e)[1] as int, (e)[2] as int),
+          )
           .toList();
       return result;
     } catch (e, st) {
-      Logger.error('[API-record] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-record] E: $e\n'
+        '$st',
+      );
 
       return 900;
     }
@@ -373,17 +406,21 @@ class VioletServer {
 
     try {
       final result = (jsonDecode(gg.body)['result'] as List<dynamic>)
-          .map((e) => (
-                int.parse((e as Map<String, dynamic>)['id'] as String),
-                DateTime.parse((e)['time'] as String),
-                (e)['author'] as String,
-                (e)['body'] as String
-              ))
+          .map(
+            (e) => (
+              int.parse((e as Map<String, dynamic>)['id'] as String),
+              DateTime.parse((e)['time'] as String),
+              (e)['author'] as String,
+              (e)['body'] as String,
+            ),
+          )
           .toList();
       return result;
     } catch (e, st) {
-      Logger.error('[API-searchComment] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-searchComment] E: $e\n'
+        '$st',
+      );
 
       return 900;
     }
@@ -401,24 +438,30 @@ class VioletServer {
 
     try {
       final result = (jsonDecode(gg.body)['result'] as List<dynamic>)
-          .map((e) => (
-                int.parse((e as Map<String, dynamic>)['id'] as String),
-                DateTime.parse((e)['time'] as String),
-                (e)['author'] as String,
-                (e)['body'] as String
-              ))
+          .map(
+            (e) => (
+              int.parse((e as Map<String, dynamic>)['id'] as String),
+              DateTime.parse((e)['time'] as String),
+              (e)['author'] as String,
+              (e)['body'] as String,
+            ),
+          )
           .toList();
       return result;
     } catch (e, st) {
-      Logger.error('[API-searchComment] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-searchComment] E: $e\n'
+        '$st',
+      );
 
       return 900;
     }
   }
 
   static Future<List<MessageSearchResult>?> searchMessage(
-      String type, String what) async {
+    String type,
+    String what,
+  ) async {
     final gg = await http.get(
       '${Settings.searchMessageAPI.value}/$type/${Uri.encodeFull(what)}',
       headers: _vwHeader(),
@@ -431,15 +474,19 @@ class VioletServer {
     try {
       return MessageSearchResult.fromJson(gg.body);
     } catch (e, st) {
-      Logger.error('[API-searchMessage] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-searchMessage] E: $e\n'
+        '$st',
+      );
 
       return null;
     }
   }
 
   static Future<List<MessageSearchResult>?> searchMessageWord(
-      int articleId, String what) async {
+    int articleId,
+    String what,
+  ) async {
     final gg = await http.get(
       '${Settings.searchMessageAPI.value}/wcontains/$articleId/${Uri.encodeFull(what)}',
       headers: _vwHeader(),
@@ -452,8 +499,10 @@ class VioletServer {
     try {
       return MessageSearchResult.fromJson(gg.body);
     } catch (e, st) {
-      Logger.error('[API-searchMessageWord] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-searchMessageWord] E: $e\n'
+        '$st',
+      );
 
       return null;
     }
@@ -472,8 +521,10 @@ class VioletServer {
 
       return jsonDecode(res.body)['result'] as Map<String, dynamic>;
     } catch (e, st) {
-      Logger.error('[API-restore] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-restore] E: $e\n'
+        '$st',
+      );
     }
     return false;
   }
@@ -491,8 +542,10 @@ class VioletServer {
 
       return jsonDecode(res.body)['result'] as List<dynamic>;
     } catch (e, st) {
-      Logger.error('[API-bookmarks] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-bookmarks] E: $e\n'
+        '$st',
+      );
     }
     return null;
   }
@@ -510,14 +563,18 @@ class VioletServer {
 
       return jsonDecode(res.body)['result'] as List<dynamic>;
     } catch (e, st) {
-      Logger.error('[API-versions] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-versions] E: $e\n'
+        '$st',
+      );
     }
     return null;
   }
 
   static Future<dynamic> resotreBookmarkWithVersion(
-      String userAppId, String vid) async {
+    String userAppId,
+    String vid,
+  ) async {
     try {
       final res = await http.get(
         '$api/bookmarks/v2/restore_v?user=$userAppId&vid=$vid',
@@ -530,8 +587,10 @@ class VioletServer {
 
       return jsonDecode(res.body)['result'] as Map<String, dynamic>;
     } catch (e, st) {
-      Logger.error('[API-restore_v] E: $e\n'
-          '$st');
+      Logger.error(
+        '[API-restore_v] E: $e\n'
+        '$st',
+      );
     }
     return false;
   }
@@ -543,7 +602,7 @@ class VioletServer {
     return {
       'v-token': vToken.toString(),
       'v-valid': vValid,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     };
   }
 
@@ -554,7 +613,7 @@ class VioletServer {
     return {
       'v-token': vToken.toString(),
       'v-valid': vValid,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     };
   }
 }

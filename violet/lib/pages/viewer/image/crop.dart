@@ -161,16 +161,19 @@ class CropState extends State<Crop> with TickerProviderStateMixin {
 
   void _getImage({bool force = false}) {
     final oldImageStream = _imageStream;
-    final newImageStream =
-        widget.image.resolve(createLocalImageConfiguration(context));
+    final newImageStream = widget.image.resolve(
+      createLocalImageConfiguration(context),
+    );
     _imageStream = newImageStream;
     if (newImageStream.key != oldImageStream?.key || force) {
       final oldImageListener = _imageListener;
       if (oldImageListener != null) {
         oldImageStream?.removeListener(oldImageListener);
       }
-      final newImageListener =
-          ImageStreamListener(_updateImage, onError: widget.onImageError);
+      final newImageListener = ImageStreamListener(
+        _updateImage,
+        onError: widget.onImageError,
+      );
       _imageListener = newImageListener;
       newImageStream.addListener(newImageListener);
     }
@@ -178,64 +181,65 @@ class CropState extends State<Crop> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
-        constraints: const BoxConstraints.expand(),
-        child: Listener(
-          onPointerDown: (event) => pointers++,
-          onPointerUp: (event) => pointers = 0,
-          onPointerSignal: (event) {
-            if (event is PointerScrollEvent && _isEnabled) {
-              final image = _image;
-              final boundaries = _boundaries;
-              if (image == null || boundaries == null) return;
+    constraints: const BoxConstraints.expand(),
+    child: Listener(
+      onPointerDown: (event) => pointers++,
+      onPointerUp: (event) => pointers = 0,
+      onPointerSignal: (event) {
+        if (event is PointerScrollEvent && _isEnabled) {
+          final image = _image;
+          final boundaries = _boundaries;
+          if (image == null || boundaries == null) return;
 
-              final delta = event.scrollDelta.dy;
-              final scaleFactor = delta > 0 ? 0.9 : 1.1;
+          final delta = event.scrollDelta.dy;
+          final scaleFactor = delta > 0 ? 0.9 : 1.1;
 
-              // 현재 스케일이 최대/최소 범위에 있는지 확인
-              final newScale = _scale * scaleFactor;
-              if (newScale < (_minimumScale ?? 1.0) ||
-                  newScale > _maximumScale) {
-                return; // 범위를 벗어나면 이벤트 무시
-              }
+          // 현재 스케일이 최대/최소 범위에 있는지 확인
+          final newScale = _scale * scaleFactor;
+          if (newScale < (_minimumScale ?? 1.0) || newScale > _maximumScale) {
+            return; // 범위를 벗어나면 이벤트 무시
+          }
 
-              setState(() {
-                _scale = newScale;
+          setState(() {
+            _scale = newScale;
 
-                final dx = boundaries.width *
-                    (1.0 - scaleFactor) /
-                    (image.width * _scale * _ratio);
-                final dy = boundaries.height *
-                    (1.0 - scaleFactor) /
-                    (image.height * _scale * _ratio);
+            final dx =
+                boundaries.width *
+                (1.0 - scaleFactor) /
+                (image.width * _scale * _ratio);
+            final dy =
+                boundaries.height *
+                (1.0 - scaleFactor) /
+                (image.height * _scale * _ratio);
 
-                _view = Rect.fromLTWH(
-                  _view.left + dx / 2,
-                  _view.top + dy / 2,
-                  _view.width,
-                  _view.height,
-                );
-              });
-            }
-          },
-          child: GestureDetector(
-            key: _surfaceKey,
-            behavior: HitTestBehavior.opaque,
-            onScaleStart: _isEnabled ? _handleScaleStart : null,
-            onScaleUpdate: _isEnabled ? _handleScaleUpdate : null,
-            onScaleEnd: _isEnabled ? _handleScaleEnd : null,
-            child: CustomPaint(
-              painter: _CropPainter(
-                image: _image,
-                ratio: _ratio,
-                view: _view,
-                area: _area,
-                scale: _scale,
-                active: _activeController.value,
-              ),
-            ),
+            _view = Rect.fromLTWH(
+              _view.left + dx / 2,
+              _view.top + dy / 2,
+              _view.width,
+              _view.height,
+            );
+          });
+        }
+      },
+      child: GestureDetector(
+        key: _surfaceKey,
+        behavior: HitTestBehavior.opaque,
+        onScaleStart: _isEnabled ? _handleScaleStart : null,
+        onScaleUpdate: _isEnabled ? _handleScaleUpdate : null,
+        onScaleEnd: _isEnabled ? _handleScaleEnd : null,
+        child: CustomPaint(
+          painter: _CropPainter(
+            image: _image,
+            ratio: _ratio,
+            view: _view,
+            area: _area,
+            scale: _scale,
+            active: _activeController.value,
           ),
         ),
-      );
+      ),
+    ),
+  );
 
   void _activate() {
     _activeController.animateTo(
@@ -306,23 +310,25 @@ class CropState extends State<Crop> with TickerProviderStateMixin {
       height = 1.0;
       width =
           ((widget.aspectRatio ?? 1.0) * imageHeight * viewHeight * height) /
-              imageWidth /
-              viewWidth;
+          imageWidth /
+          viewWidth;
       if (width > 1.0) {
         width = 1.0;
-        height = (imageWidth * viewWidth * width) /
+        height =
+            (imageWidth * viewWidth * width) /
             (imageHeight * viewHeight * (widget.aspectRatio ?? 1.0));
       }
     } else {
       width = 1.0;
-      height = (imageWidth * viewWidth * width) /
+      height =
+          (imageWidth * viewWidth * width) /
           (imageHeight * viewHeight * (widget.aspectRatio ?? 1.0));
       if (height > 1.0) {
         height = 1.0;
         width =
             ((widget.aspectRatio ?? 1.0) * imageHeight * viewHeight * height) /
-                imageWidth /
-                viewWidth;
+            imageWidth /
+            viewWidth;
       }
     }
     final aspectRatio = _maxAreaWidthMap[widget.aspectRatio];
@@ -435,17 +441,11 @@ class CropState extends State<Crop> with TickerProviderStateMixin {
   Rect _getViewInBoundaries(double scale) =>
       Offset(
         max(
-          min(
-            _view.left,
-            _area.left * _view.width / scale,
-          ),
+          min(_view.left, _area.left * _view.width / scale),
           _area.right * _view.width / scale - 1.0,
         ),
         max(
-          min(
-            _view.top,
-            _area.top * _view.height / scale,
-          ),
+          min(_view.top, _area.top * _view.height / scale),
           _area.bottom * _view.height / scale - 1.0,
         ),
       ) &
@@ -473,10 +473,7 @@ class CropState extends State<Crop> with TickerProviderStateMixin {
     }
 
     final targetScale = _scale.clamp(minimumScale, _maximumScale);
-    _scaleTween = Tween<double>(
-      begin: _scale,
-      end: targetScale,
-    );
+    _scaleTween = Tween<double>(begin: _scale, end: targetScale);
 
     _startView = _view;
     _viewTween = RectTween(
@@ -509,7 +506,8 @@ class CropState extends State<Crop> with TickerProviderStateMixin {
     var areaTop = _area.top + (top ?? 0.0);
     var areaRight = _area.right + (right ?? 0.0);
     double width = areaRight - areaLeft;
-    double height = (image.width * _view.width * width) /
+    double height =
+        (image.width * _view.width * width) /
         (image.height * _view.height * (widget.aspectRatio ?? 1.0));
     final maxAreaWidth = _maxAreaWidthMap[widget.aspectRatio];
     if ((height >= 1.0 || width >= 1.0) && maxAreaWidth != null) {
@@ -605,13 +603,22 @@ class CropState extends State<Crop> with TickerProviderStateMixin {
         _updateArea(left: dx, top: dy, cropHandleSide: _CropHandleSide.topLeft);
       } else if (_handle == _CropHandleSide.topRight) {
         _updateArea(
-            top: dy, right: dx, cropHandleSide: _CropHandleSide.topRight);
+          top: dy,
+          right: dx,
+          cropHandleSide: _CropHandleSide.topRight,
+        );
       } else if (_handle == _CropHandleSide.bottomLeft) {
         _updateArea(
-            left: dx, bottom: dy, cropHandleSide: _CropHandleSide.bottomLeft);
+          left: dx,
+          bottom: dy,
+          cropHandleSide: _CropHandleSide.bottomLeft,
+        );
       } else if (_handle == _CropHandleSide.bottomRight) {
         _updateArea(
-            right: dx, bottom: dy, cropHandleSide: _CropHandleSide.bottomRight);
+          right: dx,
+          bottom: dy,
+          cropHandleSide: _CropHandleSide.bottomRight,
+        );
       }
     } else if (_action == _CropAction.moving) {
       final image = _image;
@@ -638,10 +645,12 @@ class CropState extends State<Crop> with TickerProviderStateMixin {
       setState(() {
         _scale = _startScale * details.scale;
 
-        final dx = boundaries.width *
+        final dx =
+            boundaries.width *
             (1.0 - details.scale) /
             (image.width * _scale * _ratio);
-        final dy = boundaries.height *
+        final dy =
+            boundaries.height *
             (1.0 - details.scale) /
             (image.height * _scale * _ratio);
 
@@ -719,11 +728,12 @@ class _CropPainter extends CustomPainter {
     }
 
     paint.color = Color.fromRGBO(
-        0x0,
-        0x0,
-        0x0,
-        _kCropOverlayActiveOpacity * active +
-            _kCropOverlayInactiveOpacity * (1.0 - active));
+      0x0,
+      0x0,
+      0x0,
+      _kCropOverlayActiveOpacity * active +
+          _kCropOverlayInactiveOpacity * (1.0 - active),
+    );
     final boundaries = Rect.fromLTWH(
       rect.width * area.left,
       rect.height * area.top,
@@ -732,14 +742,22 @@ class _CropPainter extends CustomPainter {
     );
     canvas.drawRect(Rect.fromLTRB(0.0, 0.0, rect.width, boundaries.top), paint);
     canvas.drawRect(
-        Rect.fromLTRB(0.0, boundaries.bottom, rect.width, rect.height), paint);
+      Rect.fromLTRB(0.0, boundaries.bottom, rect.width, rect.height),
+      paint,
+    );
     canvas.drawRect(
-        Rect.fromLTRB(0.0, boundaries.top, boundaries.left, boundaries.bottom),
-        paint);
+      Rect.fromLTRB(0.0, boundaries.top, boundaries.left, boundaries.bottom),
+      paint,
+    );
     canvas.drawRect(
-        Rect.fromLTRB(
-            boundaries.right, boundaries.top, rect.width, boundaries.bottom),
-        paint);
+      Rect.fromLTRB(
+        boundaries.right,
+        boundaries.top,
+        rect.width,
+        boundaries.bottom,
+      ),
+      paint,
+    );
 
     if (boundaries.isEmpty == false) {
       _drawGrid(canvas, boundaries);
@@ -814,19 +832,25 @@ class _CropPainter extends CustomPainter {
     for (var column = 1; column < _kCropGridColumnCount; column++) {
       path
         ..moveTo(
-            boundaries.left + column * boundaries.width / _kCropGridColumnCount,
-            boundaries.top)
+          boundaries.left + column * boundaries.width / _kCropGridColumnCount,
+          boundaries.top,
+        )
         ..lineTo(
-            boundaries.left + column * boundaries.width / _kCropGridColumnCount,
-            boundaries.bottom);
+          boundaries.left + column * boundaries.width / _kCropGridColumnCount,
+          boundaries.bottom,
+        );
     }
 
     for (var row = 1; row < _kCropGridRowCount; row++) {
       path
-        ..moveTo(boundaries.left,
-            boundaries.top + row * boundaries.height / _kCropGridRowCount)
-        ..lineTo(boundaries.right,
-            boundaries.top + row * boundaries.height / _kCropGridRowCount);
+        ..moveTo(
+          boundaries.left,
+          boundaries.top + row * boundaries.height / _kCropGridRowCount,
+        )
+        ..lineTo(
+          boundaries.right,
+          boundaries.top + row * boundaries.height / _kCropGridRowCount,
+        );
     }
 
     canvas.drawPath(path, paint);
