@@ -590,7 +590,10 @@ class Bookmark {
   Future<void> unbookmarkArtist(String name, ArtistType type) async {
     if (!await isBookmarkArtist(name, type)) return;
     var db = await CommonUserDatabase.getInstance();
-    await db.delete('BookmarkArtist', 'Artist=? AND IsGroup=?', [name, type]);
+    await db.delete('BookmarkArtist', 'Artist=? AND IsGroup=?', [
+      name,
+      type.index,
+    ]);
     bookmarkArtistSet![type]!.remove(name);
   }
 
