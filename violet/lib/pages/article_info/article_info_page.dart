@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,6 +21,7 @@ import 'package:uuid/uuid.dart';
 import 'package:violet/component/eh/eh_headers.dart';
 import 'package:violet/component/hitomi/related.dart';
 import 'package:violet/component/hitomi/tag_translate.dart';
+import 'package:violet/context/modal_bottom_sheet_context.dart';
 import 'package:violet/database/query.dart';
 import 'package:violet/database/user/bookmark.dart';
 import 'package:violet/database/user/download.dart';
@@ -36,6 +38,7 @@ import 'package:violet/pages/common/toast.dart';
 import 'package:violet/pages/common/utils.dart';
 import 'package:violet/pages/download/download_page.dart';
 import 'package:violet/pages/lab/lab/search_comment_author.dart';
+import 'package:violet/pages/search/search_page.dart';
 import 'package:violet/pages/segment/platform_navigator.dart';
 import 'package:violet/pages/viewer/viewer_page.dart';
 import 'package:violet/pages/viewer/viewer_page_provider.dart';
@@ -477,7 +480,7 @@ class SingleChipWidget extends StatelessWidget {
           ),
         ),
         Wrap(
-          children: <Widget>[_Chip(group: raw.toLowerCase(), name: target!)],
+          children: <Widget>[TagChip(group: raw.toLowerCase(), name: target!)],
         ),
       ],
     );
@@ -508,7 +511,7 @@ class MultiChipWidget extends StatelessWidget {
             spacing: 3.0,
             runSpacing: -9.0,
             children: groupName
-                .map((x) => _Chip(group: x.$1, name: x.$2))
+                .map((x) => TagChip(group: x.$1, name: x.$2))
                 .toList(),
           ),
         ),
@@ -863,11 +866,11 @@ class __InfoAreaWidgetState extends State<_InfoAreaWidget> {
 
 // Create tag-chip
 // group, name
-class _Chip extends StatelessWidget {
+class TagChip extends StatelessWidget {
   final String name;
   final String group;
 
-  const _Chip({required this.name, required this.group});
+  const TagChip({super.key, required this.name, required this.group});
 
   String normalize(String tag) {
     if (tag == 'groups') return 'group';
@@ -946,36 +949,54 @@ class _Chip extends StatelessWidget {
             ),
           ],
         ),
-        // avatar: CircleAvatar(
-        //   backgroundColor: avatarBg,
-        //   child: avatar,
-        // ),
-        // label: Text(
-        //   ' $tagDisplayed',
-        //   style: const TextStyle(
-        //     color: Colors.white,
-        //   ),
-        // ),
         backgroundColor: color,
         elevation: 6.0,
-        // shadowColor: Colors.grey[60],
         padding: const EdgeInsets.all(6.0),
       ),
+      onDoubleTap: () async {
+        final targetTag = '${normalize(group)}:${name.replaceAll(' ', '_')}';
+
+        CupertinoScaffold? cached;
+        if (ModalBottomSheetContext.up() == 0) {
+          await CupertinoScaffold.showCupertinoModalBottomSheet(
+            context: context,
+            builder: (context) {
+              cached ??= CupertinoScaffold(
+                body: SearchPage(searchKeyWord: targetTag),
+              );
+              return cached!;
+            },
+          );
+        } else {
+          await showCupertinoModalBottomSheet(
+            context: context,
+            builder: (context) {
+              cached ??= CupertinoScaffold(
+                body: SearchPage(searchKeyWord: targetTag),
+              );
+              return cached!;
+            },
+          );
+        }
+
+        ModalBottomSheetContext.down();
+      },
       onLongPress: () async {
-        if (!Settings.excludeTags.value.contains(
-          '${normalize(group)}:${name.replaceAll(' ', '_')}',
-        )) {
-          final yn = await showYesNoDialog(context, '이 태그를 제외태그에 추가할까요?');
+        final targetTag = '${normalize(group)}:${name.replaceAll(' ', '_')}';
+        if (!Settings.excludeTags.value.contains(targetTag)) {
+          final yn = await showYesNoDialog(
+            context,
+            '$targetTag 태그를 제외태그에 추가할까요?',
+          );
           if (yn) {
-            Settings.excludeTags.value.add(
-              '${normalize(group)}:${name.replaceAll(' ', '_')}',
-            );
+            Settings.excludeTags.value.add(targetTag);
             await Settings.excludeTags.setValue(Settings.excludeTags.value);
-            if (!context.mounted) return;
-            await showOkDialog(context, '제외태그에 성공적으로 추가했습니다!');
+            if (context.mounted) {
+              await showOkDialog(context, '제외태그에 성공적으로 추가했습니다!');
+            }
           }
         } else {
-          await showOkDialog(context, '이미 제외태그에 추가된 항목입니다!');
+          await showOkDialog(context, '$targetTag 태그는 이미 제외태그에 추가된 항목입니다!');
         }
       },
       onTap: () async {
@@ -995,7 +1016,7 @@ class _Chip extends StatelessWidget {
       },
     );
 
-    return SizedBox(height: 44, child: FittedBox(child: fc));
+    return SizedBox(height: 42, child: FittedBox(child: fc));
   }
 }
 
