@@ -14,15 +14,13 @@ import 'package:pimp_my_button/pimp_my_button.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:violet/component/hentai.dart';
-import 'package:violet/component/hitomi/tag_translate.dart';
-import 'package:violet/context/modal_bottom_sheet_context.dart';
 import 'package:violet/database/user/bookmark.dart';
 import 'package:violet/database/user/record.dart';
 import 'package:violet/locale/locale.dart' as locale;
 import 'package:violet/model/article_list_item.dart';
 import 'package:violet/other/dialogs.dart';
+import 'package:violet/pages/article_info/article_info_page.dart';
 import 'package:violet/pages/common/utils.dart';
-import 'package:violet/pages/search/search_page.dart';
 import 'package:violet/pages/viewer/viewer_page.dart';
 import 'package:violet/pages/viewer/viewer_page_provider.dart';
 import 'package:violet/script/script_manager.dart';
@@ -561,17 +559,7 @@ class _DetailWidget extends StatelessWidget {
       return Container(height: 30);
     }
 
-    final tags = (c.articleListItem.queryResult.tags() as String)
-        .split('|')
-        .where((element) => element != '')
-        .map(
-          (e) => (
-            e.contains(':') ? e.split(':')[0] : 'tags',
-            e.contains(':') ? e.split(':')[1] : e,
-          ),
-        )
-        .toList();
-
+    final tags = c.articleListItem.queryResult.tagList();
     if (Settings.useTabletMode.value) {
       return ExtendedWrap(
         spacing: 3.0,
@@ -586,129 +574,6 @@ class _DetailWidget extends StatelessWidget {
         children: tags.map((x) => TagChip(group: x.$1, name: x.$2)).toList(),
       );
     }
-  }
-}
-
-class TagChip extends StatelessWidget {
-  final String name;
-  final String group;
-
-  const TagChip({super.key, required this.name, required this.group});
-
-  String normalize(String tag) {
-    if (tag == 'groups') return 'group';
-    if (tag == 'artists') return 'artist';
-    if (tag == 'tags') return 'tag';
-    return tag;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    var tagDisplayed = name;
-    Color color = Colors.grey;
-
-    if (Settings.translateTags.value) {
-      tagDisplayed = TagTranslate.ofAny(
-        tagDisplayed,
-      ).split(':').last.split('|').first;
-    }
-
-    if (group == 'female') {
-      color = Colors.pink.shade400;
-    } else if (group == 'male') {
-      color = Colors.blue;
-    }
-
-    var mustHasMorePad = true;
-    Widget avatar = Text(
-      group[0].toUpperCase(),
-      style: const TextStyle(color: Colors.white),
-    );
-
-    if (group == 'female') {
-      mustHasMorePad = false;
-      avatar = const Icon(
-        MdiIcons.genderFemale,
-        size: 18.0,
-        color: Colors.white,
-      );
-    } else if (group == 'male') {
-      mustHasMorePad = false;
-      avatar = const Icon(MdiIcons.genderMale, size: 18.0, color: Colors.white);
-    }
-
-    final fc = GestureDetector(
-      child: RawChip(
-        labelPadding: const EdgeInsets.all(0.0),
-        label: Row(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(
-                left: 2.0 + (mustHasMorePad ? 4.0 : 0),
-                right: (mustHasMorePad ? 4.0 : 0),
-              ),
-              child: avatar,
-            ),
-            Text(
-              ' $tagDisplayed ',
-              style: const TextStyle(color: Colors.white),
-            ),
-          ],
-        ),
-        backgroundColor: color,
-        elevation: 6.0,
-        // shadowColor: Colors.grey[60],
-        padding: const EdgeInsets.all(6.0),
-      ),
-      onTap: () async {
-        final targetTag = '${normalize(group)}:${name.replaceAll(' ', '_')}';
-
-        CupertinoScaffold? cached;
-        if (ModalBottomSheetContext.up() == 0) {
-          await CupertinoScaffold.showCupertinoModalBottomSheet(
-            context: context,
-            builder: (context) {
-              cached ??= CupertinoScaffold(
-                body: SearchPage(searchKeyWord: targetTag),
-              );
-              return cached!;
-            },
-          );
-        } else {
-          await showCupertinoModalBottomSheet(
-            context: context,
-            builder: (context) {
-              cached ??= CupertinoScaffold(
-                body: SearchPage(searchKeyWord: targetTag),
-              );
-              return cached!;
-            },
-          );
-        }
-
-        ModalBottomSheetContext.down();
-      },
-      onLongPress: () async {
-        final targetTag = '${normalize(group)}:${name.replaceAll(' ', '_')}';
-        if (!Settings.excludeTags.value.contains(targetTag)) {
-          final yn = await showYesNoDialog(
-            context,
-            '$targetTag 태그를 제외태그에 추가할까요?',
-          );
-          if (yn) {
-            Settings.excludeTags.value.add(targetTag);
-            await Settings.excludeTags.setValue(Settings.excludeTags.value);
-            if (context.mounted) {
-              await showOkDialog(context, '제외태그에 성공적으로 추가했습니다!');
-            }
-          }
-        } else {
-          await showOkDialog(context, '$targetTag 태그는 이미 제외태그에 추가된 항목입니다!');
-        }
-      },
-    );
-
-    return SizedBox(height: 42, child: FittedBox(child: fc));
   }
 }
 
