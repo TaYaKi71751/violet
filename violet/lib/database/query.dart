@@ -1,6 +1,7 @@
 // This source code is a part of Project Violet.
 // Copyright (C) 2020-2024. violet-team. Licensed under the Apache-2.0 License.
 
+import 'package:violet/component/index.dart';
 import 'package:violet/database/database.dart';
 import 'package:violet/settings/settings.dart';
 
@@ -51,7 +52,8 @@ class QueryResult {
   // group, name
   List<(String, String)> tagList() {
     if (tags() == null) return [];
-    return (tags() as String)
+
+    var tagList = (tags() as String)
         .split('|')
         .where((element) => element != '')
         .map(
@@ -61,6 +63,20 @@ class QueryResult {
           ),
         )
         .toList();
+
+    tagList.sort((a, b) {
+      final groupOrder = const ['male', 'female'];
+
+      final ga = groupOrder.indexOf(a.$1);
+      final gb = groupOrder.indexOf(b.$1);
+      if (ga != gb) return ga.compareTo(gb);
+
+      final na = HentaiIndex.tagCount?[a.$1]?[a.$2] ?? 0;
+      final nb = HentaiIndex.tagCount?[b.$1]?[b.$2] ?? 0;
+      return na.compareTo(nb);
+    });
+
+    return tagList.reversed.toList();
   }
 }
 
