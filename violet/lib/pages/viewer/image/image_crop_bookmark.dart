@@ -76,8 +76,7 @@ class ImageCropBookmark extends StatelessWidget {
 
     showToast(
       level: ToastLevel.check,
-      message:
-          '$articleId(${page}p): [${area.toString().split('(')[1].split(')')[0]}] Saved!',
+      message: '$articleId(${page}p): [$area] Saved!',
     );
 
     // ignore: use_build_context_synchronously
