@@ -358,18 +358,7 @@ class TagInfoAreaWidget extends StatelessWidget {
       children: [
         MultiChipWidget(
           Translations.instance!.trans('tags'),
-          queryResult.tags() != null
-              ? (queryResult.tags() as String)
-                    .split('|')
-                    .where((element) => element != '')
-                    .map(
-                      (e) => (
-                        e.contains(':') ? e.split(':')[0] : 'tags',
-                        e.contains(':') ? e.split(':')[1] : e,
-                      ),
-                    )
-                    .toList()
-              : [],
+          queryResult.tagList(),
         ),
         SingleChipWidget(
           queryResult.language(),

@@ -562,17 +562,7 @@ class _DetailWidget extends StatelessWidget {
       return Container(height: 30);
     }
 
-    final tags = (c.articleListItem.queryResult.tags() as String)
-        .split('|')
-        .where((element) => element != '')
-        .map(
-          (e) => (
-            e.contains(':') ? e.split(':')[0] : 'tags',
-            e.contains(':') ? e.split(':')[1] : e,
-          ),
-        )
-        .toList();
-
+    final tags = c.articleListItem.queryResult.tagList();
     if (Settings.useTabletMode.value) {
       return ExtendedWrap(
         spacing: 3.0,

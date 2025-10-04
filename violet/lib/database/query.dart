@@ -47,6 +47,21 @@ class QueryResult {
     var ms = ticksSinceEpoch ~/ ticksPerMillisecond;
     return DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true);
   }
+
+  // group, name
+  List<(String, String)> tagList() {
+    if (tags() == null) return [];
+    return (tags() as String)
+        .split('|')
+        .where((element) => element != '')
+        .map(
+          (e) => (
+            e.contains(':') ? e.split(':')[0] : 'tags',
+            e.contains(':') ? e.split(':')[1] : e,
+          ),
+        )
+        .toList();
+  }
 }
 
 class QueryManager {
