@@ -354,7 +354,6 @@ class TagInfoAreaWidget extends StatelessWidget {
       shrinkWrap: true,
       children: [
         MultiChipWidget(
-          queryResult.tags(),
           Translations.instance!.trans('tags'),
           queryResult.tags() != null
               ? (queryResult.tags() as String)
@@ -375,7 +374,6 @@ class TagInfoAreaWidget extends StatelessWidget {
           'language',
         ),
         MultiChipWidget(
-          queryResult.artists(),
           Translations.instance!.trans('artist'),
           queryResult.artists() != null
               ? (queryResult.artists() as String)
@@ -386,7 +384,6 @@ class TagInfoAreaWidget extends StatelessWidget {
               : [],
         ),
         MultiChipWidget(
-          queryResult.groups(),
           Translations.instance!.trans('group'),
           queryResult.groups() != null
               ? (queryResult.groups() as String)
@@ -397,7 +394,6 @@ class TagInfoAreaWidget extends StatelessWidget {
               : [],
         ),
         MultiChipWidget(
-          queryResult.series(),
           Translations.instance!.trans('series'),
           queryResult.series() != null
               ? (queryResult.series() as String)
@@ -408,7 +404,6 @@ class TagInfoAreaWidget extends StatelessWidget {
               : [],
         ),
         MultiChipWidget(
-          queryResult.characters(),
           Translations.instance!.trans('character'),
           queryResult.characters() != null
               ? (queryResult.characters() as String)
@@ -492,13 +487,12 @@ class SingleChipWidget extends StatelessWidget {
 class MultiChipWidget extends StatelessWidget {
   final List<(String, String)> groupName;
   final String name;
-  final String? target;
 
-  const MultiChipWidget(this.target, this.name, this.groupName, {super.key});
+  const MultiChipWidget(this.name, this.groupName, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    if (target == null) return Container();
+    if (groupName.isEmpty) return Container();
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
