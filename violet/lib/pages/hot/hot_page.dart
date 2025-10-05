@@ -43,8 +43,7 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
   Future<RequestType>? future;
 
   int index = 0;
-  i2t() => ['daily', 'week', 'month', 'alltime'][index];
-  i2tr() => ['daily', 'weekly', 'monthly', 'alltime'][index];
+  i2t() => ['daily', 'weekly', 'monthly', 'alltime'][index];
 
   Widget? cachedListView;
 
@@ -282,7 +281,7 @@ class _HotPageState extends ThemeSwitchableState<HotPage>
     return Padding(
       padding: const EdgeInsets.only(top: 24, left: 12),
       child: Text(
-        '${Translations.instance!.trans(i2tr())} ${Translations.instance!.trans('hot')}',
+        '${Translations.instance!.trans(i2t())} ${Translations.instance!.trans('hot')}',
         style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
     );
