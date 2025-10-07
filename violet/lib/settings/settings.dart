@@ -317,6 +317,11 @@ class Settings {
 
   static final useLockScreen = SettingItem<bool>('useLockScreen', false);
   static final useSecureMode = SettingItem<bool>('useSecureMode', false);
+  // Version of the last patch note prompt that user dismissed (per-version hide)
+  static final lastPatchNoteShownVersion = SettingItem<String>(
+    'lastPatchNoteShownVersion',
+    '',
+  );
 
   static Future<void> initFirst() async {
     prefs = await SharedPreferences.getInstance();
