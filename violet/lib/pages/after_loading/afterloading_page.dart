@@ -30,6 +30,7 @@ import 'package:violet/settings/settings.dart';
 import 'package:violet/update/update_manager.dart';
 import 'package:violet/variables.dart';
 import 'package:violet/version/update_sync.dart';
+import 'package:violet/widgets/patch_note_prompt.dart';
 
 class AfterLoadingPage extends StatefulWidget {
   const AfterLoadingPage({super.key});
@@ -52,9 +53,12 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
       AppLinks().uriLinkStream.listen(handleDeeplink);
     }
 
-    Future.delayed(
-      const Duration(milliseconds: 200),
-    ).then((value) => UpdateManager.updateCheck(context));
+    Future.delayed(const Duration(milliseconds: 200)).then((value) async {
+      await UpdateManager.updateCheck(context);
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await showPatchNotePromptIfNeeded(context);
+      });
+    });
   }
 
   bool _alreadyLocked = false;
