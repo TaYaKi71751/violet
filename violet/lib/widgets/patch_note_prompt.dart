@@ -213,22 +213,18 @@ class _LatestPatchSummaryCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          ...latest.contents
-              .take(3)
-              .map(
-                (e) => Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('• '),
-                      Expanded(child: Text(e)),
-                    ],
-                  ),
-                ),
+          ...latest.contents.map(
+            (e) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('• '),
+                  Expanded(child: Text(e)),
+                ],
               ),
-          if (latest.contents.length > 3)
-            Row(children: const [Expanded(child: Text('• ...'))]),
+            ),
+          ),
         ],
       ),
     );
