@@ -50,6 +50,7 @@ class Settings {
   static final downloadAlignType = SettingItem<int>('downloadAlignType', 0);
   static final themeFlat = SettingItem<bool>('themeFlat', false);
   static final themeBlack = SettingItem<bool>('themeBlack', false);
+  static final useSystemTheme = SettingItem<bool>('useSystemTheme', false);
   static final useTabletMode = SettingItem<bool>('usetabletmode', false);
 
   // Tag Settings

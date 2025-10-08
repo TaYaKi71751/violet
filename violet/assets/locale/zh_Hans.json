@@ -10,6 +10,7 @@
   "news": "更新",
   "theme": "主题",
   "darkmode": "深色模式",
+  "usesystemtheme": "跟随系统主题",
   "colorsetting": "颜色设置",
   "defaulttag": "默认标签",
   "currenttag": "当前标签: ",

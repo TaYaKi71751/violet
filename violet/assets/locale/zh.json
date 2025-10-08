@@ -10,6 +10,7 @@
   "news": "Update",
   "theme": "Theme",
   "darkmode": "Dark Mode",
+  "usesystemtheme": "Use System Theme",
   "colorsetting": "Color Setting",
   "defaulttag": "Default Tag",
   "currenttag": "Current Tag: ",

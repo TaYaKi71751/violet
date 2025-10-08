@@ -33,6 +33,7 @@ import 'package:violet/pages/splash/splash_page.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/src/rust/frb_generated.dart';
 import 'package:violet/style/palette.dart';
+import 'package:violet/widgets/theme_switchable_state.dart';
 
 Future<void> main() async {
   runZonedGuarded<Future<void>>(
@@ -53,6 +54,8 @@ Future<void> main() async {
       }
       await Settings.initFirst();
       await warmupFlare();
+
+      registerPlatformBrightnessListener();
 
       runApp(const MyApp());
     },
@@ -108,6 +111,22 @@ Future<String> initUserId() async {
   return id;
 }
 
+void registerPlatformBrightnessListener() {
+  PlatformDispatcher.instance.onPlatformBrightnessChanged = () {
+    final brightness = PlatformDispatcher.instance.platformBrightness;
+    final ctx = MyApp.navigatorKey.currentContext;
+    if (Settings.useSystemTheme.value && ctx != null) {
+      final themeChanged =
+          Settings.themeWhat.value != (brightness == Brightness.dark);
+      if (themeChanged) {
+        Settings.themeWhat.setValue(brightness == Brightness.dark);
+        DynamicTheme.of(ctx)?.setBrightness(brightness);
+        ThemeSwitchableStateTargetStore.doChange();
+      }
+    }
+  };
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -117,7 +136,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DynamicTheme(
-      defaultBrightness: Brightness.light,
+      defaultBrightness: Settings.useSystemTheme.value
+          ? PlatformDispatcher.instance.platformBrightness
+          : (Settings.themeWhat.value ? Brightness.dark : Brightness.light),
       data: (brightness) => ThemeData(
         appBarTheme: AppBarTheme(
           systemOverlayStyle: !Settings.themeWhat.value

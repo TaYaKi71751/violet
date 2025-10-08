@@ -77,16 +77,13 @@ class SettingsPage extends StatefulWidget {
   State<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage>
+class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
     with AutomaticKeepAliveClientMixin<SettingsPage>, DoubleTapToTopMixin {
   final FlareControls _flareController = FlareControls();
-  bool _themeSwitch = false;
 
   @override
-  void initState() {
-    super.initState();
-    _themeSwitch = Settings.themeWhat.value;
-  }
+  VoidCallback? get shouldReloadCallback =>
+      () => _shouldReload = true;
 
   List<Widget>? _cachedGroups;
   bool _shouldReload = false;
@@ -208,24 +205,70 @@ class _SettingsPageState extends State<SettingsPage>
               height: 50,
               child: FlareActor(
                 'assets/flare/switch_daytime.flr',
-                animation: _themeSwitch ? 'night_idle' : 'day_idle',
+                animation: Settings.themeWhat.value ? 'night_idle' : 'day_idle',
                 controller: _flareController,
                 snapToEnd: true,
               ),
             ),
           ),
           onTap: () async {
-            if (!_themeSwitch) {
+            if (Settings.themeWhat.value) {
               _flareController.play('switch_night');
             } else {
               _flareController.play('switch_day');
             }
-            _themeSwitch = !_themeSwitch;
-            await Settings.themeWhat.setValue(_themeSwitch);
+            await Settings.themeWhat.setValue(!Settings.themeWhat.value);
             DynamicTheme.of(context)!.setBrightness(
-              !_themeSwitch ? Brightness.light : Brightness.dark,
+              Settings.themeWhat.value ? Brightness.dark : Brightness.light,
             );
             ThemeSwitchableStateTargetStore.doChange();
+            setState(() {
+              _shouldReload = true;
+            });
+          },
+        ),
+        InkWell(
+          customBorder: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(8.0),
+              topRight: Radius.circular(8.0),
+            ),
+          ),
+          child: ListTile(
+            leading: Icon(MdiIcons.monitor, color: Settings.majorColor.value),
+            title: Text(Translations.instance!.trans('usesystemtheme')),
+            trailing: Switch(
+              value: Settings.useSystemTheme.value,
+              onChanged: (newValue) async {
+                await Settings.useSystemTheme.setValue(newValue);
+                setState(() {
+                  _shouldReload = true;
+                });
+              },
+              activeTrackColor: Settings.majorColor.value,
+              activeColor: Settings.majorAccentColor.value,
+            ),
+          ),
+          onTap: () async {
+            await Settings.useSystemTheme.setValue(
+              !Settings.useSystemTheme.value,
+            );
+            if (Settings.useSystemTheme.value) {
+              final systemBrightness = MediaQuery.platformBrightnessOf(context);
+              final themeChanged =
+                  Settings.themeWhat.value !=
+                  (systemBrightness == Brightness.dark);
+              if (themeChanged) {
+                if (Settings.themeWhat.value) {
+                  _flareController.play('switch_night');
+                } else {
+                  _flareController.play('switch_day');
+                }
+                await Settings.themeWhat.setValue(!Settings.themeWhat.value);
+                DynamicTheme.of(context)!.setBrightness(systemBrightness);
+                ThemeSwitchableStateTargetStore.doChange();
+              }
+            }
             setState(() {
               _shouldReload = true;
             });
@@ -269,7 +312,7 @@ class _SettingsPageState extends State<SettingsPage>
           },
         ),
         InkWell(
-          onTap: _themeSwitch
+          onTap: Settings.themeWhat.value
               ? () async {
                   await Settings.themeBlack.setValue(
                     !Settings.themeBlack.value,
@@ -328,7 +371,7 @@ class _SettingsPageState extends State<SettingsPage>
             title: Text(Translations.instance!.trans('blackmode')),
             trailing: Switch(
               value: Settings.themeBlack.value,
-              onChanged: _themeSwitch
+              onChanged: Settings.themeWhat.value
                   ? (newValue) async {
                       await Settings.themeFlat.setValue(newValue);
                       DynamicTheme.of(context)!.setThemeData(
