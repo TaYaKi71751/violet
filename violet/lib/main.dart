@@ -111,6 +111,9 @@ Future<String> initUserId() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+
   @override
   Widget build(BuildContext context) {
     return DynamicTheme(
@@ -190,8 +193,6 @@ class MyApp extends StatelessWidget {
     final navigatorObservers = Platform.isAndroid || Platform.isIOS
         ? [FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance)]
         : <NavigatorObserver>[];
-
-    final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
     return GetMaterialApp(
       navigatorKey: navigatorKey,
