@@ -62,7 +62,6 @@ class _GroupArticleListPageState extends State<LabGroupArticleListPage> {
 
   void refresh() {
     Future.delayed(const Duration(milliseconds: 100)).then((value) async {
-      var queryRaw = 'SELECT * FROM HitomiColumnModel WHERE ';
       var cc = widget.articles
           .where((e) => e.group() == widget.groupId)
           .toList()
@@ -80,50 +79,47 @@ class _GroupArticleListPageState extends State<LabGroupArticleListPage> {
         return;
       }
 
-      //queryRaw += cc.map((e) => 'Id=${e.article()}').join(' OR ');
-      queryRaw += 'Id IN (${cc.map((e) => e.article()).join(',')})';
-      QueryManager.query(
-        queryRaw + (!Settings.searchPure.value ? ' AND ExistOnHitomi=1' : ''),
-      ).then((value) async {
-        var qr = <String, QueryResult>{};
-        for (var element in value.results!) {
-          qr[element.id().toString()] = element;
-        }
+      final ids = cc.map((e) => e.article()).toList();
+      final results = await QueryManager.queryIds(ids);
 
-        var result = <QueryResult>[];
-        for (var element in cc) {
-          if (qr[element.article()] == null) {
-            // TODO: Handle query not found
-            var headers = await ScriptManager.runHitomiGetHeaderContent(
-              element.article(),
-            );
-            var hh = await http.get(
-              'https://ltn.gold-usergeneratedcontent.net/galleryblock/${element.article()}.html',
-              headers: headers,
-            );
-            var article = await HitomiParser.parseGalleryBlock(hh.body);
-            var meta = {
-              'Id': int.parse(element.article()),
-              'Title': article['Title'],
-              'Artists': article['Artists'].join('|'),
-            };
-            result.add(QueryResult(result: meta));
-            _shouldRebuild = true;
-            setState(() {
-              _shouldRebuild = true;
-            });
-          } else {
-            result.add(qr[element.article()]!);
-          }
-        }
+      var qr = <String, QueryResult>{};
+      for (final element in results) {
+        qr[element.id().toString()] = element;
+      }
 
-        queryResult = result;
-        _applyFilter();
-        _shouldRebuild = true;
-        setState(() {
+      var result = <QueryResult>[];
+      for (var element in cc) {
+        if (qr[element.article()] == null) {
+          // TODO: Handle query not found
+          var headers = await ScriptManager.runHitomiGetHeaderContent(
+            element.article(),
+          );
+          var hh = await http.get(
+            'https://ltn.gold-usergeneratedcontent.net/galleryblock/${element.article()}.html',
+            headers: headers,
+          );
+          var article = await HitomiParser.parseGalleryBlock(hh.body);
+          var meta = {
+            'Id': int.parse(element.article()),
+            'Title': article['Title'],
+            'Artists': article['Artists'].join('|'),
+          };
+          result.add(QueryResult(result: meta));
           _shouldRebuild = true;
-          key = ObjectKey(const Uuid().v4());
-        });
+          setState(() {
+            _shouldRebuild = true;
+          });
+        } else {
+          result.add(qr[element.article()]!);
+        }
+      }
+
+      queryResult = result;
+      _applyFilter();
+      _shouldRebuild = true;
+      setState(() {
+        _shouldRebuild = true;
+        key = ObjectKey(const Uuid().v4());
       });
     });
   }
