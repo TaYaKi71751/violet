@@ -55,6 +55,7 @@ Future<void> main() async {
       await Settings.initFirst();
       await warmupFlare();
 
+      await syncThemeWithSystemAtLaunch();
       registerPlatformBrightnessListener();
 
       runApp(const MyApp());
@@ -125,6 +126,17 @@ void registerPlatformBrightnessListener() {
       }
     }
   };
+}
+
+// Synchronize theme preference with the current system brightness at app launch.
+Future<void> syncThemeWithSystemAtLaunch() async {
+  if (!Settings.useSystemTheme.value) return;
+  final brightness = PlatformDispatcher.instance.platformBrightness;
+  final shouldUpdate =
+      Settings.themeWhat.value != (brightness == Brightness.dark);
+  if (shouldUpdate) {
+    await Settings.themeWhat.setValue(brightness == Brightness.dark);
+  }
 }
 
 class MyApp extends StatelessWidget {
