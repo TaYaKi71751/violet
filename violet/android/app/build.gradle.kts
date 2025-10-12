@@ -53,6 +53,17 @@ android {
     }
 
     buildTypes {
+        maybeCreate("profile")
+        getByName("profile") {
+            initWith(getByName("debug"))
+            matchingFallbacks += listOf("debug")
+            signingConfig = signingConfigs.getByName("release")
+        }
+
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("release")
+        }
+
         release {
             signingConfig = signingConfigs.getByName("release")
             

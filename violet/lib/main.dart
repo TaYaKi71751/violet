@@ -148,6 +148,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DynamicTheme(
+      loadBrightnessOnStart: false,
       defaultBrightness: Settings.useSystemTheme.value
           ? PlatformDispatcher.instance.platformBrightness
           : (Settings.themeWhat.value ? Brightness.dark : Brightness.light),
