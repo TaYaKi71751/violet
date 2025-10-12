@@ -10,6 +10,7 @@ class PatchModel {
   bool isMajor;
   bool isMinor;
   List<String> contents;
+  List<String>? contentsKorean;
 
   PatchModel({
     required this.dateTime,
@@ -17,10 +18,27 @@ class PatchModel {
     this.isMajor = false,
     this.isMinor = false,
     required this.contents,
+    this.contentsKorean,
   });
 }
 
 final patches = [
+  PatchModel(
+    dateTime: DateTime(2025, 10, 9),
+    version: '1.34.4 Patch',
+    contents: [
+      'add using system theme option',
+      'fix reload bug when theme switch',
+      'fix thumbnail slider bug on downloaded article view',
+      'use skia instead of impeller on android for avoid performance issue',
+    ],
+    contentsKorean: [
+      '시스템 테마 사용 옵션 추가',
+      '테마 스위치 시 리로드 버그 수정',
+      '다운로드된 작품 뷰어에서 썸네일 슬라이더가 동작하지 않던 버그 수정',
+      '성능 이슈를 피하기 위해 Android에서 Impeller rendering engine을 임시로 비활성화',
+    ],
+  ),
   PatchModel(
     dateTime: DateTime(2025, 10, 7),
     version: '1.34.3 Patch',
