@@ -299,7 +299,7 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
                     child: BlockPicker(
                       pickerColor: Settings.majorColor.value,
                       onColorChanged: (color) async {
-                        await Settings.majorColor.setValue(color);
+                        await Settings.setMajorColor(color);
                         setState(() {
                           _shouldReload = true;
                         });
