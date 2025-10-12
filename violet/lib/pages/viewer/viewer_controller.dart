@@ -68,7 +68,7 @@ class ViewerController extends GetxController {
 
   double get thumbSizeValue =>
       [180.0, 140.0, 120.0, 96.0][thumbSize.value] *
-      (Platform.isWindows ? 3.0 : 0);
+      (Platform.isWindows ? 3.0 : 1.0);
 
   /// timer options
   var timer = false.obs;
