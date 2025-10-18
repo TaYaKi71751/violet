@@ -28,7 +28,10 @@ bool _isScriptUrl(String url) {
     'raw.githubusercontent.com/project-violet/violet-message-search',
   ];
 
-  return hosts.any((element) => url.contains(element));
+  const blacklist = ['ltn.gold-usergeneratedcontent.net/gg.js'];
+
+  return hosts.any((element) => url.contains(element)) &&
+      !blacklist.any((element) => url.contains(element));
 }
 
 Future<http.Response> get(
