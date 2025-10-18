@@ -7,8 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:violet/component/hitomi/comments.dart';
-import 'package:violet/component/hitomi/ldi.dart';
 import 'package:violet/database/query.dart';
 import 'package:violet/database/user/record.dart';
 import 'package:violet/locale/locale.dart';
@@ -22,7 +20,6 @@ import 'package:violet/pages/lab/lab/floating_article_view.dart';
 import 'package:violet/pages/lab/lab/recent_comments.dart';
 import 'package:violet/pages/lab/lab/recent_record.dart';
 import 'package:violet/pages/lab/lab/recent_record_u.dart';
-import 'package:violet/pages/lab/lab/search_comment.dart';
 import 'package:violet/pages/lab/lab/search_message.dart';
 import 'package:violet/pages/lab/lab/setting.dart';
 import 'package:violet/pages/lab/lab/statistics.dart';
@@ -66,30 +63,14 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                 '#001 Articles',
                 'Likes and Dislikes Index (LDI) DESC',
                 null,
-                () async {
-                  if (LDI.ldi == null) await LDI.init();
-
-                  final rr = await QueryManager.queryIds(
-                    LDI.ldi!.map((e) => e.$1).take(1500).toList(),
-                  );
-
-                  _navigate(ArticleListPage(name: 'LDI DESC', cc: rr));
-                },
+                null,
               ),
               _buildItem(
                 const Icon(MdiIcons.meteor, size: 40, color: Colors.brown),
                 '#002 Articles',
                 'Likes and Dislikes Index (LDI) ASC',
                 null,
-                () async {
-                  if (LDI.ldi == null) await LDI.init();
-
-                  final rr = await QueryManager.queryIds(
-                    LDI.ldi!.reversed.map((e) => e.$1).take(1500).toList(),
-                  );
-
-                  _navigate(ArticleListPage(name: 'LDI ASC', cc: rr));
-                },
+                null,
               ),
               _buildItem(
                 const Icon(MdiIcons.binoculars, size: 40, color: Colors.grey),
@@ -279,24 +260,14 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                 '#011 Search Comment',
                 'Search ExHentai Comment',
                 null,
-                () async {
-                  _navigate(const LabSearchComments());
-                },
+                null,
               ),
               _buildItem(
                 const Icon(MdiIcons.commentFlash, size: 40, color: Colors.cyan),
                 '#012 Articles',
                 'Sort with ExHentai Comments Count',
                 null,
-                () async {
-                  if (CommentsCount.counts == null) await CommentsCount.init();
-
-                  final rr = await QueryManager.queryIds(
-                    CommentsCount.counts!.map((e) => e.$1).take(1500).toList(),
-                  );
-
-                  _navigate(ArticleListPage(name: 'Comment Counts', cc: rr));
-                },
+                null,
               ),
               _buildItem(
                 const Icon(MdiIcons.commentFlash, size: 40, color: Colors.cyan),
@@ -490,7 +461,28 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
     );
   }
 
-  _buildItem(image, title, subtitle, [warp, run]) {
+  _buildItem(
+    Widget image,
+    String title,
+    String subtitle,
+    Widget? warp,
+    Function()? run,
+  ) {
+    final bool disabled = warp == null && run == null;
+    final Widget leadingWidget = disabled
+        ? Stack(
+            alignment: Alignment.center,
+            children: [
+              Opacity(opacity: 0.4, child: image),
+              const Positioned(
+                right: 0,
+                bottom: 0,
+                child: Icon(Icons.block, size: 18, color: Colors.redAccent),
+              ),
+            ],
+          )
+        : image;
+
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
       width: double.infinity,
@@ -526,16 +518,19 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
               vertical: 0.0,
               horizontal: 16.0,
             ),
-            leading: image,
+            leading: leadingWidget,
             title: Text(title, style: const TextStyle(fontSize: 16.0)),
             subtitle: Text(subtitle),
-            onTap: () async {
-              if (warp != null) {
-                await _navigate(warp);
-              } else {
-                await run();
-              }
-            },
+            enabled: !disabled,
+            onTap: disabled
+                ? null
+                : () async {
+                    if (warp != null) {
+                      await _navigate(warp);
+                    } else {
+                      await run!();
+                    }
+                  },
           ),
         ),
       ),
