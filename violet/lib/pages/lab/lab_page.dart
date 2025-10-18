@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:violet/component/hitomi/comments.dart';
 import 'package:violet/database/query.dart';
 import 'package:violet/database/user/record.dart';
 import 'package:violet/locale/locale.dart';
@@ -21,7 +20,6 @@ import 'package:violet/pages/lab/lab/floating_article_view.dart';
 import 'package:violet/pages/lab/lab/recent_comments.dart';
 import 'package:violet/pages/lab/lab/recent_record.dart';
 import 'package:violet/pages/lab/lab/recent_record_u.dart';
-import 'package:violet/pages/lab/lab/search_comment.dart';
 import 'package:violet/pages/lab/lab/search_message.dart';
 import 'package:violet/pages/lab/lab/setting.dart';
 import 'package:violet/pages/lab/lab/statistics.dart';
@@ -262,24 +260,14 @@ class _LaboratoryPageState extends State<LaboratoryPage> {
                 '#011 Search Comment',
                 'Search ExHentai Comment',
                 null,
-                () async {
-                  _navigate(const LabSearchComments());
-                },
+                null,
               ),
               _buildItem(
                 const Icon(MdiIcons.commentFlash, size: 40, color: Colors.cyan),
                 '#012 Articles',
                 'Sort with ExHentai Comments Count',
                 null,
-                () async {
-                  if (CommentsCount.counts == null) await CommentsCount.init();
-
-                  final rr = await QueryManager.queryIds(
-                    CommentsCount.counts!.map((e) => e.$1).take(1500).toList(),
-                  );
-
-                  _navigate(ArticleListPage(name: 'Comment Counts', cc: rr));
-                },
+                null,
               ),
               _buildItem(
                 const Icon(MdiIcons.commentFlash, size: 40, color: Colors.cyan),
