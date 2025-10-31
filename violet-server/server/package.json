@@ -48,7 +48,7 @@
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
-    "typeorm": "^0.3.25",
+    "typeorm": "^0.3.27",
     "violet-server-nest": "file:",
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0"
