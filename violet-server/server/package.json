@@ -51,7 +51,9 @@
     "typeorm": "^0.3.25",
     "violet-server-nest": "file:",
     "winston": "^3.17.0",
-    "winston-daily-rotate-file": "^5.0.0"
+    "winston-daily-rotate-file": "^5.0.0",
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.5"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.10",
