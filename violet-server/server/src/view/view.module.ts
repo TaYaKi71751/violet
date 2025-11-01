@@ -7,5 +7,6 @@ import { ViewRepository } from './view.repository';
 @Module({
   controllers: [ViewController],
   providers: [RedisService, ViewService, ViewRepository],
+  exports: [ViewService],
 })
-export class ViewModule {}
+export class ViewModule { }

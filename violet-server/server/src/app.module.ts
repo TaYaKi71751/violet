@@ -17,6 +17,7 @@ import * as Joi from 'joi';
 import { AWSModule } from './aws/aws.module';
 import { StatsModule } from './stats/stats.module';
 import { BookmarkModule } from './bookmark/bookmark.module';
+import { BotModule } from './bot/bot.module';
 
 export const envValidationSchema = Joi.object({
   NODE_ENV: Joi.string().valid('dev', 'prod', 'test').required(),
@@ -72,6 +73,7 @@ export const envValidationSchema = Joi.object({
     RedisModule,
     AWSModule,
     StatsModule,
+    BotModule,
     BookmarkModule,
   ],
   controllers: [AppController],
