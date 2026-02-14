@@ -32,7 +32,7 @@ export function ViewerPage() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        navigate('/');
+        navigate(-1);
       }
     };
 
@@ -111,7 +111,7 @@ export function ViewerPage() {
       currentPage={currentPage}
       totalPages={totalPages}
       onPageChange={goToPage}
-      onClose={() => navigate('/')}
+      onClose={() => navigate(-1)}
     />
   );
 }

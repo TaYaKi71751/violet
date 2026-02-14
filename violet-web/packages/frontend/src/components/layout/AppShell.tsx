@@ -21,10 +21,26 @@ export function AppShell() {
   const searchBarRef = useRef<SearchBarRef>(null);
   const contentRef = useRef<HTMLElement>(null);
 
-  // Scroll content to top on navigation (pathname or query param change)
+  // Save scroll position on scroll (keyed by location.key)
   useEffect(() => {
-    contentRef.current?.scrollTo(0, 0);
-  }, [location.pathname, location.search]);
+    const content = contentRef.current;
+    if (!content) return;
+    const handleScroll = () => {
+      sessionStorage.setItem(`scroll:${location.key}`, String(content.scrollTop));
+    };
+    content.addEventListener('scroll', handleScroll, { passive: true });
+    return () => content.removeEventListener('scroll', handleScroll);
+  }, [location.key]);
+
+  // Restore saved scroll position or scroll to top on navigation
+  useEffect(() => {
+    const saved = sessionStorage.getItem(`scroll:${location.key}`);
+    if (saved) {
+      contentRef.current?.scrollTo(0, parseInt(saved));
+    } else {
+      contentRef.current?.scrollTo(0, 0);
+    }
+  }, [location.key]);
 
   const fullQuery = contentLanguage !== 'all' ? `${query} lang:${contentLanguage}` : query;
   const { data } = useSearch(fullQuery || ' ', 0);
