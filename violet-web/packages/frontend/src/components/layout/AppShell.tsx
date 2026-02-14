@@ -1,4 +1,4 @@
-import { Outlet, useSearchParams } from 'react-router';
+import { Outlet, useSearchParams, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Sidebar } from './Sidebar';
 import { BottomNav } from './BottomNav';
@@ -12,6 +12,7 @@ export function AppShell() {
   const isMobile = useIsMobile();
   const isDesktop = useIsDesktop();
   const { t } = useTranslation();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
   const { contentLanguage } = useAppStore();
@@ -19,11 +20,13 @@ export function AppShell() {
   const fullQuery = contentLanguage !== 'all' ? `${query} lang:${contentLanguage}` : query;
   const { data } = useSearch(fullQuery || ' ', 0);
 
+  const showSearchBar = location.pathname === '/' || location.pathname === '/bookmarks';
+
   return (
     <div className={styles.shell}>
       {isDesktop && <Sidebar />}
       <div className={styles.mainArea}>
-        {isDesktop && (
+        {isDesktop && showSearchBar && (
           <div className={styles.searchBar}>
             <SearchBar />
             {data && (
