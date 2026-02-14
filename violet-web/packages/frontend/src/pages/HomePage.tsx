@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useSearch } from '../hooks/useSearch';
@@ -9,10 +8,21 @@ import styles from './HomePage.module.css';
 
 export function HomePage() {
   const { t } = useTranslation();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
-  const [page, setPage] = useState(0);
+  const page = parseInt(searchParams.get('p') || '0');
   const { contentLanguage } = useAppStore();
+
+  const setPage = (updater: number | ((prev: number) => number)) => {
+    const newPage = typeof updater === 'function' ? updater(page) : updater;
+    const newParams = new URLSearchParams(searchParams);
+    if (newPage === 0) {
+      newParams.delete('p');
+    } else {
+      newParams.set('p', String(newPage));
+    }
+    setSearchParams(newParams);
+  };
 
   const fullQuery =
     contentLanguage !== 'all' ? `${query} lang:${contentLanguage}` : query;

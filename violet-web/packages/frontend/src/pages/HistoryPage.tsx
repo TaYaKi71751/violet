@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router';
 import { useReadHistory } from '../hooks/useReadHistory';
 import { useQueries } from '@tanstack/react-query';
 import { getArticle } from '../api/content';
@@ -9,8 +9,20 @@ import styles from './HistoryPage.module.css';
 
 export function HistoryPage() {
   const { t } = useTranslation();
-  const [page, setPage] = useState(0);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = parseInt(searchParams.get('p') || '0');
   const { data, isLoading } = useReadHistory(page);
+
+  const setPage = (updater: number | ((prev: number) => number)) => {
+    const newPage = typeof updater === 'function' ? updater(page) : updater;
+    const newParams = new URLSearchParams(searchParams);
+    if (newPage === 0) {
+      newParams.delete('p');
+    } else {
+      newParams.set('p', String(newPage));
+    }
+    setSearchParams(newParams);
+  };
 
   const articleQueries = useQueries({
     queries: (data?.logs ?? []).map((log) => ({
