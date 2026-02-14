@@ -10,16 +10,20 @@ export type ThemeColor =
   | 'indigo' | 'lightBlue' | 'lightGreen' | 'lime' | 'orange'
   | 'pink' | 'red' | 'teal' | 'yellow';
 
+export type ViewMode = 'grid' | 'detail';
+
 interface AppState {
   contentLanguage: ContentLanguage;
   uiLanguage: UILanguage;
   themeColor: ThemeColor;
   sidebarCollapsed: boolean;
+  viewMode: ViewMode;
 
   setContentLanguage: (lang: ContentLanguage) => void;
   setUILanguage: (lang: UILanguage) => void;
   setThemeColor: (color: ThemeColor) => void;
   toggleSidebar: () => void;
+  setViewMode: (mode: ViewMode) => void;
 }
 
 // Helper to get system language
@@ -38,6 +42,7 @@ export const useAppStore = create<AppState>()(
       uiLanguage: 'system',
       themeColor: 'purple',
       sidebarCollapsed: false,
+      viewMode: 'grid',
 
       setContentLanguage: (contentLanguage) => set({ contentLanguage }),
       setUILanguage: (uiLanguage) => {
@@ -47,6 +52,7 @@ export const useAppStore = create<AppState>()(
       },
       setThemeColor: (themeColor) => set({ themeColor }),
       toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
+      setViewMode: (viewMode) => set({ viewMode }),
     }),
     { name: 'violet-app-settings' },
   ),

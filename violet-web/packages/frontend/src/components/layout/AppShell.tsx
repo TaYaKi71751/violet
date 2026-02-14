@@ -17,7 +17,7 @@ export function AppShell() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
-  const { contentLanguage } = useAppStore();
+  const { contentLanguage, viewMode, setViewMode } = useAppStore();
   const searchBarRef = useRef<SearchBarRef>(null);
   const contentRef = useRef<HTMLElement>(null);
 
@@ -64,6 +64,19 @@ export function AppShell() {
                 <span className={styles.count}>{t('home.results', { count: data.totalCount })}</span>
               </div>
             )}
+            <label className={styles.viewSwitch} title={viewMode === 'grid' ? 'Detail view' : 'Grid view'}>
+              <span className={styles.switchLabel}>▦</span>
+              <input
+                type="checkbox"
+                className={styles.switchInput}
+                checked={viewMode === 'detail'}
+                onChange={() => setViewMode(viewMode === 'grid' ? 'detail' : 'grid')}
+              />
+              <span className={styles.switchTrack}>
+                <span className={styles.switchThumb} />
+              </span>
+              <span className={styles.switchLabel}>☰</span>
+            </label>
           </div>
         )}
         <main ref={contentRef} className={styles.content}>

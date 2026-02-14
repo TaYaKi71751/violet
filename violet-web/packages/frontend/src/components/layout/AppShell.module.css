@@ -39,6 +39,57 @@
   font-size: 0.85rem;
 }
 
+.viewSwitch {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.switchLabel {
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  line-height: 1;
+}
+
+.switchInput {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switchTrack {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  background: var(--color-border);
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+
+.switchInput:checked ~ .switchTrack {
+  background: var(--color-primary, #7c3aed);
+}
+
+.switchThumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.switchInput:checked ~ .switchTrack .switchThumb {
+  transform: translateX(16px);
+}
+
 .content {
   flex: 1;
   overflow-y: auto;

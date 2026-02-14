@@ -4,6 +4,7 @@ import { SearchBar, type SearchBarRef } from './SearchBar';
 import { TagChips } from './TagChips';
 import type { TagChipData } from '../../hooks/useArticleTagSummary';
 import type { TagEntry } from '@violet-web/shared';
+import { useAppStore } from '../../stores/app-store';
 import styles from './LocalSearchSection.module.css';
 
 interface LocalSearchSectionProps {
@@ -28,6 +29,7 @@ export function LocalSearchSection({
   isLoading,
 }: LocalSearchSectionProps) {
   const { t } = useTranslation();
+  const { viewMode, setViewMode } = useAppStore();
 
   return (
     <div className={styles.container}>
@@ -42,6 +44,19 @@ export function LocalSearchSection({
             {t('home.results', { count: resultCount })}
           </div>
         )}
+        <label className={styles.viewSwitch} title={viewMode === 'grid' ? 'Detail view' : 'Grid view'}>
+          <span className={styles.switchLabel}>▦</span>
+          <input
+            type="checkbox"
+            className={styles.switchInput}
+            checked={viewMode === 'detail'}
+            onChange={() => setViewMode(viewMode === 'grid' ? 'detail' : 'grid')}
+          />
+          <span className={styles.switchTrack}>
+            <span className={styles.switchThumb} />
+          </span>
+          <span className={styles.switchLabel}>☰</span>
+        </label>
       </div>
 
       {!isLoading && tagSummary.length > 0 && (
