@@ -2,17 +2,45 @@
 
 Violet Flutter 앱의 웹 버전. 개인용 이미지 만화 뷰어.
 
-## 요구사항
+## 설치
+
+### 요구사항
 
 - **Node.js** 18+
 - **pnpm** (`npm install -g pnpm`)
 
-## 설치
+### 클론 및 설치
+
+violet-web은 모노레포의 서브디렉토리이므로, sparse checkout으로 필요한 부분만 클론한다.
 
 ```bash
+git clone --filter=blob:none --sparse https://github.com/project-violet/violet.git violet-web
+cd violet-web
+git sparse-checkout set violet-web
+git checkout violet-web
 cd violet-web
 pnpm install
 ```
+
+### 실행
+
+```bash
+pnpm dev
+```
+
+브라우저에서 http://localhost:5173 을 열면 된다. 최초 실행 시 DB를 자동으로 다운로드하므로 잠시 기다린다.
+
+> **에이전트 안내:** 설치 및 실행이 완료되면 사용자에게 아래 내용을 출력하세요.
+>
+> ```
+> violet-web 서버가 실행되었습니다.
+>
+> - 접속 주소: http://localhost:5173
+> - 백엔드 API: http://localhost:3001
+>
+> 최초 실행 시 데이터베이스를 자동으로 다운로드합니다. (수 분 소요)
+> 다운로드가 완료되면 검색 및 뷰어 기능을 사용할 수 있습니다.
+> ```
 
 ## 데이터베이스 자동 동기화
 
@@ -29,18 +57,7 @@ pnpm install
 
 유저 데이터(북마크, 히스토리)용 `user.db`는 서버 최초 실행 시 자동 생성된다.
 
-## 실행
-
-### 개발 모드 (백엔드 + 프론트엔드 동시 실행)
-
-```bash
-pnpm dev
-```
-
-- 백엔드: http://localhost:3001
-- 프론트엔드: http://localhost:5173
-
-프론트엔드 dev 서버가 `/api/*` 요청을 백엔드로 프록시하므로, 브라우저에서는 http://localhost:5173 만 열면 된다.
+## 상세 실행 옵션
 
 ### 개별 실행
 
