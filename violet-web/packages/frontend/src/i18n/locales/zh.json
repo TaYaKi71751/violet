@@ -36,6 +36,10 @@
       "ja": "日本語",
       "zh": "中文"
     },
+    "theme": {
+      "heading": "主题颜色",
+      "description": "选择您喜欢的颜色主题"
+    },
     "sync": {
       "heading": "数据库同步",
       "database": "数据库:",

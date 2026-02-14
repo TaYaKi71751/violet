@@ -5,10 +5,17 @@ import { useAppStore } from '../stores/app-store';
 import { useSyncStatus, useTriggerSync, useTriggerFullSync } from '../hooks/useSync';
 import styles from './SettingsPage.module.css';
 
+const themeColors = [
+  'purple', 'amber', 'black', 'blue', 'blueGrey', 'brown',
+  'cyan', 'deepOrange', 'deepPurple', 'green', 'grey',
+  'indigo', 'lightBlue', 'lightGreen', 'lime', 'orange',
+  'pink', 'red', 'teal', 'yellow'
+] as const;
+
 export function SettingsPage() {
   const { t } = useTranslation();
   const { recentSearches, clearRecentSearches } = useSearchStore();
-  const { contentLanguage, uiLanguage, setContentLanguage, setUILanguage } = useAppStore();
+  const { contentLanguage, uiLanguage, themeColor, setContentLanguage, setUILanguage, setThemeColor } = useAppStore();
   const { data: syncStatus } = useSyncStatus();
   const triggerSync = useTriggerSync();
   const triggerFullSync = useTriggerFullSync();
@@ -87,6 +94,25 @@ export function SettingsPage() {
             <option value="ja">{t('settings.language.ja')}</option>
             <option value="zh">{t('settings.language.zh')}</option>
           </select>
+        </div>
+      </div>
+
+      <div className={styles.section}>
+        <h3 className={styles.subheading}>{t('settings.theme.heading')}</h3>
+        <p className={styles.themeDesc}>{t('settings.theme.description')}</p>
+        <div className={styles.colorGrid}>
+          {themeColors.map((color) => {
+            const logoSrc = color === 'purple' ? '/logos/logo.png' : `/logos/logo-${color}.png`;
+            return (
+              <div
+                key={color}
+                className={`${styles.colorOption} ${themeColor === color ? styles.colorActive : ''}`}
+                onClick={() => setThemeColor(color)}
+              >
+                <img src={logoSrc} alt={color} className={styles.colorLogo} />
+              </div>
+            );
+          })}
         </div>
       </div>
 

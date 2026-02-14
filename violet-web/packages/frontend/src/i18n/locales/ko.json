@@ -36,6 +36,10 @@
       "ja": "日本語",
       "zh": "中文"
     },
+    "theme": {
+      "heading": "테마 색상",
+      "description": "원하는 색상 테마를 선택하세요"
+    },
     "sync": {
       "heading": "데이터베이스 동기화",
       "database": "데이터베이스:",

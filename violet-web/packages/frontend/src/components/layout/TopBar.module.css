@@ -10,11 +10,14 @@
 }
 
 .brand {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-primary);
   cursor: pointer;
-  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  height: 32px;
+  width: auto;
 }
 
 .searchWrapper {

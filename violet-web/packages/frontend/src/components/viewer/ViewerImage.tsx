@@ -8,7 +8,7 @@ interface ViewerImageProps {
   onLoad?: () => void;
 }
 
-const MAX_RETRIES = 3;
+const MAX_RETRIES = 10;
 const RETRY_DELAY = 1500; // 1.5 seconds
 
 export function ViewerImage({ src, alt = '', onLoad }: ViewerImageProps) {

@@ -10,15 +10,19 @@ export function TopBar() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
-  const { contentLanguage } = useAppStore();
+  const { contentLanguage, themeColor } = useAppStore();
 
   const fullQuery = contentLanguage !== 'all' ? `${query} lang:${contentLanguage}` : query;
   const { data } = useSearch(fullQuery || ' ', 0);
 
+  const logoSrc = themeColor === 'purple'
+    ? '/logos/logo.png'
+    : `/logos/logo-${themeColor}.png`;
+
   return (
     <header className={styles.topbar}>
       <div className={styles.brand} onClick={() => navigate('/')}>
-        Violet
+        <img src={logoSrc} alt="Violet" className={styles.logo} />
       </div>
       <div className={styles.searchWrapper}>
         <SearchBar />

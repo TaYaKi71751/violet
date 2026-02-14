@@ -36,6 +36,10 @@
       "ja": "日本語",
       "zh": "中文"
     },
+    "theme": {
+      "heading": "テーマカラー",
+      "description": "お好みのカラーテーマを選択"
+    },
     "sync": {
       "heading": "データベース同期",
       "database": "データベース:",
