@@ -1,4 +1,67 @@
 {
+  "app": {
+    "name": "Violet"
+  },
+  "nav": {
+    "home": "홈",
+    "bookmarks": "북마크",
+    "history": "기록",
+    "settings": "설정"
+  },
+  "home": {
+    "heading": "둘러보기",
+    "searchHeading": "검색: {{query}}",
+    "results": "{{count}}개 결과",
+    "prev": "이전",
+    "next": "다음"
+  },
+  "search": {
+    "placeholder": "검색...",
+    "searchButton": "검색"
+  },
+  "settings": {
+    "heading": "설정",
+    "language": {
+      "heading": "언어",
+      "contentLanguage": "콘텐츠 언어 (검색 필터)",
+      "uiLanguage": "UI 언어",
+      "all": "모든 언어",
+      "korean": "한국어",
+      "english": "영어",
+      "japanese": "일본어",
+      "chinese": "중국어",
+      "system": "시스템 기본값",
+      "en": "English",
+      "ko": "한국어",
+      "ja": "日本語",
+      "zh": "中文"
+    },
+    "sync": {
+      "heading": "데이터베이스 동기화",
+      "database": "데이터베이스:",
+      "ready": "준비됨",
+      "notFound": "찾을 수 없음",
+      "lastSync": "마지막 동기화:",
+      "never": "없음",
+      "status": "상태:",
+      "idle": "대기 중",
+      "checking": "업데이트 확인 중...",
+      "downloadingFull": "전체 데이터베이스 다운로드 중...",
+      "applyingChunks": "업데이트 적용 중...",
+      "error": "오류",
+      "syncNow": "지금 동기화",
+      "redownloadDB": "DB 재다운로드",
+      "starting": "시작 중...",
+      "confirmRedownload": "전체 데이터베이스를 재다운로드합니다. 계속하시겠습니까?",
+      "yes": "예, 재다운로드",
+      "cancel": "취소"
+    },
+    "recentSearches": {
+      "heading": "최근 검색",
+      "clear": "검색 기록 지우기",
+      "empty": "최근 검색 없음"
+    }
+  },
   "viewer": {
     "back": "뒤로",
     "settings": "설정",
@@ -34,19 +97,7 @@
         "normal": "첫 페이지 쌍으로"
       },
       "padding": {
-        "title": "여백",
-        "none": "없음",
-        "small": "작게",
-        "medium": "중간",
-        "large": "크게"
-      },
-      "language": {
-        "title": "언어",
-        "system": "시스템 기본값",
-        "en": "English",
-        "ko": "한국어",
-        "ja": "日本語",
-        "zh": "中文"
+        "title": "여백"
       }
     }
   }

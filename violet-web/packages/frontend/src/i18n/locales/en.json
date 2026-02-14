@@ -1,4 +1,67 @@
 {
+  "app": {
+    "name": "Violet"
+  },
+  "nav": {
+    "home": "Home",
+    "bookmarks": "Bookmarks",
+    "history": "History",
+    "settings": "Settings"
+  },
+  "home": {
+    "heading": "Browse",
+    "searchHeading": "Search: {{query}}",
+    "results": "{{count}} results",
+    "prev": "Prev",
+    "next": "Next"
+  },
+  "search": {
+    "placeholder": "Search...",
+    "searchButton": "Search"
+  },
+  "settings": {
+    "heading": "Settings",
+    "language": {
+      "heading": "Language",
+      "contentLanguage": "Content Language (Search Filter)",
+      "uiLanguage": "UI Language",
+      "all": "All Languages",
+      "korean": "Korean",
+      "english": "English",
+      "japanese": "Japanese",
+      "chinese": "Chinese",
+      "system": "System Default",
+      "en": "English",
+      "ko": "한국어",
+      "ja": "日本語",
+      "zh": "中文"
+    },
+    "sync": {
+      "heading": "Database Sync",
+      "database": "Database:",
+      "ready": "Ready",
+      "notFound": "Not Found",
+      "lastSync": "Last Sync:",
+      "never": "Never",
+      "status": "Status:",
+      "idle": "Idle",
+      "checking": "Checking for updates...",
+      "downloadingFull": "Downloading full database...",
+      "applyingChunks": "Applying updates...",
+      "error": "Error",
+      "syncNow": "Sync Now",
+      "redownloadDB": "Re-download DB",
+      "starting": "Starting...",
+      "confirmRedownload": "This will re-download the entire database. Continue?",
+      "yes": "Yes, Re-download",
+      "cancel": "Cancel"
+    },
+    "recentSearches": {
+      "heading": "Recent Searches",
+      "clear": "Clear Search History",
+      "empty": "No recent searches"
+    }
+  },
   "viewer": {
     "back": "Back",
     "settings": "Settings",
@@ -34,19 +97,7 @@
         "normal": "First page paired"
       },
       "padding": {
-        "title": "Padding",
-        "none": "None",
-        "small": "Small",
-        "medium": "Medium",
-        "large": "Large"
-      },
-      "language": {
-        "title": "Language",
-        "system": "System Default",
-        "en": "English",
-        "ko": "한국어",
-        "ja": "日本語",
-        "zh": "中文"
+        "title": "Padding"
       }
     }
   }

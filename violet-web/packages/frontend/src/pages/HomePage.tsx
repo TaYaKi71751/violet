@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { useSearch } from '../hooks/useSearch';
 import { useAppStore } from '../stores/app-store';
 import { SearchResultGrid } from '../components/search/SearchResultGrid';
@@ -7,6 +8,7 @@ import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import styles from './HomePage.module.css';
 
 export function HomePage() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
   const [page, setPage] = useState(0);
@@ -21,12 +23,12 @@ export function HomePage() {
   return (
     <div>
       <h2 className={styles.heading}>
-        {query ? `Search: ${query}` : 'Browse'}
+        {query ? t('home.searchHeading', { query }) : t('home.heading')}
       </h2>
       {isLoading && <LoadingSpinner />}
       {data && (
         <>
-          <p className={styles.count}>{data.totalCount} results</p>
+          <p className={styles.count}>{t('home.results', { count: data.totalCount })}</p>
           <SearchResultGrid articles={data.articles} />
           {totalPages > 1 && (
             <div className={styles.pagination}>
@@ -34,7 +36,7 @@ export function HomePage() {
                 disabled={page === 0}
                 onClick={() => setPage((p) => p - 1)}
               >
-                Prev
+                {t('home.prev')}
               </button>
               <span>
                 {page + 1} / {totalPages}
@@ -43,7 +45,7 @@ export function HomePage() {
                 disabled={page >= totalPages - 1}
                 onClick={() => setPage((p) => p + 1)}
               >
-                Next
+                {t('home.next')}
               </button>
             </div>
           )}

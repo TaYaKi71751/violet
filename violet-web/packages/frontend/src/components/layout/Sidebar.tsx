@@ -1,14 +1,17 @@
 import { NavLink } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import styles from './Sidebar.module.css';
 
 const navItems = [
-  { to: '/', label: 'Home' },
-  { to: '/bookmarks', label: 'Bookmarks' },
-  { to: '/history', label: 'History' },
-  { to: '/settings', label: 'Settings' },
+  { to: '/', labelKey: 'nav.home' },
+  { to: '/bookmarks', labelKey: 'nav.bookmarks' },
+  { to: '/history', labelKey: 'nav.history' },
+  { to: '/settings', labelKey: 'nav.settings' },
 ];
 
 export function Sidebar() {
+  const { t } = useTranslation();
+
   return (
     <nav className={styles.sidebar}>
       {navItems.map((item) => (
@@ -19,7 +22,7 @@ export function Sidebar() {
             `${styles.link} ${isActive ? styles.active : ''}`
           }
         >
-          {item.label}
+          {t(item.labelKey)}
         </NavLink>
       ))}
     </nav>

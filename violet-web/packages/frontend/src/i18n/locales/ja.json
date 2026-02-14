@@ -1,4 +1,67 @@
 {
+  "app": {
+    "name": "Violet"
+  },
+  "nav": {
+    "home": "ホーム",
+    "bookmarks": "ブックマーク",
+    "history": "履歴",
+    "settings": "設定"
+  },
+  "home": {
+    "heading": "閲覧",
+    "searchHeading": "検索: {{query}}",
+    "results": "{{count}}件の結果",
+    "prev": "前へ",
+    "next": "次へ"
+  },
+  "search": {
+    "placeholder": "検索...",
+    "searchButton": "検索"
+  },
+  "settings": {
+    "heading": "設定",
+    "language": {
+      "heading": "言語",
+      "contentLanguage": "コンテンツ言語（検索フィルター）",
+      "uiLanguage": "UI言語",
+      "all": "すべての言語",
+      "korean": "韓国語",
+      "english": "英語",
+      "japanese": "日本語",
+      "chinese": "中国語",
+      "system": "システムデフォルト",
+      "en": "English",
+      "ko": "한국어",
+      "ja": "日本語",
+      "zh": "中文"
+    },
+    "sync": {
+      "heading": "データベース同期",
+      "database": "データベース:",
+      "ready": "準備完了",
+      "notFound": "見つかりません",
+      "lastSync": "最終同期:",
+      "never": "なし",
+      "status": "ステータス:",
+      "idle": "待機中",
+      "checking": "更新を確認中...",
+      "downloadingFull": "データベース全体をダウンロード中...",
+      "applyingChunks": "更新を適用中...",
+      "error": "エラー",
+      "syncNow": "今すぐ同期",
+      "redownloadDB": "DBを再ダウンロード",
+      "starting": "開始中...",
+      "confirmRedownload": "データベース全体を再ダウンロードします。続行しますか？",
+      "yes": "はい、再ダウンロード",
+      "cancel": "キャンセル"
+    },
+    "recentSearches": {
+      "heading": "最近の検索",
+      "clear": "検索履歴をクリア",
+      "empty": "最近の検索はありません"
+    }
+  },
   "viewer": {
     "back": "戻る",
     "settings": "設定",
@@ -34,19 +97,7 @@
         "normal": "最初のページをペア"
       },
       "padding": {
-        "title": "余白",
-        "none": "なし",
-        "small": "小",
-        "medium": "中",
-        "large": "大"
-      },
-      "language": {
-        "title": "言語",
-        "system": "システムデフォルト",
-        "en": "English",
-        "ko": "한국어",
-        "ja": "日本語",
-        "zh": "中文"
+        "title": "余白"
       }
     }
   }

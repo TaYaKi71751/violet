@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ViewerSettings } from '../components/viewer/ViewerSettings';
 import { useSearchStore } from '../stores/search-store';
 import { useAppStore } from '../stores/app-store';
@@ -6,6 +7,7 @@ import { useSyncStatus, useTriggerSync, useTriggerFullSync } from '../hooks/useS
 import styles from './SettingsPage.module.css';
 
 export function SettingsPage() {
+  const { t } = useTranslation();
   const { recentSearches, clearRecentSearches } = useSearchStore();
   const { contentLanguage, uiLanguage, setContentLanguage, setUILanguage } = useAppStore();
   const { data: syncStatus } = useSyncStatus();
@@ -27,23 +29,23 @@ export function SettingsPage() {
   };
 
   const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return 'Never';
+    if (!dateStr) return t('settings.sync.never');
     return new Date(dateStr).toLocaleString();
   };
 
   const getStatusText = () => {
-    if (!syncStatus) return 'Loading...';
+    if (!syncStatus) return t('viewer.loading');
     switch (syncStatus.status) {
       case 'idle':
-        return 'Idle';
+        return t('settings.sync.idle');
       case 'checking':
-        return 'Checking for updates...';
+        return t('settings.sync.checking');
       case 'downloading_full':
-        return 'Downloading full database...';
+        return t('settings.sync.downloadingFull');
       case 'applying_chunks':
-        return 'Applying updates...';
+        return t('settings.sync.applyingChunks');
       case 'error':
-        return 'Error';
+        return t('settings.sync.error');
       default:
         return syncStatus.status;
     }
@@ -53,60 +55,60 @@ export function SettingsPage() {
 
   return (
     <div className={styles.page}>
-      <h2 className={styles.heading}>Settings</h2>
+      <h2 className={styles.heading}>{t('settings.heading')}</h2>
 
       <div className={styles.section}>
-        <h3 className={styles.subheading}>Language</h3>
+        <h3 className={styles.subheading}>{t('settings.language.heading')}</h3>
 
         <div className={styles.settingGroup}>
-          <label className={styles.settingLabel}>Content Language (Search Filter)</label>
+          <label className={styles.settingLabel}>{t('settings.language.contentLanguage')}</label>
           <select
             className={styles.select}
             value={contentLanguage}
             onChange={(e) => setContentLanguage(e.target.value as any)}
           >
-            <option value="all">All Languages</option>
-            <option value="korean">Korean</option>
-            <option value="english">English</option>
-            <option value="japanese">Japanese</option>
-            <option value="chinese">Chinese</option>
+            <option value="all">{t('settings.language.all')}</option>
+            <option value="korean">{t('settings.language.korean')}</option>
+            <option value="english">{t('settings.language.english')}</option>
+            <option value="japanese">{t('settings.language.japanese')}</option>
+            <option value="chinese">{t('settings.language.chinese')}</option>
           </select>
         </div>
 
         <div className={styles.settingGroup}>
-          <label className={styles.settingLabel}>UI Language</label>
+          <label className={styles.settingLabel}>{t('settings.language.uiLanguage')}</label>
           <select
             className={styles.select}
             value={uiLanguage}
             onChange={(e) => setUILanguage(e.target.value as any)}
           >
-            <option value="system">System Default</option>
-            <option value="en">English</option>
-            <option value="ko">한국어</option>
-            <option value="ja">日本語</option>
-            <option value="zh">中文</option>
+            <option value="system">{t('settings.language.system')}</option>
+            <option value="en">{t('settings.language.en')}</option>
+            <option value="ko">{t('settings.language.ko')}</option>
+            <option value="ja">{t('settings.language.ja')}</option>
+            <option value="zh">{t('settings.language.zh')}</option>
           </select>
         </div>
       </div>
 
       <div className={styles.section}>
-        <h3 className={styles.subheading}>Database Sync</h3>
+        <h3 className={styles.subheading}>{t('settings.sync.heading')}</h3>
 
         <div className={styles.syncInfo}>
           <div className={styles.infoRow}>
-            <span className={styles.label}>Database:</span>
+            <span className={styles.label}>{t('settings.sync.database')}</span>
             <span className={syncStatus?.dbExists ? styles.statusOk : styles.statusError}>
-              {syncStatus?.dbExists ? 'Ready' : 'Not Found'}
+              {syncStatus?.dbExists ? t('settings.sync.ready') : t('settings.sync.notFound')}
             </span>
           </div>
 
           <div className={styles.infoRow}>
-            <span className={styles.label}>Last Sync:</span>
+            <span className={styles.label}>{t('settings.sync.lastSync')}</span>
             <span>{formatDate(syncStatus?.lastSync || null)}</span>
           </div>
 
           <div className={styles.infoRow}>
-            <span className={styles.label}>Status:</span>
+            <span className={styles.label}>{t('settings.sync.status')}</span>
             <span className={isSyncing ? styles.statusSyncing : ''}>
               {getStatusText()}
             </span>
@@ -130,7 +132,7 @@ export function SettingsPage() {
 
           {syncStatus?.error && (
             <div className={styles.error}>
-              Error: {syncStatus.error}
+              {t('settings.sync.error')}: {syncStatus.error}
             </div>
           )}
         </div>
@@ -141,7 +143,7 @@ export function SettingsPage() {
             onClick={handleSyncNow}
             disabled={isSyncing || triggerSync.isPending}
           >
-            {triggerSync.isPending ? 'Starting...' : 'Sync Now'}
+            {triggerSync.isPending ? t('settings.sync.starting') : t('settings.sync.syncNow')}
           </button>
 
           <button
@@ -149,19 +151,19 @@ export function SettingsPage() {
             onClick={handleFullSync}
             disabled={isSyncing || triggerFullSync.isPending}
           >
-            {triggerFullSync.isPending ? 'Starting...' : 'Re-download DB'}
+            {triggerFullSync.isPending ? t('settings.sync.starting') : t('settings.sync.redownloadDB')}
           </button>
         </div>
 
         {showFullSyncConfirm && (
           <div className={styles.confirmDialog}>
-            <p>This will re-download the entire database. Continue?</p>
+            <p>{t('settings.sync.confirmRedownload')}</p>
             <div className={styles.confirmButtons}>
               <button className={styles.confirmBtn} onClick={confirmFullSync}>
-                Yes, Re-download
+                {t('settings.sync.yes')}
               </button>
               <button className={styles.cancelBtn} onClick={() => setShowFullSyncConfirm(false)}>
-                Cancel
+                {t('settings.sync.cancel')}
               </button>
             </div>
           </div>
@@ -171,7 +173,7 @@ export function SettingsPage() {
       <ViewerSettings />
 
       <div className={styles.section}>
-        <h3 className={styles.subheading}>Recent Searches</h3>
+        <h3 className={styles.subheading}>{t('settings.recentSearches.heading')}</h3>
         {recentSearches.length > 0 ? (
           <>
             <div className={styles.searches}>
@@ -180,11 +182,11 @@ export function SettingsPage() {
               ))}
             </div>
             <button className={styles.clearBtn} onClick={clearRecentSearches}>
-              Clear Search History
+              {t('settings.recentSearches.clear')}
             </button>
           </>
         ) : (
-          <p className={styles.empty}>No recent searches</p>
+          <p className={styles.empty}>{t('settings.recentSearches.empty')}</p>
         )}
       </div>
     </div>
