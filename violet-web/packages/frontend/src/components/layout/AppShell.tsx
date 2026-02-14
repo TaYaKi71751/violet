@@ -31,7 +31,6 @@ export function AppShell() {
             <SearchBar />
             {data && (
               <div className={styles.results}>
-                {query && <span className={styles.query}>{t('home.searchHeading', { query })}</span>}
                 <span className={styles.count}>{t('home.results', { count: data.totalCount })}</span>
               </div>
             )}

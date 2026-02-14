@@ -1,4 +1,9 @@
-import type { Article, ArticleSearchResult } from '@violet-web/shared';
+import type {
+  Article,
+  ArticleSearchResult,
+  SuggestionResult,
+  SuggestionCacheStatus,
+} from '@violet-web/shared';
 import { api } from './client';
 
 export async function searchArticles(
@@ -14,5 +19,25 @@ export async function searchArticles(
 
 export async function getArticle(id: number): Promise<Article> {
   const { data } = await api.get<Article>(`/content/${id}`);
+  return data;
+}
+
+export async function fetchSuggestions(
+  q: string,
+  limit = 20
+): Promise<SuggestionResult> {
+  const { data } = await api.get<SuggestionResult>('/content/suggest', {
+    params: { q, limit },
+  });
+  return data;
+}
+
+export async function rebuildSuggestionCache(): Promise<{ success: boolean }> {
+  const { data } = await api.post<{ success: boolean }>('/content/suggest/rebuild');
+  return data;
+}
+
+export async function getSuggestionCacheStatus(): Promise<SuggestionCacheStatus> {
+  const { data } = await api.get<SuggestionCacheStatus>('/content/suggest/status');
   return data;
 }

@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import { getContentDb, isContentDbReady } from '../services/content-db.js';
 import { translateQuery } from '../services/query-engine.js';
+import {
+  buildSuggestionCache,
+  searchSuggestions,
+  getCacheStatus,
+} from '../services/suggestion-engine.js';
 
 export const contentRouter = Router();
 
@@ -22,6 +27,41 @@ contentRouter.get('/search', (req, res) => {
   const totalCount = countRow?.cnt ?? 0;
 
   res.json({ articles, totalCount, page, pageSize });
+});
+
+// Suggestion endpoints (must be before /:id route)
+contentRouter.get('/suggest', (req, res) => {
+  if (!isContentDbReady()) {
+    res.status(503).json({ error: 'Database syncing, please wait.' });
+    return;
+  }
+
+  const q = (req.query.q as string) || '';
+  const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+
+  const suggestions = searchSuggestions(q, limit);
+  res.json({ suggestions });
+});
+
+contentRouter.post('/suggest/rebuild', (req, res) => {
+  if (!isContentDbReady()) {
+    res.status(503).json({ error: 'Database syncing, please wait.' });
+    return;
+  }
+
+  try {
+    const db = getContentDb();
+    buildSuggestionCache(db);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Failed to build suggestion cache:', error);
+    res.status(500).json({ error: 'Failed to build cache' });
+  }
+});
+
+contentRouter.get('/suggest/status', (req, res) => {
+  const status = getCacheStatus();
+  res.json(status);
 });
 
 contentRouter.get('/:id', (req, res) => {

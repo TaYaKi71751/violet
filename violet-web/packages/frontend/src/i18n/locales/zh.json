@@ -19,7 +19,10 @@
     "placeholder": "搜索... (例如: artist:名字, tag:名字)",
     "searchButton": "搜索",
     "noResults": "未找到搜索结果。",
-    "allLanguages": "所有语言"
+    "allLanguages": "所有语言",
+    "suggestions": "建议",
+    "recentSearches": "最近搜索",
+    "clearRecent": "清除"
   },
   "article": {
     "artist": "作者",
@@ -91,6 +94,15 @@
       "heading": "最近搜索",
       "clear": "清除搜索历史",
       "empty": "无最近搜索"
+    },
+    "suggestions": {
+      "heading": "建议缓存",
+      "build": "构建缓存",
+      "rebuild": "重建缓存",
+      "status": "状态",
+      "notBuilt": "未构建",
+      "built": "已构建",
+      "building": "构建中..."
     }
   },
   "viewer": {

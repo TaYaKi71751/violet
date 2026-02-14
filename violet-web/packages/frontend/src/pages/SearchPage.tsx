@@ -23,7 +23,7 @@ export function SearchPage() {
   return (
     <div>
       <h2 className={styles.heading}>
-        {query ? t('home.searchHeading', { query }) : t('home.heading')}
+        {t('home.heading')}
       </h2>
       <SearchFilters language={language} onLanguageChange={setLanguage} />
       {isLoading && <LoadingSpinner />}

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useSearchStore } from '../stores/search-store';
 import { useAppStore } from '../stores/app-store';
 import { useSyncStatus, useTriggerSync, useTriggerFullSync } from '../hooks/useSync';
+import { useSuggestionCacheStatus, useRebuildSuggestionCache } from '../hooks/useSuggestionCache';
 import styles from './SettingsPage.module.css';
 
 const themeColors = [
@@ -20,6 +21,8 @@ export function SettingsPage() {
   const triggerSync = useTriggerSync();
   const triggerFullSync = useTriggerFullSync();
   const [showFullSyncConfirm, setShowFullSyncConfirm] = useState(false);
+  const { data: cacheStatus } = useSuggestionCacheStatus();
+  const rebuildCache = useRebuildSuggestionCache();
 
   const handleSyncNow = () => {
     triggerSync.mutate();
@@ -193,6 +196,44 @@ export function SettingsPage() {
             </div>
           </div>
         )}
+      </div>
+
+      <div className={styles.section}>
+        <h3 className={styles.subheading}>{t('settings.suggestions.heading')}</h3>
+
+        <div className={styles.syncInfo}>
+          <div className={styles.infoRow}>
+            <span className={styles.label}>{t('settings.suggestions.status')}</span>
+            <span className={cacheStatus?.built ? styles.statusOk : styles.statusError}>
+              {cacheStatus?.built ? t('settings.suggestions.built') : t('settings.suggestions.notBuilt')}
+            </span>
+          </div>
+
+          {cacheStatus?.built && cacheStatus.counts && (
+            <>
+              {Object.entries(cacheStatus.counts).map(([key, count]) => (
+                <div key={key} className={styles.infoRow}>
+                  <span className={styles.label}>{key}:</span>
+                  <span>{count.toLocaleString()}</span>
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+
+        <div className={styles.syncButtons}>
+          <button
+            className={styles.syncBtn}
+            onClick={() => rebuildCache.mutate()}
+            disabled={rebuildCache.isPending}
+          >
+            {rebuildCache.isPending
+              ? t('settings.suggestions.building')
+              : cacheStatus?.built
+              ? t('settings.suggestions.rebuild')
+              : t('settings.suggestions.build')}
+          </button>
+        </div>
       </div>
 
       <div className={styles.section}>

@@ -31,3 +31,32 @@ export interface ImageList {
   bigThumbnails: string[];
   smallThumbnails: string[];
 }
+
+export type SuggestionCategory =
+  | 'artist'
+  | 'tag'
+  | 'male'
+  | 'female'
+  | 'series'
+  | 'character'
+  | 'group'
+  | 'uploader'
+  | 'lang'
+  | 'type'
+  | 'class';
+
+export interface TagEntry {
+  category: SuggestionCategory;
+  tag: string;
+  display: string;
+  count: number;
+}
+
+export interface SuggestionResult {
+  suggestions: TagEntry[];
+}
+
+export interface SuggestionCacheStatus {
+  built: boolean;
+  counts: Record<string, number>;
+}

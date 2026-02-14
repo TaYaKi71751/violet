@@ -19,7 +19,10 @@
     "placeholder": "검색... (예: artist:이름, tag:이름)",
     "searchButton": "검색",
     "noResults": "검색 결과가 없습니다.",
-    "allLanguages": "모든 언어"
+    "allLanguages": "모든 언어",
+    "suggestions": "추천",
+    "recentSearches": "최근 검색",
+    "clearRecent": "삭제"
   },
   "article": {
     "artist": "작가",
@@ -91,6 +94,15 @@
       "heading": "최근 검색",
       "clear": "검색 기록 지우기",
       "empty": "최근 검색 없음"
+    },
+    "suggestions": {
+      "heading": "제안 캐시",
+      "build": "캐시 빌드",
+      "rebuild": "캐시 재빌드",
+      "status": "상태",
+      "notBuilt": "빌드 안됨",
+      "built": "빌드됨",
+      "building": "빌드 중..."
     }
   },
   "viewer": {
