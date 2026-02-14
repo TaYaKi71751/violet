@@ -89,14 +89,12 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
             {artists.length > 0 && (
               <span>
                 {isDetail && <span className={styles.detailLabel}>Artist</span>}
-                {isDetail
-                  ? artists.map((a, i) => (
-                      <span key={a}>
-                        {i > 0 && ', '}
-                        <span className={styles.clickable} onClick={handleSearchClick('artist', a)}>{a}</span>
-                      </span>
-                    ))
-                  : artists.join(', ')}
+                {artists.map((a, i) => (
+                  <span key={a}>
+                    {i > 0 && ', '}
+                    <span className={styles.clickable} onClick={handleSearchClick('artist', a)}>{a}</span>
+                  </span>
+                ))}
               </span>
             )}
             {language && (

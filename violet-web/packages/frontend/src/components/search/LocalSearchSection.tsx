@@ -29,7 +29,7 @@ export function LocalSearchSection({
   isLoading,
 }: LocalSearchSectionProps) {
   const { t } = useTranslation();
-  const { viewMode, setViewMode } = useAppStore();
+  const { viewMode, setViewMode, cardMinWidth, setCardMinWidth } = useAppStore();
 
   return (
     <div className={styles.container}>
@@ -44,6 +44,16 @@ export function LocalSearchSection({
             {t('home.results', { count: resultCount })}
           </div>
         )}
+        <input
+          type="range"
+          className={styles.cardSizeSlider}
+          min={120}
+          max={350}
+          step={10}
+          value={cardMinWidth}
+          onChange={(e) => setCardMinWidth(Number(e.target.value))}
+          title={`Card width: ${cardMinWidth}px`}
+        />
         <label className={styles.viewSwitch} title={viewMode === 'grid' ? 'Detail view' : 'Grid view'}>
           <span className={styles.switchLabel}>▦</span>
           <input

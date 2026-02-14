@@ -11,13 +11,17 @@ interface SearchResultGridProps {
 export function SearchResultGrid({ articles }: SearchResultGridProps) {
   const { t } = useTranslation();
   const viewMode = useAppStore((s) => s.viewMode);
+  const cardMinWidth = useAppStore((s) => s.cardMinWidth);
 
   if (articles.length === 0) {
     return <div className={styles.empty}>{t('search.noResults')}</div>;
   }
 
   return (
-    <div className={styles.grid}>
+    <div
+      className={styles.grid}
+      style={{ '--card-min-width': `${cardMinWidth}px` } as React.CSSProperties}
+    >
       {articles.map((article) => (
         <ArticleCard key={article.Id} article={article} viewMode={viewMode} />
       ))}

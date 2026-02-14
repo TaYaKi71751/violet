@@ -17,7 +17,7 @@ export function AppShell() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
-  const { contentLanguage, viewMode, setViewMode } = useAppStore();
+  const { contentLanguage, viewMode, setViewMode, cardMinWidth, setCardMinWidth } = useAppStore();
   const searchBarRef = useRef<SearchBarRef>(null);
   const contentRef = useRef<HTMLElement>(null);
 
@@ -64,6 +64,16 @@ export function AppShell() {
                 <span className={styles.count}>{t('home.results', { count: data.totalCount })}</span>
               </div>
             )}
+            <input
+              type="range"
+              className={styles.cardSizeSlider}
+              min={120}
+              max={350}
+              step={10}
+              value={cardMinWidth}
+              onChange={(e) => setCardMinWidth(Number(e.target.value))}
+              title={`Card width: ${cardMinWidth}px`}
+            />
             <label className={styles.viewSwitch} title={viewMode === 'grid' ? 'Detail view' : 'Grid view'}>
               <span className={styles.switchLabel}>▦</span>
               <input

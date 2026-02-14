@@ -18,12 +18,14 @@ interface AppState {
   themeColor: ThemeColor;
   sidebarCollapsed: boolean;
   viewMode: ViewMode;
+  cardMinWidth: number;
 
   setContentLanguage: (lang: ContentLanguage) => void;
   setUILanguage: (lang: UILanguage) => void;
   setThemeColor: (color: ThemeColor) => void;
   toggleSidebar: () => void;
   setViewMode: (mode: ViewMode) => void;
+  setCardMinWidth: (width: number) => void;
 }
 
 // Helper to get system language
@@ -43,6 +45,7 @@ export const useAppStore = create<AppState>()(
       themeColor: 'purple',
       sidebarCollapsed: false,
       viewMode: 'grid',
+      cardMinWidth: 200,
 
       setContentLanguage: (contentLanguage) => set({ contentLanguage }),
       setUILanguage: (uiLanguage) => {
@@ -53,6 +56,7 @@ export const useAppStore = create<AppState>()(
       setThemeColor: (themeColor) => set({ themeColor }),
       toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
       setViewMode: (viewMode) => set({ viewMode }),
+      setCardMinWidth: (cardMinWidth) => set({ cardMinWidth }),
     }),
     { name: 'violet-app-settings' },
   ),
