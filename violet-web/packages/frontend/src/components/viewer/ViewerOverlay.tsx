@@ -27,10 +27,29 @@ export function ViewerOverlay({
   const { data: groups } = useBookmarkGroups();
   const [showBookmarkDialog, setShowBookmarkDialog] = useState(false);
 
+  const handleLeftTap = () => {
+    // Left third - could be used for previous page in paged mode
+    if (currentPage > 0) {
+      onPageChange(currentPage - 1);
+    }
+  };
+
+  const handleRightTap = () => {
+    // Right third - could be used for next page in paged mode
+    if (currentPage < totalPages - 1) {
+      onPageChange(currentPage + 1);
+    }
+  };
+
   if (!showOverlay) {
     return (
       <>
-        <div className={styles.tapZone} onClick={toggleOverlay} />
+        <div className={styles.tapZoneLeft} onClick={handleLeftTap} />
+        <div className={styles.tapZoneCenter} onClick={toggleOverlay} />
+        <div className={styles.tapZoneRight} onClick={handleRightTap} />
+        <div className={styles.pageIndicator}>
+          {t('viewer.pageInfo', { current: currentPage + 1, total: totalPages })}
+        </div>
         {showSettings && <ViewerSettingsPanel />}
       </>
     );
@@ -38,7 +57,9 @@ export function ViewerOverlay({
 
   return (
     <>
-      <div className={styles.tapZone} onClick={toggleOverlay} />
+      <div className={styles.tapZoneLeft} onClick={handleLeftTap} />
+      <div className={styles.tapZoneCenter} onClick={toggleOverlay} />
+      <div className={styles.tapZoneRight} onClick={handleRightTap} />
       <div className={styles.top}>
         <button className={styles.closeBtn} onClick={onClose}>
           {t('viewer.back')}

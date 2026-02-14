@@ -33,7 +33,7 @@ export const useViewerStore = create<ViewerState>()(
       pageMode: 'scroll',
       readDirection: 'rtl',
       padding: 0,
-      showOverlay: true,
+      showOverlay: false,
       twoPageMode: false,
       coverPageMode: 'cover',
       showSettings: false,

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useImageList } from '../hooks/useImageList';
 import { useViewer } from '../hooks/useViewer';
 import { useInsertReadLog, useUpdateReadLog } from '../hooks/useReadHistory';
+import { useViewerStore } from '../stores/viewer-store';
 import { ViewerContainer } from '../components/viewer/ViewerContainer';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { getProxyImageUrl } from '../api/proxy';
@@ -21,6 +22,11 @@ export function ViewerPage() {
   const insertLog = useInsertReadLog();
   const updateLog = useUpdateReadLog();
   const logIdRef = useRef<number | null>(null);
+
+  // Force hide overlay on mount
+  useEffect(() => {
+    useViewerStore.setState({ showOverlay: false });
+  }, []);
 
   // Insert read log on mount
   useEffect(() => {
