@@ -6,6 +6,7 @@
     "home": "ホーム",
     "bookmarks": "ブックマーク",
     "history": "履歴",
+    "downloads": "ダウンロード",
     "settings": "設定"
   },
   "home": {
@@ -46,6 +47,11 @@
   },
   "history": {
     "heading": "履歴"
+  },
+  "downloads": {
+    "heading": "ダウンロード",
+    "startToast": "ダウンロードを開始しました",
+    "errorToast": "ダウンロードの開始に失敗しました"
   },
   "viewer": {
     "noImages": "このギャラリーの画像が見つかりませんでした。"

@@ -6,6 +6,7 @@
     "home": "Home",
     "bookmarks": "Bookmarks",
     "history": "History",
+    "downloads": "Downloads",
     "settings": "Settings"
   },
   "home": {
@@ -46,6 +47,11 @@
   },
   "history": {
     "heading": "History"
+  },
+  "downloads": {
+    "heading": "Downloads",
+    "startToast": "Download started",
+    "errorToast": "Failed to start download"
   },
   "viewer": {
     "noImages": "No images found for this gallery."

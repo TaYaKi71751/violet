@@ -41,6 +41,16 @@ CREATE TABLE IF NOT EXISTS ArticleReadLog (
   LastPage      INTEGER,
   Type          INTEGER
 );
+
+CREATE TABLE IF NOT EXISTS Download (
+  Id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  Article         TEXT NOT NULL,
+  Status          TEXT NOT NULL DEFAULT 'pending',
+  TotalPages      INTEGER NOT NULL DEFAULT 0,
+  DownloadedPages INTEGER NOT NULL DEFAULT 0,
+  DateTime        TEXT NOT NULL,
+  ErrorMessage    TEXT
+);
 `;
 
 const DEFAULT_GROUP_SQL = `

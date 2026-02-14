@@ -6,6 +6,7 @@ const navItems = [
   { to: '/', labelKey: 'nav.home' },
   { to: '/bookmarks', labelKey: 'nav.bookmarks' },
   { to: '/history', labelKey: 'nav.history' },
+  { to: '/downloads', labelKey: 'nav.downloads' },
   { to: '/settings', labelKey: 'nav.settings' },
 ];
 

@@ -1,10 +1,12 @@
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import { Download } from 'lucide-react';
 import type { Article } from '@violet-web/shared';
 import { parsePipeTags, parseTagTuples, ticksToDate } from '@violet-web/shared';
 import { LazyImage } from '../common/LazyImage';
 import { useThumbnail } from '../../hooks/useThumbnail';
 import { useIsBookmarked, useToggleBookmark } from '../../hooks/useBookmarks';
+import { useStartDownload } from '../../hooks/useDownloads';
 import { useTagTranslation } from '../../hooks/useTagTranslation';
 import { useTagCounts } from '../../hooks/useTagCounts';
 import type { ViewMode } from '../../stores/app-store';
@@ -27,6 +29,7 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
   const { data: thumbnailUrl } = useThumbnail(article.Id);
   const { data: isBookmarked } = useIsBookmarked(String(article.Id));
   const toggleBookmark = useToggleBookmark();
+  const startDownload = useStartDownload();
   const { translateTag } = useTagTranslation();
   const tagCounts = useTagCounts();
 
@@ -36,6 +39,11 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
   const handleBookmarkClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleBookmark.mutate({ articleId: String(article.Id), isBookmarked: !!isBookmarked });
+  };
+
+  const handleDownloadClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    startDownload.mutate(String(article.Id));
   };
 
   const handleSearchClick = (category: string, value: string) => (e: React.MouseEvent) => {
@@ -80,6 +88,14 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
           ) : (
             <div className={styles.noImage}>{t('article.noImage')}</div>
           )}
+          <button
+            className={styles.downloadBtn}
+            onClick={handleDownloadClick}
+            disabled={startDownload.isPending}
+            aria-label={t('downloads.heading')}
+          >
+            <Download size={14} />
+          </button>
           <button
             className={`${styles.bookmarkBtn} ${isBookmarked ? styles.bookmarked : ''}`}
             onClick={handleBookmarkClick}

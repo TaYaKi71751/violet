@@ -57,6 +57,36 @@
   text-transform: capitalize;
 }
 
+.downloadBtn {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+  z-index: 10;
+  opacity: 0;
+}
+
+.card:hover .downloadBtn {
+  opacity: 1;
+}
+
+.downloadBtn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.1);
+}
+
 .bookmarkBtn {
   position: absolute;
   top: 8px;
