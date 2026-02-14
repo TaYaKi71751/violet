@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { ViewerSettings } from '../components/viewer/ViewerSettings';
 import { useSearchStore } from '../stores/search-store';
+import { useAppStore } from '../stores/app-store';
 import { useSyncStatus, useTriggerSync, useTriggerFullSync } from '../hooks/useSync';
 import styles from './SettingsPage.module.css';
 
 export function SettingsPage() {
   const { recentSearches, clearRecentSearches } = useSearchStore();
+  const { contentLanguage, uiLanguage, setContentLanguage, setUILanguage } = useAppStore();
   const { data: syncStatus } = useSyncStatus();
   const triggerSync = useTriggerSync();
   const triggerFullSync = useTriggerFullSync();
@@ -52,6 +54,40 @@ export function SettingsPage() {
   return (
     <div className={styles.page}>
       <h2 className={styles.heading}>Settings</h2>
+
+      <div className={styles.section}>
+        <h3 className={styles.subheading}>Language</h3>
+
+        <div className={styles.settingGroup}>
+          <label className={styles.settingLabel}>Content Language (Search Filter)</label>
+          <select
+            className={styles.select}
+            value={contentLanguage}
+            onChange={(e) => setContentLanguage(e.target.value as any)}
+          >
+            <option value="all">All Languages</option>
+            <option value="korean">Korean</option>
+            <option value="english">English</option>
+            <option value="japanese">Japanese</option>
+            <option value="chinese">Chinese</option>
+          </select>
+        </div>
+
+        <div className={styles.settingGroup}>
+          <label className={styles.settingLabel}>UI Language</label>
+          <select
+            className={styles.select}
+            value={uiLanguage}
+            onChange={(e) => setUILanguage(e.target.value as any)}
+          >
+            <option value="system">System Default</option>
+            <option value="en">English</option>
+            <option value="ko">한국어</option>
+            <option value="ja">日本語</option>
+            <option value="zh">中文</option>
+          </select>
+        </div>
+      </div>
 
       <div className={styles.section}>
         <h3 className={styles.subheading}>Database Sync</h3>

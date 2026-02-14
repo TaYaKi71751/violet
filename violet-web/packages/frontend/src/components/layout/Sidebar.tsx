@@ -3,7 +3,6 @@ import styles from './Sidebar.module.css';
 
 const navItems = [
   { to: '/', label: 'Home' },
-  { to: '/search', label: 'Search' },
   { to: '/bookmarks', label: 'Bookmarks' },
   { to: '/history', label: 'History' },
   { to: '/settings', label: 'Settings' },

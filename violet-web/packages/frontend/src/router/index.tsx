@@ -1,7 +1,6 @@
 import { Routes, Route } from 'react-router';
 import { AppShell } from '../components/layout/AppShell';
 import { HomePage } from '../pages/HomePage';
-import { SearchPage } from '../pages/SearchPage';
 import { ArticlePage } from '../pages/ArticlePage';
 import { ViewerPage } from '../pages/ViewerPage';
 import { BookmarksPage } from '../pages/BookmarksPage';
@@ -13,7 +12,6 @@ export function AppRoutes() {
     <Routes>
       <Route element={<AppShell />}>
         <Route index element={<HomePage />} />
-        <Route path="search" element={<SearchPage />} />
         <Route path="article/:id" element={<ArticlePage />} />
         <Route path="bookmarks" element={<BookmarksPage />} />
         <Route path="history" element={<HistoryPage />} />

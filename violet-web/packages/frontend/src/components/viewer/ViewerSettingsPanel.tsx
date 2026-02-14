@@ -11,14 +11,12 @@ export function ViewerSettingsPanel() {
     twoPageMode,
     coverPageMode,
     padding,
-    language,
     setViewMode,
     setPageMode,
     setReadDirection,
     setTwoPageMode,
     setCoverPageMode,
     setPadding,
-    setLanguage,
     toggleSettings,
   } = useViewerStore();
 
@@ -33,43 +31,6 @@ export function ViewerSettingsPanel() {
         </div>
 
         <div className={styles.content}>
-          {/* Language */}
-          <div className={styles.section}>
-            <label className={styles.label}>{t('viewer.settingsPanel.language.title')}</label>
-            <div className={styles.buttons}>
-              <button
-                className={`${styles.btn} ${language === 'system' ? styles.active : ''}`}
-                onClick={() => setLanguage('system')}
-              >
-                {t('viewer.settingsPanel.language.system')}
-              </button>
-              <button
-                className={`${styles.btn} ${language === 'en' ? styles.active : ''}`}
-                onClick={() => setLanguage('en')}
-              >
-                {t('viewer.settingsPanel.language.en')}
-              </button>
-              <button
-                className={`${styles.btn} ${language === 'ko' ? styles.active : ''}`}
-                onClick={() => setLanguage('ko')}
-              >
-                {t('viewer.settingsPanel.language.ko')}
-              </button>
-              <button
-                className={`${styles.btn} ${language === 'ja' ? styles.active : ''}`}
-                onClick={() => setLanguage('ja')}
-              >
-                {t('viewer.settingsPanel.language.ja')}
-              </button>
-              <button
-                className={`${styles.btn} ${language === 'zh' ? styles.active : ''}`}
-                onClick={() => setLanguage('zh')}
-              >
-                {t('viewer.settingsPanel.language.zh')}
-              </button>
-            </div>
-          </div>
-
           {/* Page Mode */}
           <div className={styles.section}>
             <label className={styles.label}>{t('viewer.settingsPanel.pageMode.title')}</label>
