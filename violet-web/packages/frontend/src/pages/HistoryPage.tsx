@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useReadHistory, useInfiniteReadHistory } from '../hooks/useReadHistory';
@@ -90,9 +90,14 @@ export function HistoryPage() {
 
   const totalPages = data ? Math.ceil(data.totalCount / data.pageSize) : 0;
 
-  // Reset selected tags when page changes
+  // Reset selected tags when page changes (but not on initial mount,
+  // to avoid a replace-navigation that would change location.key and break scroll restoration)
+  const prevPageRef = useRef(page);
   useEffect(() => {
-    resetTags();
+    if (prevPageRef.current !== page) {
+      prevPageRef.current = page;
+      resetTags();
+    }
   }, [page, resetTags]);
 
   return (
