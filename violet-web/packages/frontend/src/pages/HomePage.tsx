@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useSearch } from '../hooks/useSearch';
@@ -24,6 +24,11 @@ export function HomePage() {
     }
     setSearchParams(newParams);
   };
+
+  useEffect(() => {
+    document.title = query ? `${query} - Violet` : 'Violet';
+    return () => { document.title = 'Violet'; };
+  }, [query]);
 
   const fullQuery =
     contentLanguage !== 'all' ? `${query} lang:${contentLanguage}` : query;
