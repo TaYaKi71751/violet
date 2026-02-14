@@ -1,20 +1,48 @@
 .shell {
   display: flex;
-  flex-direction: column;
   height: 100vh;
   overflow: hidden;
 }
 
-.body {
+.mainArea {
   display: flex;
+  flex-direction: column;
   flex: 1;
   overflow: hidden;
+}
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--color-bg-elevated);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.results {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.query {
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.count {
+  font-size: 0.85rem;
 }
 
 .content {
   flex: 1;
   overflow-y: auto;
-  padding: var(--spacing-md);
+  padding: var(--spacing-lg);
 }
 
 @media (max-width: 767px) {
