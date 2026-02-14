@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useBookmarkGroups, useBookmarkArticles } from '../hooks/useBookmarks';
 import { BookmarkGroupList } from '../components/bookmark/BookmarkGroupList';
@@ -21,11 +21,18 @@ const PAGE_SIZE = 30;
 export function BookmarksPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const isMobile = useIsMobile();
   const { scrollMode } = useAppStore();
 
-  const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>(undefined);
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>(() => {
+    const saved = sessionStorage.getItem(`bookmarks:group:${location.key}`);
+    return saved ? parseInt(saved) : undefined;
+  });
+  const [visibleCount, setVisibleCount] = useState(() => {
+    const saved = sessionStorage.getItem(`bookmarks:visible:${location.key}`);
+    return saved ? parseInt(saved) : PAGE_SIZE;
+  });
 
   const { data: groups, isLoading: groupsLoading } = useBookmarkGroups();
   const { data: bookmarkArticles, isLoading: articlesLoading } =
@@ -64,10 +71,29 @@ export function BookmarksPage() {
       onReset: handleReset,
     });
 
-  // Reset selected tags and visible count when group changes
+  // Persist selectedGroupId and visibleCount to sessionStorage for scroll restoration
   useEffect(() => {
-    resetTags();
-    setVisibleCount(PAGE_SIZE);
+    if (selectedGroupId !== undefined) {
+      sessionStorage.setItem(`bookmarks:group:${location.key}`, String(selectedGroupId));
+    } else {
+      sessionStorage.removeItem(`bookmarks:group:${location.key}`);
+    }
+  }, [selectedGroupId, location.key]);
+
+  useEffect(() => {
+    sessionStorage.setItem(`bookmarks:visible:${location.key}`, String(visibleCount));
+  }, [visibleCount, location.key]);
+
+  // Reset selected tags and visible count when group changes
+  // Use a ref to track the previous group so we only reset on actual user-initiated changes,
+  // not on the initial mount where we restore from sessionStorage.
+  const prevGroupRef = useRef(selectedGroupId);
+  useEffect(() => {
+    if (prevGroupRef.current !== selectedGroupId) {
+      prevGroupRef.current = selectedGroupId;
+      resetTags();
+      setVisibleCount(PAGE_SIZE);
+    }
   }, [selectedGroupId, resetTags]);
 
   const handleLoadMore = useCallback(() => {
