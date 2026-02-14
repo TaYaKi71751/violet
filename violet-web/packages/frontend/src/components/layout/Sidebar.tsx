@@ -1,6 +1,8 @@
 import { NavLink, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Home, Bookmark, History, Settings, ChevronLeft, ChevronRight } from 'lucide-react';
+import { DiscordIcon } from '../icons/DiscordIcon';
+import { GithubIcon } from '../icons/GithubIcon';
 import { useAppStore } from '../../stores/app-store';
 import styles from './Sidebar.module.css';
 
@@ -44,6 +46,29 @@ export function Sidebar() {
             </NavLink>
           );
         })}
+      </div>
+
+      <div className={styles.socialLinks}>
+        <a
+          href="https://discord.gg/your-discord"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.socialLink}
+          title="Discord"
+        >
+          <DiscordIcon size={20} className={styles.icon} />
+          {!sidebarCollapsed && <span>Discord</span>}
+        </a>
+        <a
+          href="https://github.com/project-violet/violet"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.socialLink}
+          title="GitHub"
+        >
+          <GithubIcon size={20} className={styles.icon} />
+          {!sidebarCollapsed && <span>GitHub</span>}
+        </a>
       </div>
 
       <button className={styles.toggleBtn} onClick={toggleSidebar}>
