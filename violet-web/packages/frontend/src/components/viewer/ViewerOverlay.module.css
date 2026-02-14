@@ -64,8 +64,8 @@
   padding: 0;
   background: rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-sm);
-  color: #ffd700;
-  font-size: 1.3rem;
+  color: #fff;
+  font-size: 1.2rem;
   border: none;
   cursor: pointer;
   display: flex;
@@ -81,8 +81,12 @@
 }
 
 .bookmarkBtn.bookmarked {
-  color: #ffd700;
-  text-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffeb99;
+  text-shadow:
+    0 0 4px rgba(255, 235, 153, 0.4),
+    0 0 2px rgba(255, 235, 153, 0.3);
+  box-shadow: 0 0 0 1px rgba(255, 235, 153, 0.3);
 }
 
 .pageInfo {

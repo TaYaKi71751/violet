@@ -61,13 +61,13 @@
   position: absolute;
   top: 8px;
   right: 8px;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border: none;
   border-radius: var(--radius-sm);
-  background: rgba(0, 0, 0, 0.6);
-  color: #ffd700;
-  font-size: 1.2rem;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 1.1rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -75,14 +75,24 @@
   transition: all 0.2s;
   backdrop-filter: blur(4px);
   z-index: 10;
+  opacity: 0;
+}
+
+.card:hover .bookmarkBtn {
+  opacity: 1;
 }
 
 .bookmarkBtn:hover {
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(255, 255, 255, 0.25);
   transform: scale(1.1);
 }
 
 .bookmarkBtn.bookmarked {
-  color: #ffd700;
-  text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffeb99;
+  text-shadow:
+    0 0 4px rgba(255, 235, 153, 0.4),
+    0 0 2px rgba(255, 235, 153, 0.3);
+  box-shadow: 0 0 0 1px rgba(255, 235, 153, 0.3);
 }
