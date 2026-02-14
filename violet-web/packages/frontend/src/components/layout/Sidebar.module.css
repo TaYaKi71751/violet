@@ -5,7 +5,7 @@
   padding: var(--spacing-md) 0;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-sm);
   flex-shrink: 0;
   overflow-y: auto;
   transition: width 0.3s ease;
@@ -18,11 +18,13 @@
 
 .logoContainer {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: var(--spacing-md) 0;
   cursor: pointer;
   overflow: hidden;
+  gap: var(--spacing-md);
 }
 
 .logo {
@@ -33,6 +35,13 @@
 
 .collapsed .logo {
   height: 40px;
+}
+
+.logoText {
+  color: var(--color-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 .navLinks {

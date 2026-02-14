@@ -24,6 +24,7 @@ export function Sidebar() {
     <nav className={`${styles.sidebar} ${sidebarCollapsed ? styles.collapsed : ''}`}>
       <div className={styles.logoContainer} onClick={() => navigate('/')}>
         <img src={logoSrc} alt="Violet" className={styles.logo} />
+        {!sidebarCollapsed && <div className={styles.logoText}>Project Violet</div>}
       </div>
 
       <div className={styles.navLinks}>
