@@ -11,14 +11,17 @@ interface ViewerImageProps {
 
 const MAX_RETRIES = 10;
 const RETRY_DELAY = 1500; // 1.5 seconds
+const ACTIVE_DEBOUNCE = 150; // ms - prevents loading images during fast scrolling
 
 export function ViewerImage({ src, alt = '', active = true, onLoad }: ViewerImageProps) {
   const { t } = useTranslation();
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
+  const [shouldRender, setShouldRender] = useState(active);
   const imgRef = useRef<HTMLImageElement>(null);
   const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const activeTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     setLoaded(false);
@@ -26,10 +29,24 @@ export function ViewerImage({ src, alt = '', active = true, onLoad }: ViewerImag
     setRetryCount(0);
   }, [src]);
 
-  // If not active, don't load the image
-  if (!active) {
-    return <div className={styles.container} />;
-  }
+  // Debounce active state: only render after staying active for a short period
+  useEffect(() => {
+    if (active) {
+      activeTimeoutRef.current = setTimeout(() => {
+        setShouldRender(true);
+      }, ACTIVE_DEBOUNCE);
+    } else {
+      setShouldRender(false);
+      if (activeTimeoutRef.current) {
+        clearTimeout(activeTimeoutRef.current);
+      }
+    }
+    return () => {
+      if (activeTimeoutRef.current) {
+        clearTimeout(activeTimeoutRef.current);
+      }
+    };
+  }, [active]);
 
   useEffect(() => {
     return () => {
@@ -39,14 +56,17 @@ export function ViewerImage({ src, alt = '', active = true, onLoad }: ViewerImag
     };
   }, []);
 
+  // If not active, show placeholder
+  if (!shouldRender) {
+    return <div className={styles.container} />;
+  }
+
   const handleError = () => {
     if (retryCount < MAX_RETRIES) {
-      // Auto retry after delay
       retryTimeoutRef.current = setTimeout(() => {
         setRetryCount((c) => c + 1);
       }, RETRY_DELAY);
     } else {
-      // Max retries exceeded
       setError(true);
     }
   };
