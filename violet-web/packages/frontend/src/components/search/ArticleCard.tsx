@@ -46,6 +46,9 @@ export function ArticleCard({ article }: ArticleCardProps) {
           >
             {isBookmarked ? '★' : '☆'}
           </button>
+          {article.Files != null && (
+            <span className={styles.pageCount}>{article.Files}P</span>
+          )}
         </div>
         <div className={styles.info}>
           <div className={styles.title}>{article.Title}</div>
