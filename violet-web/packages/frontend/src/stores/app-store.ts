@@ -14,10 +14,12 @@ interface AppState {
   contentLanguage: ContentLanguage;
   uiLanguage: UILanguage;
   themeColor: ThemeColor;
+  sidebarCollapsed: boolean;
 
   setContentLanguage: (lang: ContentLanguage) => void;
   setUILanguage: (lang: UILanguage) => void;
   setThemeColor: (color: ThemeColor) => void;
+  toggleSidebar: () => void;
 }
 
 // Helper to get system language
@@ -35,6 +37,7 @@ export const useAppStore = create<AppState>()(
       contentLanguage: 'all',
       uiLanguage: 'system',
       themeColor: 'purple',
+      sidebarCollapsed: false,
 
       setContentLanguage: (contentLanguage) => set({ contentLanguage }),
       setUILanguage: (uiLanguage) => {
@@ -43,6 +46,7 @@ export const useAppStore = create<AppState>()(
         set({ uiLanguage });
       },
       setThemeColor: (themeColor) => set({ themeColor }),
+      toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
     }),
     { name: 'violet-app-settings' },
   ),
