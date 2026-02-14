@@ -41,7 +41,7 @@
 
 .cardSizeSlider {
   margin-left: auto;
-  width: 80px;
+  width: 100px;
   accent-color: var(--color-primary, #7c3aed);
   cursor: pointer;
 }

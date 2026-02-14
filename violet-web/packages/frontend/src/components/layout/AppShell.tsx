@@ -72,7 +72,6 @@ export function AppShell() {
               step={10}
               value={cardMinWidth}
               onChange={(e) => setCardMinWidth(Number(e.target.value))}
-              title={`Card width: ${cardMinWidth}px`}
             />
             <label className={styles.viewSwitch} title={viewMode === 'grid' ? 'Detail view' : 'Grid view'}>
               <span className={styles.switchLabel}>▦</span>
