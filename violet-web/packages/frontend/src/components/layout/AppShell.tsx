@@ -19,6 +19,12 @@ export function AppShell() {
   const query = searchParams.get('q') || '';
   const { contentLanguage } = useAppStore();
   const searchBarRef = useRef<SearchBarRef>(null);
+  const contentRef = useRef<HTMLElement>(null);
+
+  // Scroll content to top on navigation (pathname or query param change)
+  useEffect(() => {
+    contentRef.current?.scrollTo(0, 0);
+  }, [location.pathname, location.search]);
 
   const fullQuery = contentLanguage !== 'all' ? `${query} lang:${contentLanguage}` : query;
   const { data } = useSearch(fullQuery || ' ', 0);
@@ -60,7 +66,7 @@ export function AppShell() {
             )}
           </div>
         )}
-        <main className={styles.content}>
+        <main ref={contentRef} className={styles.content}>
           <Outlet />
         </main>
       </div>

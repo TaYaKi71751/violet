@@ -72,7 +72,7 @@ export function HistoryPage() {
   }, [page, resetTags]);
 
   return (
-    <div>
+    <div className={styles.page}>
       <h2 className={styles.heading}>{t('history.heading')}</h2>
 
       {!isMobile && (

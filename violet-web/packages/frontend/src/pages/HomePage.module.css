@@ -1,3 +1,9 @@
+.page {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .heading {
   font-size: 1.25rem;
   margin-bottom: var(--spacing-md);
@@ -14,19 +20,37 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-md);
-  margin-top: var(--spacing-lg);
-  padding: var(--spacing-md);
+  padding: 10px 16px;
+  position: sticky;
+  bottom: 12px;
+  width: fit-content;
+  margin-top: auto;
+  margin-left: auto;
+  margin-right: auto;
+  background: rgba(30, 30, 30, 0.85);
+  backdrop-filter: blur(8px);
+  border-radius: 999px;
+  z-index: 10;
+  color: #fff;
+  font-size: 0.85rem;
 }
 
 .pagination button {
-  padding: var(--spacing-sm) var(--spacing-md);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  color: var(--color-text);
+  padding: 6px 16px;
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.pagination button:hover {
+  background: rgba(255, 255, 255, 0.22);
 }
 
 .pagination button:disabled {
-  opacity: 0.4;
+  opacity: 0.3;
   cursor: not-allowed;
 }

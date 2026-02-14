@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useSearch } from '../hooks/useSearch';
@@ -29,33 +30,32 @@ export function HomePage() {
   const { data, isLoading } = useSearch(fullQuery || ' ', page);
 
   const totalPages = data ? Math.ceil(data.totalCount / data.pageSize) : 0;
+  const lastTotalPagesRef = useRef(0);
+  if (totalPages > 0) lastTotalPagesRef.current = totalPages;
+  const displayTotalPages = totalPages || lastTotalPagesRef.current;
 
   return (
-    <div>
+    <div className={styles.page}>
       {isLoading && <LoadingSpinner />}
-      {data && (
-        <>
-          <SearchResultGrid articles={data.articles} />
-          {totalPages > 1 && (
-            <div className={styles.pagination}>
-              <button
-                disabled={page === 0}
-                onClick={() => setPage((p) => p - 1)}
-              >
-                {t('home.prev')}
-              </button>
-              <span>
-                {page + 1} / {totalPages}
-              </span>
-              <button
-                disabled={page >= totalPages - 1}
-                onClick={() => setPage((p) => p + 1)}
-              >
-                {t('home.next')}
-              </button>
-            </div>
-          )}
-        </>
+      {data && <SearchResultGrid articles={data.articles} />}
+      {displayTotalPages > 1 && (
+        <div className={styles.pagination}>
+          <button
+            disabled={page === 0}
+            onClick={() => setPage((p) => p - 1)}
+          >
+            {t('home.prev')}
+          </button>
+          <span>
+            {page + 1} / {displayTotalPages}
+          </span>
+          <button
+            disabled={page >= displayTotalPages - 1}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            {t('home.next')}
+          </button>
+        </div>
       )}
     </div>
   );

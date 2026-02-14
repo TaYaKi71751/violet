@@ -2,7 +2,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: var(--spacing-xl);
+  flex: 1;
 }
 
 .spinner {
