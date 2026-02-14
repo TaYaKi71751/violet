@@ -245,6 +245,25 @@ export function searchSuggestions(query: string, limit = 20): TagEntry[] {
  */
 export function invalidateSuggestionCache(): void {
   cache = null;
+  tagCountsCache = null;
+}
+
+/**
+ * Get tag counts for female/male/tag categories as a minimal map
+ */
+let tagCountsCache: Record<string, number> | null = null;
+
+export function getTagCounts(): Record<string, number> {
+  if (tagCountsCache) return tagCountsCache;
+  if (!cache) return {};
+  const map: Record<string, number> = {};
+  for (const entry of cache) {
+    if (entry.category === 'female' || entry.category === 'male' || entry.category === 'tag') {
+      map[entry.display] = entry.count;
+    }
+  }
+  tagCountsCache = map;
+  return map;
 }
 
 /**

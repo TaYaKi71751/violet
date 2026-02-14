@@ -6,6 +6,7 @@ import { LazyImage } from '../common/LazyImage';
 import { useThumbnail } from '../../hooks/useThumbnail';
 import { useIsBookmarked, useToggleBookmark } from '../../hooks/useBookmarks';
 import { useTagTranslation } from '../../hooks/useTagTranslation';
+import { useTagCounts } from '../../hooks/useTagCounts';
 import type { ViewMode } from '../../stores/app-store';
 import styles from './ArticleCard.module.css';
 
@@ -27,6 +28,7 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
   const { data: isBookmarked } = useIsBookmarked(String(article.Id));
   const toggleBookmark = useToggleBookmark();
   const { translateTag } = useTagTranslation();
+  const tagCounts = useTagCounts();
 
   const artists = parsePipeTags(article.Artists);
   const language = article.Language ?? '';
@@ -57,6 +59,11 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
         .sort((a, b) => {
           const orderDiff = getTagOrder(a.namespace) - getTagOrder(b.namespace);
           if (orderDiff !== 0) return orderDiff;
+          if (tagCounts) {
+            const countA = tagCounts[`${a.namespace}:${a.tag}`] ?? 0;
+            const countB = tagCounts[`${b.namespace}:${b.tag}`] ?? 0;
+            return countB - countA;
+          }
           return a.tag.localeCompare(b.tag);
         })
     : [];

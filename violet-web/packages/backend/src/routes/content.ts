@@ -6,6 +6,7 @@ import {
   loadSuggestionCacheFromFile,
   searchSuggestions,
   getCacheStatus,
+  getTagCounts,
 } from '../services/suggestion-engine.js';
 
 // Load cache from file on startup, or build from DB if file not available
@@ -64,6 +65,10 @@ contentRouter.post('/suggest/rebuild', (req, res) => {
     console.error('Failed to build suggestion cache:', error);
     res.status(500).json({ error: 'Failed to build cache' });
   }
+});
+
+contentRouter.get('/suggest/tag-counts', (_req, res) => {
+  res.json(getTagCounts());
 });
 
 contentRouter.get('/suggest/status', (req, res) => {

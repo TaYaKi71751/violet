@@ -41,3 +41,8 @@ export async function getSuggestionCacheStatus(): Promise<SuggestionCacheStatus>
   const { data } = await api.get<SuggestionCacheStatus>('/content/suggest/status');
   return data;
 }
+
+export async function fetchTagCounts(): Promise<Record<string, number>> {
+  const { data } = await api.get<Record<string, number>>('/content/suggest/tag-counts');
+  return data;
+}

@@ -22,7 +22,9 @@ export function useTagTranslation() {
   const translateTag = useCallback(
     (namespace: string, tag: string): string | undefined => {
       if (!dict) return undefined;
-      const val = dict[`tag:${namespace}:${tag}`] ?? dict[`${namespace}:${tag}`];
+      const val = namespace
+        ? (dict[`tag:${namespace}:${tag}`] ?? dict[`${namespace}:${tag}`])
+        : dict[`tag:${tag}`];
       if (!val) return undefined;
       const idx = val.indexOf(':');
       return idx >= 0 ? val.slice(idx + 1) : val;
