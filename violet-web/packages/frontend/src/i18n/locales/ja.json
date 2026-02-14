@@ -41,7 +41,8 @@
     "all": "すべて",
     "addBookmark": "ブックマーク追加",
     "add": "追加",
-    "cancel": "キャンセル"
+    "cancel": "キャンセル",
+    "uncategorized": "未分類"
   },
   "history": {
     "heading": "履歴"

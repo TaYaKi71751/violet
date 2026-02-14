@@ -1,8 +1,6 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useViewerStore } from '../../stores/viewer-store';
-import { useBookmarkGroups, useIsBookmarked } from '../../hooks/useBookmarks';
-import { AddBookmarkDialog } from '../bookmark/AddBookmarkDialog';
+import { useIsBookmarked, useToggleBookmark } from '../../hooks/useBookmarks';
 import { ViewerSettingsPanel } from './ViewerSettingsPanel';
 import styles from './ViewerOverlay.module.css';
 
@@ -24,8 +22,7 @@ export function ViewerOverlay({
   const { t } = useTranslation();
   const { showOverlay, showSettings, toggleOverlay, toggleSettings } = useViewerStore();
   const { data: isBookmarked } = useIsBookmarked(String(galleryId));
-  const { data: groups } = useBookmarkGroups();
-  const [showBookmarkDialog, setShowBookmarkDialog] = useState(false);
+  const toggleBookmark = useToggleBookmark();
 
   const handleLeftTap = () => {
     // Left third - could be used for previous page in paged mode
@@ -68,8 +65,9 @@ export function ViewerOverlay({
           className={`${styles.bookmarkBtn} ${isBookmarked ? styles.bookmarked : ''}`}
           onClick={(e) => {
             e.stopPropagation();
-            setShowBookmarkDialog(true);
+            toggleBookmark.mutate({ articleId: String(galleryId), isBookmarked: !!isBookmarked });
           }}
+          disabled={toggleBookmark.isPending}
           aria-label={isBookmarked ? t('article.bookmarked') : t('article.bookmark')}
         >
           {isBookmarked ? '★' : '☆'}
@@ -98,13 +96,6 @@ export function ViewerOverlay({
         />
       </div>
       {showSettings && <ViewerSettingsPanel />}
-      {showBookmarkDialog && groups && (
-        <AddBookmarkDialog
-          articleId={String(galleryId)}
-          groups={groups}
-          onClose={() => setShowBookmarkDialog(false)}
-        />
-      )}
     </>
   );
 }

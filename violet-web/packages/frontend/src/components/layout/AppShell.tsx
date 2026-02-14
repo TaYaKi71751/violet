@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Sidebar } from './Sidebar';
 import { BottomNav } from './BottomNav';
 import { SearchBar } from '../search/SearchBar';
+import { Toast } from '../common/Toast';
 import { useIsMobile, useIsDesktop } from '../../hooks/useMediaQuery';
 import { useSearch } from '../../hooks/useSearch';
 import { useAppStore } from '../../stores/app-store';
@@ -41,6 +42,7 @@ export function AppShell() {
         </main>
       </div>
       {isMobile && <BottomNav />}
+      <Toast />
     </div>
   );
 }

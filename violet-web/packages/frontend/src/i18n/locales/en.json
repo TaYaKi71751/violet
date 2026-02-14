@@ -41,7 +41,8 @@
     "all": "All",
     "addBookmark": "Add Bookmark",
     "add": "Add",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "uncategorized": "Uncategorized"
   },
   "history": {
     "heading": "History"

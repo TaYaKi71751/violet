@@ -15,6 +15,10 @@ export function AddBookmarkDialog({ articleId, groups, onClose }: AddBookmarkDia
   const [selectedGroup, setSelectedGroup] = useState(1);
   const addBookmark = useAddBookmark();
 
+  const getGroupName = (group: BookmarkGroup) => {
+    return group.Name === 'violet_default' ? t('bookmarks.uncategorized') : group.Name;
+  };
+
   const handleAdd = () => {
     addBookmark.mutate(
       { Article: articleId, GroupId: selectedGroup },
@@ -33,7 +37,7 @@ export function AddBookmarkDialog({ articleId, groups, onClose }: AddBookmarkDia
         >
           {groups.map((g) => (
             <option key={g.Id} value={g.Id}>
-              {g.Name}
+              {getGroupName(g)}
             </option>
           ))}
         </select>

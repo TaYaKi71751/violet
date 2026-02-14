@@ -1,12 +1,10 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import type { Article } from '@violet-web/shared';
 import { parsePipeTags } from '@violet-web/shared';
 import { LazyImage } from '../common/LazyImage';
 import { useThumbnail } from '../../hooks/useThumbnail';
-import { useBookmarkGroups, useIsBookmarked } from '../../hooks/useBookmarks';
-import { AddBookmarkDialog } from '../bookmark/AddBookmarkDialog';
+import { useIsBookmarked, useToggleBookmark } from '../../hooks/useBookmarks';
 import styles from './ArticleCard.module.css';
 
 interface ArticleCardProps {
@@ -18,15 +16,14 @@ export function ArticleCard({ article }: ArticleCardProps) {
   const navigate = useNavigate();
   const { data: thumbnailUrl } = useThumbnail(article.Id);
   const { data: isBookmarked } = useIsBookmarked(String(article.Id));
-  const { data: groups } = useBookmarkGroups();
-  const [showBookmarkDialog, setShowBookmarkDialog] = useState(false);
+  const toggleBookmark = useToggleBookmark();
 
   const artists = parsePipeTags(article.Artists);
   const language = article.Language ?? '';
 
   const handleBookmarkClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setShowBookmarkDialog(true);
+    toggleBookmark.mutate({ articleId: String(article.Id), isBookmarked: !!isBookmarked });
   };
 
   return (
@@ -44,6 +41,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
           <button
             className={`${styles.bookmarkBtn} ${isBookmarked ? styles.bookmarked : ''}`}
             onClick={handleBookmarkClick}
+            disabled={toggleBookmark.isPending}
             aria-label={isBookmarked ? t('article.bookmarked') : t('article.bookmark')}
           >
             {isBookmarked ? '★' : '☆'}
@@ -57,14 +55,6 @@ export function ArticleCard({ article }: ArticleCardProps) {
           </div>
         </div>
       </div>
-
-      {showBookmarkDialog && groups && (
-        <AddBookmarkDialog
-          articleId={String(article.Id)}
-          groups={groups}
-          onClose={() => setShowBookmarkDialog(false)}
-        />
-      )}
     </>
   );
 }

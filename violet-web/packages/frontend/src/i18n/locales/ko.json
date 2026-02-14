@@ -41,7 +41,8 @@
     "all": "전체",
     "addBookmark": "북마크 추가",
     "add": "추가",
-    "cancel": "취소"
+    "cancel": "취소",
+    "uncategorized": "미분류"
   },
   "history": {
     "heading": "기록"

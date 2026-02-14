@@ -10,6 +10,11 @@ interface BookmarkGroupListProps {
 
 export function BookmarkGroupList({ groups, selectedId, onSelect }: BookmarkGroupListProps) {
   const { t } = useTranslation();
+
+  const getGroupName = (group: BookmarkGroup) => {
+    return group.Name === 'violet_default' ? t('bookmarks.uncategorized') : group.Name;
+  };
+
   return (
     <div className={styles.list}>
       <button
@@ -24,7 +29,7 @@ export function BookmarkGroupList({ groups, selectedId, onSelect }: BookmarkGrou
           className={`${styles.item} ${selectedId === g.Id ? styles.active : ''}`}
           onClick={() => onSelect(g.Id)}
         >
-          {g.Name}
+          {getGroupName(g)}
         </button>
       ))}
     </div>
