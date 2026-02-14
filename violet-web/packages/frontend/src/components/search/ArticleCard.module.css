@@ -12,6 +12,7 @@
 }
 
 .imageWrapper {
+  position: relative;
   aspect-ratio: 3 / 4;
   overflow: hidden;
 }
@@ -54,4 +55,34 @@
 
 .lang {
   text-transform: capitalize;
+}
+
+.bookmarkBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffd700;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+  z-index: 10;
+}
+
+.bookmarkBtn:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(1.1);
+}
+
+.bookmarkBtn.bookmarked {
+  color: #ffd700;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
 }

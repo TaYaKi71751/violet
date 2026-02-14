@@ -6,6 +6,7 @@ import { ViewerOverlay } from './ViewerOverlay';
 import styles from './ViewerContainer.module.css';
 
 interface ViewerContainerProps {
+  galleryId: number;
   imageUrls: string[];
   currentPage: number;
   totalPages: number;
@@ -14,6 +15,7 @@ interface ViewerContainerProps {
 }
 
 export function ViewerContainer({
+  galleryId,
   imageUrls,
   currentPage,
   totalPages,
@@ -52,6 +54,7 @@ export function ViewerContainer({
         />
       )}
       <ViewerOverlay
+        galleryId={galleryId}
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={onPageChange}

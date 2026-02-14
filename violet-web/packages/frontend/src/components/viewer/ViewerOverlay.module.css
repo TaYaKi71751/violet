@@ -35,6 +35,33 @@
   background: rgba(255, 255, 255, 0.25);
 }
 
+.bookmarkBtn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
+  color: #ffd700;
+  font-size: 1.3rem;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  margin-left: var(--spacing-sm);
+}
+
+.bookmarkBtn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.1);
+}
+
+.bookmarkBtn.bookmarked {
+  color: #ffd700;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
+}
+
 .pageInfo {
   color: #fff;
   font-size: 0.9rem;

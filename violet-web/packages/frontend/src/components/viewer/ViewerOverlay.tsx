@@ -1,9 +1,13 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useViewerStore } from '../../stores/viewer-store';
+import { useBookmarkGroups, useIsBookmarked } from '../../hooks/useBookmarks';
+import { AddBookmarkDialog } from '../bookmark/AddBookmarkDialog';
 import { ViewerSettingsPanel } from './ViewerSettingsPanel';
 import styles from './ViewerOverlay.module.css';
 
 interface ViewerOverlayProps {
+  galleryId: number;
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
@@ -11,6 +15,7 @@ interface ViewerOverlayProps {
 }
 
 export function ViewerOverlay({
+  galleryId,
   currentPage,
   totalPages,
   onPageChange,
@@ -18,6 +23,9 @@ export function ViewerOverlay({
 }: ViewerOverlayProps) {
   const { t } = useTranslation();
   const { showOverlay, showSettings, toggleOverlay, toggleSettings } = useViewerStore();
+  const { data: isBookmarked } = useIsBookmarked(String(galleryId));
+  const { data: groups } = useBookmarkGroups();
+  const [showBookmarkDialog, setShowBookmarkDialog] = useState(false);
 
   if (!showOverlay) {
     return (
@@ -34,6 +42,16 @@ export function ViewerOverlay({
       <div className={styles.top}>
         <button className={styles.closeBtn} onClick={onClose}>
           {t('viewer.back')}
+        </button>
+        <button
+          className={`${styles.bookmarkBtn} ${isBookmarked ? styles.bookmarked : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowBookmarkDialog(true);
+          }}
+          aria-label={isBookmarked ? t('article.bookmarked') : t('article.bookmark')}
+        >
+          {isBookmarked ? '★' : '☆'}
         </button>
         <span className={styles.pageInfo}>
           {t('viewer.pageInfo', { current: currentPage + 1, total: totalPages })}
@@ -59,6 +77,13 @@ export function ViewerOverlay({
         />
       </div>
       {showSettings && <ViewerSettingsPanel />}
+      {showBookmarkDialog && groups && (
+        <AddBookmarkDialog
+          articleId={String(galleryId)}
+          groups={groups}
+          onClose={() => setShowBookmarkDialog(false)}
+        />
+      )}
     </>
   );
 }

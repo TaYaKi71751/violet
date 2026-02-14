@@ -54,11 +54,12 @@ export function ViewerPage() {
 
   return (
     <ViewerContainer
+      galleryId={galleryId}
       imageUrls={proxyUrls}
       currentPage={currentPage}
       totalPages={totalPages}
       onPageChange={goToPage}
-      onClose={() => navigate(`/article/${galleryId}`)}
+      onClose={() => navigate('/')}
     />
   );
 }
