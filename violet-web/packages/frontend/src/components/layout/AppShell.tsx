@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { Outlet, useSearchParams, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Sidebar } from './Sidebar';
@@ -21,11 +21,15 @@ export function AppShell() {
   const searchBarRef = useRef<SearchBarRef>(null);
   const contentRef = useRef<HTMLElement>(null);
 
+  // Flag to prevent saving scroll position while restoring
+  const isRestoringRef = useRef(false);
+
   // Save scroll position on scroll (keyed by location.key)
   useEffect(() => {
     const content = contentRef.current;
     if (!content) return;
     const handleScroll = () => {
+      if (isRestoringRef.current) return;
       sessionStorage.setItem(`scroll:${location.key}`, String(content.scrollTop));
     };
     content.addEventListener('scroll', handleScroll, { passive: true });
@@ -34,12 +38,28 @@ export function AppShell() {
 
   // Restore saved scroll position or scroll to top on navigation
   useEffect(() => {
+    const content = contentRef.current;
+    if (!content) return;
+
     const saved = sessionStorage.getItem(`scroll:${location.key}`);
-    if (saved) {
-      contentRef.current?.scrollTo(0, parseInt(saved));
-    } else {
-      contentRef.current?.scrollTo(0, 0);
-    }
+    const target = saved ? parseInt(saved) : 0;
+
+    content.scrollTo(0, target);
+
+    if (!saved) return;
+
+    // Retry restoration as content renders (images, query data, etc.)
+    isRestoringRef.current = true;
+    const timers = [50, 100, 200, 500].map((delay) =>
+      setTimeout(() => content.scrollTo(0, target), delay),
+    );
+    const done = setTimeout(() => { isRestoringRef.current = false; }, 600);
+
+    return () => {
+      timers.forEach(clearTimeout);
+      clearTimeout(done);
+      isRestoringRef.current = false;
+    };
   }, [location.key]);
 
   const fullQuery = contentLanguage !== 'all' ? `${query} lang:${contentLanguage}` : query;
