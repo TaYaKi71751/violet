@@ -136,6 +136,16 @@
   color: var(--color-text-secondary);
 }
 
+.clickable {
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.clickable:hover {
+  color: var(--color-primary, #7c3aed);
+  text-decoration: underline;
+}
+
 .tagList {
   display: flex;
   flex-wrap: wrap;

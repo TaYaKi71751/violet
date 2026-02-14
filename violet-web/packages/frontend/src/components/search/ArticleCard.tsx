@@ -34,6 +34,17 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
     toggleBookmark.mutate({ articleId: String(article.Id), isBookmarked: !!isBookmarked });
   };
 
+  const handleSearchClick = (category: string, value: string) => (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const encoded = value.replace(/ /g, '_');
+    const url = `/?q=${category}:${encoded}`;
+    if (e.ctrlKey || e.metaKey) {
+      window.open(url, '_blank');
+    } else {
+      navigate(url);
+    }
+  };
+
   const isDetail = viewMode === 'detail';
 
   const groups = isDetail ? parsePipeTags(article.Groups) : [];
@@ -76,7 +87,17 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
           <div className={styles.title}>{article.Title}</div>
           <div className={styles.meta}>
             {artists.length > 0 && (
-              <span>{isDetail && <span className={styles.detailLabel}>Artist</span>}{artists.join(', ')}</span>
+              <span>
+                {isDetail && <span className={styles.detailLabel}>Artist</span>}
+                {isDetail
+                  ? artists.map((a, i) => (
+                      <span key={a}>
+                        {i > 0 && ', '}
+                        <span className={styles.clickable} onClick={handleSearchClick('artist', a)}>{a}</span>
+                      </span>
+                    ))
+                  : artists.join(', ')}
+              </span>
             )}
             {language && (
               <span className={styles.lang}>{isDetail && <span className={styles.detailLabel}>Lang</span>}{language}</span>
@@ -88,13 +109,23 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
               {groups.length > 0 && (
                 <div className={styles.detailRow}>
                   <span className={styles.detailLabel}>Group</span>
-                  <span>{groups.join(', ')}</span>
+                  <span>{groups.map((g, i) => (
+                    <span key={g}>
+                      {i > 0 && ', '}
+                      <span className={styles.clickable} onClick={handleSearchClick('group', g)}>{g}</span>
+                    </span>
+                  ))}</span>
                 </div>
               )}
               {series.length > 0 && (
                 <div className={styles.detailRow}>
                   <span className={styles.detailLabel}>Series</span>
-                  <span>{series.join(', ')}</span>
+                  <span>{series.map((s, i) => (
+                    <span key={s}>
+                      {i > 0 && ', '}
+                      <span className={styles.clickable} onClick={handleSearchClick('series', s)}>{s}</span>
+                    </span>
+                  ))}</span>
                 </div>
               )}
               {tags.length > 0 && (
