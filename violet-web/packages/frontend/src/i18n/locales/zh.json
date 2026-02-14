@@ -103,7 +103,7 @@
       "empty": "无最近搜索"
     },
     "suggestions": {
-      "heading": "建议缓存",
+      "heading": "标签缓存",
       "build": "构建缓存",
       "rebuild": "重建缓存",
       "status": "状态",

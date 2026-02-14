@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchStore } from '../stores/search-store';
+
 import { useAppStore } from '../stores/app-store';
 import { useSyncStatus, useTriggerSync, useTriggerFullSync } from '../hooks/useSync';
 import { useSuggestionCacheStatus, useRebuildSuggestionCache } from '../hooks/useSuggestionCache';
@@ -15,7 +15,6 @@ const themeColors = [
 
 export function SettingsPage() {
   const { t } = useTranslation();
-  const { recentSearches, clearRecentSearches } = useSearchStore();
   const { contentLanguage, uiLanguage, themeColor, scrollMode, setContentLanguage, setUILanguage, setThemeColor, setScrollMode } = useAppStore();
   const { data: syncStatus } = useSyncStatus();
   const triggerSync = useTriggerSync();
@@ -252,23 +251,6 @@ export function SettingsPage() {
         </div>
       </div>
 
-      <div className={styles.section}>
-        <h3 className={styles.subheading}>{t('settings.recentSearches.heading')}</h3>
-        {recentSearches.length > 0 ? (
-          <>
-            <div className={styles.searches}>
-              {recentSearches.map((q, i) => (
-                <span key={i} className={styles.searchItem}>{q}</span>
-              ))}
-            </div>
-            <button className={styles.clearBtn} onClick={clearRecentSearches}>
-              {t('settings.recentSearches.clear')}
-            </button>
-          </>
-        ) : (
-          <p className={styles.empty}>{t('settings.recentSearches.empty')}</p>
-        )}
-      </div>
     </div>
   );
 }

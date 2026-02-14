@@ -103,7 +103,7 @@
       "empty": "最近の検索はありません"
     },
     "suggestions": {
-      "heading": "サジェストキャッシュ",
+      "heading": "タグキャッシュ",
       "build": "キャッシュ構築",
       "rebuild": "キャッシュ再構築",
       "status": "ステータス",

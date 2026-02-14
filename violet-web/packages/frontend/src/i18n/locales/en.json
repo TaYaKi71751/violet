@@ -103,7 +103,7 @@
       "empty": "No recent searches"
     },
     "suggestions": {
-      "heading": "Suggestion Cache",
+      "heading": "Tag Cache",
       "build": "Build Cache",
       "rebuild": "Rebuild Cache",
       "status": "Status",

@@ -49,7 +49,7 @@ export const useAppStore = create<AppState>()(
       sidebarCollapsed: false,
       viewMode: 'grid',
       cardMinWidth: 200,
-      scrollMode: 'pagination',
+      scrollMode: 'infinite',
 
       setContentLanguage: (contentLanguage) => set({ contentLanguage }),
       setUILanguage: (uiLanguage) => {

@@ -103,7 +103,7 @@
       "empty": "최근 검색 없음"
     },
     "suggestions": {
-      "heading": "제안 캐시",
+      "heading": "태그 캐시",
       "build": "캐시 빌드",
       "rebuild": "캐시 재빌드",
       "status": "상태",
