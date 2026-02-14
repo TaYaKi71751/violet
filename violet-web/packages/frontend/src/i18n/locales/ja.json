@@ -79,7 +79,8 @@
     },
     "tagTranslation": {
       "heading": "タグ翻訳",
-      "korean": "韓国語"
+      "korean": "韓国語",
+      "koreanDesc": "カードと検索候補でタグを韓国語で表示します"
     },
     "sync": {
       "heading": "データベース同期",

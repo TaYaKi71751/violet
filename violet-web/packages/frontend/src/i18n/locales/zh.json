@@ -79,7 +79,8 @@
     },
     "tagTranslation": {
       "heading": "标签翻译",
-      "korean": "韩语"
+      "korean": "韩语",
+      "koreanDesc": "在卡片和搜索建议中以韩语显示标签"
     },
     "sync": {
       "heading": "数据库同步",

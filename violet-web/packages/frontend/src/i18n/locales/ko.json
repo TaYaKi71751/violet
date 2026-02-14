@@ -79,7 +79,8 @@
     },
     "tagTranslation": {
       "heading": "태그 번역",
-      "korean": "한국어"
+      "korean": "한국어",
+      "koreanDesc": "카드 및 검색 자동완성에서 태그를 한국어로 표시합니다"
     },
     "sync": {
       "heading": "데이터베이스 동기화",

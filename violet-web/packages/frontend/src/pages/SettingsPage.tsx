@@ -138,14 +138,18 @@ export function SettingsPage() {
       <div className={styles.section}>
         <h3 className={styles.subheading}>{t('settings.tagTranslation.heading')}</h3>
 
-        <div className={styles.settingGroup}>
-          <label className={styles.settingLabel}>
+        <div className={styles.toggleRow}>
+          <div className={styles.toggleInfo}>
+            <span className={styles.toggleLabel}>{t('settings.tagTranslation.korean')}</span>
+            <span className={styles.toggleDesc}>{t('settings.tagTranslation.koreanDesc')}</span>
+          </div>
+          <label className={styles.toggle}>
             <input
               type="checkbox"
               checked={tagTranslation}
               onChange={(e) => setTagTranslation(e.target.checked)}
             />
-            {' '}{t('settings.tagTranslation.korean')}
+            <span className={styles.toggleTrack} />
           </label>
         </div>
       </div>

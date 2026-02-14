@@ -79,7 +79,8 @@
     },
     "tagTranslation": {
       "heading": "Tag Translation",
-      "korean": "Korean"
+      "korean": "Korean",
+      "koreanDesc": "Display tags in Korean on cards and search suggestions"
     },
     "sync": {
       "heading": "Database Sync",
