@@ -11,3 +11,8 @@ export async function resolveGallery(id: number): Promise<ImageList> {
   const { data } = await api.get<ImageList>(`/proxy/gallery/${id}`);
   return data;
 }
+
+export async function getThumbnailUrl(galleryId: number): Promise<string> {
+  const { data } = await api.get<{ url: string }>(`/proxy/thumbnail/${galleryId}`);
+  return data.url;
+}

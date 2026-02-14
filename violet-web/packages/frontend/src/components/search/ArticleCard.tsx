@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router';
 import type { Article } from '@violet-web/shared';
 import { parsePipeTags } from '@violet-web/shared';
 import { LazyImage } from '../common/LazyImage';
-import { getProxyImageUrl } from '../../api/proxy';
+import { useThumbnail } from '../../hooks/useThumbnail';
 import styles from './ArticleCard.module.css';
 
 interface ArticleCardProps {
@@ -11,10 +11,7 @@ interface ArticleCardProps {
 
 export function ArticleCard({ article }: ArticleCardProps) {
   const navigate = useNavigate();
-
-  const thumbnailUrl = article.Thumbnail
-    ? getProxyImageUrl(article.Thumbnail)
-    : undefined;
+  const { data: thumbnailUrl } = useThumbnail(article.Id);
 
   const artists = parsePipeTags(article.Artists);
   const language = article.Language ?? '';

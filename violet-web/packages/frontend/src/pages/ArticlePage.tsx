@@ -6,7 +6,7 @@ import { useBookmarkGroups, useIsBookmarked } from '../hooks/useBookmarks';
 import { AddBookmarkDialog } from '../components/bookmark/AddBookmarkDialog';
 import { LazyImage } from '../components/common/LazyImage';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
-import { getProxyImageUrl } from '../api/proxy';
+import { useThumbnail } from '../hooks/useThumbnail';
 import styles from './ArticlePage.module.css';
 
 export function ArticlePage() {
@@ -16,6 +16,7 @@ export function ArticlePage() {
   const { data: article, isLoading } = useArticle(articleId);
   const { data: isBookmarked } = useIsBookmarked(id!);
   const { data: groups } = useBookmarkGroups();
+  const { data: thumbnailUrl } = useThumbnail(articleId);
   const [showBookmarkDialog, setShowBookmarkDialog] = useState(false);
 
   if (isLoading) return <LoadingSpinner />;
@@ -25,9 +26,6 @@ export function ArticlePage() {
   const tags = parseTagTuples(article.Tags);
   const series = parsePipeTags(article.Series);
   const characters = parsePipeTags(article.Characters);
-  const thumbnailUrl = article.Thumbnail
-    ? getProxyImageUrl(article.Thumbnail)
-    : undefined;
 
   return (
     <div className={styles.page}>
