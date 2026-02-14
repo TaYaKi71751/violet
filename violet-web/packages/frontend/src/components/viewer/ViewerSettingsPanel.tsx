@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import { useViewerStore } from '../../stores/viewer-store';
 import styles from './ViewerSettingsPanel.module.css';
 
 export function ViewerSettingsPanel() {
+  const { t } = useTranslation();
   const {
     viewMode,
     pageMode,
@@ -9,12 +11,14 @@ export function ViewerSettingsPanel() {
     twoPageMode,
     coverPageMode,
     padding,
+    language,
     setViewMode,
     setPageMode,
     setReadDirection,
     setTwoPageMode,
     setCoverPageMode,
     setPadding,
+    setLanguage,
     toggleSettings,
   } = useViewerStore();
 
@@ -22,28 +26,65 @@ export function ViewerSettingsPanel() {
     <div className={styles.overlay} onClick={toggleSettings}>
       <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h3>Viewer Settings</h3>
+          <h3>{t('viewer.settingsPanel.title')}</h3>
           <button className={styles.closeBtn} onClick={toggleSettings}>
             ×
           </button>
         </div>
 
         <div className={styles.content}>
+          {/* Language */}
+          <div className={styles.section}>
+            <label className={styles.label}>{t('viewer.settingsPanel.language.title')}</label>
+            <div className={styles.buttons}>
+              <button
+                className={`${styles.btn} ${language === 'system' ? styles.active : ''}`}
+                onClick={() => setLanguage('system')}
+              >
+                {t('viewer.settingsPanel.language.system')}
+              </button>
+              <button
+                className={`${styles.btn} ${language === 'en' ? styles.active : ''}`}
+                onClick={() => setLanguage('en')}
+              >
+                {t('viewer.settingsPanel.language.en')}
+              </button>
+              <button
+                className={`${styles.btn} ${language === 'ko' ? styles.active : ''}`}
+                onClick={() => setLanguage('ko')}
+              >
+                {t('viewer.settingsPanel.language.ko')}
+              </button>
+              <button
+                className={`${styles.btn} ${language === 'ja' ? styles.active : ''}`}
+                onClick={() => setLanguage('ja')}
+              >
+                {t('viewer.settingsPanel.language.ja')}
+              </button>
+              <button
+                className={`${styles.btn} ${language === 'zh' ? styles.active : ''}`}
+                onClick={() => setLanguage('zh')}
+              >
+                {t('viewer.settingsPanel.language.zh')}
+              </button>
+            </div>
+          </div>
+
           {/* Page Mode */}
           <div className={styles.section}>
-            <label className={styles.label}>Reading Mode</label>
+            <label className={styles.label}>{t('viewer.settingsPanel.pageMode.title')}</label>
             <div className={styles.buttons}>
               <button
                 className={`${styles.btn} ${pageMode === 'scroll' ? styles.active : ''}`}
                 onClick={() => setPageMode('scroll')}
               >
-                Scroll
+                {t('viewer.settingsPanel.pageMode.scroll')}
               </button>
               <button
                 className={`${styles.btn} ${pageMode === 'paged' ? styles.active : ''}`}
                 onClick={() => setPageMode('paged')}
               >
-                Paged
+                {t('viewer.settingsPanel.pageMode.paged')}
               </button>
             </div>
           </div>
@@ -51,19 +92,19 @@ export function ViewerSettingsPanel() {
           {/* View Mode (for scroll mode) */}
           {pageMode === 'scroll' && (
             <div className={styles.section}>
-              <label className={styles.label}>Scroll Direction</label>
+              <label className={styles.label}>{t('viewer.settingsPanel.viewMode.title')}</label>
               <div className={styles.buttons}>
                 <button
                   className={`${styles.btn} ${viewMode === 'vertical' ? styles.active : ''}`}
                   onClick={() => setViewMode('vertical')}
                 >
-                  Vertical
+                  {t('viewer.settingsPanel.viewMode.vertical')}
                 </button>
                 <button
                   className={`${styles.btn} ${viewMode === 'horizontal' ? styles.active : ''}`}
                   onClick={() => setViewMode('horizontal')}
                 >
-                  Horizontal
+                  {t('viewer.settingsPanel.viewMode.horizontal')}
                 </button>
               </div>
             </div>
@@ -71,38 +112,38 @@ export function ViewerSettingsPanel() {
 
           {/* Page Layout */}
           <div className={styles.section}>
-            <label className={styles.label}>Page Layout</label>
+            <label className={styles.label}>{t('viewer.settingsPanel.twoPageMode.title')}</label>
             <div className={styles.buttons}>
               <button
                 className={`${styles.btn} ${!twoPageMode ? styles.active : ''}`}
                 onClick={() => setTwoPageMode(false)}
               >
-                Single Page
+                {t('viewer.settingsPanel.twoPageMode.disabled')}
               </button>
               <button
                 className={`${styles.btn} ${twoPageMode ? styles.active : ''}`}
                 onClick={() => setTwoPageMode(true)}
               >
-                Two Pages
+                {t('viewer.settingsPanel.twoPageMode.enabled')}
               </button>
             </div>
           </div>
 
           {/* Read Direction */}
           <div className={styles.section}>
-            <label className={styles.label}>Reading Direction</label>
+            <label className={styles.label}>{t('viewer.settingsPanel.readDirection.title')}</label>
             <div className={styles.buttons}>
               <button
                 className={`${styles.btn} ${readDirection === 'ltr' ? styles.active : ''}`}
                 onClick={() => setReadDirection('ltr')}
               >
-                Left to Right
+                {t('viewer.settingsPanel.readDirection.ltr')}
               </button>
               <button
                 className={`${styles.btn} ${readDirection === 'rtl' ? styles.active : ''}`}
                 onClick={() => setReadDirection('rtl')}
               >
-                Right to Left
+                {t('viewer.settingsPanel.readDirection.rtl')}
               </button>
             </div>
           </div>
@@ -110,19 +151,19 @@ export function ViewerSettingsPanel() {
           {/* Cover Page Mode (only for two-page mode) */}
           {twoPageMode && (
             <div className={styles.section}>
-              <label className={styles.label}>First Page</label>
+              <label className={styles.label}>{t('viewer.settingsPanel.coverPageMode.title')}</label>
               <div className={styles.buttons}>
                 <button
                   className={`${styles.btn} ${coverPageMode === 'cover' ? styles.active : ''}`}
                   onClick={() => setCoverPageMode('cover')}
                 >
-                  Cover (Alone)
+                  {t('viewer.settingsPanel.coverPageMode.cover')}
                 </button>
                 <button
                   className={`${styles.btn} ${coverPageMode === 'normal' ? styles.active : ''}`}
                   onClick={() => setCoverPageMode('normal')}
                 >
-                  Normal (Pair)
+                  {t('viewer.settingsPanel.coverPageMode.normal')}
                 </button>
               </div>
             </div>
@@ -131,7 +172,7 @@ export function ViewerSettingsPanel() {
           {/* Padding (for vertical scroll) */}
           {pageMode === 'scroll' && viewMode === 'vertical' && (
             <div className={styles.section}>
-              <label className={styles.label}>Padding: {padding}px</label>
+              <label className={styles.label}>{t('viewer.settingsPanel.padding.title')}: {padding}px</label>
               <input
                 type="range"
                 min={0}

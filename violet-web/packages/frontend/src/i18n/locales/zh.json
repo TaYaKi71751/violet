@@ -1,0 +1,53 @@
+{
+  "viewer": {
+    "back": "返回",
+    "settings": "设置",
+    "pageInfo": "{{current}} / {{total}}",
+    "loading": "加载中...",
+    "retrying": "重试中... ({{current}}/{{max}})",
+    "loadError": "{{max}}次尝试后加载图片失败。点击重试。",
+    "settingsPanel": {
+      "title": "查看器设置",
+      "pageMode": {
+        "title": "页面模式",
+        "scroll": "滚动",
+        "paged": "翻页"
+      },
+      "viewMode": {
+        "title": "查看模式",
+        "vertical": "垂直",
+        "horizontal": "水平"
+      },
+      "twoPageMode": {
+        "title": "双页模式",
+        "enabled": "启用",
+        "disabled": "禁用"
+      },
+      "readDirection": {
+        "title": "阅读方向",
+        "ltr": "从左到右",
+        "rtl": "从右到左"
+      },
+      "coverPageMode": {
+        "title": "封面页",
+        "cover": "仅第一页",
+        "normal": "第一页配对"
+      },
+      "padding": {
+        "title": "边距",
+        "none": "无",
+        "small": "小",
+        "medium": "中",
+        "large": "大"
+      },
+      "language": {
+        "title": "语言",
+        "system": "系统默认",
+        "en": "English",
+        "ko": "한국어",
+        "ja": "日本語",
+        "zh": "中文"
+      }
+    }
+  }
+}

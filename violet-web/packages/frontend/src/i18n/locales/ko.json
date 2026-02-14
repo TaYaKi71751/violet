@@ -1,0 +1,53 @@
+{
+  "viewer": {
+    "back": "뒤로",
+    "settings": "설정",
+    "pageInfo": "{{current}} / {{total}}",
+    "loading": "로딩 중...",
+    "retrying": "재시도 중... ({{current}}/{{max}})",
+    "loadError": "{{max}}번 시도 후 이미지 로드 실패. 클릭하여 재시도.",
+    "settingsPanel": {
+      "title": "뷰어 설정",
+      "pageMode": {
+        "title": "페이지 모드",
+        "scroll": "스크롤",
+        "paged": "페이지 넘김"
+      },
+      "viewMode": {
+        "title": "보기 모드",
+        "vertical": "세로",
+        "horizontal": "가로"
+      },
+      "twoPageMode": {
+        "title": "두 페이지 보기",
+        "enabled": "사용",
+        "disabled": "사용 안 함"
+      },
+      "readDirection": {
+        "title": "읽기 방향",
+        "ltr": "왼쪽에서 오른쪽",
+        "rtl": "오른쪽에서 왼쪽"
+      },
+      "coverPageMode": {
+        "title": "표지 페이지",
+        "cover": "첫 페이지만",
+        "normal": "첫 페이지 쌍으로"
+      },
+      "padding": {
+        "title": "여백",
+        "none": "없음",
+        "small": "작게",
+        "medium": "중간",
+        "large": "크게"
+      },
+      "language": {
+        "title": "언어",
+        "system": "시스템 기본값",
+        "en": "English",
+        "ko": "한국어",
+        "ja": "日本語",
+        "zh": "中文"
+      }
+    }
+  }
+}

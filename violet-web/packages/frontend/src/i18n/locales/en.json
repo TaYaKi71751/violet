@@ -1,0 +1,53 @@
+{
+  "viewer": {
+    "back": "Back",
+    "settings": "Settings",
+    "pageInfo": "{{current}} / {{total}}",
+    "loading": "Loading...",
+    "retrying": "Retrying... ({{current}}/{{max}})",
+    "loadError": "Failed to load image after {{max}} attempts. Click to retry.",
+    "settingsPanel": {
+      "title": "Viewer Settings",
+      "pageMode": {
+        "title": "Page Mode",
+        "scroll": "Scroll",
+        "paged": "Paged"
+      },
+      "viewMode": {
+        "title": "View Mode",
+        "vertical": "Vertical",
+        "horizontal": "Horizontal"
+      },
+      "twoPageMode": {
+        "title": "Two-Page Mode",
+        "enabled": "Enabled",
+        "disabled": "Disabled"
+      },
+      "readDirection": {
+        "title": "Reading Direction",
+        "ltr": "Left to Right",
+        "rtl": "Right to Left"
+      },
+      "coverPageMode": {
+        "title": "Cover Page",
+        "cover": "First page alone",
+        "normal": "First page paired"
+      },
+      "padding": {
+        "title": "Padding",
+        "none": "None",
+        "small": "Small",
+        "medium": "Medium",
+        "large": "Large"
+      },
+      "language": {
+        "title": "Language",
+        "system": "System Default",
+        "en": "English",
+        "ko": "한국어",
+        "ja": "日本語",
+        "zh": "中文"
+      }
+    }
+  }
+}

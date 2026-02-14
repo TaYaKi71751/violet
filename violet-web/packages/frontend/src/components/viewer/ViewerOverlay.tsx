@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useViewerStore } from '../../stores/viewer-store';
 import { ViewerSettingsPanel } from './ViewerSettingsPanel';
 import styles from './ViewerOverlay.module.css';
@@ -15,6 +16,7 @@ export function ViewerOverlay({
   onPageChange,
   onClose,
 }: ViewerOverlayProps) {
+  const { t } = useTranslation();
   const { showOverlay, showSettings, toggleOverlay, toggleSettings } = useViewerStore();
 
   if (!showOverlay) {
@@ -31,10 +33,10 @@ export function ViewerOverlay({
       <div className={styles.tapZone} onClick={toggleOverlay} />
       <div className={styles.top}>
         <button className={styles.closeBtn} onClick={onClose}>
-          Back
+          {t('viewer.back')}
         </button>
         <span className={styles.pageInfo}>
-          {currentPage + 1} / {totalPages}
+          {t('viewer.pageInfo', { current: currentPage + 1, total: totalPages })}
         </span>
         <button
           className={styles.settingsBtn}
@@ -43,7 +45,7 @@ export function ViewerOverlay({
             toggleSettings();
           }}
         >
-          Settings
+          {t('viewer.settings')}
         </button>
       </div>
       <div className={styles.bottom}>

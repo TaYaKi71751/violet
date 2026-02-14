@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './ViewerImage.module.css';
 
 interface ViewerImageProps {
@@ -11,6 +12,7 @@ const MAX_RETRIES = 3;
 const RETRY_DELAY = 1500; // 1.5 seconds
 
 export function ViewerImage({ src, alt = '', onLoad }: ViewerImageProps) {
+  const { t } = useTranslation();
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
@@ -67,12 +69,14 @@ export function ViewerImage({ src, alt = '', onLoad }: ViewerImageProps) {
         />
       ) : (
         <div className={styles.error} onClick={manualRetry}>
-          Failed to load image after {MAX_RETRIES} attempts. Click to retry.
+          {t('viewer.loadError', { max: MAX_RETRIES })}
         </div>
       )}
       {!loaded && !error && (
         <div className={styles.loading}>
-          {retryCount > 0 ? `Retrying... (${retryCount}/${MAX_RETRIES})` : 'Loading...'}
+          {retryCount > 0
+            ? t('viewer.retrying', { current: retryCount, max: MAX_RETRIES })
+            : t('viewer.loading')}
         </div>
       )}
     </div>
