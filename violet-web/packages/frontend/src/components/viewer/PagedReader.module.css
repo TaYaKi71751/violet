@@ -28,7 +28,16 @@
   display: block;
 }
 
-/* When only one page is visible, allow full width */
-.container:has(.pageWrapper:only-of-type) .pageWrapper {
-  max-width: 100%;
+/* Single page mode - align to side based on reading direction */
+.container.singlePage {
+  justify-content: flex-end; /* LTR: page on right, empty on left */
+}
+
+.container.singlePage[data-rtl="true"] {
+  justify-content: flex-start; /* RTL: page on left, empty on right */
+}
+
+/* Keep single page at 50% width */
+.container.singlePage .pageWrapper {
+  max-width: 50%;
 }

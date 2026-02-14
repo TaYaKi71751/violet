@@ -28,6 +28,18 @@ export function ViewerPage() {
     useViewerStore.setState({ showOverlay: false });
   }, []);
 
+  // ESC key to exit viewer
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        navigate('/');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [navigate]);
+
   // Insert read log on mount
   useEffect(() => {
     if (!galleryId) return;
@@ -49,9 +61,43 @@ export function ViewerPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading) {
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#000',
+        zIndex: 100,
+      }}>
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
   if (!imageList || imageList.urls.length === 0) {
-    return <div style={{ padding: 20 }}>{t('viewer.noImages')}</div>;
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#000',
+        color: '#fff',
+        zIndex: 100,
+      }}>
+        {t('viewer.noImages')}
+      </div>
+    );
   }
 
   const proxyUrls = imageList.urls.map((url) =>

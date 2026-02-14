@@ -153,8 +153,15 @@ export function PagedReader({
     [containerRef, goNext, goPrev, rtl],
   );
 
+  const isSinglePage = visiblePageIndices.size === 1;
+
   return (
-    <div ref={setContainerRef} className={styles.container} onClick={handleClick}>
+    <div
+      ref={setContainerRef}
+      className={`${styles.container} ${isSinglePage ? styles.singlePage : ''}`}
+      onClick={handleClick}
+      data-rtl={rtl}
+    >
       {/* Render ALL pages, show/hide with CSS - no flickering */}
       {imageUrls.map((url, index) => (
         <div
