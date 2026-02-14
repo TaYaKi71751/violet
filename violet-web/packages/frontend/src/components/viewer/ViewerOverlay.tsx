@@ -20,21 +20,24 @@ export function ViewerOverlay({
   onClose,
 }: ViewerOverlayProps) {
   const { t } = useTranslation();
-  const { showOverlay, showSettings, toggleOverlay, toggleSettings } = useViewerStore();
+  const { showOverlay, showSettings, readDirection, toggleOverlay, toggleSettings } = useViewerStore();
   const { data: isBookmarked } = useIsBookmarked(String(galleryId));
   const toggleBookmark = useToggleBookmark();
+  const rtl = readDirection === 'rtl';
 
   const handleLeftTap = () => {
-    // Left third - could be used for previous page in paged mode
-    if (currentPage > 0) {
-      onPageChange(currentPage - 1);
+    if (rtl) {
+      if (currentPage < totalPages - 1) onPageChange(currentPage + 1);
+    } else {
+      if (currentPage > 0) onPageChange(currentPage - 1);
     }
   };
 
   const handleRightTap = () => {
-    // Right third - could be used for next page in paged mode
-    if (currentPage < totalPages - 1) {
-      onPageChange(currentPage + 1);
+    if (rtl) {
+      if (currentPage > 0) onPageChange(currentPage - 1);
+    } else {
+      if (currentPage < totalPages - 1) onPageChange(currentPage + 1);
     }
   };
 

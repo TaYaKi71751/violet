@@ -58,6 +58,31 @@ export function HorizontalReader({
     };
   }, [onPageChange]);
 
+  // Click navigation
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const container = containerRef.current;
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const halfWidth = rect.width / 2;
+
+      const goNext = () => {
+        if (currentPage < imageUrls.length - 1) onPageChange(currentPage + 1);
+      };
+      const goPrev = () => {
+        if (currentPage > 0) onPageChange(currentPage - 1);
+      };
+
+      if (clickX < halfWidth) {
+        rtl ? goNext() : goPrev();
+      } else {
+        rtl ? goPrev() : goNext();
+      }
+    },
+    [currentPage, imageUrls.length, onPageChange, rtl],
+  );
+
   // Check if a page should be actively loaded (within prefetch range)
   const isPageActive = useCallback(
     (pageIndex: number) => {
@@ -71,6 +96,7 @@ export function HorizontalReader({
       ref={containerRef}
       className={styles.container}
       style={{ direction: rtl ? 'rtl' : 'ltr' }}
+      onClick={handleClick}
     >
       {imageUrls.map((url, i) => (
         <div key={i} className={styles.page}>
