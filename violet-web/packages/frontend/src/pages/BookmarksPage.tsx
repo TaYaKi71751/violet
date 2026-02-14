@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useBookmarkGroups, useBookmarkArticles } from '../hooks/useBookmarks';
@@ -45,12 +45,17 @@ export function BookmarksPage() {
   // Filter articles based on URL query parameter
   const filteredArticles = useLocalArticleSearch(articles);
 
+  // Memoize reset callback
+  const handleReset = useCallback(() => {
+    navigate('/bookmarks', { replace: true });
+  }, [navigate]);
+
   // Local search state
   const { selectedTags, searchBarRef, getSuggestions, handleTagToggle, resetTags } =
     useLocalSearchState({
       basePath: '/bookmarks',
       tagSummary,
-      onReset: () => navigate('/bookmarks', { replace: true }),
+      onReset: handleReset,
     });
 
   // Reset selected tags when group changes

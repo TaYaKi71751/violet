@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import type { SearchBarRef } from '../components/search/SearchBar';
 import type { TagChipData } from './useArticleTagSummary';
 import { getLocalSuggestions } from './useLocalSuggestions';
@@ -9,10 +9,12 @@ interface UseLocalSearchStateOptions {
   basePath: string;
   tagSummary: TagChipData[];
   onReset?: () => void;
+  preserveParams?: string[]; // Query parameters to preserve when updating search
 }
 
-export function useLocalSearchState({ basePath, tagSummary, onReset }: UseLocalSearchStateOptions) {
+export function useLocalSearchState({ basePath, tagSummary, onReset, preserveParams = [] }: UseLocalSearchStateOptions) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
   const searchBarRef = useRef<SearchBarRef>(null);
 
@@ -42,31 +44,46 @@ export function useLocalSearchState({ basePath, tagSummary, onReset }: UseLocalS
   // Handle tag chip toggle
   const handleTagToggle = useCallback(
     (display: string) => {
-      const newSelected = new Set(selectedTags);
-      if (newSelected.has(display)) {
-        newSelected.delete(display);
-      } else {
-        newSelected.add(display);
-      }
-      setSelectedTags(newSelected);
+      setSelectedTags((prev) => {
+        const newSelected = new Set(prev);
+        if (newSelected.has(display)) {
+          newSelected.delete(display);
+        } else {
+          newSelected.add(display);
+        }
 
-      // Update URL with selected tags
-      const tags = Array.from(newSelected).join(' ');
-      if (tags) {
-        navigate(`${basePath}?q=${encodeURIComponent(tags)}`);
-      } else {
-        navigate(basePath);
-      }
+        // Update URL with selected tags while preserving other params
+        const newParams = new URLSearchParams();
+
+        // Preserve specified parameters (like 'p' for pagination)
+        preserveParams.forEach((param) => {
+          const value = searchParams.get(param);
+          if (value) {
+            newParams.set(param, value);
+          }
+        });
+
+        // Set or delete the query parameter
+        const tags = Array.from(newSelected).join(' ');
+        if (tags) {
+          newParams.set('q', tags);
+        } else {
+          newParams.delete('q');
+        }
+
+        const search = newParams.toString();
+        navigate(`${basePath}${search ? `?${search}` : ''}`);
+
+        return newSelected;
+      });
     },
-    [selectedTags, basePath, navigate]
+    [basePath, navigate, searchParams, preserveParams]
   );
 
   // Reset selected tags when needed
   const resetTags = useCallback(() => {
     setSelectedTags(new Set());
-    if (onReset) {
-      onReset();
-    }
+    onReset?.();
   }, [onReset]);
 
   return {
