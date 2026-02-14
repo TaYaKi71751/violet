@@ -148,6 +148,7 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
                 <div className={styles.tagList}>
                   {tags.map((tag) => {
                     const koTag = translateTag(tag.namespace, tag.tag.replace(/_/g, ' '));
+                    const category = tag.namespace || 'tag';
                     return (
                       <span
                         key={`${tag.namespace}:${tag.tag}`}
@@ -158,6 +159,7 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
                               ? styles.tagMale
                               : styles.tagGeneral
                         }`}
+                        onClick={handleSearchClick(category, tag.tag)}
                       >
                         {koTag ?? tag.tag.replace(/_/g, ' ')}
                       </span>
