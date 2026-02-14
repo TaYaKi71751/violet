@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo, type FormEvent, type KeyboardEvent } from 'react';
+import { useState, useRef, useEffect, useMemo, forwardRef, useImperativeHandle, type FormEvent, type KeyboardEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate, useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -9,7 +9,11 @@ import styles from './SearchBar.module.css';
 
 type DropdownItem = TagEntry | string;
 
-export function SearchBar() {
+export interface SearchBarRef {
+  focus: () => void;
+}
+
+export const SearchBar = forwardRef<SearchBarRef>(function SearchBar(_props, ref) {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const queryFromUrl = searchParams.get('q') || '';
@@ -26,6 +30,13 @@ export function SearchBar() {
   const navigate = useNavigate();
   const { recentSearches, addRecentSearch, clearRecentSearches } = useSearchStore();
   const { data: suggestions, isLoading } = useSuggestions(value);
+
+  // Expose focus method to parent
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      inputRef.current?.focus();
+    },
+  }));
 
   // Sync input value with URL query parameter
   useEffect(() => {
@@ -247,4 +258,4 @@ export function SearchBar() {
         )}
     </div>
   );
-}
+});
