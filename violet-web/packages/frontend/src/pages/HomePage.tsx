@@ -22,13 +22,9 @@ export function HomePage() {
 
   return (
     <div>
-      <h2 className={styles.heading}>
-        {query ? t('home.searchHeading', { query }) : t('home.heading')}
-      </h2>
       {isLoading && <LoadingSpinner />}
       {data && (
         <>
-          <p className={styles.count}>{t('home.results', { count: data.totalCount })}</p>
           <SearchResultGrid articles={data.articles} />
           {totalPages > 1 && (
             <div className={styles.pagination}>

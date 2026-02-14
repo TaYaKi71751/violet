@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ViewerSettings } from '../components/viewer/ViewerSettings';
 import { useSearchStore } from '../stores/search-store';
 import { useAppStore } from '../stores/app-store';
 import { useSyncStatus, useTriggerSync, useTriggerFullSync } from '../hooks/useSync';
@@ -169,8 +168,6 @@ export function SettingsPage() {
           </div>
         )}
       </div>
-
-      <ViewerSettings />
 
       <div className={styles.section}>
         <h3 className={styles.subheading}>{t('settings.recentSearches.heading')}</h3>

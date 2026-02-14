@@ -13,7 +13,7 @@ export function SearchBar() {
     const q = value.trim();
     if (!q) return;
     addRecentSearch(q);
-    navigate(`/search?q=${encodeURIComponent(q)}`);
+    navigate(`/?q=${encodeURIComponent(q)}`);
   };
 
   return (
