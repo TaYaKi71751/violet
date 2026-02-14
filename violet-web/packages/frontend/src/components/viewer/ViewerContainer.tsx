@@ -1,6 +1,7 @@
 import { useViewerStore } from '../../stores/viewer-store';
 import { VerticalReader } from './VerticalReader';
 import { HorizontalReader } from './HorizontalReader';
+import { PagedReader } from './PagedReader';
 import { ViewerOverlay } from './ViewerOverlay';
 import styles from './ViewerContainer.module.css';
 
@@ -19,11 +20,23 @@ export function ViewerContainer({
   onPageChange,
   onClose,
 }: ViewerContainerProps) {
-  const { viewMode, readDirection, padding } = useViewerStore();
+  const { viewMode, pageMode, readDirection, padding, twoPageMode, coverPageMode } =
+    useViewerStore();
+
+  const rtl = readDirection === 'rtl';
 
   return (
     <div className={styles.container}>
-      {viewMode === 'vertical' ? (
+      {pageMode === 'paged' ? (
+        <PagedReader
+          imageUrls={imageUrls}
+          currentPage={currentPage}
+          onPageChange={onPageChange}
+          rtl={rtl}
+          twoPageMode={twoPageMode}
+          coverPageMode={coverPageMode}
+        />
+      ) : viewMode === 'vertical' ? (
         <VerticalReader
           imageUrls={imageUrls}
           currentPage={currentPage}
@@ -35,7 +48,7 @@ export function ViewerContainer({
           imageUrls={imageUrls}
           currentPage={currentPage}
           onPageChange={onPageChange}
-          rtl={readDirection === 'rtl'}
+          rtl={rtl}
         />
       )}
       <ViewerOverlay

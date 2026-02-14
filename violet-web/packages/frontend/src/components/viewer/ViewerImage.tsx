@@ -7,20 +7,45 @@ interface ViewerImageProps {
   onLoad?: () => void;
 }
 
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1500; // 1.5 seconds
+
 export function ViewerImage({ src, alt = '', onLoad }: ViewerImageProps) {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const imgRef = useRef<HTMLImageElement>(null);
+  const retryTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     setLoaded(false);
     setError(false);
+    setRetryCount(0);
   }, [src]);
 
-  const retry = () => {
+  useEffect(() => {
+    return () => {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleError = () => {
+    if (retryCount < MAX_RETRIES) {
+      // Auto retry after delay
+      retryTimeoutRef.current = setTimeout(() => {
+        setRetryCount((c) => c + 1);
+      }, RETRY_DELAY);
+    } else {
+      // Max retries exceeded
+      setError(true);
+    }
+  };
+
+  const manualRetry = () => {
     setError(false);
-    setRetryCount((c) => c + 1);
+    setRetryCount(0);
   };
 
   const handleLoad = () => {
@@ -38,15 +63,17 @@ export function ViewerImage({ src, alt = '', onLoad }: ViewerImageProps) {
           alt={alt}
           className={`${styles.image} ${loaded ? styles.loaded : ''}`}
           onLoad={handleLoad}
-          onError={() => setError(true)}
+          onError={handleError}
         />
       ) : (
-        <div className={styles.error} onClick={retry}>
-          Failed to load image. Click to retry.
+        <div className={styles.error} onClick={manualRetry}>
+          Failed to load image after {MAX_RETRIES} attempts. Click to retry.
         </div>
       )}
       {!loaded && !error && (
-        <div className={styles.loading}>Loading...</div>
+        <div className={styles.loading}>
+          {retryCount > 0 ? `Retrying... (${retryCount}/${MAX_RETRIES})` : 'Loading...'}
+        </div>
       )}
     </div>
   );

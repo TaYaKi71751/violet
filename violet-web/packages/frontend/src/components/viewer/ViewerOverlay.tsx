@@ -1,4 +1,5 @@
 import { useViewerStore } from '../../stores/viewer-store';
+import { ViewerSettingsPanel } from './ViewerSettingsPanel';
 import styles from './ViewerOverlay.module.css';
 
 interface ViewerOverlayProps {
@@ -14,11 +15,14 @@ export function ViewerOverlay({
   onPageChange,
   onClose,
 }: ViewerOverlayProps) {
-  const { showOverlay, toggleOverlay } = useViewerStore();
+  const { showOverlay, showSettings, toggleOverlay, toggleSettings } = useViewerStore();
 
   if (!showOverlay) {
     return (
-      <div className={styles.tapZone} onClick={toggleOverlay} />
+      <>
+        <div className={styles.tapZone} onClick={toggleOverlay} />
+        {showSettings && <ViewerSettingsPanel />}
+      </>
     );
   }
 
@@ -32,6 +36,15 @@ export function ViewerOverlay({
         <span className={styles.pageInfo}>
           {currentPage + 1} / {totalPages}
         </span>
+        <button
+          className={styles.settingsBtn}
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleSettings();
+          }}
+        >
+          Settings
+        </button>
       </div>
       <div className={styles.bottom}>
         <input
@@ -43,6 +56,7 @@ export function ViewerOverlay({
           onChange={(e) => onPageChange(Number(e.target.value))}
         />
       </div>
+      {showSettings && <ViewerSettingsPanel />}
     </>
   );
 }
