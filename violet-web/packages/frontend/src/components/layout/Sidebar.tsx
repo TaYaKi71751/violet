@@ -50,7 +50,7 @@ export function Sidebar() {
 
       <div className={styles.socialLinks}>
         <a
-          href="https://discord.gg/your-discord"
+          href="https://discord.com/invite/fqrtRxC"
           target="_blank"
           rel="noopener noreferrer"
           className={styles.socialLink}
