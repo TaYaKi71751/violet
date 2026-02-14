@@ -1,0 +1,185 @@
+.page {
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.heading {
+  font-size: 1.25rem;
+}
+
+.section {
+  padding: var(--spacing-md);
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-md);
+}
+
+.subheading {
+  font-size: 1rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.searches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+}
+
+.searchItem {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.clearBtn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-danger);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.empty {
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+}
+
+.syncInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.label {
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.statusOk {
+  color: var(--color-success, #22c55e);
+  font-weight: 500;
+}
+
+.statusError {
+  color: var(--color-danger);
+  font-weight: 500;
+}
+
+.statusSyncing {
+  color: var(--color-primary, #8b5cf6);
+  font-weight: 500;
+}
+
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.progressBar {
+  height: 8px;
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--color-primary, #8b5cf6);
+  transition: width 0.3s ease;
+}
+
+.progressText {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.error {
+  padding: var(--spacing-sm);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-sm);
+  color: var(--color-danger);
+  font-size: 0.85rem;
+}
+
+.syncButtons {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.syncBtn,
+.fullSyncBtn {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.syncBtn {
+  background: var(--color-primary, #8b5cf6);
+  color: #fff;
+}
+
+.fullSyncBtn {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border, #e5e7eb);
+}
+
+.syncBtn:disabled,
+.fullSyncBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.confirmDialog {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: var(--radius-sm);
+}
+
+.confirmDialog p {
+  margin-bottom: var(--spacing-sm);
+  font-size: 0.9rem;
+}
+
+.confirmButtons {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.confirmBtn,
+.cancelBtn {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.confirmBtn {
+  background: var(--color-danger);
+  color: #fff;
+}
+
+.cancelBtn {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border, #e5e7eb);
+}

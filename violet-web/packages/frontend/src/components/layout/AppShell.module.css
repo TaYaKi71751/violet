@@ -1,0 +1,24 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-md);
+}
+
+@media (max-width: 767px) {
+  .content {
+    padding: var(--spacing-sm);
+    padding-bottom: calc(var(--bottomnav-height) + var(--spacing-sm));
+  }
+}
