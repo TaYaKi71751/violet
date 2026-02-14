@@ -6,20 +6,26 @@ import { BookmarkGroupList } from '../components/bookmark/BookmarkGroupList';
 import { LocalSearchSection } from '../components/search/LocalSearchSection';
 import { SearchResultGrid } from '../components/search/SearchResultGrid';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { InfiniteScroll } from '../components/common/InfiniteScroll';
 import { useQueries } from '@tanstack/react-query';
 import { getArticle } from '../api/content';
 import { useArticleTagSummary } from '../hooks/useArticleTagSummary';
 import { useLocalArticleSearch } from '../hooks/useLocalArticleSearch';
 import { useLocalSearchState } from '../hooks/useLocalSearchState';
 import { useIsMobile } from '../hooks/useMediaQuery';
+import { useAppStore } from '../stores/app-store';
 import styles from './BookmarksPage.module.css';
+
+const PAGE_SIZE = 30;
 
 export function BookmarksPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { scrollMode } = useAppStore();
 
   const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>(undefined);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const { data: groups, isLoading: groupsLoading } = useBookmarkGroups();
   const { data: bookmarkArticles, isLoading: articlesLoading } =
@@ -58,10 +64,22 @@ export function BookmarksPage() {
       onReset: handleReset,
     });
 
-  // Reset selected tags when group changes
+  // Reset selected tags and visible count when group changes
   useEffect(() => {
     resetTags();
+    setVisibleCount(PAGE_SIZE);
   }, [selectedGroupId, resetTags]);
+
+  const handleLoadMore = useCallback(() => {
+    setVisibleCount((prev) => prev + PAGE_SIZE);
+  }, []);
+
+  const displayedArticles =
+    scrollMode === 'infinite'
+      ? filteredArticles.slice(0, visibleCount)
+      : filteredArticles;
+
+  const hasMore = scrollMode === 'infinite' && visibleCount < filteredArticles.length;
 
   return (
     <div>
@@ -88,7 +106,17 @@ export function BookmarksPage() {
       )}
 
       {isLoading && <LoadingSpinner />}
-      {!isLoading && <SearchResultGrid articles={filteredArticles} />}
+      {!isLoading && scrollMode === 'infinite' ? (
+        <InfiniteScroll
+          hasMore={hasMore}
+          loading={false}
+          onLoadMore={handleLoadMore}
+        >
+          <SearchResultGrid articles={displayedArticles} />
+        </InfiniteScroll>
+      ) : (
+        !isLoading && <SearchResultGrid articles={displayedArticles} />
+      )}
     </div>
   );
 }

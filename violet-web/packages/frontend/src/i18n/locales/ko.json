@@ -71,6 +71,12 @@
       "heading": "테마 색상",
       "description": "원하는 색상 테마를 선택하세요"
     },
+    "display": {
+      "heading": "디스플레이",
+      "scrollMode": "스크롤 모드",
+      "pagination": "페이지네이션",
+      "infinite": "무한 스크롤"
+    },
     "sync": {
       "heading": "데이터베이스 동기화",
       "database": "데이터베이스:",

@@ -71,6 +71,12 @@
       "heading": "Theme Color",
       "description": "Choose your favorite color theme"
     },
+    "display": {
+      "heading": "Display",
+      "scrollMode": "Scroll Mode",
+      "pagination": "Pagination",
+      "infinite": "Infinite Scroll"
+    },
     "sync": {
       "heading": "Database Sync",
       "database": "Database:",

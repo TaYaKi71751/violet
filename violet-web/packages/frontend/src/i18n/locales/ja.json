@@ -71,6 +71,12 @@
       "heading": "テーマカラー",
       "description": "お好みのカラーテーマを選択"
     },
+    "display": {
+      "heading": "表示",
+      "scrollMode": "スクロールモード",
+      "pagination": "ページネーション",
+      "infinite": "無限スクロール"
+    },
     "sync": {
       "heading": "データベース同期",
       "database": "データベース:",

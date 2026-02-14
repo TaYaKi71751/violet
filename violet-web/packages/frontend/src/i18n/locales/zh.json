@@ -71,6 +71,12 @@
       "heading": "主题颜色",
       "description": "选择您喜欢的颜色主题"
     },
+    "display": {
+      "heading": "显示",
+      "scrollMode": "滚动模式",
+      "pagination": "分页",
+      "infinite": "无限滚动"
+    },
     "sync": {
       "heading": "数据库同步",
       "database": "数据库:",

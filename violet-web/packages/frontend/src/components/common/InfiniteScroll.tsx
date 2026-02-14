@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { LoadingSpinner } from './LoadingSpinner';
 
 interface InfiniteScrollProps {
   onLoadMore: () => void;
@@ -31,6 +32,7 @@ export function InfiniteScroll({ onLoadMore, hasMore, loading, children }: Infin
     <>
       {children}
       <div ref={sentinelRef} />
+      {loading && <LoadingSpinner />}
     </>
   );
 }

@@ -1,10 +1,11 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { useSearch } from '../hooks/useSearch';
+import { useSearch, useInfiniteSearch } from '../hooks/useSearch';
 import { useAppStore } from '../stores/app-store';
 import { SearchResultGrid } from '../components/search/SearchResultGrid';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { InfiniteScroll } from '../components/common/InfiniteScroll';
 import styles from './HomePage.module.css';
 
 export function HomePage() {
@@ -12,7 +13,7 @@ export function HomePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
   const page = parseInt(searchParams.get('p') || '0');
-  const { contentLanguage } = useAppStore();
+  const { contentLanguage, scrollMode } = useAppStore();
 
   const setPage = (updater: number | ((prev: number) => number)) => {
     const newPage = typeof updater === 'function' ? updater(page) : updater;
@@ -32,12 +33,49 @@ export function HomePage() {
 
   const fullQuery =
     contentLanguage !== 'all' ? `${query} lang:${contentLanguage}` : query;
-  const { data, isLoading } = useSearch(fullQuery || ' ', page);
+
+  // Pagination mode
+  const { data, isLoading } = useSearch(
+    scrollMode === 'pagination' ? (fullQuery || ' ') : '',
+    page,
+  );
+
+  // Infinite scroll mode
+  const {
+    data: infiniteData,
+    isLoading: infiniteLoading,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useInfiniteSearch(
+    scrollMode === 'infinite' ? (fullQuery || ' ') : '',
+  );
+
+  const handleLoadMore = useCallback(() => {
+    fetchNextPage();
+  }, [fetchNextPage]);
 
   const totalPages = data ? Math.ceil(data.totalCount / data.pageSize) : 0;
   const lastTotalPagesRef = useRef(0);
   if (totalPages > 0) lastTotalPagesRef.current = totalPages;
   const displayTotalPages = totalPages || lastTotalPagesRef.current;
+
+  if (scrollMode === 'infinite') {
+    const allArticles = infiniteData?.pages.flatMap((p) => p.articles) ?? [];
+
+    return (
+      <div className={styles.page}>
+        {infiniteLoading && !infiniteData && <LoadingSpinner />}
+        <InfiniteScroll
+          hasMore={!!hasNextPage}
+          loading={isFetchingNextPage}
+          onLoadMore={handleLoadMore}
+        >
+          <SearchResultGrid articles={allArticles} />
+        </InfiniteScroll>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.page}>

@@ -11,6 +11,7 @@ export type ThemeColor =
   | 'pink' | 'red' | 'teal' | 'yellow';
 
 export type ViewMode = 'grid' | 'detail';
+export type ScrollMode = 'pagination' | 'infinite';
 
 interface AppState {
   contentLanguage: ContentLanguage;
@@ -19,6 +20,7 @@ interface AppState {
   sidebarCollapsed: boolean;
   viewMode: ViewMode;
   cardMinWidth: number;
+  scrollMode: ScrollMode;
 
   setContentLanguage: (lang: ContentLanguage) => void;
   setUILanguage: (lang: UILanguage) => void;
@@ -26,6 +28,7 @@ interface AppState {
   toggleSidebar: () => void;
   setViewMode: (mode: ViewMode) => void;
   setCardMinWidth: (width: number) => void;
+  setScrollMode: (mode: ScrollMode) => void;
 }
 
 // Helper to get system language
@@ -46,6 +49,7 @@ export const useAppStore = create<AppState>()(
       sidebarCollapsed: false,
       viewMode: 'grid',
       cardMinWidth: 200,
+      scrollMode: 'pagination',
 
       setContentLanguage: (contentLanguage) => set({ contentLanguage }),
       setUILanguage: (uiLanguage) => {
@@ -57,6 +61,7 @@ export const useAppStore = create<AppState>()(
       toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
       setViewMode: (viewMode) => set({ viewMode }),
       setCardMinWidth: (cardMinWidth) => set({ cardMinWidth }),
+      setScrollMode: (scrollMode) => set({ scrollMode }),
     }),
     { name: 'violet-app-settings' },
   ),

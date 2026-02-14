@@ -16,7 +16,7 @@ const themeColors = [
 export function SettingsPage() {
   const { t } = useTranslation();
   const { recentSearches, clearRecentSearches } = useSearchStore();
-  const { contentLanguage, uiLanguage, themeColor, setContentLanguage, setUILanguage, setThemeColor } = useAppStore();
+  const { contentLanguage, uiLanguage, themeColor, scrollMode, setContentLanguage, setUILanguage, setThemeColor, setScrollMode } = useAppStore();
   const { data: syncStatus } = useSyncStatus();
   const triggerSync = useTriggerSync();
   const triggerFullSync = useTriggerFullSync();
@@ -116,6 +116,22 @@ export function SettingsPage() {
               </div>
             );
           })}
+        </div>
+      </div>
+
+      <div className={styles.section}>
+        <h3 className={styles.subheading}>{t('settings.display.heading')}</h3>
+
+        <div className={styles.settingGroup}>
+          <label className={styles.settingLabel}>{t('settings.display.scrollMode')}</label>
+          <select
+            className={styles.select}
+            value={scrollMode}
+            onChange={(e) => setScrollMode(e.target.value as any)}
+          >
+            <option value="pagination">{t('settings.display.pagination')}</option>
+            <option value="infinite">{t('settings.display.infinite')}</option>
+          </select>
         </div>
       </div>
 
