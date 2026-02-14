@@ -2,6 +2,8 @@ import { useRef, useEffect, useCallback } from 'react';
 import { ViewerImage } from './ViewerImage';
 import styles from './VerticalReader.module.css';
 
+const PREFETCH_RANGE = 5;
+
 interface VerticalReaderProps {
   imageUrls: string[];
   currentPage: number;
@@ -66,6 +68,14 @@ export function VerticalReader({
     scrollToPage(currentPage);
   }, [currentPage, scrollToPage]);
 
+  // Check if a page should be actively loaded (within prefetch range)
+  const isPageActive = useCallback(
+    (pageIndex: number) => {
+      return Math.abs(pageIndex - currentPage) <= PREFETCH_RANGE;
+    },
+    [currentPage]
+  );
+
   return (
     <div ref={containerRef} className={styles.container}>
       {imageUrls.map((url, i) => (
@@ -76,7 +86,7 @@ export function VerticalReader({
           className={styles.page}
           style={{ padding: `${padding}px 0` }}
         >
-          <ViewerImage src={url} alt={`Page ${i + 1}`} />
+          <ViewerImage src={url} alt={`Page ${i + 1}`} active={isPageActive(i)} />
         </div>
       ))}
     </div>

@@ -2,6 +2,8 @@ import { useEffect, useCallback, useMemo, useState } from 'react';
 import { ViewerImage } from './ViewerImage';
 import styles from './PagedReader.module.css';
 
+const PREFETCH_RANGE = 5;
+
 interface PagedReaderProps {
   imageUrls: string[];
   currentPage: number;
@@ -155,6 +157,14 @@ export function PagedReader({
 
   const isSinglePage = visiblePageIndices.size === 1;
 
+  // Check if a page should be actively loaded (within prefetch range)
+  const isPageActive = useCallback(
+    (pageIndex: number) => {
+      return Math.abs(pageIndex - currentPage) <= PREFETCH_RANGE;
+    },
+    [currentPage]
+  );
+
   return (
     <div
       ref={setContainerRef}
@@ -162,7 +172,7 @@ export function PagedReader({
       onClick={handleClick}
       data-rtl={rtl}
     >
-      {/* Render ALL pages, show/hide with CSS - no flickering */}
+      {/* Render ALL pages, but only load images within prefetch range */}
       {imageUrls.map((url, index) => (
         <div
           key={index}
@@ -172,7 +182,11 @@ export function PagedReader({
             order: orderedVisiblePages.indexOf(index),
           }}
         >
-          <ViewerImage src={url} alt={`Page ${index + 1}`} />
+          <ViewerImage
+            src={url}
+            alt={`Page ${index + 1}`}
+            active={isPageActive(index)}
+          />
         </div>
       ))}
     </div>

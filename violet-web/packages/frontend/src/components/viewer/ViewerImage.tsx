@@ -5,25 +5,31 @@ import styles from './ViewerImage.module.css';
 interface ViewerImageProps {
   src: string;
   alt?: string;
+  active?: boolean; // If false, show placeholder instead of loading image
   onLoad?: () => void;
 }
 
 const MAX_RETRIES = 10;
 const RETRY_DELAY = 1500; // 1.5 seconds
 
-export function ViewerImage({ src, alt = '', onLoad }: ViewerImageProps) {
+export function ViewerImage({ src, alt = '', active = true, onLoad }: ViewerImageProps) {
   const { t } = useTranslation();
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const imgRef = useRef<HTMLImageElement>(null);
-  const retryTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     setLoaded(false);
     setError(false);
     setRetryCount(0);
   }, [src]);
+
+  // If not active, don't load the image
+  if (!active) {
+    return <div className={styles.container} />;
+  }
 
   useEffect(() => {
     return () => {

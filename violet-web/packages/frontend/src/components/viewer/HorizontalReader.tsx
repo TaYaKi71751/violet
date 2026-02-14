@@ -2,6 +2,8 @@ import { useRef, useEffect, useCallback } from 'react';
 import { ViewerImage } from './ViewerImage';
 import styles from './HorizontalReader.module.css';
 
+const PREFETCH_RANGE = 5;
+
 interface HorizontalReaderProps {
   imageUrls: string[];
   currentPage: number;
@@ -56,6 +58,14 @@ export function HorizontalReader({
     };
   }, [onPageChange]);
 
+  // Check if a page should be actively loaded (within prefetch range)
+  const isPageActive = useCallback(
+    (pageIndex: number) => {
+      return Math.abs(pageIndex - currentPage) <= PREFETCH_RANGE;
+    },
+    [currentPage]
+  );
+
   return (
     <div
       ref={containerRef}
@@ -64,7 +74,7 @@ export function HorizontalReader({
     >
       {imageUrls.map((url, i) => (
         <div key={i} className={styles.page}>
-          <ViewerImage src={url} alt={`Page ${i + 1}`} />
+          <ViewerImage src={url} alt={`Page ${i + 1}`} active={isPageActive(i)} />
         </div>
       ))}
     </div>
