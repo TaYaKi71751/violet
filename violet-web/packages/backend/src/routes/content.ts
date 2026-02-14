@@ -3,9 +3,16 @@ import { getContentDb, isContentDbReady } from '../services/content-db.js';
 import { translateQuery } from '../services/query-engine.js';
 import {
   buildSuggestionCache,
+  loadSuggestionCacheFromFile,
   searchSuggestions,
   getCacheStatus,
 } from '../services/suggestion-engine.js';
+
+// Load cache from file on startup, or build from DB if file not available
+if (!loadSuggestionCacheFromFile() && isContentDbReady()) {
+  console.log('No suggestion cache file found, building from DB...');
+  buildSuggestionCache(getContentDb());
+}
 
 export const contentRouter = Router();
 

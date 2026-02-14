@@ -1,4 +1,8 @@
+import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { join } from 'path';
 import type { Database } from 'better-sqlite3';
+
+const CACHE_FILE = join(process.cwd(), 'suggestion-cache.json');
 
 export type SuggestionCategory =
   | 'artist'
@@ -156,10 +160,37 @@ export function buildSuggestionCache(db: Database): void {
   // Sort by count descending
   cache = allEntries.sort((a, b) => b.count - a.count);
 
+  // Persist to file
+  try {
+    writeFileSync(CACHE_FILE, JSON.stringify(cache));
+  } catch (e) {
+    console.warn('Failed to write suggestion cache file:', e);
+  }
+
   console.log('Suggestion cache built:', {
     totalEntries: cache.length,
     topEntry: cache[0] ? `${cache[0].display} (${cache[0].count})` : 'none',
   });
+}
+
+/**
+ * Load suggestion cache from file if available
+ * Returns true if cache was loaded, false otherwise
+ */
+export function loadSuggestionCacheFromFile(): boolean {
+  if (cache) return true;
+  try {
+    if (existsSync(CACHE_FILE)) {
+      cache = JSON.parse(readFileSync(CACHE_FILE, 'utf-8'));
+      console.log('Suggestion cache loaded from file:', {
+        totalEntries: cache!.length,
+      });
+      return true;
+    }
+  } catch (e) {
+    console.warn('Failed to load suggestion cache file:', e);
+  }
+  return false;
 }
 
 /**
