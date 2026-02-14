@@ -16,8 +16,35 @@
     "next": "Next"
   },
   "search": {
-    "placeholder": "Search...",
-    "searchButton": "Search"
+    "placeholder": "Search... (e.g. artist:name, tag:name)",
+    "searchButton": "Search",
+    "noResults": "No results found.",
+    "allLanguages": "All Languages"
+  },
+  "article": {
+    "artist": "Artist",
+    "language": "Language",
+    "type": "Type",
+    "pages": "Pages",
+    "series": "Series",
+    "characters": "Characters",
+    "read": "Read",
+    "bookmarked": "Bookmarked",
+    "bookmark": "Bookmark",
+    "noImage": "No Image"
+  },
+  "bookmarks": {
+    "heading": "Bookmarks",
+    "all": "All",
+    "addBookmark": "Add Bookmark",
+    "add": "Add",
+    "cancel": "Cancel"
+  },
+  "history": {
+    "heading": "History"
+  },
+  "viewer": {
+    "noImages": "No images found for this gallery."
   },
   "settings": {
     "heading": "Settings",

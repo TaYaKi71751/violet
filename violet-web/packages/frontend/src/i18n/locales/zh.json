@@ -16,8 +16,35 @@
     "next": "下一页"
   },
   "search": {
-    "placeholder": "搜索...",
-    "searchButton": "搜索"
+    "placeholder": "搜索... (例如: artist:名字, tag:名字)",
+    "searchButton": "搜索",
+    "noResults": "未找到搜索结果。",
+    "allLanguages": "所有语言"
+  },
+  "article": {
+    "artist": "作者",
+    "language": "语言",
+    "type": "类型",
+    "pages": "页数",
+    "series": "系列",
+    "characters": "角色",
+    "read": "阅读",
+    "bookmarked": "已收藏",
+    "bookmark": "收藏",
+    "noImage": "无图片"
+  },
+  "bookmarks": {
+    "heading": "书签",
+    "all": "全部",
+    "addBookmark": "添加书签",
+    "add": "添加",
+    "cancel": "取消"
+  },
+  "history": {
+    "heading": "历史"
+  },
+  "viewer": {
+    "noImages": "未找到该图库的图片。"
   },
   "settings": {
     "heading": "设置",

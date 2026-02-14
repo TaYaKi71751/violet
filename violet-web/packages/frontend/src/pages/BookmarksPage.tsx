@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useBookmarkGroups, useBookmarkArticles } from '../hooks/useBookmarks';
 import { useArticle } from '../hooks/useArticle';
 import { BookmarkGroupList } from '../components/bookmark/BookmarkGroupList';
@@ -9,6 +10,7 @@ import { getArticle } from '../api/content';
 import styles from './BookmarksPage.module.css';
 
 export function BookmarksPage() {
+  const { t } = useTranslation();
   const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>(undefined);
   const { data: groups, isLoading: groupsLoading } = useBookmarkGroups();
   const { data: bookmarkArticles, isLoading: articlesLoading } =
@@ -30,7 +32,7 @@ export function BookmarksPage() {
 
   return (
     <div>
-      <h2 className={styles.heading}>Bookmarks</h2>
+      <h2 className={styles.heading}>{t('bookmarks.heading')}</h2>
       {groups && (
         <BookmarkGroupList
           groups={groups}

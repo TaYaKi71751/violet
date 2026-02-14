@@ -16,8 +16,35 @@
     "next": "次へ"
   },
   "search": {
-    "placeholder": "検索...",
-    "searchButton": "検索"
+    "placeholder": "検索... (例: artist:名前, tag:名前)",
+    "searchButton": "検索",
+    "noResults": "検索結果が見つかりませんでした。",
+    "allLanguages": "すべての言語"
+  },
+  "article": {
+    "artist": "作家",
+    "language": "言語",
+    "type": "タイプ",
+    "pages": "ページ",
+    "series": "シリーズ",
+    "characters": "キャラクター",
+    "read": "読む",
+    "bookmarked": "ブックマーク済み",
+    "bookmark": "ブックマーク",
+    "noImage": "画像なし"
+  },
+  "bookmarks": {
+    "heading": "ブックマーク",
+    "all": "すべて",
+    "addBookmark": "ブックマーク追加",
+    "add": "追加",
+    "cancel": "キャンセル"
+  },
+  "history": {
+    "heading": "履歴"
+  },
+  "viewer": {
+    "noImages": "このギャラリーの画像が見つかりませんでした。"
   },
   "settings": {
     "heading": "設定",

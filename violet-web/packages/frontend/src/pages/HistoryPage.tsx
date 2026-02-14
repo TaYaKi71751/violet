@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useReadHistory } from '../hooks/useReadHistory';
 import { useQueries } from '@tanstack/react-query';
 import { getArticle } from '../api/content';
@@ -7,6 +8,7 @@ import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import styles from './HistoryPage.module.css';
 
 export function HistoryPage() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const { data, isLoading } = useReadHistory(page);
 
@@ -26,13 +28,13 @@ export function HistoryPage() {
 
   return (
     <div>
-      <h2 className={styles.heading}>History</h2>
+      <h2 className={styles.heading}>{t('history.heading')}</h2>
       {isLoading && <LoadingSpinner />}
       {!isLoading && <SearchResultGrid articles={articles} />}
       {totalPages > 1 && (
         <div className={styles.pagination}>
           <button disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
-            Prev
+            {t('home.prev')}
           </button>
           <span>
             {page + 1} / {totalPages}
@@ -41,7 +43,7 @@ export function HistoryPage() {
             disabled={page >= totalPages - 1}
             onClick={() => setPage((p) => p + 1)}
           >
-            Next
+            {t('home.next')}
           </button>
         </div>
       )}

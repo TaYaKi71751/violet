@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { useImageList } from '../hooks/useImageList';
 import { useViewer } from '../hooks/useViewer';
 import { useInsertReadLog, useUpdateReadLog } from '../hooks/useReadHistory';
@@ -8,6 +9,7 @@ import { getProxyImageUrl } from '../api/proxy';
 import { useEffect, useRef } from 'react';
 
 export function ViewerPage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const galleryId = parseInt(id!);
@@ -43,7 +45,7 @@ export function ViewerPage() {
 
   if (isLoading) return <LoadingSpinner />;
   if (!imageList || imageList.urls.length === 0) {
-    return <div style={{ padding: 20 }}>No images found for this gallery.</div>;
+    return <div style={{ padding: 20 }}>{t('viewer.noImages')}</div>;
   }
 
   const proxyUrls = imageList.urls.map((url) =>

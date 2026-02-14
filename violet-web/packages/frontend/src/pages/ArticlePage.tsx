@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { parsePipeTags, parseTagTuples } from '@violet-web/shared';
 import { useArticle } from '../hooks/useArticle';
 import { useBookmarkGroups, useIsBookmarked } from '../hooks/useBookmarks';
@@ -10,6 +11,7 @@ import { useThumbnail } from '../hooks/useThumbnail';
 import styles from './ArticlePage.module.css';
 
 export function ArticlePage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const articleId = parseInt(id!);
@@ -40,37 +42,37 @@ export function ArticlePage() {
           <div className={styles.meta}>
             {artists.length > 0 && (
               <div className={styles.field}>
-                <span className={styles.label}>Artist</span>
+                <span className={styles.label}>{t('article.artist')}</span>
                 <span>{artists.join(', ')}</span>
               </div>
             )}
             {article.Language && (
               <div className={styles.field}>
-                <span className={styles.label}>Language</span>
+                <span className={styles.label}>{t('article.language')}</span>
                 <span>{article.Language}</span>
               </div>
             )}
             {article.Type && (
               <div className={styles.field}>
-                <span className={styles.label}>Type</span>
+                <span className={styles.label}>{t('article.type')}</span>
                 <span>{article.Type}</span>
               </div>
             )}
             {article.Files && (
               <div className={styles.field}>
-                <span className={styles.label}>Pages</span>
+                <span className={styles.label}>{t('article.pages')}</span>
                 <span>{article.Files}</span>
               </div>
             )}
             {series.length > 0 && (
               <div className={styles.field}>
-                <span className={styles.label}>Series</span>
+                <span className={styles.label}>{t('article.series')}</span>
                 <span>{series.join(', ')}</span>
               </div>
             )}
             {characters.length > 0 && (
               <div className={styles.field}>
-                <span className={styles.label}>Characters</span>
+                <span className={styles.label}>{t('article.characters')}</span>
                 <span>{characters.join(', ')}</span>
               </div>
             )}
@@ -81,13 +83,13 @@ export function ArticlePage() {
               className={styles.readBtn}
               onClick={() => navigate(`/viewer/${article.Id}`)}
             >
-              Read
+              {t('article.read')}
             </button>
             <button
               className={styles.bookmarkBtn}
               onClick={() => setShowBookmarkDialog(true)}
             >
-              {isBookmarked ? 'Bookmarked' : 'Bookmark'}
+              {isBookmarked ? t('article.bookmarked') : t('article.bookmark')}
             </button>
           </div>
         </div>

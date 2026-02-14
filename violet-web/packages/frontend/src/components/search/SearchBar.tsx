@@ -1,9 +1,11 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { useSearchStore } from '../../stores/search-store';
 import styles from './SearchBar.module.css';
 
 export function SearchBar() {
+  const { t } = useTranslation();
   const [value, setValue] = useState('');
   const navigate = useNavigate();
   const addRecentSearch = useSearchStore((s) => s.addRecentSearch);
@@ -23,7 +25,7 @@ export function SearchBar() {
         type="text"
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder="Search... (e.g. artist:name, tag:name)"
+        placeholder={t('search.placeholder')}
       />
     </form>
   );

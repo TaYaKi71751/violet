@@ -16,8 +16,35 @@
     "next": "다음"
   },
   "search": {
-    "placeholder": "검색...",
-    "searchButton": "검색"
+    "placeholder": "검색... (예: artist:이름, tag:이름)",
+    "searchButton": "검색",
+    "noResults": "검색 결과가 없습니다.",
+    "allLanguages": "모든 언어"
+  },
+  "article": {
+    "artist": "작가",
+    "language": "언어",
+    "type": "타입",
+    "pages": "페이지",
+    "series": "시리즈",
+    "characters": "캐릭터",
+    "read": "읽기",
+    "bookmarked": "북마크됨",
+    "bookmark": "북마크",
+    "noImage": "이미지 없음"
+  },
+  "bookmarks": {
+    "heading": "북마크",
+    "all": "전체",
+    "addBookmark": "북마크 추가",
+    "add": "추가",
+    "cancel": "취소"
+  },
+  "history": {
+    "heading": "기록"
+  },
+  "viewer": {
+    "noImages": "갤러리에서 이미지를 찾을 수 없습니다."
   },
   "settings": {
     "heading": "설정",

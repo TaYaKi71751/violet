@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { BookmarkGroup } from '@violet-web/shared';
 import styles from './BookmarkGroupList.module.css';
 
@@ -8,13 +9,14 @@ interface BookmarkGroupListProps {
 }
 
 export function BookmarkGroupList({ groups, selectedId, onSelect }: BookmarkGroupListProps) {
+  const { t } = useTranslation();
   return (
     <div className={styles.list}>
       <button
         className={`${styles.item} ${selectedId === undefined ? styles.active : ''}`}
         onClick={() => onSelect(undefined)}
       >
-        All
+        {t('bookmarks.all')}
       </button>
       {groups.map((g) => (
         <button

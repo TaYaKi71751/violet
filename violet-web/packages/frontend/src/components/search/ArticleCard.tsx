@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import type { Article } from '@violet-web/shared';
 import { parsePipeTags } from '@violet-web/shared';
 import { LazyImage } from '../common/LazyImage';
@@ -10,6 +11,7 @@ interface ArticleCardProps {
 }
 
 export function ArticleCard({ article }: ArticleCardProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: thumbnailUrl } = useThumbnail(article.Id);
 
@@ -25,7 +27,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
         {thumbnailUrl ? (
           <LazyImage src={thumbnailUrl} alt={article.Title} className={styles.image} />
         ) : (
-          <div className={styles.noImage}>No Image</div>
+          <div className={styles.noImage}>{t('article.noImage')}</div>
         )}
       </div>
       <div className={styles.info}>
