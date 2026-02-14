@@ -124,4 +124,9 @@
   z-index: 15;
   pointer-events: none;
   backdrop-filter: blur(4px);
+  transition: bottom 0.2s ease;
+}
+
+.pageIndicatorAboveSlider {
+  bottom: 70px;
 }

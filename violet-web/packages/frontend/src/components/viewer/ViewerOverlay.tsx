@@ -38,63 +38,56 @@ export function ViewerOverlay({
     }
   };
 
-  if (!showOverlay) {
-    return (
-      <>
-        <div className={styles.tapZoneLeft} onClick={handleLeftTap} />
-        <div className={styles.tapZoneCenter} onClick={toggleOverlay} />
-        <div className={styles.tapZoneRight} onClick={handleRightTap} />
-        <div className={styles.pageIndicator}>
-          {t('viewer.pageInfo', { current: currentPage + 1, total: totalPages })}
-        </div>
-        {showSettings && <ViewerSettingsPanel />}
-      </>
-    );
-  }
-
   return (
     <>
       <div className={styles.tapZoneLeft} onClick={handleLeftTap} />
       <div className={styles.tapZoneCenter} onClick={toggleOverlay} />
       <div className={styles.tapZoneRight} onClick={handleRightTap} />
-      <div className={styles.top}>
-        <button className={styles.closeBtn} onClick={onClose}>
-          {t('viewer.back')}
-        </button>
-        <button
-          className={`${styles.bookmarkBtn} ${isBookmarked ? styles.bookmarked : ''}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleBookmark.mutate({ articleId: String(galleryId), isBookmarked: !!isBookmarked });
-          }}
-          disabled={toggleBookmark.isPending}
-          aria-label={isBookmarked ? t('article.bookmarked') : t('article.bookmark')}
-        >
-          {isBookmarked ? '★' : '☆'}
-        </button>
-        <span className={styles.pageInfo}>
-          {t('viewer.pageInfo', { current: currentPage + 1, total: totalPages })}
-        </span>
-        <button
-          className={styles.settingsBtn}
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleSettings();
-          }}
-        >
-          {t('viewer.settings')}
-        </button>
+
+      <div className={`${styles.pageIndicator} ${showOverlay ? styles.pageIndicatorAboveSlider : ''}`}>
+        {t('viewer.pageInfo', { current: currentPage + 1, total: totalPages })}
       </div>
-      <div className={styles.bottom}>
-        <input
-          type="range"
-          className={styles.slider}
-          min={0}
-          max={totalPages - 1}
-          value={currentPage}
-          onChange={(e) => onPageChange(Number(e.target.value))}
-        />
-      </div>
+
+      {showOverlay && (
+        <>
+          <div className={styles.top}>
+            <button className={styles.closeBtn} onClick={onClose}>
+              {t('viewer.back')}
+            </button>
+            <button
+              className={`${styles.bookmarkBtn} ${isBookmarked ? styles.bookmarked : ''}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleBookmark.mutate({ articleId: String(galleryId), isBookmarked: !!isBookmarked });
+              }}
+              disabled={toggleBookmark.isPending}
+              aria-label={isBookmarked ? t('article.bookmarked') : t('article.bookmark')}
+            >
+              {isBookmarked ? '★' : '☆'}
+            </button>
+            <div style={{ flex: 1 }} />
+            <button
+              className={styles.settingsBtn}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleSettings();
+              }}
+            >
+              {t('viewer.settings')}
+            </button>
+          </div>
+          <div className={styles.bottom}>
+            <input
+              type="range"
+              className={styles.slider}
+              min={0}
+              max={totalPages - 1}
+              value={currentPage}
+              onChange={(e) => onPageChange(Number(e.target.value))}
+            />
+          </div>
+        </>
+      )}
       {showSettings && <ViewerSettingsPanel />}
     </>
   );

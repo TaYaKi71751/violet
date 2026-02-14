@@ -156,6 +156,8 @@ export function PagedReader({
   );
 
   const isSinglePage = visiblePageIndices.size === 1;
+  const isCoverPage = isSinglePage && currentPage === 0;
+  const isLastSinglePage = isSinglePage && currentPage > 0;
 
   // Check if a page should be actively loaded (within prefetch range)
   const isPageActive = useCallback(
@@ -168,7 +170,7 @@ export function PagedReader({
   return (
     <div
       ref={setContainerRef}
-      className={`${styles.container} ${isSinglePage ? styles.singlePage : ''}`}
+      className={`${styles.container} ${isCoverPage ? styles.coverPage : ''} ${isLastSinglePage ? styles.lastSinglePage : ''}`}
       onClick={handleClick}
       data-rtl={rtl}
     >

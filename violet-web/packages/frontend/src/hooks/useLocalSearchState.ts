@@ -17,6 +17,8 @@ export function useLocalSearchState({ basePath, tagSummary, onReset, preservePar
   const [searchParams] = useSearchParams();
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
   const searchBarRef = useRef<SearchBarRef>(null);
+  const onResetRef = useRef(onReset);
+  onResetRef.current = onReset;
 
   // Create suggestions function for SearchBar
   const getSuggestions = useCallback(
@@ -83,8 +85,8 @@ export function useLocalSearchState({ basePath, tagSummary, onReset, preservePar
   // Reset selected tags when needed
   const resetTags = useCallback(() => {
     setSelectedTags(new Set());
-    onReset?.();
-  }, [onReset]);
+    onResetRef.current?.();
+  }, []);
 
   return {
     selectedTags,

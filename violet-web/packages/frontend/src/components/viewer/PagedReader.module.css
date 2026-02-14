@@ -28,16 +28,46 @@
   display: block;
 }
 
-/* Single page mode - align to side based on reading direction */
-.container.singlePage {
-  justify-content: flex-end; /* LTR: page on right, empty on left */
+/* Cover page (first page alone) - page in right half (LTR) or left half (RTL) */
+.container.coverPage {
+  justify-content: flex-end;
 }
 
-.container.singlePage[data-rtl="true"] {
-  justify-content: flex-start; /* RTL: page on left, empty on right */
+.container.coverPage[data-rtl="true"] {
+  justify-content: flex-start;
 }
 
-/* Keep single page at 50% width */
-.container.singlePage .pageWrapper {
+.container.coverPage .pageWrapper {
+  width: 50%;
   max-width: 50%;
+}
+
+.container.coverPage .pageWrapper > div {
+  justify-content: flex-start; /* LTR: image hugs center line */
+}
+
+.container.coverPage[data-rtl="true"] .pageWrapper > div {
+  justify-content: flex-end; /* RTL: image hugs center line */
+}
+
+/* Last single page - page in left half (LTR) or right half (RTL), opposite of cover */
+.container.lastSinglePage {
+  justify-content: flex-start;
+}
+
+.container.lastSinglePage[data-rtl="true"] {
+  justify-content: flex-end;
+}
+
+.container.lastSinglePage .pageWrapper {
+  width: 50%;
+  max-width: 50%;
+}
+
+.container.lastSinglePage .pageWrapper > div {
+  justify-content: flex-end; /* LTR: image hugs center line */
+}
+
+.container.lastSinglePage[data-rtl="true"] .pageWrapper > div {
+  justify-content: flex-start; /* RTL: image hugs center line */
 }
