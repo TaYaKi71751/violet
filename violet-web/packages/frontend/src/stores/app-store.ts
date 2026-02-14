@@ -21,6 +21,7 @@ interface AppState {
   viewMode: ViewMode;
   cardMinWidth: number;
   scrollMode: ScrollMode;
+  tagTranslation: boolean;
 
   setContentLanguage: (lang: ContentLanguage) => void;
   setUILanguage: (lang: UILanguage) => void;
@@ -29,6 +30,7 @@ interface AppState {
   setViewMode: (mode: ViewMode) => void;
   setCardMinWidth: (width: number) => void;
   setScrollMode: (mode: ScrollMode) => void;
+  setTagTranslation: (enabled: boolean) => void;
 }
 
 // Helper to get system language
@@ -50,6 +52,7 @@ export const useAppStore = create<AppState>()(
       viewMode: 'grid',
       cardMinWidth: 200,
       scrollMode: 'infinite',
+      tagTranslation: true,
 
       setContentLanguage: (contentLanguage) => set({ contentLanguage }),
       setUILanguage: (uiLanguage) => {
@@ -62,6 +65,7 @@ export const useAppStore = create<AppState>()(
       setViewMode: (viewMode) => set({ viewMode }),
       setCardMinWidth: (cardMinWidth) => set({ cardMinWidth }),
       setScrollMode: (scrollMode) => set({ scrollMode }),
+      setTagTranslation: (tagTranslation) => set({ tagTranslation }),
     }),
     { name: 'violet-app-settings' },
   ),

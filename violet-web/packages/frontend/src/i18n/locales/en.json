@@ -77,6 +77,10 @@
       "pagination": "Pagination",
       "infinite": "Infinite Scroll"
     },
+    "tagTranslation": {
+      "heading": "Tag Translation",
+      "korean": "Korean"
+    },
     "sync": {
       "heading": "Database Sync",
       "database": "Database:",

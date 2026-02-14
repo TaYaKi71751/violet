@@ -15,7 +15,7 @@ const themeColors = [
 
 export function SettingsPage() {
   const { t } = useTranslation();
-  const { contentLanguage, uiLanguage, themeColor, scrollMode, setContentLanguage, setUILanguage, setThemeColor, setScrollMode } = useAppStore();
+  const { contentLanguage, uiLanguage, themeColor, scrollMode, tagTranslation, setContentLanguage, setUILanguage, setThemeColor, setScrollMode, setTagTranslation } = useAppStore();
   const { data: syncStatus } = useSyncStatus();
   const triggerSync = useTriggerSync();
   const triggerFullSync = useTriggerFullSync();
@@ -131,6 +131,22 @@ export function SettingsPage() {
             <option value="pagination">{t('settings.display.pagination')}</option>
             <option value="infinite">{t('settings.display.infinite')}</option>
           </select>
+        </div>
+
+      </div>
+
+      <div className={styles.section}>
+        <h3 className={styles.subheading}>{t('settings.tagTranslation.heading')}</h3>
+
+        <div className={styles.settingGroup}>
+          <label className={styles.settingLabel}>
+            <input
+              type="checkbox"
+              checked={tagTranslation}
+              onChange={(e) => setTagTranslation(e.target.checked)}
+            />
+            {' '}{t('settings.tagTranslation.korean')}
+          </label>
         </div>
       </div>
 

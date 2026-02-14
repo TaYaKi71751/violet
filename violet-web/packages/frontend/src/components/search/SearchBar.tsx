@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useSearchStore } from '../../stores/search-store';
 import { useSuggestions } from '../../hooks/useSuggestions';
+import { useTagTranslation } from '../../hooks/useTagTranslation';
 import type { TagEntry } from '@violet-web/shared';
 import styles from './SearchBar.module.css';
 
@@ -36,6 +37,7 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(function Searc
   const navigate = useNavigate();
   const { recentSearches, addRecentSearch, clearRecentSearches } = useSearchStore();
   const { data: apiSuggestions, isLoading } = useSuggestions(value);
+  const { translateTag } = useTagTranslation();
 
   // Expose focus method to parent
   useImperativeHandle(ref, () => ({
@@ -257,7 +259,17 @@ export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(function Searc
                   item
                 ) : (
                   <>
-                    <span className={styles.entryDisplay}>{item.display}</span>
+                    <span className={styles.entryDisplay}>
+                      {item.display}
+                      {(() => {
+                        const parts = item.display.split(':');
+                        if (parts.length === 2) {
+                          const ko = translateTag(parts[0], parts[1]);
+                          if (ko) return ` (${ko})`;
+                        }
+                        return null;
+                      })()}
+                    </span>
                     <span className={styles.entryCount}>{item.count.toLocaleString()}</span>
                   </>
                 )}

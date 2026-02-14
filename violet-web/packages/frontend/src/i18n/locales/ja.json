@@ -77,6 +77,10 @@
       "pagination": "ページネーション",
       "infinite": "無限スクロール"
     },
+    "tagTranslation": {
+      "heading": "タグ翻訳",
+      "korean": "韓国語"
+    },
     "sync": {
       "heading": "データベース同期",
       "database": "データベース:",

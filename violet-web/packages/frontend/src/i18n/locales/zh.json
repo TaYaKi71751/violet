@@ -77,6 +77,10 @@
       "pagination": "分页",
       "infinite": "无限滚动"
     },
+    "tagTranslation": {
+      "heading": "标签翻译",
+      "korean": "韩语"
+    },
     "sync": {
       "heading": "数据库同步",
       "database": "数据库:",

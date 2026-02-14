@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import type { Article } from '@violet-web/shared';
-import { parsePipeTags, parseTagTuples } from '@violet-web/shared';
+import { parsePipeTags, parseTagTuples, ticksToDate } from '@violet-web/shared';
 import { LazyImage } from '../common/LazyImage';
 import { useThumbnail } from '../../hooks/useThumbnail';
 import { useIsBookmarked, useToggleBookmark } from '../../hooks/useBookmarks';
+import { useTagTranslation } from '../../hooks/useTagTranslation';
 import type { ViewMode } from '../../stores/app-store';
 import styles from './ArticleCard.module.css';
 
@@ -25,6 +26,7 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
   const { data: thumbnailUrl } = useThumbnail(article.Id);
   const { data: isBookmarked } = useIsBookmarked(String(article.Id));
   const toggleBookmark = useToggleBookmark();
+  const { translateTag } = useTagTranslation();
 
   const artists = parsePipeTags(article.Artists);
   const language = article.Language ?? '';
@@ -126,22 +128,34 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
                   ))}</span>
                 </div>
               )}
+              {article.Published != null && (
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Date</span>
+                  <span>{(typeof article.Published === 'number'
+                    ? ticksToDate(article.Published)
+                    : new Date(article.Published)
+                  ).toLocaleDateString()}</span>
+                </div>
+              )}
               {tags.length > 0 && (
                 <div className={styles.tagList}>
-                  {tags.map((tag) => (
-                    <span
-                      key={`${tag.namespace}:${tag.tag}`}
-                      className={`${styles.tagChip} ${
-                        tag.namespace === 'female'
-                          ? styles.tagFemale
-                          : tag.namespace === 'male'
-                            ? styles.tagMale
-                            : styles.tagGeneral
-                      }`}
-                    >
-                      {tag.tag.replace(/_/g, ' ')}
-                    </span>
-                  ))}
+                  {tags.map((tag) => {
+                    const koTag = translateTag(tag.namespace, tag.tag.replace(/_/g, ' '));
+                    return (
+                      <span
+                        key={`${tag.namespace}:${tag.tag}`}
+                        className={`${styles.tagChip} ${
+                          tag.namespace === 'female'
+                            ? styles.tagFemale
+                            : tag.namespace === 'male'
+                              ? styles.tagMale
+                              : styles.tagGeneral
+                        }`}
+                      >
+                        {koTag ?? tag.tag.replace(/_/g, ' ')}
+                      </span>
+                    );
+                  })}
                 </div>
               )}
             </div>
