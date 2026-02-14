@@ -1,9 +1,8 @@
-.heading {
-  font-size: 1.25rem;
-  margin-bottom: var(--spacing-md);
+.container {
+  /* Container for search bar and tag chips */
 }
 
-.searchSection {
+.searchBar {
   margin: var(--spacing-md) 0 8px 0;
   display: flex;
   align-items: center;

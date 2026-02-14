@@ -1,17 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useBookmarkGroups, useBookmarkArticles } from '../hooks/useBookmarks';
-import { useArticle } from '../hooks/useArticle';
 import { BookmarkGroupList } from '../components/bookmark/BookmarkGroupList';
+import { LocalSearchSection } from '../components/search/LocalSearchSection';
 import { SearchResultGrid } from '../components/search/SearchResultGrid';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { useQueries } from '@tanstack/react-query';
 import { getArticle } from '../api/content';
+import { useArticleTagSummary } from '../hooks/useArticleTagSummary';
+import { useLocalArticleSearch } from '../hooks/useLocalArticleSearch';
+import { useLocalSearchState } from '../hooks/useLocalSearchState';
+import { useIsMobile } from '../hooks/useMediaQuery';
 import styles from './BookmarksPage.module.css';
 
 export function BookmarksPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const isMobile = useIsMobile();
+
   const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>(undefined);
+
   const { data: groups, isLoading: groupsLoading } = useBookmarkGroups();
   const { data: bookmarkArticles, isLoading: articlesLoading } =
     useBookmarkArticles(selectedGroupId);
@@ -30,6 +39,25 @@ export function BookmarksPage() {
 
   const isLoading = groupsLoading || articlesLoading || articleQueries.some((q) => q.isLoading);
 
+  // Extract tag summary from all articles in current group
+  const tagSummary = useArticleTagSummary(articles);
+
+  // Filter articles based on URL query parameter
+  const filteredArticles = useLocalArticleSearch(articles);
+
+  // Local search state
+  const { selectedTags, searchBarRef, getSuggestions, handleTagToggle, resetTags } =
+    useLocalSearchState({
+      basePath: '/bookmarks',
+      tagSummary,
+      onReset: () => navigate('/bookmarks', { replace: true }),
+    });
+
+  // Reset selected tags when group changes
+  useEffect(() => {
+    resetTags();
+  }, [selectedGroupId, resetTags]);
+
   return (
     <div>
       <h2 className={styles.heading}>{t('bookmarks.heading')}</h2>
@@ -40,8 +68,22 @@ export function BookmarksPage() {
           onSelect={setSelectedGroupId}
         />
       )}
+
+      {!isMobile && (
+        <LocalSearchSection
+          basePath="/bookmarks"
+          searchBarRef={searchBarRef}
+          getSuggestions={getSuggestions}
+          tagSummary={tagSummary}
+          selectedTags={selectedTags}
+          onTagToggle={handleTagToggle}
+          resultCount={filteredArticles.length}
+          isLoading={isLoading}
+        />
+      )}
+
       {isLoading && <LoadingSpinner />}
-      {!isLoading && <SearchResultGrid articles={articles} />}
+      {!isLoading && <SearchResultGrid articles={filteredArticles} />}
     </div>
   );
 }

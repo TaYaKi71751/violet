@@ -13,7 +13,13 @@ export interface SearchBarRef {
   focus: () => void;
 }
 
-export const SearchBar = forwardRef<SearchBarRef>(function SearchBar(_props, ref) {
+export interface SearchBarProps {
+  getSuggestions?: (input: string) => TagEntry[]; // Function to get local suggestions based on input
+  basePath?: string; // Base path for navigation (default: '/')
+}
+
+export const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(function SearchBar(props, ref) {
+  const { getSuggestions, basePath = '/' } = props;
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const queryFromUrl = searchParams.get('q') || '';
@@ -29,7 +35,7 @@ export const SearchBar = forwardRef<SearchBarRef>(function SearchBar(_props, ref
 
   const navigate = useNavigate();
   const { recentSearches, addRecentSearch, clearRecentSearches } = useSearchStore();
-  const { data: suggestions, isLoading } = useSuggestions(value);
+  const { data: apiSuggestions, isLoading } = useSuggestions(value);
 
   // Expose focus method to parent
   useImperativeHandle(ref, () => ({
@@ -50,15 +56,19 @@ export const SearchBar = forwardRef<SearchBarRef>(function SearchBar(_props, ref
 
   // Memoize suggestion mode and dropdown items to prevent flickering
   const { isSuggestionMode, dropdownItems } = useMemo(() => {
-    const hasSuggestions = suggestions?.suggestions && suggestions.suggestions.length > 0;
+    // Use local suggestions if function provided, otherwise use API suggestions
+    const suggestions = getSuggestions
+      ? getSuggestions(value)
+      : (apiSuggestions?.suggestions ?? []);
+    const hasSuggestions = suggestions.length > 0;
     const inSuggestionMode = lastToken.length > 0 && hasSuggestions;
 
     const items: DropdownItem[] = inSuggestionMode
-      ? suggestions?.suggestions || []
+      ? suggestions
       : recentSearches.slice(0, 10);
 
     return { isSuggestionMode: inSuggestionMode, dropdownItems: items };
-  }, [lastToken, suggestions, recentSearches]);
+  }, [lastToken, value, getSuggestions, apiSuggestions, recentSearches]);
 
   // Update dropdown position when opening (but not on every render)
   useEffect(() => {
@@ -108,7 +118,7 @@ export const SearchBar = forwardRef<SearchBarRef>(function SearchBar(_props, ref
     const q = value.trim();
     if (!q) return;
     addRecentSearch(q);
-    navigate(`/?q=${encodeURIComponent(q)}`);
+    navigate(`${basePath}?q=${encodeURIComponent(q)}`);
     setIsOpen(false);
   };
 
@@ -157,7 +167,7 @@ export const SearchBar = forwardRef<SearchBarRef>(function SearchBar(_props, ref
       // Recent search - execute search immediately
       setValue(item);
       addRecentSearch(item);
-      navigate(`/?q=${encodeURIComponent(item)}`);
+      navigate(`${basePath}?q=${encodeURIComponent(item)}`);
       setIsOpen(false);
     } else {
       // TagEntry - replace the last token with the selected suggestion

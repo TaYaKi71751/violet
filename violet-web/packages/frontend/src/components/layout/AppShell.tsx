@@ -23,9 +23,10 @@ export function AppShell() {
   const fullQuery = contentLanguage !== 'all' ? `${query} lang:${contentLanguage}` : query;
   const { data } = useSearch(fullQuery || ' ', 0);
 
-  const showSearchBar = location.pathname === '/' || location.pathname === '/bookmarks' || location.pathname === '/history';
+  const showSearchBar = location.pathname === '/';
 
-  // Handle "/" key to focus search bar on home, bookmarks, and history pages
+  // Handle "/" key to focus search bar on home page
+  // Note: bookmarks and history pages will handle "/" key themselves
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
@@ -34,9 +35,8 @@ export function AppShell() {
         return;
       }
 
-      // Only trigger on home, bookmarks, or history pages
-      const validPaths = ['/', '/bookmarks', '/history'];
-      if (e.key === '/' && validPaths.includes(location.pathname)) {
+      // Only trigger on home page (bookmarks/history have their own search bars)
+      if (e.key === '/' && location.pathname === '/') {
         e.preventDefault();
         searchBarRef.current?.focus();
       }
