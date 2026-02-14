@@ -1,0 +1,159 @@
+{
+  "app": {
+    "name": "Violet"
+  },
+  "nav": {
+    "home": "홈",
+    "bookmarks": "북마크",
+    "history": "기록",
+    "settings": "설정"
+  },
+  "home": {
+    "heading": "둘러보기",
+    "searchHeading": "검색: {{query}}",
+    "results": "{{count}}개 결과",
+    "prev": "이전",
+    "next": "다음"
+  },
+  "search": {
+    "placeholder": "검색... (예: artist:이름, tag:이름)",
+    "searchButton": "검색",
+    "noResults": "검색 결과가 없습니다.",
+    "allLanguages": "모든 언어",
+    "suggestions": "추천",
+    "recentSearches": "최근 검색",
+    "clearRecent": "삭제"
+  },
+  "article": {
+    "artist": "작가",
+    "language": "언어",
+    "type": "타입",
+    "pages": "페이지",
+    "series": "시리즈",
+    "characters": "캐릭터",
+    "read": "읽기",
+    "bookmarked": "북마크됨",
+    "bookmark": "북마크",
+    "noImage": "이미지 없음"
+  },
+  "bookmarks": {
+    "heading": "북마크",
+    "all": "전체",
+    "addBookmark": "북마크 추가",
+    "add": "추가",
+    "cancel": "취소",
+    "uncategorized": "미분류"
+  },
+  "history": {
+    "heading": "기록"
+  },
+  "viewer": {
+    "noImages": "갤러리에서 이미지를 찾을 수 없습니다."
+  },
+  "settings": {
+    "heading": "설정",
+    "language": {
+      "heading": "언어",
+      "contentLanguage": "콘텐츠 언어 (검색 필터)",
+      "uiLanguage": "UI 언어",
+      "all": "모든 언어",
+      "korean": "한국어",
+      "english": "영어",
+      "japanese": "일본어",
+      "chinese": "중국어",
+      "system": "시스템 기본값",
+      "en": "English",
+      "ko": "한국어",
+      "ja": "日本語",
+      "zh": "中文"
+    },
+    "theme": {
+      "heading": "테마 색상",
+      "description": "원하는 색상 테마를 선택하세요"
+    },
+    "display": {
+      "heading": "디스플레이",
+      "scrollMode": "스크롤 모드",
+      "pagination": "페이지네이션",
+      "infinite": "무한 스크롤"
+    },
+    "tagTranslation": {
+      "heading": "태그 번역",
+      "korean": "한국어",
+      "koreanDesc": "카드 및 검색 자동완성에서 태그를 한국어로 표시합니다"
+    },
+    "sync": {
+      "heading": "데이터베이스 동기화",
+      "database": "데이터베이스:",
+      "ready": "준비됨",
+      "notFound": "찾을 수 없음",
+      "lastSync": "마지막 동기화:",
+      "never": "없음",
+      "status": "상태:",
+      "idle": "대기 중",
+      "checking": "업데이트 확인 중...",
+      "downloadingFull": "전체 데이터베이스 다운로드 중...",
+      "applyingChunks": "업데이트 적용 중...",
+      "error": "오류",
+      "syncNow": "지금 동기화",
+      "redownloadDB": "DB 재다운로드",
+      "starting": "시작 중...",
+      "confirmRedownload": "전체 데이터베이스를 재다운로드합니다. 계속하시겠습니까?",
+      "yes": "예, 재다운로드",
+      "cancel": "취소"
+    },
+    "recentSearches": {
+      "heading": "최근 검색",
+      "clear": "검색 기록 지우기",
+      "empty": "최근 검색 없음"
+    },
+    "suggestions": {
+      "heading": "태그 캐시",
+      "build": "캐시 빌드",
+      "rebuild": "캐시 재빌드",
+      "status": "상태",
+      "notBuilt": "빌드 안됨",
+      "built": "빌드됨",
+      "building": "빌드 중..."
+    }
+  },
+  "viewer": {
+    "back": "뒤로",
+    "settings": "설정",
+    "pageInfo": "{{current}} / {{total}}",
+    "loading": "로딩 중...",
+    "retrying": "재시도 중... ({{current}}/{{max}})",
+    "loadError": "{{max}}번 시도 후 이미지 로드 실패. 클릭하여 재시도.",
+    "settingsPanel": {
+      "title": "뷰어 설정",
+      "pageMode": {
+        "title": "페이지 모드",
+        "scroll": "스크롤",
+        "paged": "페이지 넘김"
+      },
+      "viewMode": {
+        "title": "보기 모드",
+        "vertical": "세로",
+        "horizontal": "가로"
+      },
+      "twoPageMode": {
+        "title": "두 페이지 보기",
+        "enabled": "사용",
+        "disabled": "사용 안 함"
+      },
+      "readDirection": {
+        "title": "읽기 방향",
+        "ltr": "왼쪽에서 오른쪽",
+        "rtl": "오른쪽에서 왼쪽"
+      },
+      "coverPageMode": {
+        "title": "표지 페이지",
+        "cover": "첫 페이지만",
+        "normal": "첫 페이지 쌍으로"
+      },
+      "padding": {
+        "title": "여백"
+      }
+    }
+  }
+}

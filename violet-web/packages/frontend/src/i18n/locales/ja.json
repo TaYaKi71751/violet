@@ -1,0 +1,159 @@
+{
+  "app": {
+    "name": "Violet"
+  },
+  "nav": {
+    "home": "ホーム",
+    "bookmarks": "ブックマーク",
+    "history": "履歴",
+    "settings": "設定"
+  },
+  "home": {
+    "heading": "閲覧",
+    "searchHeading": "検索: {{query}}",
+    "results": "{{count}}件の結果",
+    "prev": "前へ",
+    "next": "次へ"
+  },
+  "search": {
+    "placeholder": "検索... (例: artist:名前, tag:名前)",
+    "searchButton": "検索",
+    "noResults": "検索結果が見つかりませんでした。",
+    "allLanguages": "すべての言語",
+    "suggestions": "候補",
+    "recentSearches": "最近の検索",
+    "clearRecent": "クリア"
+  },
+  "article": {
+    "artist": "作家",
+    "language": "言語",
+    "type": "タイプ",
+    "pages": "ページ",
+    "series": "シリーズ",
+    "characters": "キャラクター",
+    "read": "読む",
+    "bookmarked": "ブックマーク済み",
+    "bookmark": "ブックマーク",
+    "noImage": "画像なし"
+  },
+  "bookmarks": {
+    "heading": "ブックマーク",
+    "all": "すべて",
+    "addBookmark": "ブックマーク追加",
+    "add": "追加",
+    "cancel": "キャンセル",
+    "uncategorized": "未分類"
+  },
+  "history": {
+    "heading": "履歴"
+  },
+  "viewer": {
+    "noImages": "このギャラリーの画像が見つかりませんでした。"
+  },
+  "settings": {
+    "heading": "設定",
+    "language": {
+      "heading": "言語",
+      "contentLanguage": "コンテンツ言語（検索フィルター）",
+      "uiLanguage": "UI言語",
+      "all": "すべての言語",
+      "korean": "韓国語",
+      "english": "英語",
+      "japanese": "日本語",
+      "chinese": "中国語",
+      "system": "システムデフォルト",
+      "en": "English",
+      "ko": "한국어",
+      "ja": "日本語",
+      "zh": "中文"
+    },
+    "theme": {
+      "heading": "テーマカラー",
+      "description": "お好みのカラーテーマを選択"
+    },
+    "display": {
+      "heading": "表示",
+      "scrollMode": "スクロールモード",
+      "pagination": "ページネーション",
+      "infinite": "無限スクロール"
+    },
+    "tagTranslation": {
+      "heading": "タグ翻訳",
+      "korean": "韓国語",
+      "koreanDesc": "カードと検索候補でタグを韓国語で表示します"
+    },
+    "sync": {
+      "heading": "データベース同期",
+      "database": "データベース:",
+      "ready": "準備完了",
+      "notFound": "見つかりません",
+      "lastSync": "最終同期:",
+      "never": "なし",
+      "status": "ステータス:",
+      "idle": "待機中",
+      "checking": "更新を確認中...",
+      "downloadingFull": "データベース全体をダウンロード中...",
+      "applyingChunks": "更新を適用中...",
+      "error": "エラー",
+      "syncNow": "今すぐ同期",
+      "redownloadDB": "DBを再ダウンロード",
+      "starting": "開始中...",
+      "confirmRedownload": "データベース全体を再ダウンロードします。続行しますか？",
+      "yes": "はい、再ダウンロード",
+      "cancel": "キャンセル"
+    },
+    "recentSearches": {
+      "heading": "最近の検索",
+      "clear": "検索履歴をクリア",
+      "empty": "最近の検索はありません"
+    },
+    "suggestions": {
+      "heading": "タグキャッシュ",
+      "build": "キャッシュ構築",
+      "rebuild": "キャッシュ再構築",
+      "status": "ステータス",
+      "notBuilt": "未構築",
+      "built": "構築済み",
+      "building": "構築中..."
+    }
+  },
+  "viewer": {
+    "back": "戻る",
+    "settings": "設定",
+    "pageInfo": "{{current}} / {{total}}",
+    "loading": "読み込み中...",
+    "retrying": "再試行中... ({{current}}/{{max}})",
+    "loadError": "{{max}}回の試行後、画像の読み込みに失敗しました。クリックして再試行。",
+    "settingsPanel": {
+      "title": "ビューア設定",
+      "pageMode": {
+        "title": "ページモード",
+        "scroll": "スクロール",
+        "paged": "ページめくり"
+      },
+      "viewMode": {
+        "title": "表示モード",
+        "vertical": "縦",
+        "horizontal": "横"
+      },
+      "twoPageMode": {
+        "title": "見開き表示",
+        "enabled": "有効",
+        "disabled": "無効"
+      },
+      "readDirection": {
+        "title": "読む方向",
+        "ltr": "左から右",
+        "rtl": "右から左"
+      },
+      "coverPageMode": {
+        "title": "表紙ページ",
+        "cover": "最初のページのみ",
+        "normal": "最初のページをペア"
+      },
+      "padding": {
+        "title": "余白"
+      }
+    }
+  }
+}

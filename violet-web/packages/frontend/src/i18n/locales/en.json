@@ -1,0 +1,159 @@
+{
+  "app": {
+    "name": "Violet"
+  },
+  "nav": {
+    "home": "Home",
+    "bookmarks": "Bookmarks",
+    "history": "History",
+    "settings": "Settings"
+  },
+  "home": {
+    "heading": "Browse",
+    "searchHeading": "Search: {{query}}",
+    "results": "{{count}} results",
+    "prev": "Prev",
+    "next": "Next"
+  },
+  "search": {
+    "placeholder": "Search... (e.g. artist:name, tag:name)",
+    "searchButton": "Search",
+    "noResults": "No results found.",
+    "allLanguages": "All Languages",
+    "suggestions": "Suggestions",
+    "recentSearches": "Recent Searches",
+    "clearRecent": "Clear"
+  },
+  "article": {
+    "artist": "Artist",
+    "language": "Language",
+    "type": "Type",
+    "pages": "Pages",
+    "series": "Series",
+    "characters": "Characters",
+    "read": "Read",
+    "bookmarked": "Bookmarked",
+    "bookmark": "Bookmark",
+    "noImage": "No Image"
+  },
+  "bookmarks": {
+    "heading": "Bookmarks",
+    "all": "All",
+    "addBookmark": "Add Bookmark",
+    "add": "Add",
+    "cancel": "Cancel",
+    "uncategorized": "Uncategorized"
+  },
+  "history": {
+    "heading": "History"
+  },
+  "viewer": {
+    "noImages": "No images found for this gallery."
+  },
+  "settings": {
+    "heading": "Settings",
+    "language": {
+      "heading": "Language",
+      "contentLanguage": "Content Language (Search Filter)",
+      "uiLanguage": "UI Language",
+      "all": "All Languages",
+      "korean": "Korean",
+      "english": "English",
+      "japanese": "Japanese",
+      "chinese": "Chinese",
+      "system": "System Default",
+      "en": "English",
+      "ko": "한국어",
+      "ja": "日本語",
+      "zh": "中文"
+    },
+    "theme": {
+      "heading": "Theme Color",
+      "description": "Choose your favorite color theme"
+    },
+    "display": {
+      "heading": "Display",
+      "scrollMode": "Scroll Mode",
+      "pagination": "Pagination",
+      "infinite": "Infinite Scroll"
+    },
+    "tagTranslation": {
+      "heading": "Tag Translation",
+      "korean": "Korean",
+      "koreanDesc": "Display tags in Korean on cards and search suggestions"
+    },
+    "sync": {
+      "heading": "Database Sync",
+      "database": "Database:",
+      "ready": "Ready",
+      "notFound": "Not Found",
+      "lastSync": "Last Sync:",
+      "never": "Never",
+      "status": "Status:",
+      "idle": "Idle",
+      "checking": "Checking for updates...",
+      "downloadingFull": "Downloading full database...",
+      "applyingChunks": "Applying updates...",
+      "error": "Error",
+      "syncNow": "Sync Now",
+      "redownloadDB": "Re-download DB",
+      "starting": "Starting...",
+      "confirmRedownload": "This will re-download the entire database. Continue?",
+      "yes": "Yes, Re-download",
+      "cancel": "Cancel"
+    },
+    "recentSearches": {
+      "heading": "Recent Searches",
+      "clear": "Clear Search History",
+      "empty": "No recent searches"
+    },
+    "suggestions": {
+      "heading": "Tag Cache",
+      "build": "Build Cache",
+      "rebuild": "Rebuild Cache",
+      "status": "Status",
+      "notBuilt": "Not built",
+      "built": "Built",
+      "building": "Building..."
+    }
+  },
+  "viewer": {
+    "back": "Back",
+    "settings": "Settings",
+    "pageInfo": "{{current}} / {{total}}",
+    "loading": "Loading...",
+    "retrying": "Retrying... ({{current}}/{{max}})",
+    "loadError": "Failed to load image after {{max}} attempts. Click to retry.",
+    "settingsPanel": {
+      "title": "Viewer Settings",
+      "pageMode": {
+        "title": "Page Mode",
+        "scroll": "Scroll",
+        "paged": "Paged"
+      },
+      "viewMode": {
+        "title": "View Mode",
+        "vertical": "Vertical",
+        "horizontal": "Horizontal"
+      },
+      "twoPageMode": {
+        "title": "Two-Page Mode",
+        "enabled": "Enabled",
+        "disabled": "Disabled"
+      },
+      "readDirection": {
+        "title": "Reading Direction",
+        "ltr": "Left to Right",
+        "rtl": "Right to Left"
+      },
+      "coverPageMode": {
+        "title": "Cover Page",
+        "cover": "First page alone",
+        "normal": "First page paired"
+      },
+      "padding": {
+        "title": "Padding"
+      }
+    }
+  }
+}
