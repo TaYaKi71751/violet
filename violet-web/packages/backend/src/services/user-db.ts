@@ -1,0 +1,64 @@
+import Database from 'better-sqlite3';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+let db: Database.Database | null = null;
+
+const SCHEMA = `
+CREATE TABLE IF NOT EXISTS BookmarkGroup (
+  Id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  Name        TEXT,
+  DateTime    TEXT,
+  Description TEXT,
+  Color       INTEGER,
+  Gorder      INTEGER
+);
+
+CREATE TABLE IF NOT EXISTS BookmarkArticle (
+  Id       INTEGER PRIMARY KEY AUTOINCREMENT,
+  Article  TEXT,
+  DateTime TEXT,
+  GroupId  INTEGER,
+  FOREIGN KEY(GroupId) REFERENCES BookmarkGroup(Id)
+);
+
+CREATE TABLE IF NOT EXISTS BookmarkArtist (
+  Id       INTEGER PRIMARY KEY AUTOINCREMENT,
+  Artist   TEXT,
+  IsGroup  INTEGER,
+  DateTime TEXT,
+  GroupId  INTEGER,
+  FOREIGN KEY(GroupId) REFERENCES BookmarkGroup(Id)
+);
+
+CREATE TABLE IF NOT EXISTS ArticleReadLog (
+  Id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  Article       TEXT,
+  DateTimeStart TEXT,
+  DateTimeEnd   TEXT,
+  LastPage      INTEGER,
+  Type          INTEGER
+);
+`;
+
+const DEFAULT_GROUP_SQL = `
+INSERT OR IGNORE INTO BookmarkGroup (Id, Name, DateTime, Description, Color, Gorder)
+VALUES (1, 'violet_default', datetime('now'), 'Default bookmark group', NULL, 1);
+`;
+
+export function getUserDb(): Database.Database {
+  if (db) return db;
+
+  const dbPath =
+    process.env.USER_DB_PATH || path.resolve(__dirname, '../../data/user.db');
+  db = new Database(dbPath);
+  db.pragma('journal_mode = WAL');
+
+  // Create tables if not exist
+  db.exec(SCHEMA);
+  db.exec(DEFAULT_GROUP_SQL);
+
+  return db;
+}
