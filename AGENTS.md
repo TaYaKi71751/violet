@@ -30,3 +30,7 @@ Sonnet의 경우 Co-authored-by: Claude Sonnet ~ <noreply@anthropic.com>
 커밋엔 ulw, Ultraworked with Sisyphus와 같은 바이럴 내용을 절대 추가하지 않는다
 
 Sisyphus나 oh-my-opencode 에이전트는 Co-author 로 절대 추가하지 않는다
+
+### Staging
+
+사용자가 명시적으로 지정하지 않은 untracked 파일은 절대 staging(git add)하지 않는다
