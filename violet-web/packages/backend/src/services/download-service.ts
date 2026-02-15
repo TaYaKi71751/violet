@@ -11,7 +11,7 @@ const USER_AGENT =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
 
 const MAX_RETRIES = 10;
-const BASE_DELAY_MS = 500;
+const RETRY_DELAY_MS = 500;
 
 async function fetchWithRetry(
   url: string,
@@ -32,9 +32,8 @@ async function fetchWithRetry(
       throw new Error(`Failed to fetch page ${pageIndex}: HTTP ${res.status} after ${MAX_RETRIES} retries`);
     }
 
-    const delay = BASE_DELAY_MS * Math.pow(2, attempt - 1);
-    console.warn(`${tag} Page ${pageIndex} HTTP ${res.status}, retry ${attempt}/${MAX_RETRIES} in ${delay}ms`);
-    await new Promise((r) => setTimeout(r, delay));
+    console.warn(`${tag} Page ${pageIndex} HTTP ${res.status}, retry ${attempt}/${MAX_RETRIES} in ${RETRY_DELAY_MS}ms`);
+    await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
   }
 
   throw new Error('Unreachable');
