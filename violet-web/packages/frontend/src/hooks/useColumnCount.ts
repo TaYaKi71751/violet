@@ -13,6 +13,7 @@ export function useColumnCount(minColumnWidth: number): number {
     const update = () => {
       setCount(Math.max(1, Math.floor(window.innerWidth / minColumnWidth)));
     };
+    update();
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);
   }, [minColumnWidth]);

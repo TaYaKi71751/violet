@@ -6,6 +6,7 @@ import styles from './CropBookmarkGrid.module.css';
 
 interface CropBookmarkGridProps {
   crops: BookmarkCropImage[];
+  columnWidth: number;
   onDelete: (id: number) => void;
 }
 
@@ -45,8 +46,8 @@ function distributeToColumns(crops: BookmarkCropImage[], columnCount: number) {
   return columns;
 }
 
-export function CropBookmarkGrid({ crops, onDelete }: CropBookmarkGridProps) {
-  const columnCount = useColumnCount(240);
+export function CropBookmarkGrid({ crops, columnWidth, onDelete }: CropBookmarkGridProps) {
+  const columnCount = useColumnCount(columnWidth);
 
   const columns = useMemo(
     () => distributeToColumns(crops, columnCount),
