@@ -66,6 +66,7 @@
     "answerLabel": "AI 답변",
     "score": "관련도",
     "mode": "모드",
+    "modeSuperFast": "즉시 검색",
     "modeFast": "빠른 검색",
     "modeDetail": "상세 검색",
     "noResults": "검색 결과가 없습니다.",

@@ -4,6 +4,7 @@ ChromaDB에서 유사 문서 검색 → DeepSeek V3로 답변
 
 GET /search?q=질문&top_k=5&mode=fast
 GET /search?q=질문&top_k=5&mode=detail
+GET /search?q=질문&top_k=5&mode=super_fast
 """
 
 import json
@@ -79,12 +80,26 @@ PROMPT_DETAIL = """아래는 벡터 DB에서 검색된 여러 문서의 내용�
 5. answer도 서술형으로 풍부하게 작성
 6. JSON 외에 다른 텍스트를 출력하지 마세요"""
 
+PROMPT_SUPER_FAST = """검색된 문서들을 질문과의 관련도로 평가하여 JSON 출력. description과 answer는 출력하지 마세요.
+
+질문: {query}
+
+문서:
+{context_text}
+
+출력 형식 (JSON만 출력):
+{{"query":"질문","results":[{{"articleId":"ID","score":0.9}}]}}
+
+규칙: score 0~1, 0.3 미만 제외, 내림차순, JSON만 출력"""
+
 PROMPTS = {
+    "super_fast": PROMPT_SUPER_FAST,
     "fast": PROMPT_FAST,
     "detail": PROMPT_DETAIL,
 }
 
 MAX_TOKENS = {
+    "super_fast": 2048,
     "fast": 8192,
     "detail": 8192,
 }
@@ -114,7 +129,7 @@ def do_search(query: str, top_k: int, mode: str) -> dict:
     distances = results["distances"][0]
 
     if not docs:
-        return {"query": query, "results": [], "answer": "검색 결과가 없습니다."}
+        return {"query": query, "results": [], "answer": ""}
 
     # 3. 컨텍스트 조립
     context_parts = []
@@ -171,7 +186,7 @@ def search():
 
     mode = request.args.get("mode", "")
     if mode not in PROMPTS:
-        return jsonify({"error": f"mode 파라미터가 필요합니다. (fast 또는 detail)"}), 400
+        return jsonify({"error": f"mode 파라미터가 필요합니다. (super_fast, fast 또는 detail)"}), 400
 
     top_k = request.args.get("top_k", 5, type=int)
 

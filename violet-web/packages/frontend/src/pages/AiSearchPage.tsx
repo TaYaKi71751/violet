@@ -12,7 +12,7 @@ export function AiSearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const queryFromUrl = searchParams.get('q') || '';
   const topKFromUrl = parseInt(searchParams.get('top_k') || '5') || 5;
-  const modeFromUrl = searchParams.get('mode') || 'fast';
+  const modeFromUrl = searchParams.get('mode') || 'super_fast';
   const [inputValue, setInputValue] = useState(queryFromUrl);
   const [topK, setTopK] = useState(topKFromUrl);
   const [mode, setMode] = useState(modeFromUrl);
@@ -66,6 +66,7 @@ export function AiSearchPage() {
               value={mode}
               onChange={(e) => setMode(e.target.value)}
             >
+              <option value="super_fast">{t('aiSearch.modeSuperFast')}</option>
               <option value="fast">{t('aiSearch.modeFast')}</option>
               <option value="detail">{t('aiSearch.modeDetail')}</option>
             </select>

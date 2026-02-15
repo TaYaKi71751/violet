@@ -66,6 +66,7 @@
     "answerLabel": "AI回答",
     "score": "関連度",
     "mode": "モード",
+    "modeSuperFast": "即時検索",
     "modeFast": "高速検索",
     "modeDetail": "詳細検索",
     "noResults": "検索結果が見つかりませんでした。",

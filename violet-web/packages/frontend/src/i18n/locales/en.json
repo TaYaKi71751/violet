@@ -66,6 +66,7 @@
     "answerLabel": "AI Answer",
     "score": "Relevance",
     "mode": "Mode",
+    "modeSuperFast": "Instant",
     "modeFast": "Fast",
     "modeDetail": "Detail",
     "noResults": "No results found.",
