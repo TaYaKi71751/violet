@@ -39,8 +39,8 @@ def _worker_init(config: dict):
     from paddleocr import PaddleOCR
 
     _worker_ocr = PaddleOCR(
-        text_detection_model_name="PP-OCRv5_mobile_det",
-        text_recognition_model_name="korean_PP-OCRv5_mobile_rec",
+        text_detection_model_name=config["det_model"],
+        text_recognition_model_name=config["rec_model"],
         use_doc_orientation_classify=False,
         use_doc_unwarping=False,
         use_textline_orientation=True,
@@ -243,6 +243,16 @@ def parse_args():
         default="gpu:0",
         help="PaddleOCR 디바이스 (기본: gpu:0)",
     )
+    parser.add_argument(
+        "--det-model",
+        default="PP-OCRv5_mobile_det",
+        help="텍스트 검출 모델 (기본: PP-OCRv5_mobile_det)",
+    )
+    parser.add_argument(
+        "--rec-model",
+        default="korean_PP-OCRv5_mobile_rec",
+        help="텍스트 인식 모델 (기본: korean_PP-OCRv5_mobile_rec)",
+    )
     return parser.parse_args()
 
 
@@ -328,6 +338,8 @@ def main():
         "device": args.device,
         "threshold": args.threshold,
         "rec_batch_size": args.rec_batch_size,
+        "det_model": args.det_model,
+        "rec_model": args.rec_model,
     }
 
     total = len(tasks)
