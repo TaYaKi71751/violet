@@ -195,6 +195,10 @@
   color: #fff;
 }
 
+.summary {
+  display: none;
+}
+
 /* PC: horizontal layout */
 @media (min-width: 768px) {
   .dialog {
@@ -219,5 +223,33 @@
 
   .actionsMobile {
     display: none;
+  }
+
+  .summary {
+    display: block;
+    border-top: 1px solid var(--color-border, #333);
+    padding-top: var(--spacing-md);
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--color-text-secondary);
+  }
+
+  .summary h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: var(--spacing-md) 0 var(--spacing-xs);
+  }
+
+  .summary h2:first-child {
+    margin-top: 0;
+  }
+
+  .summary p {
+    margin: var(--spacing-xs) 0;
+  }
+
+  .summary strong {
+    color: var(--color-text);
   }
 }

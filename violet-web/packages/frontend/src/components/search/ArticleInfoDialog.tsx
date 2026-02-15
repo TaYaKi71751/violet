@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Download, BookOpen } from 'lucide-react';
+import Markdown from 'react-markdown';
 import type { Article } from '@violet-web/shared';
 import { parsePipeTags, parseTagTuples, ticksToDate } from '@violet-web/shared';
 import { LazyImage } from '../common/LazyImage';
@@ -9,6 +10,7 @@ import { useIsBookmarked, useToggleBookmark } from '../../hooks/useBookmarks';
 import { useStartDownload } from '../../hooks/useDownloads';
 import { useTagTranslation } from '../../hooks/useTagTranslation';
 import { useTagCounts } from '../../hooks/useTagCounts';
+import { useArticleSummary } from '../../hooks/useArticleSummary';
 import styles from './ArticleInfoDialog.module.css';
 
 interface ArticleInfoDialogProps {
@@ -31,6 +33,7 @@ export function ArticleInfoDialog({ article, onClose }: ArticleInfoDialogProps) 
   const startDownload = useStartDownload();
   const { translateTag } = useTagTranslation();
   const tagCounts = useTagCounts();
+  const { data: summary } = useArticleSummary(article.Id);
 
   const artists = parsePipeTags(article.Artists);
   const groups = parsePipeTags(article.Groups);
@@ -223,6 +226,12 @@ export function ArticleInfoDialog({ article, onClose }: ArticleInfoDialogProps) 
             </div>
           </div>
         </div>
+
+        {summary && (
+          <div className={styles.summary}>
+            <Markdown>{summary}</Markdown>
+          </div>
+        )}
 
         <div className={styles.actionsMobile}>
           <button
