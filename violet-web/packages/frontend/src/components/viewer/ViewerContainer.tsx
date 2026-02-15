@@ -8,6 +8,7 @@ import styles from './ViewerContainer.module.css';
 interface ViewerContainerProps {
   galleryId: number;
   imageUrls: string[];
+  thumbnailUrls: string[];
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
@@ -17,6 +18,7 @@ interface ViewerContainerProps {
 export function ViewerContainer({
   galleryId,
   imageUrls,
+  thumbnailUrls,
   currentPage,
   totalPages,
   onPageChange,
@@ -59,6 +61,7 @@ export function ViewerContainer({
         totalPages={totalPages}
         onPageChange={onPageChange}
         onClose={onClose}
+        thumbnailUrls={thumbnailUrls}
       />
     </div>
   );

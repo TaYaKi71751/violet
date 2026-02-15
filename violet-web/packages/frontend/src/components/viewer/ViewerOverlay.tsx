@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useViewerStore } from '../../stores/viewer-store';
 import { useIsBookmarked, useToggleBookmark } from '../../hooks/useBookmarks';
 import { ViewerSettingsPanel } from './ViewerSettingsPanel';
+import { PageThumbnailDialog } from './PageThumbnailDialog';
 import styles from './ViewerOverlay.module.css';
 
 interface ViewerOverlayProps {
@@ -10,6 +12,7 @@ interface ViewerOverlayProps {
   totalPages: number;
   onPageChange: (page: number) => void;
   onClose: () => void;
+  thumbnailUrls: string[];
 }
 
 export function ViewerOverlay({
@@ -18,12 +21,14 @@ export function ViewerOverlay({
   totalPages,
   onPageChange,
   onClose,
+  thumbnailUrls,
 }: ViewerOverlayProps) {
   const { t } = useTranslation();
-  const { showOverlay, showSettings, readDirection, toggleOverlay, toggleSettings } = useViewerStore();
+  const { showOverlay, showSettings, readDirection, twoPageMode, coverPageMode, toggleOverlay, toggleSettings } = useViewerStore();
   const { data: isBookmarked } = useIsBookmarked(String(galleryId));
   const toggleBookmark = useToggleBookmark();
   const rtl = readDirection === 'rtl';
+  const [showThumbnails, setShowThumbnails] = useState(false);
 
   const handleLeftTap = () => {
     if (rtl) {
@@ -47,7 +52,13 @@ export function ViewerOverlay({
       <div className={styles.tapZoneCenter} onClick={toggleOverlay} />
       <div className={styles.tapZoneRight} onClick={handleRightTap} />
 
-      <div className={`${styles.pageIndicator} ${showOverlay ? styles.pageIndicatorAboveSlider : ''}`}>
+      <div
+        className={`${styles.pageIndicator} ${showOverlay ? styles.pageIndicatorAboveSlider : ''}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowThumbnails(true);
+        }}
+      >
         {t('viewer.pageInfo', { current: currentPage + 1, total: totalPages })}
       </div>
 
@@ -92,6 +103,17 @@ export function ViewerOverlay({
         </>
       )}
       {showSettings && <ViewerSettingsPanel />}
+      {showThumbnails && (
+        <PageThumbnailDialog
+          thumbnailUrls={thumbnailUrls}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          twoPageMode={twoPageMode}
+          coverPageMode={coverPageMode}
+          onPageSelect={onPageChange}
+          onClose={() => setShowThumbnails(false)}
+        />
+      )}
     </>
   );
 }

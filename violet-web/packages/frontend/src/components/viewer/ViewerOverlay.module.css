@@ -122,9 +122,14 @@
   color: #fff;
   font-size: 0.85rem;
   z-index: 15;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
   backdrop-filter: blur(4px);
-  transition: bottom 0.2s ease;
+  transition: bottom 0.2s ease, background 0.2s;
+}
+
+.pageIndicator:hover {
+  background: rgba(0, 0, 0, 0.85);
 }
 
 .pageIndicatorAboveSlider {

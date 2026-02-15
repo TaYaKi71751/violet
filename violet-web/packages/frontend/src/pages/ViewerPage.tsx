@@ -100,14 +100,17 @@ export function ViewerPage() {
     );
   }
 
-  const proxyUrls = imageList.urls.map((url) =>
-    getProxyImageUrl(url, `https://hitomi.la/reader/${galleryId}.html`),
+  const referer = `https://hitomi.la/reader/${galleryId}.html`;
+  const proxyUrls = imageList.urls.map((url) => getProxyImageUrl(url, referer));
+  const thumbnailUrls = (imageList.smallThumbnails ?? []).map((url) =>
+    getProxyImageUrl(url, referer),
   );
 
   return (
     <ViewerContainer
       galleryId={galleryId}
       imageUrls={proxyUrls}
+      thumbnailUrls={thumbnailUrls}
       currentPage={currentPage}
       totalPages={totalPages}
       onPageChange={goToPage}
