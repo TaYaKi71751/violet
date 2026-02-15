@@ -141,7 +141,9 @@ def _union(parent: list[int], rank: list[int], a: int, b: int):
         rank[ra] += 1
 
 
-def group_into_dialogues(texts: list[dict], img_width: int, img_height: int) -> list[dict]:
+def group_into_dialogues(
+    texts: list[dict], img_width: int, img_height: int
+) -> list[dict]:
     """
     가까운 텍스트 박스를 말풍선(dialogue) 단위로 그루핑.
 
@@ -155,8 +157,8 @@ def group_into_dialogues(texts: list[dict], img_width: int, img_height: int) -> 
         return []
 
     # 임계값: 이미지 크기 대비 비율
-    thresh_x = img_width * 0.025   # 가로 2.5%
-    thresh_y = img_height * 0.05   # 세로 5%
+    thresh_x = img_width * 0.025  # 가로 2.5%
+    thresh_y = img_height * 0.05  # 세로 5%
 
     # 각 텍스트의 중심점 계산
     centers = []
@@ -199,11 +201,13 @@ def group_into_dialogues(texts: list[dict], img_width: int, img_height: int) -> 
         max_x = max(t["bbox"][2] for t in lines)
         max_y = max(t["bbox"][3] for t in lines)
 
-        dialogues.append({
-            "text": merged_text,
-            "confidence": round(avg_conf, 4),
-            "bbox": [min_x, min_y, max_x, max_y],
-        })
+        dialogues.append(
+            {
+                "text": merged_text,
+                "confidence": round(avg_conf, 4),
+                "bbox": [min_x, min_y, max_x, max_y],
+            }
+        )
 
     # dialogue를 y좌표 순으로 정렬 (페이지 내 읽기 순서)
     dialogues.sort(key=lambda d: d["bbox"][1])
@@ -224,8 +228,8 @@ def parse_args():
     parser.add_argument(
         "--workers",
         type=int,
-        default=10,
-        help="병렬 워커 수 (기본: 10)",
+        default=5,
+        help="병렬 워커 수 (기본: )",
     )
     parser.add_argument(
         "--rec-batch-size",
@@ -358,9 +362,7 @@ def main():
             elapsed = time.perf_counter() - t2
             per_img = elapsed / (i + 1)
             eta = per_img * (total - i - 1)
-            dlg_preview = " | ".join(
-                d["text"][:20] for d in result["dialogues"][:3]
-            )
+            dlg_preview = " | ".join(d["text"][:20] for d in result["dialogues"][:3])
             if len(result["dialogues"]) > 3:
                 dlg_preview += " ..."
             print(
