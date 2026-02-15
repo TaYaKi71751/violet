@@ -12,15 +12,15 @@ export interface AiSearchResult {
   error: Error | null;
 }
 
-export function useAiSearch(query: string, topK = 5): AiSearchResult {
+export function useAiSearch(query: string, topK = 5, mode = 'fast'): AiSearchResult {
   const {
     data: response,
     isLoading: isSearchLoading,
     isError: isSearchError,
     error: searchError,
   } = useQuery({
-    queryKey: ['ai-search', query, topK],
-    queryFn: () => aiSearch(query, topK),
+    queryKey: ['ai-search', query, topK, mode],
+    queryFn: () => aiSearch(query, topK, mode),
     enabled: query.length > 0,
     staleTime: 5 * 60 * 1000,
   });

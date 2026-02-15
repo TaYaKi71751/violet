@@ -63,6 +63,9 @@
     "placeholder": "何でも聞いてください...",
     "answerLabel": "AI回答",
     "score": "関連度",
+    "mode": "モード",
+    "modeFast": "高速検索",
+    "modeDetail": "詳細検索",
     "noResults": "検索結果が見つかりませんでした。",
     "error": "AI検索中にエラーが発生しました。"
   },

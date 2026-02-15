@@ -5,6 +5,7 @@ export const aiSearchRouter = Router();
 aiSearchRouter.get('/', async (req, res) => {
   const q = (req.query.q as string) || '';
   const topK = parseInt(req.query.top_k as string) || 5;
+  const mode = (req.query.mode as string) || 'fast';
 
   if (!q.trim()) {
     res.status(400).json({ error: 'Query parameter "q" is required.' });
@@ -12,7 +13,7 @@ aiSearchRouter.get('/', async (req, res) => {
   }
 
   try {
-    const url = `http://localhost:8787/search?q=${encodeURIComponent(q)}&top_k=${topK}`;
+    const url = `http://localhost:8787/search?q=${encodeURIComponent(q)}&top_k=${topK}&mode=${encodeURIComponent(mode)}`;
     const response = await fetch(url);
 
     if (!response.ok) {

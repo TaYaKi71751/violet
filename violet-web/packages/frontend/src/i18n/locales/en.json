@@ -63,6 +63,9 @@
     "placeholder": "Ask anything...",
     "answerLabel": "AI Answer",
     "score": "Relevance",
+    "mode": "Mode",
+    "modeFast": "Fast",
+    "modeDetail": "Detail",
     "noResults": "No results found.",
     "error": "An error occurred during AI search."
   },

@@ -63,6 +63,9 @@
     "placeholder": "무엇이든 물어보세요...",
     "answerLabel": "AI 답변",
     "score": "관련도",
+    "mode": "모드",
+    "modeFast": "빠른 검색",
+    "modeDetail": "상세 검색",
     "noResults": "검색 결과가 없습니다.",
     "error": "AI 검색 중 오류가 발생했습니다."
   },

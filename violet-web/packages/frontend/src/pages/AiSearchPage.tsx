@@ -12,10 +12,12 @@ export function AiSearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const queryFromUrl = searchParams.get('q') || '';
   const topKFromUrl = parseInt(searchParams.get('top_k') || '5') || 5;
+  const modeFromUrl = searchParams.get('mode') || 'fast';
   const [inputValue, setInputValue] = useState(queryFromUrl);
   const [topK, setTopK] = useState(topKFromUrl);
+  const [mode, setMode] = useState(modeFromUrl);
 
-  const { response, articles, isLoading, isError } = useAiSearch(queryFromUrl, topKFromUrl);
+  const { response, articles, isLoading, isError } = useAiSearch(queryFromUrl, topKFromUrl, modeFromUrl);
 
   useEffect(() => {
     setInputValue(queryFromUrl);
@@ -24,6 +26,10 @@ export function AiSearchPage() {
   useEffect(() => {
     setTopK(topKFromUrl);
   }, [topKFromUrl]);
+
+  useEffect(() => {
+    setMode(modeFromUrl);
+  }, [modeFromUrl]);
 
   useEffect(() => {
     document.title = queryFromUrl ? `AI: ${queryFromUrl} - Violet` : 'AI Search - Violet';
@@ -36,6 +42,7 @@ export function AiSearchPage() {
     if (!q) return;
     const params: Record<string, string> = { q };
     if (topK !== 5) params.top_k = String(topK);
+    if (mode !== 'fast') params.mode = mode;
     setSearchParams(params);
   };
 
@@ -52,10 +59,21 @@ export function AiSearchPage() {
             onChange={(e) => setInputValue(e.target.value)}
             placeholder={t('aiSearch.placeholder')}
           />
-          <label className={styles.topKLabel}>
+          <label className={styles.optionLabel}>
+            {t('aiSearch.mode')}
+            <select
+              className={styles.optionSelect}
+              value={mode}
+              onChange={(e) => setMode(e.target.value)}
+            >
+              <option value="fast">{t('aiSearch.modeFast')}</option>
+              <option value="detail">{t('aiSearch.modeDetail')}</option>
+            </select>
+          </label>
+          <label className={styles.optionLabel}>
             Top K
             <select
-              className={styles.topKSelect}
+              className={styles.optionSelect}
               value={topK}
               onChange={(e) => setTopK(Number(e.target.value))}
             >
