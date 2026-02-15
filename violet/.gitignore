@@ -67,3 +67,6 @@ img/*
 test/db
 test/*.7z
 test/rawdata-korean
+script/xx.py
+script/*.json
+target/*
