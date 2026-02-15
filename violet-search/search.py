@@ -85,8 +85,8 @@ PROMPTS = {
 }
 
 MAX_TOKENS = {
-    "fast": 1024,
-    "detail": 4096,
+    "fast": 8192,
+    "detail": 8192,
 }
 
 
@@ -147,8 +147,18 @@ def do_search(query: str, top_k: int, mode: str) -> dict:
     if resp.status_code != 200:
         return {"error": f"DeepSeek API 오류 ({resp.status_code})", "detail": resp.text}
 
-    raw = resp.json()["choices"][0]["message"]["content"]
-    result = json.loads(raw)
+    body = resp.json()
+    choice = body["choices"][0]
+    raw = choice["message"]["content"]
+
+    if choice.get("finish_reason") == "length":
+        app.logger.warning("응답이 max_tokens(%d)로 잘림", max_tokens)
+
+    try:
+        result = json.loads(raw)
+    except json.JSONDecodeError as e:
+        app.logger.error("JSON 파싱 실패 (finish_reason=%s) - raw 응답:\n%s", choice.get("finish_reason"), raw)
+        return {"error": f"LLM 응답이 잘렸습니다 (max_tokens={max_tokens}). 재시도해주세요.", "raw_response": raw}
     _cache[cache_key] = result
     return result
 
