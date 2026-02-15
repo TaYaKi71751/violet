@@ -16,6 +16,8 @@ import styles from './ArticleCard.module.css';
 interface ArticleCardProps {
   article: Article;
   viewMode?: ViewMode;
+  aiScore?: number;
+  aiDescription?: string;
 }
 
 const TAG_ORDER: Record<string, number> = { female: 0, male: 1, tag: 2, '': 2 };
@@ -24,7 +26,7 @@ function getTagOrder(ns: string): number {
   return TAG_ORDER[ns] ?? 3;
 }
 
-export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
+export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription }: ArticleCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: thumbnailUrl } = useThumbnail(article.Id);
@@ -195,6 +197,15 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
               <span className={styles.lang}>{isDetail && <span className={styles.detailLabel}>Lang</span>}{language}</span>
             )}
           </div>
+
+          {aiScore != null && (
+            <div className={styles.aiInfo}>
+              <span className={styles.aiScoreBadge}>{Math.round(aiScore * 100)}%</span>
+              {aiDescription && (
+                <p className={styles.aiDescription}>{aiDescription}</p>
+              )}
+            </div>
+          )}
 
           {isDetail && (
             <div className={styles.detailInfo}>

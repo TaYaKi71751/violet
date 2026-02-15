@@ -238,6 +238,29 @@
   -webkit-box-orient: vertical;
 }
 
+/* AI search info */
+.aiInfo {
+  margin-top: var(--spacing-xs);
+}
+
+.aiScoreBadge {
+  display: inline-block;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+
+.aiDescription {
+  margin: var(--spacing-xs) 0 0;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
 /* Detail mode */
 .detailCard .title {
   white-space: normal;
