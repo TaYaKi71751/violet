@@ -55,3 +55,10 @@ export interface BookmarkCropImage {
   AspectRatio: number;
   DateTime: string;
 }
+
+export interface AddBookmarkCropImageRequest {
+  Article: number;
+  Page: number;
+  Area: string;
+  AspectRatio: number;
+}

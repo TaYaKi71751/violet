@@ -51,6 +51,15 @@ CREATE TABLE IF NOT EXISTS Download (
   DateTime        TEXT NOT NULL,
   ErrorMessage    TEXT
 );
+
+CREATE TABLE IF NOT EXISTS BookmarkCropImage (
+  Id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  Article     INTEGER NOT NULL,
+  Page        INTEGER NOT NULL,
+  Area        TEXT NOT NULL,
+  AspectRatio REAL NOT NULL,
+  DateTime    TEXT NOT NULL
+);
 `;
 
 const DEFAULT_GROUP_SQL = `

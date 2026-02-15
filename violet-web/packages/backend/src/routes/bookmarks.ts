@@ -113,6 +113,20 @@ bookmarksRouter.get('/crops', (_req, res) => {
   res.json(crops);
 });
 
+bookmarksRouter.post('/crops', (req, res) => {
+  const { Article, Page, Area, AspectRatio } = req.body;
+  const db = getUserDb();
+  const nextId = (
+    db.prepare('SELECT COALESCE(MAX(Id), 0) + 1 AS nextId FROM BookmarkCropImage').get() as { nextId: number }
+  ).nextId;
+  const result = db
+    .prepare(
+      'INSERT INTO BookmarkCropImage (Id, Article, Page, Area, AspectRatio, DateTime) VALUES (?, ?, ?, ?, ?, ?)',
+    )
+    .run(nextId, Article, Page, Area, AspectRatio, new Date().toISOString().replace('T', ' ').replace('Z', ''));
+  res.json({ Id: result.lastInsertRowid });
+});
+
 bookmarksRouter.delete('/crops/:id', (req, res) => {
   const id = parseInt(req.params.id);
   const db = getUserDb();

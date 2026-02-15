@@ -62,6 +62,7 @@ export function ViewerContainer({
         onPageChange={onPageChange}
         onClose={onClose}
         thumbnailUrls={thumbnailUrls}
+        imageUrls={imageUrls}
       />
     </div>
   );

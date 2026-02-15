@@ -6,6 +6,7 @@ import {
   deleteBookmarkArticle,
   checkBookmark,
   getCropBookmarks,
+  addCropBookmark,
   deleteCropBookmark,
 } from '../api/bookmarks';
 import { useToastStore } from '../stores/toast-store';
@@ -58,6 +59,21 @@ export function useCropBookmarks() {
   return useQuery({
     queryKey: ['cropBookmarks'],
     queryFn: getCropBookmarks,
+  });
+}
+
+export function useAddCropBookmark() {
+  const qc = useQueryClient();
+  const addToast = useToastStore((state) => state.addToast);
+  return useMutation({
+    mutationFn: addCropBookmark,
+    onSuccess: (_data, variables) => {
+      qc.invalidateQueries({ queryKey: ['cropBookmarks'] });
+      addToast(`${variables.Page + 1}페이지 크롭 저장했어요`, 'success');
+    },
+    onError: () => {
+      addToast('크롭 저장 중 오류가 발생했습니다', 'error');
+    },
   });
 }
 

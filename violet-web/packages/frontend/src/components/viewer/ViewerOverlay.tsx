@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useViewerStore } from '../../stores/viewer-store';
 import { useIsBookmarked, useToggleBookmark } from '../../hooks/useBookmarks';
 import { ViewerSettingsPanel } from './ViewerSettingsPanel';
 import { PageThumbnailDialog } from './PageThumbnailDialog';
+import { CropDialog } from './CropDialog';
 import styles from './ViewerOverlay.module.css';
 
 interface ViewerOverlayProps {
@@ -13,6 +14,7 @@ interface ViewerOverlayProps {
   onPageChange: (page: number) => void;
   onClose: () => void;
   thumbnailUrls: string[];
+  imageUrls: string[];
 }
 
 export function ViewerOverlay({
@@ -22,6 +24,7 @@ export function ViewerOverlay({
   onPageChange,
   onClose,
   thumbnailUrls,
+  imageUrls,
 }: ViewerOverlayProps) {
   const { t } = useTranslation();
   const { showOverlay, showSettings, readDirection, twoPageMode, coverPageMode, toggleOverlay, toggleSettings } = useViewerStore();
@@ -29,6 +32,26 @@ export function ViewerOverlay({
   const toggleBookmark = useToggleBookmark();
   const rtl = readDirection === 'rtl';
   const [showThumbnails, setShowThumbnails] = useState(false);
+  const [showCropDialog, setShowCropDialog] = useState(false);
+
+  const visiblePages = useMemo(() => {
+    if (!twoPageMode) return [currentPage];
+
+    const pages: number[] = [];
+    if (coverPageMode === 'cover') {
+      if (currentPage === 0) {
+        pages.push(0);
+      } else {
+        if (currentPage < totalPages) pages.push(currentPage);
+        if (currentPage + 1 < totalPages) pages.push(currentPage + 1);
+      }
+    } else {
+      const pairStart = Math.floor(currentPage / 2) * 2;
+      if (pairStart < totalPages) pages.push(pairStart);
+      if (pairStart + 1 < totalPages) pages.push(pairStart + 1);
+    }
+    return pages;
+  }, [currentPage, twoPageMode, coverPageMode, totalPages]);
 
   const handleLeftTap = () => {
     if (rtl) {
@@ -79,6 +102,16 @@ export function ViewerOverlay({
             >
               {isBookmarked ? '★' : '☆'}
             </button>
+            <button
+              className={styles.cropBtn}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowCropDialog(true);
+              }}
+              aria-label="Crop"
+            >
+              ✂
+            </button>
             <div style={{ flex: 1 }} />
             <button
               className={styles.settingsBtn}
@@ -112,6 +145,14 @@ export function ViewerOverlay({
           coverPageMode={coverPageMode}
           onPageSelect={onPageChange}
           onClose={() => setShowThumbnails(false)}
+        />
+      )}
+      {showCropDialog && (
+        <CropDialog
+          galleryId={galleryId}
+          imageUrls={imageUrls}
+          visiblePages={visiblePages}
+          onClose={() => setShowCropDialog(false)}
         />
       )}
     </>
