@@ -111,13 +111,103 @@ def _worker_process_image(task: dict) -> dict:
                 entry["orientation"] = int(orientations[i])
             texts.append(entry)
 
+    dialogues = group_into_dialogues(texts, width, height)
+
     return {
         "page": page_num,
         "width": width,
         "height": height,
-        "textsCount": len(texts),
-        "texts": texts,
+        "dialogues": dialogues,
     }
+
+
+def _find(parent: list[int], i: int) -> int:
+    """Union-Find: path compression"""
+    while parent[i] != i:
+        parent[i] = parent[parent[i]]
+        i = parent[i]
+    return i
+
+
+def _union(parent: list[int], rank: list[int], a: int, b: int):
+    """Union-Find: union by rank"""
+    ra, rb = _find(parent, a), _find(parent, b)
+    if ra == rb:
+        return
+    if rank[ra] < rank[rb]:
+        ra, rb = rb, ra
+    parent[rb] = ra
+    if rank[ra] == rank[rb]:
+        rank[ra] += 1
+
+
+def group_into_dialogues(texts: list[dict], img_width: int, img_height: int) -> list[dict]:
+    """
+    가까운 텍스트 박스를 말풍선(dialogue) 단위로 그루핑.
+
+    기존 C# MergeByDist 대비 개선:
+    - Union-Find (path compression + union by rank)로 체인 누락 방지
+    - 임계값을 이미지 크기 비율로 계산 (해상도 독립적)
+    - 그룹 내 텍스트를 y좌표 순으로 정렬 (말풍선 내 줄 순서 보장)
+    """
+    n = len(texts)
+    if n == 0:
+        return []
+
+    # 임계값: 이미지 크기 대비 비율
+    thresh_x = img_width * 0.025   # 가로 2.5%
+    thresh_y = img_height * 0.05   # 세로 5%
+
+    # 각 텍스트의 중심점 계산
+    centers = []
+    for t in texts:
+        bbox = t["bbox"]  # [x1, y1, x2, y2]
+        cx = (bbox[0] + bbox[2]) / 2
+        cy = (bbox[1] + bbox[3]) / 2
+        centers.append((cx, cy))
+
+    # Union-Find로 가까운 박스끼리 병합
+    parent = list(range(n))
+    rank = [0] * n
+
+    for i in range(n):
+        for j in range(i + 1, n):
+            dx = abs(centers[i][0] - centers[j][0])
+            dy = abs(centers[i][1] - centers[j][1])
+            if dx < thresh_x and dy < thresh_y:
+                _union(parent, rank, i, j)
+
+    # 그룹별로 텍스트 수집
+    groups: dict[int, list[int]] = {}
+    for i in range(n):
+        root = _find(parent, i)
+        groups.setdefault(root, []).append(i)
+
+    # 각 그룹을 dialogue로 변환
+    dialogues = []
+    for indices in groups.values():
+        # y좌표 순 정렬 (말풍선 내 줄 순서)
+        indices.sort(key=lambda i: centers[i][1])
+
+        lines = [texts[i] for i in indices]
+        merged_text = " ".join(t["text"] for t in lines)
+        avg_conf = sum(t["confidence"] for t in lines) / len(lines)
+
+        # union bounding box
+        min_x = min(t["bbox"][0] for t in lines)
+        min_y = min(t["bbox"][1] for t in lines)
+        max_x = max(t["bbox"][2] for t in lines)
+        max_y = max(t["bbox"][3] for t in lines)
+
+        dialogues.append({
+            "text": merged_text,
+            "confidence": round(avg_conf, 4),
+            "bbox": [min_x, min_y, max_x, max_y],
+        })
+
+    # dialogue를 y좌표 순으로 정렬 (페이지 내 읽기 순서)
+    dialogues.sort(key=lambda d: d["bbox"][1])
+    return dialogues
 
 
 def parse_args():
@@ -256,13 +346,15 @@ def main():
             elapsed = time.perf_counter() - t2
             per_img = elapsed / (i + 1)
             eta = per_img * (total - i - 1)
-            text_preview = ", ".join(t["text"] for t in result["texts"][:3])
-            if len(result["texts"]) > 3:
-                text_preview += "..."
+            dlg_preview = " | ".join(
+                d["text"][:20] for d in result["dialogues"][:3]
+            )
+            if len(result["dialogues"]) > 3:
+                dlg_preview += " ..."
             print(
                 f"  [{i + 1}/{total}] 페이지 {result['page']}: "
-                f"{result['textsCount']}개 텍스트 "
-                f"({per_img:.2f}s/장, ETA {eta:.0f}s) - {text_preview}",
+                f"{len(result['dialogues'])}개 대사 "
+                f"({per_img:.2f}s/장, ETA {eta:.0f}s) - {dlg_preview}",
                 flush=True,
             )
 
@@ -279,9 +371,10 @@ def main():
         "pages": results_ordered,
     }
 
-    output_dir = args.output_dir if args.output_dir else article_dir
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    output_dir = args.output_dir if args.output_dir else os.path.join(script_dir, "raw")
     os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, f"{article_id}-raw.json")
+    output_path = os.path.join(output_dir, f"{article_id}.json")
 
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
@@ -291,10 +384,10 @@ def main():
 
     shutil.rmtree(tmp_dir, ignore_errors=True)
 
-    total_texts = sum(p["textsCount"] for p in results_ordered)
+    total_texts = sum(len(p["dialogues"]) for p in results_ordered)
     t4 = time.perf_counter()
     print()
-    print(f"완료! 총 {total_texts}개 텍스트 감지")
+    print(f"완료! 총 {total_texts}개 대사 감지")
     print(f"총 소요시간: {t4 - t0:.2f}초 (전처리 {t1 - t0:.1f}s + OCR {t3 - t2:.1f}s)")
     print(f"저장: {output_path}")
 
