@@ -94,9 +94,11 @@ export function CropImageCard({ crop, onDelete }: CropImageCardProps) {
             visible && <div className={styles.placeholder}>Loading...</div>
           )}
         </div>
-        <button className={styles.deleteBtn} onClick={handleDelete} title="Delete">
-          ×
-        </button>
+        {crop.Id >= 0 && (
+          <button className={styles.deleteBtn} onClick={handleDelete} title="Delete">
+            ×
+          </button>
+        )}
         <div className={styles.overlay}>
           <span
             className={styles.articleLink}

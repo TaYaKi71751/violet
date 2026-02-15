@@ -1,5 +1,9 @@
 import { Router } from 'express';
+import { unzipSync, strFromU8 } from 'fflate';
 import { getUserDb } from '../services/user-db.js';
+
+const DAILY_ZIP_URL =
+  'https://github.com/project-violet/violet/raw/refs/heads/dev/violet/assets/daily.zip';
 
 export const bookmarksRouter = Router();
 
@@ -106,6 +110,42 @@ bookmarksRouter.delete('/artists/:id', (req, res) => {
 });
 
 // --- Crop Images ---
+
+// User crop bookmarks (from daily.zip) — must be before /crops/:id
+let userCropCache: { data: unknown[]; fetchedAt: number } | null = null;
+const USER_CROP_CACHE_TTL = 10 * 60 * 1000; // 10 min
+
+bookmarksRouter.get('/crops/user', async (_req, res, next) => {
+  try {
+    if (userCropCache && Date.now() - userCropCache.fetchedAt < USER_CROP_CACHE_TTL) {
+      res.json(userCropCache.data);
+      return;
+    }
+
+    const response = await fetch(DAILY_ZIP_URL);
+    if (!response.ok) {
+      res.status(502).json({ error: `Failed to fetch daily.zip: ${response.status}` });
+      return;
+    }
+
+    const buf = new Uint8Array(await response.arrayBuffer());
+    const files = unzipSync(buf);
+
+    const entry = Object.entries(files).find(([name]) =>
+      name.endsWith('crop-bookmarks.json'),
+    );
+    if (!entry) {
+      res.status(404).json({ error: 'crop-bookmarks.json not found in zip' });
+      return;
+    }
+
+    const data = JSON.parse(strFromU8(entry[1]));
+    userCropCache = { data, fetchedAt: Date.now() };
+    res.json(data);
+  } catch (err) {
+    next(err);
+  }
+});
 
 bookmarksRouter.get('/crops', (_req, res) => {
   const db = getUserDb();
