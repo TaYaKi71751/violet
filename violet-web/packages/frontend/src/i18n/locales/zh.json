@@ -5,6 +5,7 @@
   "nav": {
     "home": "主页",
     "bookmarks": "书签",
+    "cropBookmarks": "裁剪",
     "history": "历史",
     "downloads": "下载",
     "aiSearch": "AI搜索",

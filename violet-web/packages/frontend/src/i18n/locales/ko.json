@@ -5,6 +5,7 @@
   "nav": {
     "home": "홈",
     "bookmarks": "북마크",
+    "cropBookmarks": "크롭",
     "history": "기록",
     "downloads": "다운로드",
     "aiSearch": "AI 검색",

@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { Home, Bookmark, History, Download, Settings, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { Home, Bookmark, Crop, History, Download, Settings, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { DiscordIcon } from '../icons/DiscordIcon';
 import { GithubIcon } from '../icons/GithubIcon';
 import { useAppStore } from '../../stores/app-store';
@@ -9,6 +9,7 @@ import styles from './Sidebar.module.css';
 const navItems = [
   { to: '/', labelKey: 'nav.home', icon: Home },
   { to: '/bookmarks', labelKey: 'nav.bookmarks', icon: Bookmark },
+  { to: '/crop-bookmarks', labelKey: 'nav.cropBookmarks', icon: Crop },
   { to: '/history', labelKey: 'nav.history', icon: History },
   { to: '/downloads', labelKey: 'nav.downloads', icon: Download },
   { to: '/ai-search', labelKey: 'nav.aiSearch', icon: Sparkles },

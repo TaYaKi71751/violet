@@ -5,6 +5,7 @@
   "nav": {
     "home": "Home",
     "bookmarks": "Bookmarks",
+    "cropBookmarks": "Crops",
     "history": "History",
     "downloads": "Downloads",
     "aiSearch": "AI Search",

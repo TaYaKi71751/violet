@@ -2,6 +2,7 @@ import type {
   BookmarkGroup,
   BookmarkArticle,
   BookmarkArtist,
+  BookmarkCropImage,
   AddBookmarkArticleRequest,
   AddBookmarkArtistRequest,
   CreateBookmarkGroupRequest,
@@ -62,4 +63,14 @@ export async function addBookmarkArtist(req: AddBookmarkArtistRequest): Promise<
 
 export async function deleteBookmarkArtist(id: number): Promise<void> {
   await api.delete(`/bookmarks/artists/${id}`);
+}
+
+// Crop Images
+export async function getCropBookmarks(): Promise<BookmarkCropImage[]> {
+  const { data } = await api.get<BookmarkCropImage[]>('/bookmarks/crops');
+  return data;
+}
+
+export async function deleteCropBookmark(id: number): Promise<void> {
+  await api.delete(`/bookmarks/crops/${id}`);
 }

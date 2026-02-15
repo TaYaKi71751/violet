@@ -5,6 +5,8 @@ import {
   addBookmarkArticle,
   deleteBookmarkArticle,
   checkBookmark,
+  getCropBookmarks,
+  deleteCropBookmark,
 } from '../api/bookmarks';
 import { useToastStore } from '../stores/toast-store';
 
@@ -48,6 +50,28 @@ export function useRemoveBookmark() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['bookmarkArticles'] });
       qc.invalidateQueries({ queryKey: ['isBookmarked'] });
+    },
+  });
+}
+
+export function useCropBookmarks() {
+  return useQuery({
+    queryKey: ['cropBookmarks'],
+    queryFn: getCropBookmarks,
+  });
+}
+
+export function useDeleteCropBookmark() {
+  const qc = useQueryClient();
+  const addToast = useToastStore((state) => state.addToast);
+  return useMutation({
+    mutationFn: deleteCropBookmark,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['cropBookmarks'] });
+      addToast('크롭 북마크가 삭제되었습니다', 'info');
+    },
+    onError: () => {
+      addToast('크롭 북마크 삭제 중 오류가 발생했습니다', 'error');
     },
   });
 }

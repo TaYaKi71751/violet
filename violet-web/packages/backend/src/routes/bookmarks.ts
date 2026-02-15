@@ -104,3 +104,18 @@ bookmarksRouter.delete('/artists/:id', (req, res) => {
   db.prepare('DELETE FROM BookmarkArtist WHERE Id = ?').run(id);
   res.json({ ok: true });
 });
+
+// --- Crop Images ---
+
+bookmarksRouter.get('/crops', (_req, res) => {
+  const db = getUserDb();
+  const crops = db.prepare('SELECT * FROM BookmarkCropImage ORDER BY Id DESC').all();
+  res.json(crops);
+});
+
+bookmarksRouter.delete('/crops/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const db = getUserDb();
+  db.prepare('DELETE FROM BookmarkCropImage WHERE Id = ?').run(id);
+  res.json({ ok: true });
+});

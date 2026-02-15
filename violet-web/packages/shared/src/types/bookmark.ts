@@ -46,3 +46,12 @@ export interface AddBookmarkArtistRequest {
   IsGroup: ArtistType;
   GroupId?: number;
 }
+
+export interface BookmarkCropImage {
+  Id: number;
+  Article: number;
+  Page: number;
+  Area: string; // "left,top,right,bottom"
+  AspectRatio: number;
+  DateTime: string;
+}

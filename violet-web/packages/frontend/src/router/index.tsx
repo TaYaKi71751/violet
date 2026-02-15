@@ -4,6 +4,7 @@ import { HomePage } from '../pages/HomePage';
 import { ArticlePage } from '../pages/ArticlePage';
 import { ViewerPage } from '../pages/ViewerPage';
 import { BookmarksPage } from '../pages/BookmarksPage';
+import { CropBookmarksPage } from '../pages/CropBookmarksPage';
 import { HistoryPage } from '../pages/HistoryPage';
 import { DownloadsPage } from '../pages/DownloadsPage';
 import { SettingsPage } from '../pages/SettingsPage';
@@ -16,6 +17,7 @@ export function AppRoutes() {
         <Route index element={<HomePage />} />
         <Route path="article/:id" element={<ArticlePage />} />
         <Route path="bookmarks" element={<BookmarksPage />} />
+        <Route path="crop-bookmarks" element={<CropBookmarksPage />} />
         <Route path="history" element={<HistoryPage />} />
         <Route path="downloads" element={<DownloadsPage />} />
         <Route path="ai-search" element={<AiSearchPage />} />
