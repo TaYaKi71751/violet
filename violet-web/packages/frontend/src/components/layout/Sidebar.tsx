@@ -8,9 +8,9 @@ import styles from './Sidebar.module.css';
 
 const navItems = [
   { to: '/', labelKey: 'nav.home', icon: Home },
+  { to: '/history', labelKey: 'nav.history', icon: History },
   { to: '/bookmarks', labelKey: 'nav.bookmarks', icon: Bookmark },
   { to: '/crop-bookmarks', labelKey: 'nav.cropBookmarks', icon: Crop },
-  { to: '/history', labelKey: 'nav.history', icon: History },
   { to: '/downloads', labelKey: 'nav.downloads', icon: Download },
   { to: '/ai-search', labelKey: 'nav.aiSearch', icon: Sparkles },
   { to: '/settings', labelKey: 'nav.settings', icon: Settings },

@@ -4,9 +4,9 @@ import styles from './BottomNav.module.css';
 
 const navItems = [
   { to: '/', labelKey: 'nav.home' },
+  { to: '/history', labelKey: 'nav.history' },
   { to: '/bookmarks', labelKey: 'nav.bookmarks' },
   { to: '/crop-bookmarks', labelKey: 'nav.cropBookmarks' },
-  { to: '/history', labelKey: 'nav.history' },
   { to: '/downloads', labelKey: 'nav.downloads' },
   { to: '/ai-search', labelKey: 'nav.aiSearch' },
   { to: '/settings', labelKey: 'nav.settings' },
