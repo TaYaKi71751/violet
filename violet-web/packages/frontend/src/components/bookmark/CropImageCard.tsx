@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import type { BookmarkCropImage } from '@violet-web/shared';
 import { resolveGallery, getProxyImageUrl } from '../../api/proxy';
+import { useArticle } from '../../hooks/useArticle';
+import { ArticleInfoDialog } from '../search/ArticleInfoDialog';
 import styles from './CropImageCard.module.css';
 
 interface CropImageCardProps {
@@ -19,6 +21,8 @@ export function CropImageCard({ crop, onDelete }: CropImageCardProps) {
   const navigate = useNavigate();
   const cardRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+  const [showInfoDialog, setShowInfoDialog] = useState(false);
+  const { data: article } = useArticle(showInfoDialog ? crop.Article : 0);
 
   // IntersectionObserver for lazy loading
   useEffect(() => {
@@ -69,32 +73,43 @@ export function CropImageCard({ crop, onDelete }: CropImageCardProps) {
   );
 
   return (
-    <div ref={cardRef} className={styles.card} onClick={handleClick}>
-      <div
-        className={styles.imageWrapper}
-        style={{ aspectRatio: String(cropAspectRatio) }}
-      >
-        {imageUrl ? (
-          <img
-            className={styles.image}
-            src={imageUrl}
-            loading="lazy"
-            style={{
-              width: `${(1 / cropWidth) * 100}%`,
-              left: `${(-left / cropWidth) * 100}%`,
-              top: `${(-top / cropHeight) * 100}%`,
-            }}
-          />
-        ) : (
-          visible && <div className={styles.placeholder}>Loading...</div>
-        )}
+    <>
+      <div ref={cardRef} className={styles.card} onClick={handleClick}>
+        <div
+          className={styles.imageWrapper}
+          style={{ aspectRatio: String(cropAspectRatio) }}
+        >
+          {imageUrl ? (
+            <img
+              className={styles.image}
+              src={imageUrl}
+              loading="lazy"
+              style={{
+                width: `${(1 / cropWidth) * 100}%`,
+                left: `${(-left / cropWidth) * 100}%`,
+                top: `${(-top / cropHeight) * 100}%`,
+              }}
+            />
+          ) : (
+            visible && <div className={styles.placeholder}>Loading...</div>
+          )}
+        </div>
+        <button className={styles.deleteBtn} onClick={handleDelete} title="Delete">
+          ×
+        </button>
+        <div className={styles.overlay}>
+          <span
+            className={styles.articleLink}
+            onClick={(e) => { e.stopPropagation(); setShowInfoDialog(true); }}
+          >
+            #{crop.Article}
+          </span>
+          {' · p'}{crop.Page + 1}
+        </div>
       </div>
-      <button className={styles.deleteBtn} onClick={handleDelete} title="Delete">
-        ×
-      </button>
-      <div className={styles.overlay}>
-        #{crop.Article} · p{crop.Page + 1}
-      </div>
-    </div>
+      {showInfoDialog && article && (
+        <ArticleInfoDialog article={article} onClose={() => setShowInfoDialog(false)} />
+      )}
+    </>
   );
 }

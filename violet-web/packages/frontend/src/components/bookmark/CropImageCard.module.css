@@ -43,6 +43,17 @@
   pointer-events: none;
 }
 
+.articleLink {
+  pointer-events: auto;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.articleLink:hover {
+  color: var(--color-primary, #7c3aed);
+  text-decoration: underline;
+}
+
 .deleteBtn {
   position: absolute;
   top: 4px;
