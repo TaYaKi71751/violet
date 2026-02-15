@@ -145,10 +145,10 @@ def group_into_dialogues(texts: list[dict], img_width: int, img_height: int) -> 
     """
     가까운 텍스트 박스를 말풍선(dialogue) 단위로 그루핑.
 
-    기존 C# MergeByDist 대비 개선:
-    - Union-Find (path compression + union by rank)로 체인 누락 방지
-    - 임계값을 이미지 크기 비율로 계산 (해상도 독립적)
-    - 그룹 내 텍스트를 y좌표 순으로 정렬 (말풍선 내 줄 순서 보장)
+    1. 각 텍스트 bbox의 중심점 계산
+    2. 중심점 거리가 임계값(가로 2.5%, 세로 5%) 이내인 박스끼리 Union-Find로 병합
+    3. 그룹 내 텍스트를 y좌표 순 정렬 후 공백으로 연결
+    4. 최종 dialogue를 페이지 내 y좌표 순으로 정렬
     """
     n = len(texts)
     if n == 0:
@@ -224,8 +224,8 @@ def parse_args():
     parser.add_argument(
         "--workers",
         type=int,
-        default=2,
-        help="병렬 워커 수 (기본: 2, 4070Ti 12GB 기준 2~3 권장)",
+        default=10,
+        help="병렬 워커 수 (기본: 10)",
     )
     parser.add_argument(
         "--rec-batch-size",
