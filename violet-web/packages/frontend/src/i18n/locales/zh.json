@@ -51,7 +51,10 @@
   "downloads": {
     "heading": "下载",
     "startToast": "开始下载",
-    "errorToast": "下载启动失败"
+    "completeToast": "下载完成",
+    "failedToast": "下载失败",
+    "errorToast": "下载启动失败",
+    "delete": "删除"
   },
   "viewer": {
     "noImages": "未找到该图库的图片。"

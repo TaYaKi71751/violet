@@ -51,7 +51,10 @@
   "downloads": {
     "heading": "ダウンロード",
     "startToast": "ダウンロードを開始しました",
-    "errorToast": "ダウンロードの開始に失敗しました"
+    "completeToast": "ダウンロードが完了しました",
+    "failedToast": "ダウンロードに失敗しました",
+    "errorToast": "ダウンロードの開始に失敗しました",
+    "delete": "削除"
   },
   "viewer": {
     "noImages": "このギャラリーの画像が見つかりませんでした。"

@@ -1,6 +1,6 @@
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { getDownloads, createDownload } from '../api/downloads';
+import { getDownloads, createDownload, deleteDownload } from '../api/downloads';
 import { useToastStore } from '../stores/toast-store';
 
 export function useDownloadHistory(page = 0, pageSize = 30, enabled = true) {
@@ -8,6 +8,13 @@ export function useDownloadHistory(page = 0, pageSize = 30, enabled = true) {
     queryKey: ['downloads', page, pageSize],
     queryFn: () => getDownloads(page, pageSize),
     enabled,
+    refetchInterval: (query) => {
+      const downloads = query.state.data?.downloads;
+      if (downloads?.some((dl) => dl.Status === 'downloading')) {
+        return 2000;
+      }
+      return false;
+    },
   });
 }
 
@@ -21,6 +28,13 @@ export function useInfiniteDownloadHistory(pageSize = 30, enabled = true) {
       return allPages.length < totalPages ? allPages.length : undefined;
     },
     enabled,
+    refetchInterval: (query) => {
+      const pages = query.state.data?.pages;
+      if (pages?.some((p) => p.downloads.some((dl) => dl.Status === 'downloading'))) {
+        return 2000;
+      }
+      return false;
+    },
   });
 }
 
@@ -38,6 +52,18 @@ export function useStartDownload() {
     },
     onError: () => {
       addToast(t('downloads.errorToast'), 'error');
+    },
+  });
+}
+
+export function useDeleteDownload() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => deleteDownload(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['downloads'] });
+      qc.invalidateQueries({ queryKey: ['downloads-infinite'] });
     },
   });
 }

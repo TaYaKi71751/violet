@@ -1,12 +1,13 @@
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { Download } from 'lucide-react';
+import { Download, Trash2 } from 'lucide-react';
 import type { Article } from '@violet-web/shared';
 import { parsePipeTags, parseTagTuples, ticksToDate } from '@violet-web/shared';
 import { LazyImage } from '../common/LazyImage';
 import { useThumbnail } from '../../hooks/useThumbnail';
 import { useIsBookmarked, useToggleBookmark } from '../../hooks/useBookmarks';
-import { useStartDownload } from '../../hooks/useDownloads';
+import { useStartDownload, useDeleteDownload } from '../../hooks/useDownloads';
+import { useDownloadProgress, useIsDownloadsPage } from '../../contexts/DownloadProgressContext';
 import { useTagTranslation } from '../../hooks/useTagTranslation';
 import { useTagCounts } from '../../hooks/useTagCounts';
 import type { ViewMode } from '../../stores/app-store';
@@ -30,6 +31,9 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
   const { data: isBookmarked } = useIsBookmarked(String(article.Id));
   const toggleBookmark = useToggleBookmark();
   const startDownload = useStartDownload();
+  const deleteDownload = useDeleteDownload();
+  const isDownloadsPage = useIsDownloadsPage();
+  const downloadRecord = useDownloadProgress(String(article.Id));
   const { translateTag } = useTagTranslation();
   const tagCounts = useTagCounts();
 
@@ -44,6 +48,13 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
   const handleDownloadClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     startDownload.mutate(String(article.Id));
+  };
+
+  const handleDeleteDownload = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (downloadRecord) {
+      deleteDownload.mutate(downloadRecord.Id);
+    }
   };
 
   const handleSearchClick = (category: string, value: string) => (e: React.MouseEvent) => {
@@ -88,14 +99,25 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
           ) : (
             <div className={styles.noImage}>{t('article.noImage')}</div>
           )}
-          <button
-            className={styles.downloadBtn}
-            onClick={handleDownloadClick}
-            disabled={startDownload.isPending}
-            aria-label={t('downloads.heading')}
-          >
-            <Download size={14} />
-          </button>
+          {isDownloadsPage ? (
+            <button
+              className={`${styles.downloadBtn} ${styles.deleteBtn}`}
+              onClick={handleDeleteDownload}
+              disabled={deleteDownload.isPending}
+              aria-label={t('downloads.delete')}
+            >
+              <Trash2 size={14} />
+            </button>
+          ) : (
+            <button
+              className={styles.downloadBtn}
+              onClick={handleDownloadClick}
+              disabled={startDownload.isPending}
+              aria-label={t('downloads.heading')}
+            >
+              <Download size={14} />
+            </button>
+          )}
           <button
             className={`${styles.bookmarkBtn} ${isBookmarked ? styles.bookmarked : ''}`}
             onClick={handleBookmarkClick}
@@ -107,6 +129,30 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
           {article.Files != null && (
             <span className={styles.pageCount}>{article.Files}P</span>
           )}
+          {downloadRecord && downloadRecord.Status === 'downloading' && (() => {
+            const pct = downloadRecord.TotalPages > 0
+              ? downloadRecord.DownloadedPages / downloadRecord.TotalPages
+              : 0;
+            const r = 36;
+            const circ = 2 * Math.PI * r;
+            const offset = circ * (1 - pct);
+            return (
+              <div className={styles.progressOverlay}>
+                <svg className={styles.progressRing} viewBox="0 0 80 80">
+                  <circle className={styles.progressRingBg} cx="40" cy="40" r={r} />
+                  <circle
+                    className={styles.progressRingFill}
+                    cx="40" cy="40" r={r}
+                    strokeDasharray={circ}
+                    strokeDashoffset={offset}
+                  />
+                </svg>
+                <div className={styles.progressText}>
+                  {downloadRecord.DownloadedPages}/{downloadRecord.TotalPages}
+                </div>
+              </div>
+            );
+          })()}
         </div>
         <div className={styles.info}>
           <div className={styles.title}>{article.Title}</div>

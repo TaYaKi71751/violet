@@ -1,24 +1,28 @@
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useDownloadHistory, useInfiniteDownloadHistory } from '../hooks/useDownloads';
 import { useQueries } from '@tanstack/react-query';
+import type { DownloadRecord } from '@violet-web/shared';
 import { getArticle } from '../api/content';
 import { LocalSearchSection } from '../components/search/LocalSearchSection';
 import { SearchResultGrid } from '../components/search/SearchResultGrid';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { InfiniteScroll } from '../components/common/InfiniteScroll';
+import { DownloadProgressProvider } from '../contexts/DownloadProgressContext';
 import { useArticleTagSummary } from '../hooks/useArticleTagSummary';
 import { useLocalArticleSearch } from '../hooks/useLocalArticleSearch';
 import { useLocalSearchState } from '../hooks/useLocalSearchState';
 import { useIsMobile } from '../hooks/useMediaQuery';
 import { useAppStore } from '../stores/app-store';
+import { useToastStore } from '../stores/toast-store';
 import styles from './DownloadsPage.module.css';
 
 export function DownloadsPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const addToast = useToastStore((s) => s.addToast);
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get('p') || '0');
   const { scrollMode } = useAppStore();
@@ -54,6 +58,35 @@ export function DownloadsPage() {
   const paginationDownloads = data?.downloads ?? [];
   const infiniteDownloads = infiniteData?.pages.flatMap((p) => p.downloads) ?? [];
   const currentDownloads = scrollMode === 'infinite' ? infiniteDownloads : paginationDownloads;
+
+  // Build download progress map for context
+  const downloadProgressMap = useMemo(() => {
+    const map = new Map<string, DownloadRecord>();
+    for (const dl of currentDownloads) {
+      map.set(dl.Article, dl);
+    }
+    return map;
+  }, [currentDownloads]);
+
+  // Detect completion transitions and show toast
+  const prevStatusRef = useRef<Map<number, string>>(new Map());
+  useEffect(() => {
+    const prevMap = prevStatusRef.current;
+    for (const dl of currentDownloads) {
+      const prev = prevMap.get(dl.Id);
+      if (prev === 'downloading' && dl.Status === 'completed') {
+        addToast(t('downloads.completeToast'), 'success');
+      }
+      if (prev === 'downloading' && dl.Status === 'failed') {
+        addToast(t('downloads.failedToast'), 'error');
+      }
+    }
+    const newMap = new Map<number, string>();
+    for (const dl of currentDownloads) {
+      newMap.set(dl.Id, dl.Status);
+    }
+    prevStatusRef.current = newMap;
+  }, [currentDownloads, addToast, t]);
 
   const articleQueries = useQueries({
     queries: currentDownloads.map((dl) => ({
@@ -116,40 +149,42 @@ export function DownloadsPage() {
         />
       )}
 
-      {scrollMode === 'infinite' ? (
-        <>
-          {infiniteLoading && !infiniteData && <LoadingSpinner />}
-          <InfiniteScroll
-            hasMore={!!hasNextPage}
-            loading={isFetchingNextPage}
-            onLoadMore={handleLoadMore}
-          >
-            <SearchResultGrid articles={filteredArticles} />
-          </InfiniteScroll>
-        </>
-      ) : (
-        <>
-          {isLoading && <LoadingSpinner />}
-          {!isLoading && <SearchResultGrid articles={filteredArticles} />}
+      <DownloadProgressProvider value={downloadProgressMap}>
+        {scrollMode === 'infinite' ? (
+          <>
+            {infiniteLoading && !infiniteData && <LoadingSpinner />}
+            <InfiniteScroll
+              hasMore={!!hasNextPage}
+              loading={isFetchingNextPage}
+              onLoadMore={handleLoadMore}
+            >
+              <SearchResultGrid articles={filteredArticles} />
+            </InfiniteScroll>
+          </>
+        ) : (
+          <>
+            {isLoading && <LoadingSpinner />}
+            {!isLoading && <SearchResultGrid articles={filteredArticles} />}
 
-          {totalPages > 1 && (
-            <div className={styles.pagination}>
-              <button disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
-                {t('home.prev')}
-              </button>
-              <span>
-                {page + 1} / {totalPages}
-              </span>
-              <button
-                disabled={page >= totalPages - 1}
-                onClick={() => setPage((p) => p + 1)}
-              >
-                {t('home.next')}
-              </button>
-            </div>
-          )}
-        </>
-      )}
+            {totalPages > 1 && (
+              <div className={styles.pagination}>
+                <button disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
+                  {t('home.prev')}
+                </button>
+                <span>
+                  {page + 1} / {totalPages}
+                </span>
+                <button
+                  disabled={page >= totalPages - 1}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  {t('home.next')}
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </DownloadProgressProvider>
     </div>
   );
 }

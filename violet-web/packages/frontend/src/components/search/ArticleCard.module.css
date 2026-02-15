@@ -87,6 +87,14 @@
   transform: scale(1.1);
 }
 
+.deleteBtn {
+  background: rgba(220, 50, 50, 0.6);
+}
+
+.deleteBtn:hover {
+  background: rgba(220, 50, 50, 0.85);
+}
+
 .bookmarkBtn {
   position: absolute;
   top: 8px;
@@ -137,6 +145,46 @@
   font-size: 0.7rem;
   border-radius: 4px;
   pointer-events: none;
+}
+
+.progressOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.progressRing {
+  width: 64px;
+  height: 64px;
+}
+
+.progressRingBg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.15);
+  stroke-width: 5;
+}
+
+.progressRingFill {
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-width: 5;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  transition: stroke-dashoffset 0.3s ease;
+}
+
+.progressText {
+  position: absolute;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 /* Detail mode */
