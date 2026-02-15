@@ -62,6 +62,15 @@ downloadsRouter.post('/:id/retry', async (req, res) => {
   }
 });
 
+downloadsRouter.get('/check/:articleId', (req, res) => {
+  const articleId = req.params.articleId;
+  const db = getUserDb();
+  const record = db
+    .prepare("SELECT * FROM Download WHERE Article = ? AND Status = 'completed' LIMIT 1")
+    .get(articleId) as Record<string, unknown> | undefined;
+  res.json({ downloaded: !!record });
+});
+
 downloadsRouter.delete('/:id', (req, res) => {
   const id = parseInt(req.params.id);
   const db = getUserDb();

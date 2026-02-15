@@ -33,3 +33,10 @@ export async function retryDownload(id: number): Promise<DownloadRecord> {
 export async function deleteDownload(id: number): Promise<void> {
   await api.delete(`/downloads/${id}`);
 }
+
+export async function checkDownloaded(articleId: string): Promise<boolean> {
+  const { data } = await api.get<{ downloaded: boolean }>(
+    `/downloads/check/${articleId}`,
+  );
+  return data.downloaded;
+}

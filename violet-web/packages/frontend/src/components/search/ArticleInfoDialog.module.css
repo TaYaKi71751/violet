@@ -190,6 +190,12 @@
   color: var(--color-text);
 }
 
+.downloaded {
+  background: rgba(46, 204, 113, 0.3);
+  color: rgba(46, 204, 113, 0.9);
+  border-color: rgba(46, 204, 113, 0.4);
+}
+
 .viewerBtn {
   background: var(--color-primary);
   color: #fff;

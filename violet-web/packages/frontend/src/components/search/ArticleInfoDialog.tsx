@@ -7,7 +7,7 @@ import { parsePipeTags, parseTagTuples, ticksToDate } from '@violet-web/shared';
 import { LazyImage } from '../common/LazyImage';
 import { useThumbnail } from '../../hooks/useThumbnail';
 import { useIsBookmarked, useToggleBookmark } from '../../hooks/useBookmarks';
-import { useStartDownload } from '../../hooks/useDownloads';
+import { useStartDownload, useIsDownloaded } from '../../hooks/useDownloads';
 import { useTagTranslation } from '../../hooks/useTagTranslation';
 import { useTagCounts } from '../../hooks/useTagCounts';
 import { useArticleSummary } from '../../hooks/useArticleSummary';
@@ -31,6 +31,7 @@ export function ArticleInfoDialog({ article, onClose }: ArticleInfoDialogProps) 
   const { data: isBookmarked } = useIsBookmarked(String(article.Id));
   const toggleBookmark = useToggleBookmark();
   const startDownload = useStartDownload();
+  const { data: isDownloaded } = useIsDownloaded(String(article.Id));
   const { translateTag } = useTagTranslation();
   const tagCounts = useTagCounts();
   const { data: summary } = useArticleSummary(article.Id);
@@ -211,7 +212,7 @@ export function ArticleInfoDialog({ article, onClose }: ArticleInfoDialogProps) 
                 {isBookmarked ? '★' : '☆'}
               </button>
               <button
-                className={`${styles.actionBtn} ${styles.downloadBtn}`}
+                className={`${styles.actionBtn} ${styles.downloadBtn} ${isDownloaded ? styles.downloaded : ''}`}
                 onClick={handleDownloadClick}
                 disabled={startDownload.isPending}
               >

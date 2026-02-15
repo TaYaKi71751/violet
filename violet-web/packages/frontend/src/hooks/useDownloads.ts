@@ -1,6 +1,6 @@
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { getDownloads, createDownload, retryDownload, deleteDownload } from '../api/downloads';
+import { getDownloads, createDownload, retryDownload, deleteDownload, checkDownloaded } from '../api/downloads';
 import { useToastStore } from '../stores/toast-store';
 
 export function useDownloadHistory(page = 0, pageSize = 30, enabled = true) {
@@ -38,20 +38,38 @@ export function useInfiniteDownloadHistory(pageSize = 30, enabled = true) {
   });
 }
 
+export function useIsDownloaded(articleId: string) {
+  return useQuery({
+    queryKey: ['downloaded', articleId],
+    queryFn: () => checkDownloaded(articleId),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
 export function useStartDownload() {
   const qc = useQueryClient();
   const { t } = useTranslation();
   const addToast = useToastStore((s) => s.addToast);
 
   return useMutation({
-    mutationFn: (articleId: string) => createDownload(articleId),
+    mutationFn: async (articleId: string) => {
+      const already = await checkDownloaded(articleId);
+      if (already) {
+        throw new Error('already_downloaded');
+      }
+      return createDownload(articleId);
+    },
     onSuccess: () => {
       addToast(t('downloads.startToast'), 'info');
       qc.invalidateQueries({ queryKey: ['downloads'] });
       qc.invalidateQueries({ queryKey: ['downloads-infinite'] });
     },
-    onError: () => {
-      addToast(t('downloads.errorToast'), 'error');
+    onError: (_err) => {
+      if (_err instanceof Error && _err.message === 'already_downloaded') {
+        addToast(t('downloads.alreadyToast'), 'info');
+      } else {
+        addToast(t('downloads.errorToast'), 'error');
+      }
     },
   });
 }

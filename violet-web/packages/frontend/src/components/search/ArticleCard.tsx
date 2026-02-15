@@ -7,7 +7,7 @@ import { parsePipeTags, parseTagTuples, ticksToDate } from '@violet-web/shared';
 import { LazyImage } from '../common/LazyImage';
 import { useThumbnail } from '../../hooks/useThumbnail';
 import { useIsBookmarked, useToggleBookmark } from '../../hooks/useBookmarks';
-import { useStartDownload, useRetryDownload, useDeleteDownload } from '../../hooks/useDownloads';
+import { useStartDownload, useRetryDownload, useDeleteDownload, useIsDownloaded } from '../../hooks/useDownloads';
 import { useDownloadProgress, useIsDownloadsPage } from '../../contexts/DownloadProgressContext';
 import { useTagTranslation } from '../../hooks/useTagTranslation';
 import { useTagCounts } from '../../hooks/useTagCounts';
@@ -38,6 +38,7 @@ export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription
   const retryDownload = useRetryDownload();
   const deleteDownload = useDeleteDownload();
   const isDownloadsPage = useIsDownloadsPage();
+  const { data: isDownloaded } = useIsDownloaded(String(article.Id));
   const downloadRecord = useDownloadProgress(String(article.Id));
   const { translateTag } = useTagTranslation();
   const tagCounts = useTagCounts();
@@ -123,7 +124,7 @@ export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription
             </button>
           ) : (
             <button
-              className={styles.downloadBtn}
+              className={`${styles.downloadBtn} ${isDownloaded ? styles.downloaded : ''}`}
               onClick={handleDownloadClick}
               disabled={startDownload.isPending}
               aria-label={t('downloads.heading')}

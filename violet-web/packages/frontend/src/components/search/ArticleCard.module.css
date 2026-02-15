@@ -91,6 +91,15 @@
   transform: scale(1.1);
 }
 
+.downloaded {
+  opacity: 1;
+  background: rgba(46, 204, 113, 0.6);
+}
+
+.downloaded:hover {
+  background: rgba(46, 204, 113, 0.8);
+}
+
 .deleteBtn {
   background: rgba(220, 50, 50, 0.6);
 }

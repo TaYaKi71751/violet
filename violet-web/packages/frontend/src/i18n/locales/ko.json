@@ -56,6 +56,7 @@
     "completeToast": "다운로드가 완료되었습니다",
     "failedToast": "다운로드에 실패했습니다",
     "errorToast": "다운로드 시작 중 오류가 발생했습니다",
+    "alreadyToast": "이미 다운로드한 작품입니다",
     "delete": "삭제",
     "retry": "재시도"
   },
