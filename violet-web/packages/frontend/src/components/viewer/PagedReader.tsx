@@ -156,8 +156,8 @@ export function PagedReader({
   );
 
   const isSinglePage = visiblePageIndices.size === 1;
-  const isCoverPage = isSinglePage && currentPage === 0;
-  const isLastSinglePage = isSinglePage && currentPage > 0;
+  const isCoverPage = twoPageMode && isSinglePage && currentPage === 0;
+  const isLastSinglePage = twoPageMode && isSinglePage && currentPage > 0;
 
   // Check if a page should be actively loaded (within prefetch range)
   const isPageActive = useCallback(
