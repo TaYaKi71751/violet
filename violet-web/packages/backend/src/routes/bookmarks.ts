@@ -1,5 +1,9 @@
 import { Router } from 'express';
+import { unzipSync, strFromU8 } from 'fflate';
 import { getUserDb } from '../services/user-db.js';
+
+const DAILY_ZIP_URL =
+  'https://github.com/project-violet/violet/raw/refs/heads/dev/violet/assets/daily.zip';
 
 export const bookmarksRouter = Router();
 
@@ -102,5 +106,70 @@ bookmarksRouter.delete('/artists/:id', (req, res) => {
   const id = parseInt(req.params.id);
   const db = getUserDb();
   db.prepare('DELETE FROM BookmarkArtist WHERE Id = ?').run(id);
+  res.json({ ok: true });
+});
+
+// --- Crop Images ---
+
+// User crop bookmarks (from daily.zip) — must be before /crops/:id
+let userCropCache: { data: unknown[]; fetchedAt: number } | null = null;
+const USER_CROP_CACHE_TTL = 10 * 60 * 1000; // 10 min
+
+bookmarksRouter.get('/crops/user', async (_req, res, next) => {
+  try {
+    if (userCropCache && Date.now() - userCropCache.fetchedAt < USER_CROP_CACHE_TTL) {
+      res.json(userCropCache.data);
+      return;
+    }
+
+    const response = await fetch(DAILY_ZIP_URL);
+    if (!response.ok) {
+      res.status(502).json({ error: `Failed to fetch daily.zip: ${response.status}` });
+      return;
+    }
+
+    const buf = new Uint8Array(await response.arrayBuffer());
+    const files = unzipSync(buf);
+
+    const entry = Object.entries(files).find(([name]) =>
+      name.endsWith('crop-bookmarks.json'),
+    );
+    if (!entry) {
+      res.status(404).json({ error: 'crop-bookmarks.json not found in zip' });
+      return;
+    }
+
+    const data = JSON.parse(strFromU8(entry[1]));
+    userCropCache = { data, fetchedAt: Date.now() };
+    res.json(data);
+  } catch (err) {
+    next(err);
+  }
+});
+
+bookmarksRouter.get('/crops', (_req, res) => {
+  const db = getUserDb();
+  const crops = db.prepare('SELECT * FROM BookmarkCropImage ORDER BY Id DESC').all();
+  res.json(crops);
+});
+
+bookmarksRouter.post('/crops', (req, res) => {
+  const { Article, Page, Area, AspectRatio } = req.body;
+  const db = getUserDb();
+  const nextId = (
+    db.prepare('SELECT COALESCE(MAX(Id), 0) + 1 AS nextId FROM BookmarkCropImage').get() as { nextId: number }
+  ).nextId;
+  const result = db
+    .prepare(
+      'INSERT INTO BookmarkCropImage (Id, Article, Page, Area, AspectRatio, DateTime) VALUES (?, ?, ?, ?, ?, ?)',
+    )
+    .run(nextId, Article, Page, Area, AspectRatio, new Date().toISOString().replace('T', ' ').replace('Z', ''));
+  res.json({ Id: result.lastInsertRowid });
+});
+
+bookmarksRouter.delete('/crops/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const db = getUserDb();
+  db.prepare('DELETE FROM BookmarkCropImage WHERE Id = ?').run(id);
   res.json({ ok: true });
 });

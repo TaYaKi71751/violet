@@ -5,7 +5,10 @@
   "nav": {
     "home": "ホーム",
     "bookmarks": "ブックマーク",
+    "cropBookmarks": "クロップ",
     "history": "履歴",
+    "downloads": "ダウンロード",
+    "aiSearch": "AI検索",
     "settings": "設定"
   },
   "home": {
@@ -46,6 +49,28 @@
   },
   "history": {
     "heading": "履歴"
+  },
+  "downloads": {
+    "heading": "ダウンロード",
+    "startToast": "ダウンロードを開始しました",
+    "completeToast": "ダウンロードが完了しました",
+    "failedToast": "ダウンロードに失敗しました",
+    "errorToast": "ダウンロードの開始に失敗しました",
+    "alreadyToast": "すでにダウンロード済みです",
+    "delete": "削除",
+    "retry": "再試行"
+  },
+  "aiSearch": {
+    "heading": "AI検索",
+    "placeholder": "何でも聞いてください...",
+    "answerLabel": "AI回答",
+    "score": "関連度",
+    "mode": "モード",
+    "modeSuperFast": "即時検索",
+    "modeFast": "高速検索",
+    "modeDetail": "詳細検索",
+    "noResults": "検索結果が見つかりませんでした。",
+    "error": "AI検索中にエラーが発生しました。"
   },
   "viewer": {
     "noImages": "このギャラリーの画像が見つかりませんでした。"

@@ -5,7 +5,10 @@
   "nav": {
     "home": "홈",
     "bookmarks": "북마크",
+    "cropBookmarks": "크롭",
     "history": "기록",
+    "downloads": "다운로드",
+    "aiSearch": "AI 검색",
     "settings": "설정"
   },
   "home": {
@@ -46,6 +49,28 @@
   },
   "history": {
     "heading": "기록"
+  },
+  "downloads": {
+    "heading": "다운로드",
+    "startToast": "다운로드를 시작합니다",
+    "completeToast": "다운로드가 완료되었습니다",
+    "failedToast": "다운로드에 실패했습니다",
+    "errorToast": "다운로드 시작 중 오류가 발생했습니다",
+    "alreadyToast": "이미 다운로드한 작품입니다",
+    "delete": "삭제",
+    "retry": "재시도"
+  },
+  "aiSearch": {
+    "heading": "AI 검색",
+    "placeholder": "무엇이든 물어보세요...",
+    "answerLabel": "AI 답변",
+    "score": "관련도",
+    "mode": "모드",
+    "modeSuperFast": "즉시 검색",
+    "modeFast": "빠른 검색",
+    "modeDetail": "상세 검색",
+    "noResults": "검색 결과가 없습니다.",
+    "error": "AI 검색 중 오류가 발생했습니다."
   },
   "viewer": {
     "noImages": "갤러리에서 이미지를 찾을 수 없습니다."

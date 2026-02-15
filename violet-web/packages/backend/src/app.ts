@@ -5,6 +5,9 @@ import { proxyRouter } from './routes/proxy.js';
 import { bookmarksRouter } from './routes/bookmarks.js';
 import { historyRouter } from './routes/history.js';
 import { syncRouter } from './routes/sync.js';
+import { downloadsRouter } from './routes/downloads.js';
+import { aiSearchRouter } from './routes/ai-search.js';
+import { summaryRouter } from './routes/summary.js';
 import { errorHandler } from './middleware/error-handler.js';
 import { requestLogger } from './middleware/request-logger.js';
 
@@ -24,6 +27,9 @@ export function createApp() {
   app.use('/api/bookmarks', bookmarksRouter);
   app.use('/api/history', historyRouter);
   app.use('/api/sync', syncRouter);
+  app.use('/api/downloads', downloadsRouter);
+  app.use('/api/ai-search', aiSearchRouter);
+  app.use('/api/summary', summaryRouter);
 
   app.use(errorHandler);
 

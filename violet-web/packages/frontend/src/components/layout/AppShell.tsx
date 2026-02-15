@@ -50,14 +50,34 @@ export function AppShell() {
 
     // Retry restoration as content renders (images, query data, etc.)
     isRestoringRef.current = true;
+
+    // Fixed-interval retries for quick restoration
     const timers = [50, 100, 200, 500].map((delay) =>
       setTimeout(() => content.scrollTo(0, target), delay),
     );
-    const done = setTimeout(() => { isRestoringRef.current = false; }, 600);
+
+    // Also observe content size changes for pages with async data loading
+    // (e.g., bookmarks/history where article data loads after initial render)
+    let observer: ResizeObserver | undefined;
+    if (typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(() => {
+        if (isRestoringRef.current) {
+          content.scrollTo(0, target);
+        }
+      });
+      // Observe the content element itself for scroll height changes
+      observer.observe(content);
+    }
+
+    const done = setTimeout(() => {
+      observer?.disconnect();
+      isRestoringRef.current = false;
+    }, 1500);
 
     return () => {
       timers.forEach(clearTimeout);
       clearTimeout(done);
+      observer?.disconnect();
       isRestoringRef.current = false;
     };
   }, [location.key]);

@@ -7,3 +7,6 @@ vector_index*/*
 *.txt
 *.pkl
 visualizations/*
+*.png
+*.zip
+__pycache__/*

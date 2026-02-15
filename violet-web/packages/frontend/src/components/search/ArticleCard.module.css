@@ -53,8 +53,59 @@
   color: var(--color-text-secondary);
 }
 
+.articleId {
+  opacity: 0.45;
+}
+
 .lang {
   text-transform: capitalize;
+}
+
+.downloadBtn {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+  z-index: 10;
+  opacity: 0;
+}
+
+.card:hover .downloadBtn {
+  opacity: 1;
+}
+
+.downloadBtn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.1);
+}
+
+.downloaded {
+  opacity: 1;
+  background: rgba(46, 204, 113, 0.6);
+}
+
+.downloaded:hover {
+  background: rgba(46, 204, 113, 0.8);
+}
+
+.deleteBtn {
+  background: rgba(220, 50, 50, 0.6);
+}
+
+.deleteBtn:hover {
+  background: rgba(220, 50, 50, 0.85);
 }
 
 .bookmarkBtn {
@@ -107,6 +158,128 @@
   font-size: 0.7rem;
   border-radius: 4px;
   pointer-events: none;
+}
+
+.progressOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.progressRing {
+  width: 64px;
+  height: 64px;
+}
+
+.progressRingBg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.15);
+  stroke-width: 5;
+}
+
+.progressRingFill {
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-width: 5;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  transition: stroke-dashoffset 0.3s ease;
+}
+
+.progressText {
+  position: absolute;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.failedOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  z-index: 5;
+}
+
+.retryBtn {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.2s;
+  backdrop-filter: blur(4px);
+}
+
+.retryBtn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.failedText {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.72rem;
+}
+
+.failedError {
+  color: rgba(255, 100, 100, 0.9);
+  font-size: 0.62rem;
+  text-align: center;
+  padding: 0 8px;
+  max-height: 2.5em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* AI search info */
+.aiInfo {
+  margin-top: var(--spacing-xs);
+}
+
+.aiScoreBadge {
+  display: inline-block;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+
+.aiDescription {
+  margin: var(--spacing-xs) 0 0;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.detailCard .meta {
+  flex-wrap: wrap;
+}
+
+.detailCard .articleId {
+  width: 100%;
 }
 
 /* Detail mode */

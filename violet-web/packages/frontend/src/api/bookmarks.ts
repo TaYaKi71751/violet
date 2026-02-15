@@ -2,8 +2,10 @@ import type {
   BookmarkGroup,
   BookmarkArticle,
   BookmarkArtist,
+  BookmarkCropImage,
   AddBookmarkArticleRequest,
   AddBookmarkArtistRequest,
+  AddBookmarkCropImageRequest,
   CreateBookmarkGroupRequest,
 } from '@violet-web/shared';
 import { api } from './client';
@@ -62,4 +64,19 @@ export async function addBookmarkArtist(req: AddBookmarkArtistRequest): Promise<
 
 export async function deleteBookmarkArtist(id: number): Promise<void> {
   await api.delete(`/bookmarks/artists/${id}`);
+}
+
+// Crop Images
+export async function getCropBookmarks(): Promise<BookmarkCropImage[]> {
+  const { data } = await api.get<BookmarkCropImage[]>('/bookmarks/crops');
+  return data;
+}
+
+export async function addCropBookmark(req: AddBookmarkCropImageRequest): Promise<{ Id: number }> {
+  const { data } = await api.post<{ Id: number }>('/bookmarks/crops', req);
+  return data;
+}
+
+export async function deleteCropBookmark(id: number): Promise<void> {
+  await api.delete(`/bookmarks/crops/${id}`);
 }

@@ -5,7 +5,10 @@
   "nav": {
     "home": "Home",
     "bookmarks": "Bookmarks",
+    "cropBookmarks": "Crops",
     "history": "History",
+    "downloads": "Downloads",
+    "aiSearch": "AI Search",
     "settings": "Settings"
   },
   "home": {
@@ -46,6 +49,28 @@
   },
   "history": {
     "heading": "History"
+  },
+  "downloads": {
+    "heading": "Downloads",
+    "startToast": "Download started",
+    "completeToast": "Download completed",
+    "failedToast": "Download failed",
+    "errorToast": "Failed to start download",
+    "alreadyToast": "Already downloaded",
+    "delete": "Delete",
+    "retry": "Retry"
+  },
+  "aiSearch": {
+    "heading": "AI Search",
+    "placeholder": "Ask anything...",
+    "answerLabel": "AI Answer",
+    "score": "Relevance",
+    "mode": "Mode",
+    "modeSuperFast": "Instant",
+    "modeFast": "Fast",
+    "modeDetail": "Detail",
+    "noResults": "No results found.",
+    "error": "An error occurred during AI search."
   },
   "viewer": {
     "noImages": "No images found for this gallery."

@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useBookmarkGroups, useBookmarkArticles } from '../hooks/useBookmarks';
 import { BookmarkGroupList } from '../components/bookmark/BookmarkGroupList';
@@ -21,18 +21,40 @@ const PAGE_SIZE = 30;
 export function BookmarksPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const isMobile = useIsMobile();
   const { scrollMode } = useAppStore();
 
-  const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>(undefined);
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>(() => {
+    const saved = sessionStorage.getItem(`bookmarks:group:${location.key}`);
+    return saved ? parseInt(saved) : undefined;
+  });
+  const [visibleCount, setVisibleCount] = useState(() => {
+    const saved = sessionStorage.getItem(`bookmarks:visible:${location.key}`);
+    return saved ? parseInt(saved) : PAGE_SIZE;
+  });
+  const [page, setPage] = useState(0);
 
   const { data: groups, isLoading: groupsLoading } = useBookmarkGroups();
   const { data: bookmarkArticles, isLoading: articlesLoading } =
     useBookmarkArticles(selectedGroupId);
 
+  // Determine which bookmark records to fetch based on scroll mode
+  const allBookmarks = bookmarkArticles ?? [];
+  const totalPages = Math.ceil(allBookmarks.length / PAGE_SIZE);
+
+  // Reset page if out of bounds
+  useEffect(() => {
+    if (page >= totalPages && totalPages > 0) setPage(totalPages - 1);
+  }, [page, totalPages]);
+
+  const fetchSlice =
+    scrollMode === 'infinite'
+      ? allBookmarks.slice(0, visibleCount)
+      : allBookmarks.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
   const articleQueries = useQueries({
-    queries: (bookmarkArticles ?? []).map((ba) => ({
+    queries: fetchSlice.map((ba) => ({
       queryKey: ['article', parseInt(ba.Article)],
       queryFn: () => getArticle(parseInt(ba.Article)),
       enabled: !!ba.Article,
@@ -45,7 +67,7 @@ export function BookmarksPage() {
 
   const isLoading = groupsLoading || articlesLoading || articleQueries.some((q) => q.isLoading);
 
-  // Extract tag summary from all articles in current group
+  // Extract tag summary from loaded articles
   const tagSummary = useArticleTagSummary(articles);
 
   // Filter articles based on URL query parameter
@@ -64,22 +86,35 @@ export function BookmarksPage() {
       onReset: handleReset,
     });
 
-  // Reset selected tags and visible count when group changes
+  // Persist selectedGroupId and visibleCount to sessionStorage for scroll restoration
   useEffect(() => {
-    resetTags();
-    setVisibleCount(PAGE_SIZE);
+    if (selectedGroupId !== undefined) {
+      sessionStorage.setItem(`bookmarks:group:${location.key}`, String(selectedGroupId));
+    } else {
+      sessionStorage.removeItem(`bookmarks:group:${location.key}`);
+    }
+  }, [selectedGroupId, location.key]);
+
+  useEffect(() => {
+    sessionStorage.setItem(`bookmarks:visible:${location.key}`, String(visibleCount));
+  }, [visibleCount, location.key]);
+
+  // Reset selected tags and visible count when group changes
+  const prevGroupRef = useRef(selectedGroupId);
+  useEffect(() => {
+    if (prevGroupRef.current !== selectedGroupId) {
+      prevGroupRef.current = selectedGroupId;
+      resetTags();
+      setVisibleCount(PAGE_SIZE);
+      setPage(0);
+    }
   }, [selectedGroupId, resetTags]);
 
   const handleLoadMore = useCallback(() => {
     setVisibleCount((prev) => prev + PAGE_SIZE);
   }, []);
 
-  const displayedArticles =
-    scrollMode === 'infinite'
-      ? filteredArticles.slice(0, visibleCount)
-      : filteredArticles;
-
-  const hasMore = scrollMode === 'infinite' && visibleCount < filteredArticles.length;
+  const hasMore = scrollMode === 'infinite' && visibleCount < allBookmarks.length;
 
   return (
     <div>
@@ -112,10 +147,33 @@ export function BookmarksPage() {
           loading={false}
           onLoadMore={handleLoadMore}
         >
-          <SearchResultGrid articles={displayedArticles} />
+          <SearchResultGrid articles={filteredArticles} />
         </InfiniteScroll>
       ) : (
-        !isLoading && <SearchResultGrid articles={displayedArticles} />
+        !isLoading && (
+          <>
+            <SearchResultGrid articles={filteredArticles} />
+            {totalPages > 1 && (
+              <div className={styles.pagination}>
+                <button
+                  disabled={page === 0}
+                  onClick={() => setPage((p) => p - 1)}
+                >
+                  {t('home.prev')}
+                </button>
+                <span>
+                  {page + 1} / {totalPages}
+                </span>
+                <button
+                  disabled={page >= totalPages - 1}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  {t('home.next')}
+                </button>
+              </div>
+            )}
+          </>
+        )
       )}
     </div>
   );

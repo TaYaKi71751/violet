@@ -1,18 +1,25 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import { Download, Trash2, RotateCw } from 'lucide-react';
 import type { Article } from '@violet-web/shared';
 import { parsePipeTags, parseTagTuples, ticksToDate } from '@violet-web/shared';
 import { LazyImage } from '../common/LazyImage';
 import { useThumbnail } from '../../hooks/useThumbnail';
 import { useIsBookmarked, useToggleBookmark } from '../../hooks/useBookmarks';
+import { useStartDownload, useRetryDownload, useDeleteDownload, useIsDownloaded } from '../../hooks/useDownloads';
+import { useDownloadProgress, useIsDownloadsPage } from '../../contexts/DownloadProgressContext';
 import { useTagTranslation } from '../../hooks/useTagTranslation';
 import { useTagCounts } from '../../hooks/useTagCounts';
+import { ArticleInfoDialog } from './ArticleInfoDialog';
 import type { ViewMode } from '../../stores/app-store';
 import styles from './ArticleCard.module.css';
 
 interface ArticleCardProps {
   article: Article;
   viewMode?: ViewMode;
+  aiScore?: number;
+  aiDescription?: string;
 }
 
 const TAG_ORDER: Record<string, number> = { female: 0, male: 1, tag: 2, '': 2 };
@@ -21,14 +28,21 @@ function getTagOrder(ns: string): number {
   return TAG_ORDER[ns] ?? 3;
 }
 
-export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
+export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription }: ArticleCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: thumbnailUrl } = useThumbnail(article.Id);
   const { data: isBookmarked } = useIsBookmarked(String(article.Id));
   const toggleBookmark = useToggleBookmark();
+  const startDownload = useStartDownload();
+  const retryDownload = useRetryDownload();
+  const deleteDownload = useDeleteDownload();
+  const isDownloadsPage = useIsDownloadsPage();
+  const { data: isDownloaded } = useIsDownloaded(String(article.Id));
+  const downloadRecord = useDownloadProgress(String(article.Id));
   const { translateTag } = useTagTranslation();
   const tagCounts = useTagCounts();
+  const [showInfoDialog, setShowInfoDialog] = useState(false);
 
   const artists = parsePipeTags(article.Artists);
   const language = article.Language ?? '';
@@ -36,6 +50,25 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
   const handleBookmarkClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleBookmark.mutate({ articleId: String(article.Id), isBookmarked: !!isBookmarked });
+  };
+
+  const handleDownloadClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    startDownload.mutate(String(article.Id));
+  };
+
+  const handleRetryDownload = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (downloadRecord) {
+      retryDownload.mutate(downloadRecord.Id);
+    }
+  };
+
+  const handleDeleteDownload = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (downloadRecord) {
+      deleteDownload.mutate(downloadRecord.Id);
+    }
   };
 
   const handleSearchClick = (category: string, value: string) => (e: React.MouseEvent) => {
@@ -80,6 +113,25 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
           ) : (
             <div className={styles.noImage}>{t('article.noImage')}</div>
           )}
+          {isDownloadsPage ? (
+            <button
+              className={`${styles.downloadBtn} ${styles.deleteBtn}`}
+              onClick={handleDeleteDownload}
+              disabled={deleteDownload.isPending}
+              aria-label={t('downloads.delete')}
+            >
+              <Trash2 size={14} />
+            </button>
+          ) : (
+            <button
+              className={`${styles.downloadBtn} ${isDownloaded ? styles.downloaded : ''}`}
+              onClick={handleDownloadClick}
+              disabled={startDownload.isPending}
+              aria-label={t('downloads.heading')}
+            >
+              <Download size={14} />
+            </button>
+          )}
           <button
             className={`${styles.bookmarkBtn} ${isBookmarked ? styles.bookmarked : ''}`}
             onClick={handleBookmarkClick}
@@ -91,10 +143,53 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
           {article.Files != null && (
             <span className={styles.pageCount}>{article.Files}P</span>
           )}
+          {downloadRecord && downloadRecord.Status === 'downloading' && (() => {
+            const pct = downloadRecord.TotalPages > 0
+              ? downloadRecord.DownloadedPages / downloadRecord.TotalPages
+              : 0;
+            const r = 36;
+            const circ = 2 * Math.PI * r;
+            const offset = circ * (1 - pct);
+            return (
+              <div className={styles.progressOverlay}>
+                <svg className={styles.progressRing} viewBox="0 0 80 80">
+                  <circle className={styles.progressRingBg} cx="40" cy="40" r={r} />
+                  <circle
+                    className={styles.progressRingFill}
+                    cx="40" cy="40" r={r}
+                    strokeDasharray={circ}
+                    strokeDashoffset={offset}
+                  />
+                </svg>
+                <div className={styles.progressText}>
+                  {downloadRecord.DownloadedPages}/{downloadRecord.TotalPages}
+                </div>
+              </div>
+            );
+          })()}
+          {downloadRecord && downloadRecord.Status === 'failed' && (
+            <div className={styles.failedOverlay}>
+              <button
+                className={styles.retryBtn}
+                onClick={handleRetryDownload}
+                disabled={retryDownload.isPending}
+              >
+                <RotateCw size={20} />
+              </button>
+              <div className={styles.failedText}>{t('downloads.retry')}</div>
+              {downloadRecord.ErrorMessage && (
+                <div className={styles.failedError}>{downloadRecord.ErrorMessage}</div>
+              )}
+            </div>
+          )}
         </div>
         <div className={styles.info}>
           <div className={styles.title}>{article.Title}</div>
           <div className={styles.meta}>
+            <span
+              className={`${styles.articleId} ${styles.clickable}`}
+              onClick={(e) => { e.stopPropagation(); setShowInfoDialog(true); }}
+            >#{article.Id}</span>
             {artists.length > 0 && (
               <span>
                 {isDetail && <span className={styles.detailLabel}>Artist</span>}
@@ -110,6 +205,15 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
               <span className={styles.lang}>{isDetail && <span className={styles.detailLabel}>Lang</span>}{language}</span>
             )}
           </div>
+
+          {aiScore != null && (
+            <div className={styles.aiInfo}>
+              <span className={styles.aiScoreBadge}>{Math.round(aiScore * 100)}%</span>
+              {aiDescription && (
+                <p className={styles.aiDescription}>{aiDescription}</p>
+              )}
+            </div>
+          )}
 
           {isDetail && (
             <div className={styles.detailInfo}>
@@ -171,6 +275,9 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
           )}
         </div>
       </div>
+      {showInfoDialog && (
+        <ArticleInfoDialog article={article} onClose={() => setShowInfoDialog(false)} />
+      )}
     </>
   );
 }

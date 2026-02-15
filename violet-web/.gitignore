@@ -7,4 +7,5 @@ dist/
 !.gitkeep
 .DS_Store
 *.tsbuildinfo
-packages/backend/data/sync-state.json
+packages/backend/data/*
+packages/backend/suggestion-cache.json

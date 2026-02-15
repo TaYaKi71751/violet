@@ -5,7 +5,10 @@
   "nav": {
     "home": "主页",
     "bookmarks": "书签",
+    "cropBookmarks": "裁剪",
     "history": "历史",
+    "downloads": "下载",
+    "aiSearch": "AI搜索",
     "settings": "设置"
   },
   "home": {
@@ -46,6 +49,28 @@
   },
   "history": {
     "heading": "历史"
+  },
+  "downloads": {
+    "heading": "下载",
+    "startToast": "开始下载",
+    "completeToast": "下载完成",
+    "failedToast": "下载失败",
+    "errorToast": "下载启动失败",
+    "alreadyToast": "已下载的作品",
+    "delete": "删除",
+    "retry": "重试"
+  },
+  "aiSearch": {
+    "heading": "AI搜索",
+    "placeholder": "随便问什么...",
+    "answerLabel": "AI回答",
+    "score": "相关度",
+    "mode": "模式",
+    "modeSuperFast": "即时搜索",
+    "modeFast": "快速搜索",
+    "modeDetail": "详细搜索",
+    "noResults": "未找到搜索结果。",
+    "error": "AI搜索时发生错误。"
   },
   "viewer": {
     "noImages": "未找到该图库的图片。"
