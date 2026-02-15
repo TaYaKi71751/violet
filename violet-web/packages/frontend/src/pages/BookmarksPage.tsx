@@ -33,13 +33,28 @@ export function BookmarksPage() {
     const saved = sessionStorage.getItem(`bookmarks:visible:${location.key}`);
     return saved ? parseInt(saved) : PAGE_SIZE;
   });
+  const [page, setPage] = useState(0);
 
   const { data: groups, isLoading: groupsLoading } = useBookmarkGroups();
   const { data: bookmarkArticles, isLoading: articlesLoading } =
     useBookmarkArticles(selectedGroupId);
 
+  // Determine which bookmark records to fetch based on scroll mode
+  const allBookmarks = bookmarkArticles ?? [];
+  const totalPages = Math.ceil(allBookmarks.length / PAGE_SIZE);
+
+  // Reset page if out of bounds
+  useEffect(() => {
+    if (page >= totalPages && totalPages > 0) setPage(totalPages - 1);
+  }, [page, totalPages]);
+
+  const fetchSlice =
+    scrollMode === 'infinite'
+      ? allBookmarks.slice(0, visibleCount)
+      : allBookmarks.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
   const articleQueries = useQueries({
-    queries: (bookmarkArticles ?? []).map((ba) => ({
+    queries: fetchSlice.map((ba) => ({
       queryKey: ['article', parseInt(ba.Article)],
       queryFn: () => getArticle(parseInt(ba.Article)),
       enabled: !!ba.Article,
@@ -52,7 +67,7 @@ export function BookmarksPage() {
 
   const isLoading = groupsLoading || articlesLoading || articleQueries.some((q) => q.isLoading);
 
-  // Extract tag summary from all articles in current group
+  // Extract tag summary from loaded articles
   const tagSummary = useArticleTagSummary(articles);
 
   // Filter articles based on URL query parameter
@@ -85,14 +100,13 @@ export function BookmarksPage() {
   }, [visibleCount, location.key]);
 
   // Reset selected tags and visible count when group changes
-  // Use a ref to track the previous group so we only reset on actual user-initiated changes,
-  // not on the initial mount where we restore from sessionStorage.
   const prevGroupRef = useRef(selectedGroupId);
   useEffect(() => {
     if (prevGroupRef.current !== selectedGroupId) {
       prevGroupRef.current = selectedGroupId;
       resetTags();
       setVisibleCount(PAGE_SIZE);
+      setPage(0);
     }
   }, [selectedGroupId, resetTags]);
 
@@ -100,12 +114,7 @@ export function BookmarksPage() {
     setVisibleCount((prev) => prev + PAGE_SIZE);
   }, []);
 
-  const displayedArticles =
-    scrollMode === 'infinite'
-      ? filteredArticles.slice(0, visibleCount)
-      : filteredArticles;
-
-  const hasMore = scrollMode === 'infinite' && visibleCount < filteredArticles.length;
+  const hasMore = scrollMode === 'infinite' && visibleCount < allBookmarks.length;
 
   return (
     <div>
@@ -138,10 +147,33 @@ export function BookmarksPage() {
           loading={false}
           onLoadMore={handleLoadMore}
         >
-          <SearchResultGrid articles={displayedArticles} />
+          <SearchResultGrid articles={filteredArticles} />
         </InfiniteScroll>
       ) : (
-        !isLoading && <SearchResultGrid articles={displayedArticles} />
+        !isLoading && (
+          <>
+            <SearchResultGrid articles={filteredArticles} />
+            {totalPages > 1 && (
+              <div className={styles.pagination}>
+                <button
+                  disabled={page === 0}
+                  onClick={() => setPage((p) => p - 1)}
+                >
+                  {t('home.prev')}
+                </button>
+                <span>
+                  {page + 1} / {totalPages}
+                </span>
+                <button
+                  disabled={page >= totalPages - 1}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  {t('home.next')}
+                </button>
+              </div>
+            )}
+          </>
+        )
       )}
     </div>
   );
