@@ -53,6 +53,10 @@
   color: var(--color-text-secondary);
 }
 
+.articleId {
+  opacity: 0.45;
+}
+
 .lang {
   text-transform: capitalize;
 }
@@ -259,6 +263,14 @@
   color: var(--color-text-secondary);
   line-height: 1.6;
   white-space: pre-wrap;
+}
+
+.detailCard .meta {
+  flex-wrap: wrap;
+}
+
+.detailCard .articleId {
+  width: 100%;
 }
 
 /* Detail mode */

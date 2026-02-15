@@ -182,6 +182,7 @@ export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription
         <div className={styles.info}>
           <div className={styles.title}>{article.Title}</div>
           <div className={styles.meta}>
+            <span className={styles.articleId}>#{article.Id}</span>
             {artists.length > 0 && (
               <span>
                 {isDetail && <span className={styles.detailLabel}>Artist</span>}
