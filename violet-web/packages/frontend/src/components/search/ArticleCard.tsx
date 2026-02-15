@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Download, Trash2, RotateCw } from 'lucide-react';
@@ -10,6 +11,7 @@ import { useStartDownload, useRetryDownload, useDeleteDownload } from '../../hoo
 import { useDownloadProgress, useIsDownloadsPage } from '../../contexts/DownloadProgressContext';
 import { useTagTranslation } from '../../hooks/useTagTranslation';
 import { useTagCounts } from '../../hooks/useTagCounts';
+import { ArticleInfoDialog } from './ArticleInfoDialog';
 import type { ViewMode } from '../../stores/app-store';
 import styles from './ArticleCard.module.css';
 
@@ -39,6 +41,7 @@ export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription
   const downloadRecord = useDownloadProgress(String(article.Id));
   const { translateTag } = useTagTranslation();
   const tagCounts = useTagCounts();
+  const [showInfoDialog, setShowInfoDialog] = useState(false);
 
   const artists = parsePipeTags(article.Artists);
   const language = article.Language ?? '';
@@ -182,7 +185,10 @@ export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription
         <div className={styles.info}>
           <div className={styles.title}>{article.Title}</div>
           <div className={styles.meta}>
-            <span className={styles.articleId}>#{article.Id}</span>
+            <span
+              className={`${styles.articleId} ${styles.clickable}`}
+              onClick={(e) => { e.stopPropagation(); setShowInfoDialog(true); }}
+            >#{article.Id}</span>
             {artists.length > 0 && (
               <span>
                 {isDetail && <span className={styles.detailLabel}>Artist</span>}
@@ -268,6 +274,9 @@ export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription
           )}
         </div>
       </div>
+      {showInfoDialog && (
+        <ArticleInfoDialog article={article} onClose={() => setShowInfoDialog(false)} />
+      )}
     </>
   );
 }
