@@ -1,15 +1,19 @@
 """
-벡터 검색 + DeepSeek 답변 생성
+벡터 검색 + DeepSeek 답변 생성 API 서버
 ChromaDB에서 유사 문서 검색 → DeepSeek V3로 답변
+
+GET /search?q=질문&top_k=5
 """
 
-import argparse
+import json
 import os
 
 import chromadb
-import google.generativeai as genai
 import requests
 from dotenv import load_dotenv
+from flask import Flask, jsonify, request
+from google import genai
+from google.genai import types
 
 load_dotenv()
 
@@ -18,68 +22,59 @@ CHROMA_DIR = os.path.join(SCRIPT_DIR, "chromadb")
 COLLECTION_NAME = "article_summaries"
 EMBEDDING_MODEL = "gemini-embedding-001"
 
-parser = argparse.ArgumentParser(description="벡터 검색 + LLM 답변")
-parser.add_argument("query", help="검색 질문")
-parser.add_argument("--top-k", type=int, default=5, help="검색 문서 수 (기본: 5)")
-parser.add_argument(
-    "--max-tokens", type=int, default=4096, help="최대 출력 토큰 (기본: 4096)"
-)
-args = parser.parse_args()
-
 gemini_key = os.environ.get("GEMINI_API_KEY")
 deepseek_key = os.environ.get("DEEPSEEK_API_KEY")
-if not gemini_key:
-    print("오류: GEMINI_API_KEY가 설정되지 않았습니다.")
-    exit(1)
-if not deepseek_key:
-    print("오류: DEEPSEEK_API_KEY가 설정되지 않았습니다.")
+if not gemini_key or not deepseek_key:
+    print("오류: GEMINI_API_KEY 또는 DEEPSEEK_API_KEY가 설정되지 않았습니다.")
     exit(1)
 
-# ── 1. 쿼리 임베딩 ──
-genai.configure(api_key=gemini_key)
-query_resp = genai.embed_content(
-    model=EMBEDDING_MODEL,
-    content=args.query,
-    task_type="RETRIEVAL_QUERY",
-)
-query_embedding = query_resp["embedding"]
-
-# ── 2. ChromaDB 검색 ──
+client_genai = genai.Client(api_key=gemini_key)
 client_chroma = chromadb.PersistentClient(path=CHROMA_DIR)
 collection = client_chroma.get_collection(name=COLLECTION_NAME)
 
-results = collection.query(
-    query_embeddings=[query_embedding],
-    n_results=args.top_k,
-)
+app = Flask(__name__)
+_cache: dict[str, dict] = {}
 
-docs = results["documents"][0]
-ids = results["ids"][0]
-distances = results["distances"][0]
 
-if not docs:
-    print("검색 결과가 없습니다.")
-    exit(0)
+def do_search(query: str, top_k: int = 5, max_tokens: int = 4096) -> dict:
+    cache_key = f"{query}::{top_k}"
+    if cache_key in _cache:
+        return _cache[cache_key]
 
-print(
-    f"검색 완료: {len(docs)}개 문서 (거리: {', '.join(f'{d:.4f}' for d in distances)})"
-)
-print()
+    # 1. 쿼리 임베딩
+    query_resp = client_genai.models.embed_content(
+        model=EMBEDDING_MODEL,
+        contents=query,
+        config=types.EmbedContentConfig(task_type="RETRIEVAL_QUERY"),
+    )
+    query_embedding = query_resp.embeddings[0].values
 
-# ── 3. 컨텍스트 조립 ──
-context_parts = []
-for i, (doc_id, doc, dist) in enumerate(zip(ids, docs, distances)):
-    context_parts.append(
-        f"[문서 {i + 1}] (articleId: {doc_id}, 유사도: {1 - dist:.4f})\n{doc}"
+    # 2. ChromaDB 검색
+    results = collection.query(
+        query_embeddings=[query_embedding],
+        n_results=top_k,
     )
 
-context_text = "\n\n---\n\n".join(context_parts)
+    docs = results["documents"][0]
+    ids = results["ids"][0]
+    distances = results["distances"][0]
 
-# ── 4. DeepSeek 답변 생성 (JSON) ──
-prompt = f"""아래는 벡터 DB에서 검색된 여러 문서의 내용입니다. 각 문서는 만화/웹툰 한 화의 분석 결과입니다.
+    if not docs:
+        return {"query": query, "results": [], "answer": "검색 결과가 없습니다."}
+
+    # 3. 컨텍스트 조립
+    context_parts = []
+    for i, (doc_id, doc, dist) in enumerate(zip(ids, docs, distances)):
+        context_parts.append(
+            f"[문서 {i + 1}] (articleId: {doc_id}, 유사도: {1 - dist:.4f})\n{doc}"
+        )
+    context_text = "\n\n---\n\n".join(context_parts)
+
+    # 4. DeepSeek 답변 생성
+    prompt = f"""아래는 벡터 DB에서 검색된 여러 문서의 내용입니다. 각 문서는 만화/웹툰 한 화의 분석 결과입니다.
 사용자의 질문에 대해, 각 작품이 얼마나 관련있는지 평가하고 JSON으로 출력하세요.
 
-**질문:** {args.query}
+**질문:** {query}
 
 **검색된 문서들:**
 {context_text}
@@ -107,30 +102,45 @@ prompt = f"""아래는 벡터 DB에서 검색된 여러 문서의 내용입니�
 5. answer도 서술형으로 풍부하게 작성
 6. JSON 외에 다른 텍스트를 출력하지 마세요"""
 
-resp = requests.post(
-    "https://api.deepseek.com/chat/completions",
-    headers={
-        "Authorization": f"Bearer {deepseek_key}",
-        "Content-Type": "application/json",
-    },
-    json={
-        "model": "deepseek-chat",
-        "messages": [
-            {"role": "user", "content": prompt},
-        ],
-        "max_tokens": args.max_tokens,
-        "response_format": {"type": "json_object"},
-    },
-)
+    resp = requests.post(
+        "https://api.deepseek.com/chat/completions",
+        headers={
+            "Authorization": f"Bearer {deepseek_key}",
+            "Content-Type": "application/json",
+        },
+        json={
+            "model": "deepseek-chat",
+            "messages": [
+                {"role": "user", "content": prompt},
+            ],
+            "max_tokens": max_tokens,
+            "response_format": {"type": "json_object"},
+        },
+    )
 
-if resp.status_code != 200:
-    print(f"API 오류 ({resp.status_code}): {resp.text}")
-    exit(1)
+    if resp.status_code != 200:
+        return {"error": f"DeepSeek API 오류 ({resp.status_code})", "detail": resp.text}
 
-import json
+    raw = resp.json()["choices"][0]["message"]["content"]
+    result = json.loads(raw)
+    _cache[cache_key] = result
+    return result
 
-raw = resp.json()["choices"][0]["message"]["content"]
-result = json.loads(raw)
 
-# 보기 좋게 출력
-print(json.dumps(result, ensure_ascii=False, indent=2))
+@app.route("/search")
+def search():
+    query = request.args.get("q", "")
+    if not query:
+        return jsonify({"error": "q 파라미터가 필요합니다."}), 400
+
+    top_k = request.args.get("top_k", 5, type=int)
+    max_tokens = request.args.get("max_tokens", 4096, type=int)
+
+    result = do_search(query, top_k=top_k, max_tokens=max_tokens)
+    return jsonify(result)
+
+
+if __name__ == "__main__":
+    port = int(os.environ.get("SEARCH_PORT", 8787))
+    print(f"검색 서버 시작: http://localhost:{port}/search?q=질문")
+    app.run(host="0.0.0.0", port=port)

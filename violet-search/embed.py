@@ -7,8 +7,9 @@ summary/*.txt → ChromaDB (Gemini embedding)
 import os
 
 import chromadb
-import google.generativeai as genai
 from dotenv import load_dotenv
+from google import genai
+from google.genai import types
 
 load_dotenv()
 
@@ -23,7 +24,7 @@ if not api_key:
     print("오류: GEMINI_API_KEY가 설정되지 않았습니다. .env 파일을 확인하세요.")
     exit(1)
 
-genai.configure(api_key=api_key)
+client_genai = genai.Client(api_key=api_key)
 
 client_chroma = chromadb.PersistentClient(path=CHROMA_DIR)
 collection = client_chroma.get_or_create_collection(
@@ -61,12 +62,12 @@ for i in range(0, len(new_items), BATCH_SIZE):
     ids = [item[0] for item in batch]
     texts = [item[1] for item in batch]
 
-    resp = genai.embed_content(
+    resp = client_genai.models.embed_content(
         model=EMBEDDING_MODEL,
-        content=texts,
-        task_type="RETRIEVAL_DOCUMENT",
+        contents=texts,
+        config=types.EmbedContentConfig(task_type="RETRIEVAL_DOCUMENT"),
     )
-    embeddings = resp["embedding"]
+    embeddings = [e.values for e in resp.embeddings]
 
     collection.add(
         ids=ids,
