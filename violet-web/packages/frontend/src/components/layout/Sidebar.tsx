@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { Home, Bookmark, History, Download, Settings, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Home, Bookmark, History, Download, Settings, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { DiscordIcon } from '../icons/DiscordIcon';
 import { GithubIcon } from '../icons/GithubIcon';
 import { useAppStore } from '../../stores/app-store';
@@ -11,6 +11,7 @@ const navItems = [
   { to: '/bookmarks', labelKey: 'nav.bookmarks', icon: Bookmark },
   { to: '/history', labelKey: 'nav.history', icon: History },
   { to: '/downloads', labelKey: 'nav.downloads', icon: Download },
+  { to: '/ai-search', labelKey: 'nav.aiSearch', icon: Sparkles },
   { to: '/settings', labelKey: 'nav.settings', icon: Settings },
 ];
 

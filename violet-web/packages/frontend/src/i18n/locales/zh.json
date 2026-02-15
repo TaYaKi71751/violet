@@ -7,6 +7,7 @@
     "bookmarks": "书签",
     "history": "历史",
     "downloads": "下载",
+    "aiSearch": "AI搜索",
     "settings": "设置"
   },
   "home": {
@@ -56,6 +57,14 @@
     "errorToast": "下载启动失败",
     "delete": "删除",
     "retry": "重试"
+  },
+  "aiSearch": {
+    "heading": "AI搜索",
+    "placeholder": "随便问什么...",
+    "answerLabel": "AI回答",
+    "score": "相关度",
+    "noResults": "未找到搜索结果。",
+    "error": "AI搜索时发生错误。"
   },
   "viewer": {
     "noImages": "未找到该图库的图片。"

@@ -7,6 +7,7 @@ const navItems = [
   { to: '/bookmarks', labelKey: 'nav.bookmarks' },
   { to: '/history', labelKey: 'nav.history' },
   { to: '/downloads', labelKey: 'nav.downloads' },
+  { to: '/ai-search', labelKey: 'nav.aiSearch' },
   { to: '/settings', labelKey: 'nav.settings' },
 ];
 

@@ -7,6 +7,7 @@
     "bookmarks": "북마크",
     "history": "기록",
     "downloads": "다운로드",
+    "aiSearch": "AI 검색",
     "settings": "설정"
   },
   "home": {
@@ -56,6 +57,14 @@
     "errorToast": "다운로드 시작 중 오류가 발생했습니다",
     "delete": "삭제",
     "retry": "재시도"
+  },
+  "aiSearch": {
+    "heading": "AI 검색",
+    "placeholder": "무엇이든 물어보세요...",
+    "answerLabel": "AI 답변",
+    "score": "관련도",
+    "noResults": "검색 결과가 없습니다.",
+    "error": "AI 검색 중 오류가 발생했습니다."
   },
   "viewer": {
     "noImages": "갤러리에서 이미지를 찾을 수 없습니다."
