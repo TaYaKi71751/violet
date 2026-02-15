@@ -1,6 +1,6 @@
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { getDownloads, createDownload, deleteDownload } from '../api/downloads';
+import { getDownloads, createDownload, retryDownload, deleteDownload } from '../api/downloads';
 import { useToastStore } from '../stores/toast-store';
 
 export function useDownloadHistory(page = 0, pageSize = 30, enabled = true) {
@@ -52,6 +52,18 @@ export function useStartDownload() {
     },
     onError: () => {
       addToast(t('downloads.errorToast'), 'error');
+    },
+  });
+}
+
+export function useRetryDownload() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => retryDownload(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['downloads'] });
+      qc.invalidateQueries({ queryKey: ['downloads-infinite'] });
     },
   });
 }

@@ -54,7 +54,8 @@
     "completeToast": "Download completed",
     "failedToast": "Download failed",
     "errorToast": "Failed to start download",
-    "delete": "Delete"
+    "delete": "Delete",
+    "retry": "Retry"
   },
   "viewer": {
     "noImages": "No images found for this gallery."

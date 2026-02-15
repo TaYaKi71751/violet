@@ -1,12 +1,12 @@
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { Download, Trash2 } from 'lucide-react';
+import { Download, Trash2, RotateCw } from 'lucide-react';
 import type { Article } from '@violet-web/shared';
 import { parsePipeTags, parseTagTuples, ticksToDate } from '@violet-web/shared';
 import { LazyImage } from '../common/LazyImage';
 import { useThumbnail } from '../../hooks/useThumbnail';
 import { useIsBookmarked, useToggleBookmark } from '../../hooks/useBookmarks';
-import { useStartDownload, useDeleteDownload } from '../../hooks/useDownloads';
+import { useStartDownload, useRetryDownload, useDeleteDownload } from '../../hooks/useDownloads';
 import { useDownloadProgress, useIsDownloadsPage } from '../../contexts/DownloadProgressContext';
 import { useTagTranslation } from '../../hooks/useTagTranslation';
 import { useTagCounts } from '../../hooks/useTagCounts';
@@ -31,6 +31,7 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
   const { data: isBookmarked } = useIsBookmarked(String(article.Id));
   const toggleBookmark = useToggleBookmark();
   const startDownload = useStartDownload();
+  const retryDownload = useRetryDownload();
   const deleteDownload = useDeleteDownload();
   const isDownloadsPage = useIsDownloadsPage();
   const downloadRecord = useDownloadProgress(String(article.Id));
@@ -48,6 +49,13 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
   const handleDownloadClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     startDownload.mutate(String(article.Id));
+  };
+
+  const handleRetryDownload = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (downloadRecord) {
+      retryDownload.mutate(downloadRecord.Id);
+    }
   };
 
   const handleDeleteDownload = (e: React.MouseEvent) => {
@@ -153,6 +161,21 @@ export function ArticleCard({ article, viewMode = 'grid' }: ArticleCardProps) {
               </div>
             );
           })()}
+          {downloadRecord && downloadRecord.Status === 'failed' && (
+            <div className={styles.failedOverlay}>
+              <button
+                className={styles.retryBtn}
+                onClick={handleRetryDownload}
+                disabled={retryDownload.isPending}
+              >
+                <RotateCw size={20} />
+              </button>
+              <div className={styles.failedText}>{t('downloads.retry')}</div>
+              {downloadRecord.ErrorMessage && (
+                <div className={styles.failedError}>{downloadRecord.ErrorMessage}</div>
+              )}
+            </div>
+          )}
         </div>
         <div className={styles.info}>
           <div className={styles.title}>{article.Title}</div>

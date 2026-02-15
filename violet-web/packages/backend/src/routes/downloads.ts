@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getUserDb } from '../services/user-db.js';
-import { startDownload } from '../services/download-service.js';
+import { startDownload, retryDownload } from '../services/download-service.js';
 
 export const downloadsRouter = Router();
 
@@ -47,6 +47,19 @@ downloadsRouter.get('/:id', (req, res) => {
   }
 
   res.json(record);
+});
+
+downloadsRouter.post('/:id/retry', async (req, res) => {
+  const id = parseInt(req.params.id);
+  try {
+    await retryDownload(id);
+    const db = getUserDb();
+    const record = db.prepare('SELECT * FROM Download WHERE Id = ?').get(id);
+    res.json(record);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    res.status(400).json({ error: message });
+  }
 });
 
 downloadsRouter.delete('/:id', (req, res) => {

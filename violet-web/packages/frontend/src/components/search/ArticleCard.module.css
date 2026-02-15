@@ -187,6 +187,57 @@
   letter-spacing: -0.02em;
 }
 
+.failedOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  z-index: 5;
+}
+
+.retryBtn {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.2s;
+  backdrop-filter: blur(4px);
+}
+
+.retryBtn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.failedText {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.72rem;
+}
+
+.failedError {
+  color: rgba(255, 100, 100, 0.9);
+  font-size: 0.62rem;
+  text-align: center;
+  padding: 0 8px;
+  max-height: 2.5em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
 /* Detail mode */
 .detailCard .title {
   white-space: normal;

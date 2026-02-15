@@ -25,6 +25,11 @@ export async function createDownload(articleId: string): Promise<DownloadRecord>
   return data;
 }
 
+export async function retryDownload(id: number): Promise<DownloadRecord> {
+  const { data } = await api.post<DownloadRecord>(`/downloads/${id}/retry`);
+  return data;
+}
+
 export async function deleteDownload(id: number): Promise<void> {
   await api.delete(`/downloads/${id}`);
 }
