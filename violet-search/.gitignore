@@ -2,4 +2,5 @@
 dialog/*
 summary/*
 raw/*
+chromadb/*
 system-prompt.txt
