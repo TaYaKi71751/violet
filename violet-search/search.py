@@ -2,7 +2,8 @@
 벡터 검색 + DeepSeek 답변 생성 API 서버
 ChromaDB에서 유사 문서 검색 → DeepSeek V3로 답변
 
-GET /search?q=질문&top_k=5
+GET /search?q=질문&top_k=5&mode=fast
+GET /search?q=질문&top_k=5&mode=detail
 """
 
 import json
@@ -35,9 +36,62 @@ collection = client_chroma.get_collection(name=COLLECTION_NAME)
 app = Flask(__name__)
 _cache: dict[str, dict] = {}
 
+PROMPT_FAST = """검색된 문서들을 질문과의 관련도로 평가하여 JSON 출력.
 
-def do_search(query: str, top_k: int = 5, max_tokens: int = 4096) -> dict:
-    cache_key = f"{query}::{top_k}"
+질문: {query}
+
+문서:
+{context_text}
+
+출력 형식 (JSON만 출력):
+{{"query":"질문","results":[{{"articleId":"ID","score":0.9,"description":"한줄 설명"}}],"answer":"한줄 답변"}}
+
+규칙: score 0~1, 0.3 미만 제외, 내림차순, description은 한국어 한줄, JSON만 출력"""
+
+PROMPT_DETAIL = """아래는 벡터 DB에서 검색된 여러 문서의 내용입니다. 각 문서는 만화/웹툰 한 화의 분석 결과입니다.
+사용자의 질문에 대해, 각 작품이 얼마나 관련있는지 평가하고 JSON으로 출력하세요.
+
+**질문:** {query}
+
+**검색된 문서들:**
+{context_text}
+
+**출력 형식 (반드시 이 JSON 형식만 출력):**
+```json
+{{
+  "query": "사용자 질문",
+  "results": [
+    {{
+      "articleId": "문서의 articleId",
+      "score": 0.95,
+      "description": "이 작품에 대한 상세 서술형 설명"
+    }}
+  ],
+  "answer": "질문에 대한 종합 답변"
+}}
+```
+
+**규칙:**
+1. score는 0.0~1.0 사이. 질문과의 관련도를 의미하며, 벡터 유사도가 아닌 내용 기반 판단
+2. 관련 없는 문서는 score를 낮게 주고, 0.3 미만이면 results에서 제외
+3. score 내림차순으로 정렬
+4. description은 반드시 한국어 서술형으로 3~5문장 이상 작성. 작품의 장르, 분위기, 등장인물 관계, 핵심 감정/갈등, 대사 스타일, 특징적 요소를 풍부하게 서술하고 마지막에 키워드를 포함할 것.
+5. answer도 서술형으로 풍부하게 작성
+6. JSON 외에 다른 텍스트를 출력하지 마세요"""
+
+PROMPTS = {
+    "fast": PROMPT_FAST,
+    "detail": PROMPT_DETAIL,
+}
+
+MAX_TOKENS = {
+    "fast": 1024,
+    "detail": 4096,
+}
+
+
+def do_search(query: str, top_k: int, mode: str) -> dict:
+    cache_key = f"{mode}::{query}::{top_k}"
     if cache_key in _cache:
         return _cache[cache_key]
 
@@ -71,36 +125,8 @@ def do_search(query: str, top_k: int = 5, max_tokens: int = 4096) -> dict:
     context_text = "\n\n---\n\n".join(context_parts)
 
     # 4. DeepSeek 답변 생성
-    prompt = f"""아래는 벡터 DB에서 검색된 여러 문서의 내용입니다. 각 문서는 만화/웹툰 한 화의 분석 결과입니다.
-사용자의 질문에 대해, 각 작품이 얼마나 관련있는지 평가하고 JSON으로 출력하세요.
-
-**질문:** {query}
-
-**검색된 문서들:**
-{context_text}
-
-**출력 형식 (반드시 이 JSON 형식만 출력):**
-```json
-{{
-  "query": "사용자 질문",
-  "results": [
-    {{
-      "articleId": "문서의 articleId",
-      "score": 0.95,
-      "description": "이 작품에 대한 상세 서술형 설명"
-    }}
-  ],
-  "answer": "질문에 대한 종합 답변"
-}}
-```
-
-**규칙:**
-1. score는 0.0~1.0 사이. 질문과의 관련도를 의미하며, 벡터 유사도가 아닌 내용 기반 판단
-2. 관련 없는 문서는 score를 낮게 주고, 0.3 미만이면 results에서 제외
-3. score 내림차순으로 정렬
-4. description은 반드시 한국어 서술형으로 3~5문장 이상 작성. 작품의 장르, 분위기, 등장인물 관계, 핵심 감정/갈등, 대사 스타일, 특징적 요소를 풍부하게 서술하고 마지막에 키워드를 포함할 것.
-5. answer도 서술형으로 풍부하게 작성
-6. JSON 외에 다른 텍스트를 출력하지 마세요"""
+    prompt = PROMPTS[mode].format(query=query, context_text=context_text)
+    max_tokens = MAX_TOKENS[mode]
 
     resp = requests.post(
         "https://api.deepseek.com/chat/completions",
@@ -133,14 +159,17 @@ def search():
     if not query:
         return jsonify({"error": "q 파라미터가 필요합니다."}), 400
 
-    top_k = request.args.get("top_k", 5, type=int)
-    max_tokens = request.args.get("max_tokens", 4096, type=int)
+    mode = request.args.get("mode", "")
+    if mode not in PROMPTS:
+        return jsonify({"error": f"mode 파라미터가 필요합니다. (fast 또는 detail)"}), 400
 
-    result = do_search(query, top_k=top_k, max_tokens=max_tokens)
+    top_k = request.args.get("top_k", 5, type=int)
+
+    result = do_search(query, top_k=top_k, mode=mode)
     return jsonify(result)
 
 
 if __name__ == "__main__":
     port = int(os.environ.get("SEARCH_PORT", 8787))
-    print(f"검색 서버 시작: http://localhost:{port}/search?q=질문")
+    print(f"검색 서버 시작: http://localhost:{port}/search?q=질문&mode=fast")
     app.run(host="0.0.0.0", port=port)
