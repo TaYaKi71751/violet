@@ -53,20 +53,50 @@ export function ViewerOverlay({
     return pages;
   }, [currentPage, twoPageMode, coverPageMode, totalPages]);
 
-  const handleLeftTap = () => {
-    if (rtl) {
+  const goNext = () => {
+    if (!twoPageMode) {
       if (currentPage < totalPages - 1) onPageChange(currentPage + 1);
+      return;
+    }
+    if (coverPageMode === 'cover') {
+      if (currentPage === 0) {
+        onPageChange(1);
+      } else {
+        const next = currentPage + 2;
+        if (next < totalPages) onPageChange(next);
+      }
     } else {
-      if (currentPage > 0) onPageChange(currentPage - 1);
+      const currentPairStart = Math.floor(currentPage / 2) * 2;
+      const next = currentPairStart + 2;
+      if (next < totalPages) onPageChange(next);
     }
   };
 
-  const handleRightTap = () => {
-    if (rtl) {
+  const goPrev = () => {
+    if (!twoPageMode) {
       if (currentPage > 0) onPageChange(currentPage - 1);
-    } else {
-      if (currentPage < totalPages - 1) onPageChange(currentPage + 1);
+      return;
     }
+    if (coverPageMode === 'cover') {
+      if (currentPage <= 1) {
+        onPageChange(0);
+      } else {
+        const prev = currentPage - 2;
+        onPageChange(prev >= 1 ? prev : 0);
+      }
+    } else {
+      const currentPairStart = Math.floor(currentPage / 2) * 2;
+      const prev = currentPairStart - 2;
+      if (prev >= 0) onPageChange(prev);
+    }
+  };
+
+  const handleLeftTap = () => {
+    rtl ? goNext() : goPrev();
+  };
+
+  const handleRightTap = () => {
+    rtl ? goPrev() : goNext();
   };
 
   return (

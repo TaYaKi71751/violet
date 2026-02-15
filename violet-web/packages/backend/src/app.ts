@@ -1,3 +1,4 @@
+import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import { contentRouter } from './routes/content.js';
@@ -32,6 +33,20 @@ export function createApp() {
   app.use('/api/summary', summaryRouter);
 
   app.use(errorHandler);
+
+  // Serve frontend static files in production
+  const frontendDist = process.env.FRONTEND_DIST;
+  if (frontendDist) {
+    const distPath = path.resolve(frontendDist);
+    app.use(express.static(distPath));
+
+    // SPA catch-all: non-API routes return index.html
+    app.get('{*path}', (_req, res) => {
+      res.sendFile(path.join(distPath, 'index.html'));
+    });
+
+    console.log(`[violet-web] Serving frontend from ${distPath}`);
+  }
 
   return app;
 }
