@@ -90,6 +90,14 @@
     "removedToast": "Removed from bookmarks",
     "errorToast": "Failed to process bookmark"
   },
+  "sync": {
+    "downloadOverlay": {
+      "title": "Downloading Database",
+      "message": "Downloading the database for first-time setup. Please wait a moment.",
+      "cacheTitle": "Building Cache",
+      "cacheMessage": "Building tag cache for search. Please wait a moment."
+    }
+  },
   "settings": {
     "heading": "Settings",
     "language": {
@@ -150,6 +158,7 @@
       "checking": "Checking for updates...",
       "downloadingFull": "Downloading full database...",
       "applyingChunks": "Applying updates...",
+      "buildingCache": "Building cache...",
       "error": "Error",
       "syncNow": "Sync Now",
       "redownloadDB": "Re-download DB",

@@ -2,7 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import Database from 'better-sqlite3';
 import { fileURLToPath } from 'url';
-import { getDbPath, closeContentDb, reopenContentDb } from './content-db.js';
+import { getDbPath, getContentDb, closeContentDb, reopenContentDb } from './content-db.js';
+import { buildSuggestionCache } from './suggestion-engine.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -25,6 +26,7 @@ export type SyncStatus =
   | 'checking'
   | 'downloading_full'
   | 'applying_chunks'
+  | 'building_cache'
   | 'error';
 
 export interface SyncProgress {
@@ -75,7 +77,11 @@ export class SyncManager {
 
     if (!dbExists) {
       console.log('[SyncManager] No database found, downloading full DB...');
-      await this.downloadFullDB();
+      // Start download in background so the server can start serving requests
+      // (frontend will poll status and show overlay)
+      this.downloadFullDB().catch((err) => {
+        console.error('[SyncManager] Full DB download error:', err);
+      });
     } else {
       console.log('[SyncManager] Database exists, checking for updates...');
       await this.checkAndSync();
@@ -237,24 +243,54 @@ export class SyncManager {
 
       console.log(`[SyncManager] Downloading from: ${dbUrl}`);
 
-      this.currentProgress = { current: 0, total: 100, message: 'Downloading database' };
-
-      // Download DB
+      // Download DB with streaming progress
       const response = await fetch(dbUrl);
       if (!response.ok) {
         throw new Error(`Failed to download DB: ${response.statusText}`);
       }
 
-      const buffer = await response.arrayBuffer();
-      console.log(`[SyncManager] Downloaded ${(buffer.byteLength / 1024 / 1024).toFixed(1)}MB`);
+      const contentLength = parseInt(response.headers.get('content-length') || '0', 10);
+      const totalMB = contentLength > 0 ? (contentLength / 1024 / 1024).toFixed(1) : '?';
 
-      // Write to temp file
+      this.currentProgress = { current: 0, total: contentLength || 100, message: `Downloading database (0/${totalMB} MB)` };
+
       const dbPath = getDbPath();
       const tempPath = dbPath + '.tmp';
 
-      this.currentProgress = { current: 50, total: 100, message: 'Saving database' };
+      if (!response.body) {
+        // Fallback: no streaming support
+        const buffer = await response.arrayBuffer();
+        fs.writeFileSync(tempPath, Buffer.from(buffer));
+      } else {
+        // Stream to file with progress updates
+        const fileStream = fs.createWriteStream(tempPath);
+        const reader = response.body.getReader();
+        let received = 0;
 
-      fs.writeFileSync(tempPath, Buffer.from(buffer));
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          fileStream.write(Buffer.from(value));
+          received += value.byteLength;
+
+          const receivedMB = (received / 1024 / 1024).toFixed(1);
+          this.currentProgress = {
+            current: received,
+            total: contentLength || received,
+            message: `Downloading database (${receivedMB}/${totalMB} MB)`,
+          };
+        }
+
+        await new Promise<void>((resolve, reject) => {
+          fileStream.end(() => resolve());
+          fileStream.on('error', reject);
+        });
+
+        console.log(`[SyncManager] Downloaded ${(received / 1024 / 1024).toFixed(1)}MB`);
+      }
+
+      this.currentProgress = { current: contentLength || 100, total: contentLength || 100, message: 'Saving database' };
 
       // Close existing DB connection
       closeContentDb();
@@ -281,6 +317,18 @@ export class SyncManager {
       this.saveState(state);
 
       console.log('[SyncManager] Full DB download complete');
+
+      // Build suggestion cache after fresh download
+      this.currentStatus = 'building_cache';
+      this.currentProgress = undefined;
+      console.log('[SyncManager] Building suggestion cache...');
+      try {
+        buildSuggestionCache(getContentDb());
+        console.log('[SyncManager] Suggestion cache built');
+      } catch (cacheErr) {
+        console.error('[SyncManager] Failed to build suggestion cache:', cacheErr);
+      }
+
       this.currentStatus = 'idle';
     } catch (error) {
       this.currentStatus = 'error';

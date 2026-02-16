@@ -69,6 +69,8 @@ export function SettingsPage() {
         return t('settings.sync.downloadingFull');
       case 'applying_chunks':
         return t('settings.sync.applyingChunks');
+      case 'building_cache':
+        return t('settings.sync.buildingCache');
       case 'error':
         return t('settings.sync.error');
       default:

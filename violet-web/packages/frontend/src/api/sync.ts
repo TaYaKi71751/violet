@@ -1,7 +1,7 @@
 import { api } from './client';
 
 export interface SyncProgress {
-  status: 'idle' | 'checking' | 'downloading_full' | 'applying_chunks' | 'error';
+  status: 'idle' | 'checking' | 'downloading_full' | 'applying_chunks' | 'building_cache' | 'error';
   lastSync: string | null;
   lastSyncDb: string | null;
   dbExists: boolean;
