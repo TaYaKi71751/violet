@@ -3,6 +3,7 @@ import { api } from './client';
 export interface SyncProgress {
   status: 'idle' | 'checking' | 'downloading_full' | 'applying_chunks' | 'error';
   lastSync: string | null;
+  lastSyncDb: string | null;
   dbExists: boolean;
   error: string | null;
   progress?: {

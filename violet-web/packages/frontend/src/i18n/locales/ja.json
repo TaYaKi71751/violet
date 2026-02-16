@@ -119,6 +119,7 @@
       "ready": "準備完了",
       "notFound": "見つかりません",
       "lastSync": "最終同期:",
+      "lastSyncDb": "最終同期(DB):",
       "never": "なし",
       "status": "ステータス:",
       "idle": "待機中",

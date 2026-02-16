@@ -119,6 +119,7 @@
       "ready": "Ready",
       "notFound": "Not Found",
       "lastSync": "Last Sync:",
+      "lastSyncDb": "Last Sync (DB):",
       "never": "Never",
       "status": "Status:",
       "idle": "Idle",

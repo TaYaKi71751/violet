@@ -229,6 +229,11 @@ export function SettingsPage() {
           </div>
 
           <div className={styles.infoRow}>
+            <span className={styles.label}>{t('settings.sync.lastSyncDb')}</span>
+            <span>{formatDate(syncStatus?.lastSyncDb || null)}</span>
+          </div>
+
+          <div className={styles.infoRow}>
             <span className={styles.label}>{t('settings.sync.status')}</span>
             <span className={isSyncing ? styles.statusSyncing : ''}>
               {getStatusText()}
