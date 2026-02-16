@@ -125,6 +125,12 @@
       "korean": "Korean",
       "koreanDesc": "Display tags in Korean on cards and search suggestions"
     },
+    "excludedTags": {
+      "heading": "Excluded Tags",
+      "description": "Tags listed here will be automatically excluded from home page search results.",
+      "placeholder": "Type a tag to exclude...",
+      "defaultNote": "Default: female:snuff, female:gore"
+    },
     "aiSearch": {
       "heading": "AI Search",
       "enable": "Enable AI Search",

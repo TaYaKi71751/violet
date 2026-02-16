@@ -24,6 +24,7 @@ interface AppState {
   scrollMode: ScrollMode;
   tagTranslation: boolean;
   aiSearchEnabled: boolean;
+  excludedTags: string[];
 
   setContentLanguage: (lang: ContentLanguage) => void;
   setUILanguage: (lang: UILanguage) => void;
@@ -35,6 +36,8 @@ interface AppState {
   setScrollMode: (mode: ScrollMode) => void;
   setTagTranslation: (enabled: boolean) => void;
   setAiSearchEnabled: (enabled: boolean) => void;
+  addExcludedTag: (tag: string) => void;
+  removeExcludedTag: (tag: string) => void;
 }
 
 // Helper to get system language
@@ -59,6 +62,7 @@ export const useAppStore = create<AppState>()(
       scrollMode: 'infinite',
       tagTranslation: true,
       aiSearchEnabled: false,
+      excludedTags: ['female:snuff', 'female:gore'],
 
       setContentLanguage: (contentLanguage) => set({ contentLanguage }),
       setUILanguage: (uiLanguage) => {
@@ -74,6 +78,16 @@ export const useAppStore = create<AppState>()(
       setScrollMode: (scrollMode) => set({ scrollMode }),
       setTagTranslation: (tagTranslation) => set({ tagTranslation }),
       setAiSearchEnabled: (aiSearchEnabled) => set({ aiSearchEnabled }),
+      addExcludedTag: (tag) =>
+        set((state) => ({
+          excludedTags: state.excludedTags.includes(tag)
+            ? state.excludedTags
+            : [...state.excludedTags, tag],
+        })),
+      removeExcludedTag: (tag) =>
+        set((state) => ({
+          excludedTags: state.excludedTags.filter((t) => t !== tag),
+        })),
     }),
     { name: 'violet-app-settings' },
   ),

@@ -125,6 +125,12 @@
       "korean": "韩语",
       "koreanDesc": "在卡片和搜索建议中以韩语显示标签"
     },
+    "excludedTags": {
+      "heading": "排除标签",
+      "description": "此处列出的标签将自动从主页搜索结果中排除。",
+      "placeholder": "输入要排除的标签...",
+      "defaultNote": "默认: female:snuff, female:gore"
+    },
     "aiSearch": {
       "heading": "AI搜索",
       "enable": "启用AI搜索",

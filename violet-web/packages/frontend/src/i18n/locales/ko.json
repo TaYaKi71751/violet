@@ -125,6 +125,12 @@
       "korean": "한국어",
       "koreanDesc": "카드 및 검색 자동완성에서 태그를 한국어로 표시합니다"
     },
+    "excludedTags": {
+      "heading": "제외 태그",
+      "description": "여기에 등록된 태그는 홈 페이지 검색 결과에서 자동으로 제외됩니다.",
+      "placeholder": "제외할 태그를 입력하세요...",
+      "defaultNote": "기본값: female:snuff, female:gore"
+    },
     "aiSearch": {
       "heading": "AI 검색",
       "enable": "AI 검색 사용",

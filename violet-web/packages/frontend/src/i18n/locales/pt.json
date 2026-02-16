@@ -125,6 +125,12 @@
       "korean": "Coreano",
       "koreanDesc": "Exibir tags em coreano nos cartões e sugestões de busca"
     },
+    "excludedTags": {
+      "heading": "Tags excluídas",
+      "description": "As tags listadas aqui serão automaticamente excluídas dos resultados de busca da página inicial.",
+      "placeholder": "Digite uma tag para excluir...",
+      "defaultNote": "Padrão: female:snuff, female:gore"
+    },
     "aiSearch": {
       "heading": "Busca IA",
       "enable": "Ativar busca IA",
