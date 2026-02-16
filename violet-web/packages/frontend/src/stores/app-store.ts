@@ -49,18 +49,33 @@ const getSystemLanguage = (): string => {
   return 'en';
 };
 
+const getDefaultContentLanguage = (): ContentLanguage => {
+  const lang = getSystemLanguage();
+  const map: Record<string, ContentLanguage> = {
+    ko: 'korean',
+    ja: 'japanese',
+    zh: 'chinese',
+    en: 'english',
+  };
+  return map[lang] || 'all';
+};
+
+const getDefaultTagTranslation = (): boolean => {
+  return getSystemLanguage() === 'ko';
+};
+
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      contentLanguage: 'all',
+      contentLanguage: getDefaultContentLanguage(),
       uiLanguage: 'system',
       themeColor: 'purple',
       sidebarCollapsed: false,
       viewMode: 'grid',
       cardMinWidth: 200,
       cropColumnWidth: 240,
-      scrollMode: 'infinite',
-      tagTranslation: true,
+      scrollMode: 'pagination',
+      tagTranslation: getDefaultTagTranslation(),
       aiSearchEnabled: false,
       excludedTags: ['female:snuff', 'female:gore'],
 
