@@ -97,14 +97,6 @@
   transform: translateX(16px);
 }
 
-.searchBarSlot {
-  flex-shrink: 0;
-}
-
-.searchBarSlot:empty {
-  display: none;
-}
-
 .content {
   flex: 1;
   overflow-y: auto;

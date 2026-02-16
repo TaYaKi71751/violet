@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { Outlet, useSearchParams, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Sidebar } from './Sidebar';
@@ -8,7 +8,6 @@ import { Toast } from '../common/Toast';
 import { useIsMobile, useIsDesktop } from '../../hooks/useMediaQuery';
 import { useSearch } from '../../hooks/useSearch';
 import { useAppStore } from '../../stores/app-store';
-import { SearchBarPortalProvider } from '../../contexts/SearchBarPortal';
 import styles from './AppShell.module.css';
 
 export function AppShell() {
@@ -21,12 +20,6 @@ export function AppShell() {
   const { contentLanguage, viewMode, setViewMode, cardMinWidth, setCardMinWidth } = useAppStore();
   const searchBarRef = useRef<SearchBarRef>(null);
   const contentRef = useRef<HTMLElement>(null);
-
-  // Portal target for page-specific search bars (history, bookmarks, etc.)
-  const [portalTarget, setPortalTarget] = useState<HTMLDivElement | null>(null);
-  const searchBarSlotRef = useCallback((node: HTMLDivElement | null) => {
-    setPortalTarget(node);
-  }, []);
 
   // Flag to prevent saving scroll position while restoring
   const isRestoringRef = useRef(false);
@@ -151,14 +144,9 @@ export function AppShell() {
             </label>
           </div>
         )}
-        {isDesktop && !showSearchBar && (
-          <div ref={searchBarSlotRef} className={styles.searchBarSlot} />
-        )}
-        <SearchBarPortalProvider value={portalTarget}>
-          <main ref={contentRef} className={styles.content}>
-            <Outlet />
-          </main>
-        </SearchBarPortalProvider>
+        <main ref={contentRef} className={styles.content}>
+          <Outlet />
+        </main>
       </div>
       {isMobile && <BottomNav />}
       <Toast />
