@@ -93,7 +93,8 @@ export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription
   };
 
   const handlePageSelect = (pageIndex: number) => {
-    navigate(`/viewer/${article.Id}?page=${pageIndex}`);
+    // pageIndex is 0-based, convert to 1-based for URL
+    navigate(`/viewer/${article.Id}?page=${pageIndex + 1}`);
   };
 
   const isDetail = viewMode === 'detail';

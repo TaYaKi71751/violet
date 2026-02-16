@@ -18,7 +18,9 @@ export function ViewerPage() {
   const { data: imageList, isLoading } = useImageList(galleryId);
 
   const totalPages = imageList?.urls.length ?? 0;
-  const initialPage = parseInt(searchParams.get('page') || '0');
+  // URL uses 1-based indexing, convert to 0-based for internal use
+  const pageParam = parseInt(searchParams.get('page') || '1');
+  const initialPage = Math.max(0, pageParam - 1);
   const { currentPage, goToPage } = useViewer(totalPages, initialPage);
 
   const insertLog = useInsertReadLog();
@@ -63,11 +65,9 @@ export function ViewerPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
 
-  // Update URL without navigation
+  // Update URL without navigation (use 1-based indexing in URL)
   useEffect(() => {
-    const url = currentPage > 0
-      ? `/viewer/${galleryId}?page=${currentPage}`
-      : `/viewer/${galleryId}`;
+    const url = `/viewer/${galleryId}?page=${currentPage + 1}`;
     window.history.replaceState(null, '', url);
   }, [currentPage, galleryId]);
 
