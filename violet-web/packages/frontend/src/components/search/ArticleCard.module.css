@@ -169,7 +169,14 @@
   color: #fff;
   font-size: 0.7rem;
   border-radius: 4px;
-  pointer-events: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  z-index: 5;
+}
+
+.pageCount:hover {
+  background: rgba(0, 0, 0, 0.85);
+  transform: scale(1.05);
 }
 
 .progressOverlay {
