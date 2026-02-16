@@ -19,6 +19,13 @@
   --color-chip-bg-active: rgba(255, 255, 255, 0.14);
   --color-chip-border-active: rgba(255, 255, 255, 0.20);
   --color-chip-bg-active-hover: rgba(255, 255, 255, 0.18);
+  --color-tag-female: #c48da0;
+  --color-tag-male: #7da1c4;
+  --color-tag-tag: #8a8f96;
+  --color-tag-artist: #c4a84e;
+  --color-tag-series: #6bb89e;
+  --color-tag-group: #9b8abf;
+  --color-tag-character: #c49070;
   --color-pagination-text: #fff;
   --color-pagination-btn-bg: rgba(255, 255, 255, 0.12);
   --color-pagination-btn-bg-hover: rgba(255, 255, 255, 0.22);
@@ -83,6 +90,13 @@
   --color-chip-bg-active: rgba(0, 0, 0, 0.05);
   --color-chip-border-active: rgba(0, 0, 0, 0.28);
   --color-chip-bg-active-hover: rgba(0, 0, 0, 0.07);
+  --color-tag-female: #c4607e;
+  --color-tag-male: #4a82b8;
+  --color-tag-tag: #6b7280;
+  --color-tag-artist: #b8912a;
+  --color-tag-series: #2e9e78;
+  --color-tag-group: #7c5cbf;
+  --color-tag-character: #c07840;
   --color-pagination-text: #1a1a1a;
   --color-pagination-btn-bg: rgba(0, 0, 0, 0.08);
   --color-pagination-btn-bg-hover: rgba(0, 0, 0, 0.15);

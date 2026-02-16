@@ -39,13 +39,13 @@
 
 /* Category prefix colors */
 .prefix { font-weight: 600; margin-right: 2px; }
-.female { color: #c48da0; }
-.male { color: #7da1c4; }
-.tag { color: #8a8f96; }
-.artist { color: #c4a84e; }
-.series { color: #6bb89e; }
-.group { color: #9b8abf; }
-.character { color: #c49070; }
+.female { color: var(--color-tag-female); }
+.male { color: var(--color-tag-male); }
+.tag { color: var(--color-tag-tag); }
+.artist { color: var(--color-tag-artist); }
+.series { color: var(--color-tag-series); }
+.group { color: var(--color-tag-group); }
+.character { color: var(--color-tag-character); }
 
 .count {
   opacity: 0.5;
