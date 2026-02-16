@@ -12,7 +12,21 @@ Claude Code를 사용하여 이 프로젝트를 개발할 때, 아래 스킬들�
 | **frontend-design** | 고품질 프론트엔드 UI 생성. 일반적인 AI 스타일을 피하고 독창적인 인터페이스 구현 | [anthropics/claude-code](https://github.com/anthropics/claude-code/tree/main/plugins/frontend-design) |
 | **karpathy-guidelines** | LLM의 흔한 코딩 실수를 줄이는 가이드라인. 과도한 복잡성 방지 및 최소 변경 유도 | [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) |
 
-## 설치
+## Docker로 바로 실행 (일반 사용자용)
+
+개발 환경 없이 Docker만으로 바로 실행할 수 있다.
+
+```bash
+docker run -d \
+  -p 3001:3001 \
+  -v $(pwd)/data:/app/data \
+  --name violet-web \
+  violetdev/violet-web:latest
+```
+
+브라우저에서 http://localhost:3001 을 열면 된다. 최초 실행 시 DB를 자동으로 다운로드하므로 잠시 기다린다.
+
+## 설치 (개발자용)
 
 ### 요구사항
 
