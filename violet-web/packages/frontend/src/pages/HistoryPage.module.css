@@ -34,7 +34,7 @@
   margin-top: auto;
   margin-left: auto;
   margin-right: auto;
-  background: rgba(30, 30, 30, 0.85);
+  background: var(--color-pagination-bg);
   backdrop-filter: blur(8px);
   border-radius: 999px;
   z-index: 10;

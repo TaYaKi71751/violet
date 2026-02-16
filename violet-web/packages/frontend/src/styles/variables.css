@@ -22,6 +22,7 @@
   --color-pagination-text: #fff;
   --color-pagination-btn-bg: rgba(255, 255, 255, 0.12);
   --color-pagination-btn-bg-hover: rgba(255, 255, 255, 0.22);
+  --color-pagination-bg: rgba(30, 30, 30, 0.85);
   --color-toggle-knob: #fff;
   --color-on-primary: #fff;
   --color-toast-bg: rgba(0, 0, 0, 0.85);
@@ -76,6 +77,7 @@
   --color-pagination-text: #1a1a1a;
   --color-pagination-btn-bg: rgba(0, 0, 0, 0.08);
   --color-pagination-btn-bg-hover: rgba(0, 0, 0, 0.15);
+  --color-pagination-bg: rgba(255, 255, 255, 0.85);
   --color-toggle-knob: #fff;
   --color-on-primary: #fff;
   --color-toast-bg: rgba(50, 50, 50, 0.90);
