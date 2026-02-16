@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import {
   getGroups,
   getBookmarkArticles,
@@ -65,14 +66,15 @@ export function useCropBookmarks() {
 export function useAddCropBookmark() {
   const qc = useQueryClient();
   const addToast = useToastStore((state) => state.addToast);
+  const { t } = useTranslation();
   return useMutation({
     mutationFn: addCropBookmark,
     onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: ['cropBookmarks'] });
-      addToast(`${variables.Page + 1}페이지 크롭 저장했어요`, 'success');
+      addToast(t('crop.savedToast', { page: variables.Page + 1 }), 'success');
     },
     onError: () => {
-      addToast('크롭 저장 중 오류가 발생했습니다', 'error');
+      addToast(t('crop.saveErrorToast'), 'error');
     },
   });
 }
@@ -80,14 +82,15 @@ export function useAddCropBookmark() {
 export function useDeleteCropBookmark() {
   const qc = useQueryClient();
   const addToast = useToastStore((state) => state.addToast);
+  const { t } = useTranslation();
   return useMutation({
     mutationFn: deleteCropBookmark,
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['cropBookmarks'] });
-      addToast('크롭 북마크가 삭제되었습니다', 'info');
+      addToast(t('crop.deletedToast'), 'info');
     },
     onError: () => {
-      addToast('크롭 북마크 삭제 중 오류가 발생했습니다', 'error');
+      addToast(t('crop.deleteErrorToast'), 'error');
     },
   });
 }
@@ -97,6 +100,7 @@ const VIOLET_DEFAULT_GROUP_ID = 1;
 export function useToggleBookmark() {
   const qc = useQueryClient();
   const addToast = useToastStore((state) => state.addToast);
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: async ({ articleId, isBookmarked }: { articleId: string; isBookmarked: boolean }) => {
@@ -119,13 +123,13 @@ export function useToggleBookmark() {
       qc.invalidateQueries({ queryKey: ['isBookmarked'] });
 
       if (data.action === 'added') {
-        addToast('북마크에 추가되었습니다', 'success');
+        addToast(t('bookmark.addedToast'), 'success');
       } else {
-        addToast('북마크가 해제되었습니다', 'info');
+        addToast(t('bookmark.removedToast'), 'info');
       }
     },
     onError: () => {
-      addToast('북마크 처리 중 오류가 발생했습니다', 'error');
+      addToast(t('bookmark.errorToast'), 'error');
     },
   });
 }

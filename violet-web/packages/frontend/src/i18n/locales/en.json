@@ -72,8 +72,23 @@
     "noResults": "No results found.",
     "error": "An error occurred during AI search."
   },
-  "viewer": {
-    "noImages": "No images found for this gallery."
+  "crop": {
+    "selectPage": "Select a page to crop",
+    "cancel": "Cancel",
+    "page": "Page {{page}}",
+    "dragToSelect": "Page {{page}} — Drag to select area",
+    "reselect": "Reselect",
+    "save": "Save",
+    "savedToast": "Crop saved for page {{page}}",
+    "saveErrorToast": "Failed to save crop",
+    "deletedToast": "Crop bookmark deleted",
+    "deleteErrorToast": "Failed to delete crop bookmark",
+    "userBookmarks": "User Bookmarks"
+  },
+  "bookmark": {
+    "addedToast": "Added to bookmarks",
+    "removedToast": "Removed from bookmarks",
+    "errorToast": "Failed to process bookmark"
   },
   "settings": {
     "heading": "Settings",
@@ -90,7 +105,10 @@
       "en": "English",
       "ko": "한국어",
       "ja": "日本語",
-      "zh": "中文"
+      "zh": "中文",
+      "eo": "Esperanto",
+      "it": "Italiano",
+      "pt": "Português"
     },
     "theme": {
       "heading": "Theme Color",
@@ -107,12 +125,19 @@
       "korean": "Korean",
       "koreanDesc": "Display tags in Korean on cards and search suggestions"
     },
+    "aiSearch": {
+      "heading": "AI Search",
+      "enable": "Enable AI Search",
+      "enableDesc": "Show AI Search tab in navigation",
+      "helpText": "AI Search requires the violet-search server to be running separately. You need to set up and run the violet-search service for this feature to work."
+    },
     "sync": {
       "heading": "Database Sync",
       "database": "Database:",
       "ready": "Ready",
       "notFound": "Not Found",
       "lastSync": "Last Sync:",
+      "lastSyncDb": "Last Sync (DB):",
       "never": "Never",
       "status": "Status:",
       "idle": "Idle",
@@ -139,10 +164,12 @@
       "status": "Status",
       "notBuilt": "Not built",
       "built": "Built",
-      "building": "Building..."
+      "building": "Building...",
+      "totalTags": "Total Tags"
     }
   },
   "viewer": {
+    "noImages": "No images found for this gallery.",
     "back": "Back",
     "settings": "Settings",
     "pageInfo": "{{current}} / {{total}}",

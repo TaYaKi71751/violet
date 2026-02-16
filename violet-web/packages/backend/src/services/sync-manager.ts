@@ -17,6 +17,7 @@ interface SyncState {
   syncLatest: number;
   databaseSync: string | null;
   databaseType: string;
+  lastSyncAt: string | null;
 }
 
 export type SyncStatus =
@@ -29,6 +30,7 @@ export type SyncStatus =
 export interface SyncProgress {
   status: SyncStatus;
   lastSync: string | null;
+  lastSyncDb: string | null;
   dbExists: boolean;
   error: string | null;
   progress?: {
@@ -175,7 +177,8 @@ export class SyncManager {
     const state = this.loadState();
     return {
       status: this.currentStatus,
-      lastSync: state.databaseSync,
+      lastSync: state.lastSyncAt || null,
+      lastSyncDb: state.databaseSync,
       dbExists: fs.existsSync(getDbPath()),
       error: this.currentError,
       progress: this.currentProgress,
@@ -268,10 +271,12 @@ export class SyncManager {
       this.currentProgress = { current: 100, total: 100, message: 'Complete' };
 
       // Update state
+      const now = new Date().toISOString();
       const state: SyncState = {
         syncLatest: dbRecord.timestamp,
-        databaseSync: new Date().toISOString(),
+        databaseSync: now,
         databaseType: language,
+        lastSyncAt: now,
       };
       this.saveState(state);
 
@@ -382,6 +387,11 @@ export class SyncManager {
         reopenContentDb();
       }
 
+      // Update lastSyncAt
+      const state = this.loadState();
+      state.lastSyncAt = new Date().toISOString();
+      this.saveState(state);
+
       console.log(`[SyncManager] Successfully synced ${chunks.length} chunks`);
       this.currentStatus = 'idle';
     } catch (error) {
@@ -421,6 +431,7 @@ export class SyncManager {
         syncLatest: 0,
         databaseSync: null,
         databaseType: process.env.SYNC_LANGUAGE || 'global',
+        lastSyncAt: null,
       };
     }
 
@@ -432,6 +443,7 @@ export class SyncManager {
         syncLatest: 0,
         databaseSync: null,
         databaseType: process.env.SYNC_LANGUAGE || 'global',
+        lastSyncAt: null,
       };
     }
   }

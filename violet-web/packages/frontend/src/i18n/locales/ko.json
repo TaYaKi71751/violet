@@ -72,8 +72,23 @@
     "noResults": "검색 결과가 없습니다.",
     "error": "AI 검색 중 오류가 발생했습니다."
   },
-  "viewer": {
-    "noImages": "갤러리에서 이미지를 찾을 수 없습니다."
+  "crop": {
+    "selectPage": "크롭할 페이지를 선택하세요",
+    "cancel": "취소",
+    "page": "{{page}}페이지",
+    "dragToSelect": "{{page}}페이지 — 드래그로 영역을 선택하세요",
+    "reselect": "다시 선택",
+    "save": "저장",
+    "savedToast": "{{page}}페이지 크롭 저장했어요",
+    "saveErrorToast": "크롭 저장 중 오류가 발생했습니다",
+    "deletedToast": "크롭 북마크가 삭제되었습니다",
+    "deleteErrorToast": "크롭 북마크 삭제 중 오류가 발생했습니다",
+    "userBookmarks": "유저 북마크"
+  },
+  "bookmark": {
+    "addedToast": "북마크에 추가되었습니다",
+    "removedToast": "북마크가 해제되었습니다",
+    "errorToast": "북마크 처리 중 오류가 발생했습니다"
   },
   "settings": {
     "heading": "설정",
@@ -90,7 +105,10 @@
       "en": "English",
       "ko": "한국어",
       "ja": "日本語",
-      "zh": "中文"
+      "zh": "中文",
+      "eo": "Esperanto",
+      "it": "Italiano",
+      "pt": "Português"
     },
     "theme": {
       "heading": "테마 색상",
@@ -107,12 +125,19 @@
       "korean": "한국어",
       "koreanDesc": "카드 및 검색 자동완성에서 태그를 한국어로 표시합니다"
     },
+    "aiSearch": {
+      "heading": "AI 검색",
+      "enable": "AI 검색 사용",
+      "enableDesc": "내비게이션에 AI 검색 탭을 표시합니다",
+      "helpText": "AI 검색을 사용하려면 violet-search 서버를 별도로 실행해야 합니다. 이 기능을 사용하려면 violet-search 서비스를 설정하고 실행하세요."
+    },
     "sync": {
       "heading": "데이터베이스 동기화",
       "database": "데이터베이스:",
       "ready": "준비됨",
       "notFound": "찾을 수 없음",
       "lastSync": "마지막 동기화:",
+      "lastSyncDb": "마지막 동기화(DB):",
       "never": "없음",
       "status": "상태:",
       "idle": "대기 중",
@@ -139,10 +164,12 @@
       "status": "상태",
       "notBuilt": "빌드 안됨",
       "built": "빌드됨",
-      "building": "빌드 중..."
+      "building": "빌드 중...",
+      "totalTags": "총 태그 수"
     }
   },
   "viewer": {
+    "noImages": "갤러리에서 이미지를 찾을 수 없습니다.",
     "back": "뒤로",
     "settings": "설정",
     "pageInfo": "{{current}} / {{total}}",

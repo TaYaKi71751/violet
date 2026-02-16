@@ -19,7 +19,7 @@ const navItems = [
 export function Sidebar() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { themeColor, sidebarCollapsed, toggleSidebar } = useAppStore();
+  const { themeColor, sidebarCollapsed, toggleSidebar, aiSearchEnabled } = useAppStore();
 
   const logoSrc = themeColor === 'purple'
     ? '/logos/logo.png'
@@ -33,7 +33,7 @@ export function Sidebar() {
       </div>
 
       <div className={styles.navLinks}>
-        {navItems.map((item) => {
+        {navItems.filter((item) => item.to !== '/ai-search' || aiSearchEnabled).map((item) => {
           const Icon = item.icon;
           return (
             <NavLink

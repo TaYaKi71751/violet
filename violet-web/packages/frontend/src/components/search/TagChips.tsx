@@ -7,6 +7,16 @@ interface TagChipsProps {
   onToggle: (display: string) => void;
 }
 
+const prefixClass: Record<string, string> = {
+  female: styles.female,
+  male: styles.male,
+  tag: styles.tag,
+  artist: styles.artist,
+  series: styles.series,
+  group: styles.group,
+  character: styles.character,
+};
+
 export function TagChips({ tags, selectedTags, onToggle }: TagChipsProps) {
   if (tags.length === 0) {
     return null;
@@ -16,8 +26,8 @@ export function TagChips({ tags, selectedTags, onToggle }: TagChipsProps) {
     <div className={styles.container}>
       {tags.map((tag) => {
         const isSelected = selectedTags.has(tag.display);
-        // Replace underscores with spaces for display
-        const displayText = tag.display.replace(/_/g, ' ');
+        const tagName = tag.tag.replace(/_/g, ' ');
+        const pClass = prefixClass[tag.category] || styles.tag;
         return (
           <button
             key={tag.display}
@@ -25,7 +35,9 @@ export function TagChips({ tags, selectedTags, onToggle }: TagChipsProps) {
             className={`${styles.chip} ${isSelected ? styles.active : ''}`}
             onClick={() => onToggle(tag.display)}
           >
-            {displayText} ({tag.count})
+            <span className={`${styles.prefix} ${pClass}`}>{tag.category}:</span>
+            {tagName}
+            <span className={styles.count}>{tag.count}</span>
           </button>
         );
       })}

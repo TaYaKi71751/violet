@@ -72,8 +72,23 @@
     "noResults": "検索結果が見つかりませんでした。",
     "error": "AI検索中にエラーが発生しました。"
   },
-  "viewer": {
-    "noImages": "このギャラリーの画像が見つかりませんでした。"
+  "crop": {
+    "selectPage": "クロップするページを選択してください",
+    "cancel": "キャンセル",
+    "page": "{{page}}ページ",
+    "dragToSelect": "{{page}}ページ — ドラッグで範囲を選択",
+    "reselect": "再選択",
+    "save": "保存",
+    "savedToast": "{{page}}ページのクロップを保存しました",
+    "saveErrorToast": "クロップの保存に失敗しました",
+    "deletedToast": "クロップブックマークを削除しました",
+    "deleteErrorToast": "クロップブックマークの削除に失敗しました",
+    "userBookmarks": "ユーザーブックマーク"
+  },
+  "bookmark": {
+    "addedToast": "ブックマークに追加しました",
+    "removedToast": "ブックマークを解除しました",
+    "errorToast": "ブックマーク処理に失敗しました"
   },
   "settings": {
     "heading": "設定",
@@ -90,7 +105,10 @@
       "en": "English",
       "ko": "한국어",
       "ja": "日本語",
-      "zh": "中文"
+      "zh": "中文",
+      "eo": "Esperanto",
+      "it": "Italiano",
+      "pt": "Português"
     },
     "theme": {
       "heading": "テーマカラー",
@@ -107,12 +125,19 @@
       "korean": "韓国語",
       "koreanDesc": "カードと検索候補でタグを韓国語で表示します"
     },
+    "aiSearch": {
+      "heading": "AI検索",
+      "enable": "AI検索を有効化",
+      "enableDesc": "ナビゲーションにAI検索タブを表示します",
+      "helpText": "AI検索を使用するには、violet-searchサーバーを別途起動する必要があります。この機能を使用するには、violet-searchサービスをセットアップして実行してください。"
+    },
     "sync": {
       "heading": "データベース同期",
       "database": "データベース:",
       "ready": "準備完了",
       "notFound": "見つかりません",
       "lastSync": "最終同期:",
+      "lastSyncDb": "最終同期(DB):",
       "never": "なし",
       "status": "ステータス:",
       "idle": "待機中",
@@ -139,10 +164,12 @@
       "status": "ステータス",
       "notBuilt": "未構築",
       "built": "構築済み",
-      "building": "構築中..."
+      "building": "構築中...",
+      "totalTags": "総タグ数"
     }
   },
   "viewer": {
+    "noImages": "このギャラリーの画像が見つかりませんでした。",
     "back": "戻る",
     "settings": "設定",
     "pageInfo": "{{current}} / {{total}}",

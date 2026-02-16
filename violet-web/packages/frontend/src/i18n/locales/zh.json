@@ -72,8 +72,23 @@
     "noResults": "未找到搜索结果。",
     "error": "AI搜索时发生错误。"
   },
-  "viewer": {
-    "noImages": "未找到该图库的图片。"
+  "crop": {
+    "selectPage": "选择要裁剪的页面",
+    "cancel": "取消",
+    "page": "第{{page}}页",
+    "dragToSelect": "第{{page}}页 — 拖动选择区域",
+    "reselect": "重新选择",
+    "save": "保存",
+    "savedToast": "第{{page}}页裁剪已保存",
+    "saveErrorToast": "裁剪保存失败",
+    "deletedToast": "裁剪书签已删除",
+    "deleteErrorToast": "裁剪书签删除失败",
+    "userBookmarks": "用户书签"
+  },
+  "bookmark": {
+    "addedToast": "已添加到书签",
+    "removedToast": "已从书签移除",
+    "errorToast": "书签处理失败"
   },
   "settings": {
     "heading": "设置",
@@ -90,7 +105,10 @@
       "en": "English",
       "ko": "한국어",
       "ja": "日本語",
-      "zh": "中文"
+      "zh": "中文",
+      "eo": "Esperanto",
+      "it": "Italiano",
+      "pt": "Português"
     },
     "theme": {
       "heading": "主题颜色",
@@ -107,12 +125,19 @@
       "korean": "韩语",
       "koreanDesc": "在卡片和搜索建议中以韩语显示标签"
     },
+    "aiSearch": {
+      "heading": "AI搜索",
+      "enable": "启用AI搜索",
+      "enableDesc": "在导航栏中显示AI搜索标签页",
+      "helpText": "AI搜索需要单独运行violet-search服务器。要使用此功能，请先设置并运行violet-search服务。"
+    },
     "sync": {
       "heading": "数据库同步",
       "database": "数据库:",
       "ready": "就绪",
       "notFound": "未找到",
       "lastSync": "最后同步:",
+      "lastSyncDb": "最后同步(DB):",
       "never": "从未",
       "status": "状态:",
       "idle": "空闲",
@@ -139,10 +164,12 @@
       "status": "状态",
       "notBuilt": "未构建",
       "built": "已构建",
-      "building": "构建中..."
+      "building": "构建中...",
+      "totalTags": "总标签数"
     }
   },
   "viewer": {
+    "noImages": "未找到该图库的图片。",
     "back": "返回",
     "settings": "设置",
     "pageInfo": "{{current}} / {{total}}",

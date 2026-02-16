@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { HelpCircle } from 'lucide-react';
 
 import { useAppStore } from '../stores/app-store';
 import { useSyncStatus, useTriggerSync, useTriggerFullSync } from '../hooks/useSync';
@@ -15,7 +16,9 @@ const themeColors = [
 
 export function SettingsPage() {
   const { t } = useTranslation();
-  const { contentLanguage, uiLanguage, themeColor, scrollMode, tagTranslation, setContentLanguage, setUILanguage, setThemeColor, setScrollMode, setTagTranslation } = useAppStore();
+  const { contentLanguage, uiLanguage, themeColor, scrollMode, tagTranslation, aiSearchEnabled, setContentLanguage, setUILanguage, setThemeColor, setScrollMode, setTagTranslation, setAiSearchEnabled } = useAppStore();
+  const [showAiSearchHelp, setShowAiSearchHelp] = useState(false);
+  const helpRef = useRef<HTMLDivElement>(null);
   const { data: syncStatus } = useSyncStatus();
   const triggerSync = useTriggerSync();
   const triggerFullSync = useTriggerFullSync();
@@ -61,6 +64,18 @@ export function SettingsPage() {
 
   const isSyncing = syncStatus?.status !== 'idle' && syncStatus?.status !== 'error';
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (helpRef.current && !helpRef.current.contains(e.target as Node)) {
+        setShowAiSearchHelp(false);
+      }
+    };
+    if (showAiSearchHelp) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showAiSearchHelp]);
+
   return (
     <div className={styles.page}>
       <h2 className={styles.heading}>{t('settings.heading')}</h2>
@@ -95,6 +110,9 @@ export function SettingsPage() {
             <option value="ko">{t('settings.language.ko')}</option>
             <option value="ja">{t('settings.language.ja')}</option>
             <option value="zh">{t('settings.language.zh')}</option>
+            <option value="eo">{t('settings.language.eo')}</option>
+            <option value="it">{t('settings.language.it')}</option>
+            <option value="pt">{t('settings.language.pt')}</option>
           </select>
         </div>
       </div>
@@ -155,6 +173,49 @@ export function SettingsPage() {
       </div>
 
       <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <h3 className={styles.subheading}>{t('settings.aiSearch.heading')}</h3>
+          <div className={styles.helpWrapper} ref={helpRef}>
+            <button
+              className={styles.helpBtn}
+              onClick={() => setShowAiSearchHelp((v) => !v)}
+              aria-label="Help"
+            >
+              <HelpCircle size={16} />
+            </button>
+            {showAiSearchHelp && (
+              <div className={styles.helpPopover}>
+                <p>{t('settings.aiSearch.helpText')}</p>
+                <a
+                  href="https://github.com/project-violet/violet/tree/dev/violet-search"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.helpLink}
+                >
+                  violet-search GitHub
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className={styles.toggleRow}>
+          <div className={styles.toggleInfo}>
+            <span className={styles.toggleLabel}>{t('settings.aiSearch.enable')}</span>
+            <span className={styles.toggleDesc}>{t('settings.aiSearch.enableDesc')}</span>
+          </div>
+          <label className={styles.toggle}>
+            <input
+              type="checkbox"
+              checked={aiSearchEnabled}
+              onChange={(e) => setAiSearchEnabled(e.target.checked)}
+            />
+            <span className={styles.toggleTrack} />
+          </label>
+        </div>
+      </div>
+
+      <div className={styles.section}>
         <h3 className={styles.subheading}>{t('settings.sync.heading')}</h3>
 
         <div className={styles.syncInfo}>
@@ -168,6 +229,11 @@ export function SettingsPage() {
           <div className={styles.infoRow}>
             <span className={styles.label}>{t('settings.sync.lastSync')}</span>
             <span>{formatDate(syncStatus?.lastSync || null)}</span>
+          </div>
+
+          <div className={styles.infoRow}>
+            <span className={styles.label}>{t('settings.sync.lastSyncDb')}</span>
+            <span>{formatDate(syncStatus?.lastSyncDb || null)}</span>
           </div>
 
           <div className={styles.infoRow}>
@@ -245,14 +311,10 @@ export function SettingsPage() {
           </div>
 
           {cacheStatus?.built && cacheStatus.counts && (
-            <>
-              {Object.entries(cacheStatus.counts).map(([key, count]) => (
-                <div key={key} className={styles.infoRow}>
-                  <span className={styles.label}>{key}:</span>
-                  <span>{count.toLocaleString()}</span>
-                </div>
-              ))}
-            </>
+            <div className={styles.infoRow}>
+              <span className={styles.label}>{t('settings.suggestions.totalTags')}</span>
+              <span>{Object.values(cacheStatus.counts).reduce((sum, c) => sum + (c as number), 0).toLocaleString()}</span>
+            </div>
           )}
         </div>
 

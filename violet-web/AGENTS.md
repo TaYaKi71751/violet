@@ -213,7 +213,14 @@ twoPageMode, coverPageMode ('cover'|'normal'), showSettings
 
 - `config.ts` — i18next + react-i18next, 시스템 언어 자동 감지
 - `locales/{en,ko,ja,zh}.json` — 4개 언어 번역 파일
-- 키 구조: `settings.*`, `search.*`, `home.*`, `article.*`, `viewer.*`, `nav.*`, `bookmarks.*`, `history.*`
+- 키 구조: `settings.*`, `search.*`, `home.*`, `article.*`, `viewer.*`, `nav.*`, `bookmarks.*`, `history.*`, `crop.*`, `bookmark.*`
+
+**중요: 모든 사용자 대면 문자열은 반드시 i18n을 통해 표시해야 합니다.**
+
+- 컴포넌트에서 한국어(또는 다른 언어) 문자열을 직접 하드코딩하지 마세요.
+- `useTranslation()` 훅의 `t()` 함수를 사용하세요.
+- 새 문자열을 추가할 때는 반드시 4개 언어 파일(en, ko, ja, zh) 모두에 키를 추가하세요.
+- toast 메시지, 다이얼로그 텍스트, 버튼 라벨, 안내 문구 등 모든 UI 텍스트에 적용됩니다.
 
 ### Data (`data/`)
 
