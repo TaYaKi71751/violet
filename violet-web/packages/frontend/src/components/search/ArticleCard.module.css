@@ -374,3 +374,19 @@
   background: #3a3a3a;
   color: #ccc;
 }
+
+/* Light mode tag colors */
+:root[data-theme="light"] .tagFemale {
+  background: rgba(232, 67, 147, 0.2);
+  color: #b8376b;
+}
+
+:root[data-theme="light"] .tagMale {
+  background: rgba(9, 132, 227, 0.2);
+  color: #1260a8;
+}
+
+:root[data-theme="light"] .tagGeneral {
+  background: #e0e0e0;
+  color: #333;
+}
