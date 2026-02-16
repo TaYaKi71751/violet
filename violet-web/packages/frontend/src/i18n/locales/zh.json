@@ -90,9 +90,6 @@
     "removedToast": "已从书签移除",
     "errorToast": "书签处理失败"
   },
-  "viewer": {
-    "noImages": "未找到该图库的图片。"
-  },
   "settings": {
     "heading": "设置",
     "language": {
@@ -169,6 +166,7 @@
     }
   },
   "viewer": {
+    "noImages": "未找到该图库的图片。",
     "back": "返回",
     "settings": "设置",
     "pageInfo": "{{current}} / {{total}}",

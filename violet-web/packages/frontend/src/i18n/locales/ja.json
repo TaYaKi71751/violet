@@ -90,9 +90,6 @@
     "removedToast": "ブックマークを解除しました",
     "errorToast": "ブックマーク処理に失敗しました"
   },
-  "viewer": {
-    "noImages": "このギャラリーの画像が見つかりませんでした。"
-  },
   "settings": {
     "heading": "設定",
     "language": {
@@ -169,6 +166,7 @@
     }
   },
   "viewer": {
+    "noImages": "このギャラリーの画像が見つかりませんでした。",
     "back": "戻る",
     "settings": "設定",
     "pageInfo": "{{current}} / {{total}}",
