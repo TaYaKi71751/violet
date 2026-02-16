@@ -27,6 +27,15 @@
   --color-on-primary: #fff;
   --color-toast-bg: rgba(0, 0, 0, 0.85);
   --color-toast-text: white;
+  --color-dialog-bg: rgba(30, 30, 30, 0.75);
+  --color-dialog-header-border: rgba(255, 255, 255, 0.1);
+  --color-dialog-text: #fff;
+  --color-dialog-text-secondary: rgba(255, 255, 255, 0.5);
+  --color-dialog-btn-bg: rgba(255, 255, 255, 0.12);
+  --color-dialog-btn-bg-hover: rgba(255, 255, 255, 0.2);
+  --color-dialog-item-hover: rgba(255, 255, 255, 0.1);
+  --color-dialog-item-active: rgba(255, 255, 255, 0.08);
+  --color-dialog-thumbnail-bg: rgba(255, 255, 255, 0.05);
 
   /* Spacing */
   --spacing-xs: 4px;
@@ -82,6 +91,15 @@
   --color-on-primary: #fff;
   --color-toast-bg: rgba(50, 50, 50, 0.90);
   --color-toast-text: white;
+  --color-dialog-bg: rgba(255, 255, 255, 0.85);
+  --color-dialog-header-border: rgba(0, 0, 0, 0.1);
+  --color-dialog-text: #1a1a1a;
+  --color-dialog-text-secondary: rgba(0, 0, 0, 0.5);
+  --color-dialog-btn-bg: rgba(0, 0, 0, 0.08);
+  --color-dialog-btn-bg-hover: rgba(0, 0, 0, 0.15);
+  --color-dialog-item-hover: rgba(0, 0, 0, 0.05);
+  --color-dialog-item-active: rgba(0, 0, 0, 0.08);
+  --color-dialog-thumbnail-bg: rgba(0, 0, 0, 0.05);
 
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
