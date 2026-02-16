@@ -2,6 +2,16 @@
 
 Violet Flutter 앱의 웹 버전. 개인용 이미지 만화 뷰어.
 
+## 개발자 및 코딩 에이전트를 위한 추천 스킬
+
+Claude Code를 사용하여 이 프로젝트를 개발할 때, 아래 스킬들을 설치하면 코드 품질과 생산성을 높일 수 있습니다.
+
+| 스킬 | 설명 | GitHub |
+|------|------|--------|
+| **superpowers** | 체계적인 디버깅, TDD, 코드 리뷰, 플랜 작성 등 개발 워크플로우 강화 | [obra/superpowers](https://github.com/obra/superpowers) |
+| **frontend-design** | 고품질 프론트엔드 UI 생성. 일반적인 AI 스타일을 피하고 독창적인 인터페이스 구현 | [anthropics/claude-code](https://github.com/anthropics/claude-code/tree/main/plugins/frontend-design) |
+| **karpathy-guidelines** | LLM의 흔한 코딩 실수를 줄이는 가이드라인. 과도한 복잡성 방지 및 최소 변경 유도 | [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) |
+
 ## 설치
 
 ### 요구사항
