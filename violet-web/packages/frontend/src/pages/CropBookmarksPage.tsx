@@ -120,6 +120,7 @@ export function CropBookmarksPage() {
           onTagToggle={handleTagToggle}
           resultCount={filteredCrops.length}
           isLoading={loading}
+          showViewControls={false}
         />
       )}
 

@@ -16,6 +16,7 @@ interface LocalSearchSectionProps {
   onTagToggle: (display: string) => void;
   resultCount?: number;
   isLoading?: boolean;
+  showViewControls?: boolean;
 }
 
 export function LocalSearchSection({
@@ -27,6 +28,7 @@ export function LocalSearchSection({
   onTagToggle,
   resultCount,
   isLoading,
+  showViewControls = true,
 }: LocalSearchSectionProps) {
   const { t } = useTranslation();
   const { viewMode, setViewMode, cardMinWidth, setCardMinWidth } = useAppStore();
@@ -44,28 +46,32 @@ export function LocalSearchSection({
             {t('home.results', { count: resultCount })}
           </div>
         )}
-        <input
-          type="range"
-          className={styles.cardSizeSlider}
-          min={120}
-          max={350}
-          step={10}
-          value={cardMinWidth}
-          onChange={(e) => setCardMinWidth(Number(e.target.value))}
-        />
-        <label className={styles.viewSwitch} title={viewMode === 'grid' ? 'Detail view' : 'Grid view'}>
-          <span className={styles.switchLabel}>▦</span>
-          <input
-            type="checkbox"
-            className={styles.switchInput}
-            checked={viewMode === 'detail'}
-            onChange={() => setViewMode(viewMode === 'grid' ? 'detail' : 'grid')}
-          />
-          <span className={styles.switchTrack}>
-            <span className={styles.switchThumb} />
-          </span>
-          <span className={styles.switchLabel}>☰</span>
-        </label>
+        {showViewControls && (
+          <>
+            <input
+              type="range"
+              className={styles.cardSizeSlider}
+              min={120}
+              max={350}
+              step={10}
+              value={cardMinWidth}
+              onChange={(e) => setCardMinWidth(Number(e.target.value))}
+            />
+            <label className={styles.viewSwitch} title={viewMode === 'grid' ? 'Detail view' : 'Grid view'}>
+              <span className={styles.switchLabel}>▦</span>
+              <input
+                type="checkbox"
+                className={styles.switchInput}
+                checked={viewMode === 'detail'}
+                onChange={() => setViewMode(viewMode === 'grid' ? 'detail' : 'grid')}
+              />
+              <span className={styles.switchTrack}>
+                <span className={styles.switchThumb} />
+              </span>
+              <span className={styles.switchLabel}>☰</span>
+            </label>
+          </>
+        )}
       </div>
 
       {!isLoading && tagSummary.length > 0 && (
