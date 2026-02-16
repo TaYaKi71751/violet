@@ -88,6 +88,7 @@
   gap: var(--spacing-xs);
   padding: var(--spacing-sm) 0;
   border-top: 1px solid var(--color-border);
+  margin-top: auto;
 }
 
 .socialLink {
@@ -109,6 +110,42 @@
 
 .socialLink:hover {
   background: var(--color-bg-hover);
+  color: var(--color-primary);
+}
+
+.themeToggle {
+  display: flex;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
+  border-top: 1px solid var(--color-border);
+}
+
+.collapsed .themeToggle {
+  flex-direction: column;
+}
+
+.themeBtn {
+  flex: 1;
+  padding: var(--spacing-sm);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.themeBtn:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.themeBtn.active {
+  border-color: var(--color-primary);
+  background: rgba(124, 92, 191, 0.1);
   color: var(--color-primary);
 }
 

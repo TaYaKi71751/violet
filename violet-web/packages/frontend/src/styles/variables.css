@@ -1,5 +1,5 @@
 :root {
-  /* Colors */
+  /* Colors - Dark theme (default) */
   --color-bg: #0f0f0f;
   --color-bg-elevated: #1a1a1a;
   --color-bg-hover: #252525;
@@ -10,6 +10,22 @@
   --color-primary: #7c5cbf;
   --color-primary-hover: #9370db;
   --color-danger: #e74c3c;
+
+  /* Component-specific colors */
+  --color-chip-bg: rgba(255, 255, 255, 0.06);
+  --color-chip-border: rgba(255, 255, 255, 0.08);
+  --color-chip-bg-hover: rgba(255, 255, 255, 0.10);
+  --color-chip-border-hover: rgba(255, 255, 255, 0.14);
+  --color-chip-bg-active: rgba(255, 255, 255, 0.14);
+  --color-chip-border-active: rgba(255, 255, 255, 0.20);
+  --color-chip-bg-active-hover: rgba(255, 255, 255, 0.18);
+  --color-pagination-text: #fff;
+  --color-pagination-btn-bg: rgba(255, 255, 255, 0.12);
+  --color-pagination-btn-bg-hover: rgba(255, 255, 255, 0.22);
+  --color-toggle-knob: #fff;
+  --color-on-primary: #fff;
+  --color-toast-bg: rgba(0, 0, 0, 0.85);
+  --color-toast-text: white;
 
   /* Spacing */
   --spacing-xs: 4px;
@@ -36,4 +52,44 @@
   /* Shadows */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Light theme overrides */
+:root[data-theme="light"] {
+  --color-bg: #f5f5f5;
+  --color-bg-elevated: #ffffff;
+  --color-bg-hover: #e8e8e8;
+  --color-surface: #f0f0f0;
+  --color-border: #d4d4d4;
+  --color-text: #1a1a1a;
+  --color-text-secondary: #666;
+  --color-primary-hover: #6a4daa;
+  --color-danger: #dc2626;
+
+  --color-chip-bg: rgba(0, 0, 0, 0.05);
+  --color-chip-border: rgba(0, 0, 0, 0.08);
+  --color-chip-bg-hover: rgba(0, 0, 0, 0.08);
+  --color-chip-border-hover: rgba(0, 0, 0, 0.14);
+  --color-chip-bg-active: rgba(0, 0, 0, 0.12);
+  --color-chip-border-active: rgba(0, 0, 0, 0.20);
+  --color-chip-bg-active-hover: rgba(0, 0, 0, 0.16);
+  --color-pagination-text: #1a1a1a;
+  --color-pagination-btn-bg: rgba(0, 0, 0, 0.08);
+  --color-pagination-btn-bg-hover: rgba(0, 0, 0, 0.15);
+  --color-toggle-knob: #fff;
+  --color-on-primary: #fff;
+  --color-toast-bg: rgba(50, 50, 50, 0.90);
+  --color-toast-text: white;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Theme transition animation */
+:root.theme-transitioning,
+:root.theme-transitioning *,
+:root.theme-transitioning *::before,
+:root.theme-transitioning *::after {
+  transition: background-color 0.3s ease, color 0.3s ease,
+              border-color 0.3s ease, box-shadow 0.3s ease !important;
 }

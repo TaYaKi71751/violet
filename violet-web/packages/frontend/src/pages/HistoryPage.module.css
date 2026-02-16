@@ -38,23 +38,23 @@
   backdrop-filter: blur(8px);
   border-radius: 999px;
   z-index: 10;
-  color: #fff;
+  color: var(--color-pagination-text);
   font-size: 0.85rem;
 }
 
 .pagination button {
   padding: 6px 16px;
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--color-pagination-btn-bg);
   border: none;
   border-radius: 999px;
-  color: #fff;
+  color: var(--color-pagination-text);
   font-size: 0.85rem;
   cursor: pointer;
   transition: background 0.15s;
 }
 
 .pagination button:hover {
-  background: rgba(255, 255, 255, 0.22);
+  background: var(--color-pagination-btn-bg-hover);
 }
 
 .pagination button:disabled {

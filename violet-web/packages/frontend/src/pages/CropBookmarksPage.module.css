@@ -67,7 +67,7 @@
   left: 2px;
   width: 16px;
   height: 16px;
-  background: #fff;
+  background: var(--color-toggle-knob);
   border-radius: 50%;
   transition: transform 0.2s;
 }

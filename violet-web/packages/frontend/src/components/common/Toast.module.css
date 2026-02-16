@@ -13,8 +13,8 @@
 .toast {
   padding: 12px 24px;
   border-radius: 8px;
-  background: rgba(0, 0, 0, 0.85);
-  color: white;
+  background: var(--color-toast-bg);
+  color: var(--color-toast-text);
   font-size: 14px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease-out;
