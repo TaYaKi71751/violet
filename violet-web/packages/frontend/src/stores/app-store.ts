@@ -24,6 +24,7 @@ interface AppState {
   scrollMode: ScrollMode;
   tagTranslation: boolean;
   aiSearchEnabled: boolean;
+  excludedTags: string[];
 
   setContentLanguage: (lang: ContentLanguage) => void;
   setUILanguage: (lang: UILanguage) => void;
@@ -35,6 +36,8 @@ interface AppState {
   setScrollMode: (mode: ScrollMode) => void;
   setTagTranslation: (enabled: boolean) => void;
   setAiSearchEnabled: (enabled: boolean) => void;
+  addExcludedTag: (tag: string) => void;
+  removeExcludedTag: (tag: string) => void;
 }
 
 // Helper to get system language
@@ -46,19 +49,35 @@ const getSystemLanguage = (): string => {
   return 'en';
 };
 
+const getDefaultContentLanguage = (): ContentLanguage => {
+  const lang = getSystemLanguage();
+  const map: Record<string, ContentLanguage> = {
+    ko: 'korean',
+    ja: 'japanese',
+    zh: 'chinese',
+    en: 'english',
+  };
+  return map[lang] || 'all';
+};
+
+const getDefaultTagTranslation = (): boolean => {
+  return getSystemLanguage() === 'ko';
+};
+
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      contentLanguage: 'all',
+      contentLanguage: getDefaultContentLanguage(),
       uiLanguage: 'system',
       themeColor: 'purple',
       sidebarCollapsed: false,
       viewMode: 'grid',
       cardMinWidth: 200,
       cropColumnWidth: 240,
-      scrollMode: 'infinite',
-      tagTranslation: true,
+      scrollMode: 'pagination',
+      tagTranslation: getDefaultTagTranslation(),
       aiSearchEnabled: false,
+      excludedTags: ['female:snuff', 'female:gore'],
 
       setContentLanguage: (contentLanguage) => set({ contentLanguage }),
       setUILanguage: (uiLanguage) => {
@@ -74,6 +93,16 @@ export const useAppStore = create<AppState>()(
       setScrollMode: (scrollMode) => set({ scrollMode }),
       setTagTranslation: (tagTranslation) => set({ tagTranslation }),
       setAiSearchEnabled: (aiSearchEnabled) => set({ aiSearchEnabled }),
+      addExcludedTag: (tag) =>
+        set((state) => ({
+          excludedTags: state.excludedTags.includes(tag)
+            ? state.excludedTags
+            : [...state.excludedTags, tag],
+        })),
+      removeExcludedTag: (tag) =>
+        set((state) => ({
+          excludedTags: state.excludedTags.filter((t) => t !== tag),
+        })),
     }),
     { name: 'violet-app-settings' },
   ),

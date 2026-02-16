@@ -13,7 +13,7 @@ export function HomePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
   const page = parseInt(searchParams.get('p') || '0');
-  const { contentLanguage, scrollMode } = useAppStore();
+  const { contentLanguage, scrollMode, excludedTags } = useAppStore();
 
   const setPage = (updater: number | ((prev: number) => number)) => {
     const newPage = typeof updater === 'function' ? updater(page) : updater;
@@ -31,8 +31,14 @@ export function HomePage() {
     return () => { document.title = 'Violet'; };
   }, [query]);
 
-  const fullQuery =
+  const baseQuery =
     contentLanguage !== 'all' ? `${query} lang:${contentLanguage}` : query;
+
+  const excludeSuffix = excludedTags
+    .filter((tag) => !query.includes(`-${tag}`))
+    .map((tag) => `-${tag}`)
+    .join(' ');
+  const fullQuery = excludeSuffix ? `${baseQuery} ${excludeSuffix}` : baseQuery;
 
   // Pagination mode
   const { data, isLoading } = useSearch(

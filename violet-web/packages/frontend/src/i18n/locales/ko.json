@@ -90,6 +90,14 @@
     "removedToast": "북마크가 해제되었습니다",
     "errorToast": "북마크 처리 중 오류가 발생했습니다"
   },
+  "sync": {
+    "downloadOverlay": {
+      "title": "데이터베이스 다운로드 중",
+      "message": "첫 실행을 위해 데이터베이스를 다운로드하고 있습니다. 잠시만 기다려 주세요.",
+      "cacheTitle": "캐시 빌드 중",
+      "cacheMessage": "검색을 위한 태그 캐시를 생성하고 있습니다. 잠시만 기다려 주세요."
+    }
+  },
   "settings": {
     "heading": "설정",
     "language": {
@@ -125,6 +133,12 @@
       "korean": "한국어",
       "koreanDesc": "카드 및 검색 자동완성에서 태그를 한국어로 표시합니다"
     },
+    "excludedTags": {
+      "heading": "제외 태그",
+      "description": "여기에 등록된 태그는 홈 페이지 검색 결과에서 자동으로 제외됩니다.",
+      "placeholder": "제외할 태그를 입력하세요...",
+      "defaultNote": "기본값: female:snuff, female:gore"
+    },
     "aiSearch": {
       "heading": "AI 검색",
       "enable": "AI 검색 사용",
@@ -144,6 +158,7 @@
       "checking": "업데이트 확인 중...",
       "downloadingFull": "전체 데이터베이스 다운로드 중...",
       "applyingChunks": "업데이트 적용 중...",
+      "buildingCache": "캐시 빌드 중...",
       "error": "오류",
       "syncNow": "지금 동기화",
       "redownloadDB": "DB 재다운로드",

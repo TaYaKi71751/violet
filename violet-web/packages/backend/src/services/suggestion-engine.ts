@@ -63,23 +63,22 @@ export function buildSuggestionCache(db: Database): void {
   };
 
   // Collect from pipe-delimited columns and count occurrences
-  const rows = db
-    .prepare(
-      'SELECT Artists, Tags, Series, Characters, Groups, Uploader, Language, Type, Class FROM HitomiColumnModel'
-    )
-    .all() as Array<{
-      Artists: string | null;
-      Tags: string | null;
-      Series: string | null;
-      Characters: string | null;
-      Groups: string | null;
-      Uploader: string | null;
-      Language: string | null;
-      Type: string | null;
-      Class: string | null;
-    }>;
+  // Use .iterate() instead of .all() to avoid loading all rows into memory at once
+  const stmt = db.prepare(
+    'SELECT Artists, Tags, Series, Characters, Groups, Uploader, Language, Type, Class FROM HitomiColumnModel'
+  );
 
-  for (const row of rows) {
+  for (const row of stmt.iterate() as IterableIterator<{
+    Artists: string | null;
+    Tags: string | null;
+    Series: string | null;
+    Characters: string | null;
+    Groups: string | null;
+    Uploader: string | null;
+    Language: string | null;
+    Type: string | null;
+    Class: string | null;
+  }>) {
     // Artists
     parsePipeTags(row.Artists).forEach((a) => {
       const normalized = normalizeTag(a);

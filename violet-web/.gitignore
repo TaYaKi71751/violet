@@ -9,3 +9,5 @@ dist/
 *.tsbuildinfo
 packages/backend/data/*
 packages/backend/suggestion-cache.json
+.claude/*
+data/*

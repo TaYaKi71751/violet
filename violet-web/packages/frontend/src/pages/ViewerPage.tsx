@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router';
+import { useParams, useNavigate, useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useImageList } from '../hooks/useImageList';
 import { useViewer } from '../hooks/useViewer';
@@ -13,11 +13,15 @@ export function ViewerPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const galleryId = parseInt(id!);
   const { data: imageList, isLoading } = useImageList(galleryId);
 
   const totalPages = imageList?.urls.length ?? 0;
-  const { currentPage, goToPage } = useViewer(totalPages);
+  // URL uses 1-based indexing, convert to 0-based for internal use
+  const pageParam = parseInt(searchParams.get('page') || '1');
+  const initialPage = Math.max(0, pageParam - 1);
+  const { currentPage, goToPage } = useViewer(totalPages, initialPage);
 
   const insertLog = useInsertReadLog();
   const updateLog = useUpdateReadLog();
@@ -60,6 +64,12 @@ export function ViewerPage() {
     updateLog.mutate({ id: logIdRef.current, LastPage: currentPage });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
+
+  // Update URL without navigation (use 1-based indexing in URL)
+  useEffect(() => {
+    const url = `/viewer/${galleryId}?page=${currentPage + 1}`;
+    window.history.replaceState(null, '', url);
+  }, [currentPage, galleryId]);
 
   if (isLoading) {
     return (

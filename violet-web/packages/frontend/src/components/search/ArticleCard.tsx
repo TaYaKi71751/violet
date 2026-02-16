@@ -11,7 +11,10 @@ import { useStartDownload, useRetryDownload, useDeleteDownload, useIsDownloaded 
 import { useDownloadProgress, useIsDownloadsPage } from '../../contexts/DownloadProgressContext';
 import { useTagTranslation } from '../../hooks/useTagTranslation';
 import { useTagCounts } from '../../hooks/useTagCounts';
+import { useImageList } from '../../hooks/useImageList';
+import { getProxyImageUrl } from '../../api/proxy';
 import { ArticleInfoDialog } from './ArticleInfoDialog';
+import { PageThumbnailDialog } from '../viewer/PageThumbnailDialog';
 import type { ViewMode } from '../../stores/app-store';
 import styles from './ArticleCard.module.css';
 
@@ -43,6 +46,8 @@ export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription
   const { translateTag } = useTagTranslation();
   const tagCounts = useTagCounts();
   const [showInfoDialog, setShowInfoDialog] = useState(false);
+  const [showPageThumbnails, setShowPageThumbnails] = useState(false);
+  const { data: imageList } = useImageList(showPageThumbnails ? article.Id : 0);
 
   const artists = parsePipeTags(article.Artists);
   const language = article.Language ?? '';
@@ -80,6 +85,16 @@ export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription
     } else {
       navigate(url);
     }
+  };
+
+  const handlePageCountClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowPageThumbnails(true);
+  };
+
+  const handlePageSelect = (pageIndex: number) => {
+    // pageIndex is 0-based, convert to 1-based for URL
+    navigate(`/viewer/${article.Id}?page=${pageIndex + 1}`);
   };
 
   const isDetail = viewMode === 'detail';
@@ -141,7 +156,12 @@ export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription
             {isBookmarked ? '★' : '☆'}
           </button>
           {article.Files != null && (
-            <span className={styles.pageCount}>{article.Files}P</span>
+            <span
+              className={`${styles.pageCount} ${styles.clickable}`}
+              onClick={handlePageCountClick}
+            >
+              {article.Files}P
+            </span>
           )}
           {downloadRecord && downloadRecord.Status === 'downloading' && (() => {
             const pct = downloadRecord.TotalPages > 0
@@ -277,6 +297,19 @@ export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription
       </div>
       {showInfoDialog && (
         <ArticleInfoDialog article={article} onClose={() => setShowInfoDialog(false)} />
+      )}
+      {showPageThumbnails && imageList && (
+        <PageThumbnailDialog
+          thumbnailUrls={(imageList.smallThumbnails ?? []).map((url) =>
+            getProxyImageUrl(url, `https://hitomi.la/reader/${article.Id}.html`),
+          )}
+          currentPage={0}
+          totalPages={article.Files ?? 0}
+          twoPageMode={false}
+          coverPageMode="normal"
+          onPageSelect={handlePageSelect}
+          onClose={() => setShowPageThumbnails(false)}
+        />
       )}
     </>
   );

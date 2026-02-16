@@ -11,7 +11,8 @@ export function useSyncStatus() {
       if (
         status === 'checking' ||
         status === 'downloading_full' ||
-        status === 'applying_chunks'
+        status === 'applying_chunks' ||
+        status === 'building_cache'
       ) {
         return 2000;
       }

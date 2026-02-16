@@ -30,11 +30,11 @@ export const useViewerStore = create<ViewerState>()(
   persist(
     (set) => ({
       viewMode: 'vertical',
-      pageMode: 'scroll',
+      pageMode: 'paged',
       readDirection: 'rtl',
       padding: 0,
       showOverlay: false,
-      twoPageMode: false,
+      twoPageMode: true,
       coverPageMode: 'cover',
       showSettings: false,
 

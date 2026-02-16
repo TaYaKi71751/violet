@@ -125,6 +125,12 @@
       "korean": "韓国語",
       "koreanDesc": "カードと検索候補でタグを韓国語で表示します"
     },
+    "excludedTags": {
+      "heading": "除外タグ",
+      "description": "ここに登録されたタグはホームページの検索結果から自動的に除外されます。",
+      "placeholder": "除外するタグを入力...",
+      "defaultNote": "デフォルト: female:snuff, female:gore"
+    },
     "aiSearch": {
       "heading": "AI検索",
       "enable": "AI検索を有効化",

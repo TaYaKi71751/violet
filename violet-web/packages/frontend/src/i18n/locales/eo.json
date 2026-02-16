@@ -125,6 +125,12 @@
       "korean": "Korea",
       "koreanDesc": "Montri etikedojn en la korea sur kartoj kaj serĉsugestoj"
     },
+    "excludedTags": {
+      "heading": "Ekskluditaj etikedoj",
+      "description": "Etikedoj listigitaj ĉi tie estos aŭtomate ekskluditaj de hejmpaĝaj serĉrezultoj.",
+      "placeholder": "Tajpu etikedon por ekskludi...",
+      "defaultNote": "Defaŭlte: female:snuff, female:gore"
+    },
     "aiSearch": {
       "heading": "AI-Serĉo",
       "enable": "Ebligi AI-Serĉon",

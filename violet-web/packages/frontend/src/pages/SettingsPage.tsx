@@ -5,6 +5,8 @@ import { HelpCircle } from 'lucide-react';
 import { useAppStore } from '../stores/app-store';
 import { useSyncStatus, useTriggerSync, useTriggerFullSync } from '../hooks/useSync';
 import { useSuggestionCacheStatus, useRebuildSuggestionCache } from '../hooks/useSuggestionCache';
+import { useSuggestions } from '../hooks/useSuggestions';
+import { useTagTranslation } from '../hooks/useTagTranslation';
 import styles from './SettingsPage.module.css';
 
 const themeColors = [
@@ -16,7 +18,7 @@ const themeColors = [
 
 export function SettingsPage() {
   const { t } = useTranslation();
-  const { contentLanguage, uiLanguage, themeColor, scrollMode, tagTranslation, aiSearchEnabled, setContentLanguage, setUILanguage, setThemeColor, setScrollMode, setTagTranslation, setAiSearchEnabled } = useAppStore();
+  const { contentLanguage, uiLanguage, themeColor, scrollMode, tagTranslation, aiSearchEnabled, excludedTags, setContentLanguage, setUILanguage, setThemeColor, setScrollMode, setTagTranslation, setAiSearchEnabled, addExcludedTag, removeExcludedTag } = useAppStore();
   const [showAiSearchHelp, setShowAiSearchHelp] = useState(false);
   const helpRef = useRef<HTMLDivElement>(null);
   const { data: syncStatus } = useSyncStatus();
@@ -25,6 +27,18 @@ export function SettingsPage() {
   const [showFullSyncConfirm, setShowFullSyncConfirm] = useState(false);
   const { data: cacheStatus } = useSuggestionCacheStatus();
   const rebuildCache = useRebuildSuggestionCache();
+
+  const [tagInput, setTagInput] = useState('');
+  const [tagDropdownOpen, setTagDropdownOpen] = useState(false);
+  const [tagHighlightedIndex, setTagHighlightedIndex] = useState(0);
+  const tagInputRef = useRef<HTMLInputElement>(null);
+  const tagWrapperRef = useRef<HTMLDivElement>(null);
+  const { data: tagSuggestions } = useSuggestions(tagInput);
+  const { translateTag } = useTagTranslation();
+
+  const filteredSuggestions = (tagSuggestions?.suggestions ?? []).filter(
+    (s) => !excludedTags.includes(s.display),
+  );
 
   const handleSyncNow = () => {
     triggerSync.mutate();
@@ -55,6 +69,8 @@ export function SettingsPage() {
         return t('settings.sync.downloadingFull');
       case 'applying_chunks':
         return t('settings.sync.applyingChunks');
+      case 'building_cache':
+        return t('settings.sync.buildingCache');
       case 'error':
         return t('settings.sync.error');
       default:
@@ -75,6 +91,61 @@ export function SettingsPage() {
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showAiSearchHelp]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (tagWrapperRef.current && !tagWrapperRef.current.contains(e.target as Node)) {
+        setTagDropdownOpen(false);
+      }
+    };
+    if (tagDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [tagDropdownOpen]);
+
+  useEffect(() => {
+    setTagHighlightedIndex(0);
+  }, [filteredSuggestions.length]);
+
+  const handleTagSelect = (display: string) => {
+    addExcludedTag(display);
+    setTagInput('');
+    setTagDropdownOpen(false);
+    tagInputRef.current?.focus();
+  };
+
+  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!tagDropdownOpen || filteredSuggestions.length === 0) {
+      if (e.key === 'Enter' && tagInput.trim()) {
+        e.preventDefault();
+        handleTagSelect(tagInput.trim());
+      }
+      return;
+    }
+    switch (e.key) {
+      case 'Escape':
+        setTagDropdownOpen(false);
+        e.preventDefault();
+        break;
+      case 'ArrowDown':
+        setTagHighlightedIndex((prev) =>
+          prev < filteredSuggestions.length - 1 ? prev + 1 : prev,
+        );
+        e.preventDefault();
+        break;
+      case 'ArrowUp':
+        setTagHighlightedIndex((prev) => (prev > 0 ? prev - 1 : 0));
+        e.preventDefault();
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (tagHighlightedIndex < filteredSuggestions.length) {
+          handleTagSelect(filteredSuggestions[tagHighlightedIndex].display);
+        }
+        break;
+    }
+  };
 
   return (
     <div className={styles.page}>
@@ -170,6 +241,75 @@ export function SettingsPage() {
             <span className={styles.toggleTrack} />
           </label>
         </div>
+      </div>
+
+      <div className={styles.section}>
+        <h3 className={styles.subheading}>{t('settings.excludedTags.heading')}</h3>
+        <p className={styles.excludedTagsDesc}>{t('settings.excludedTags.description')}</p>
+
+        <div className={styles.excludedTagChips}>
+          {excludedTags.map((tag) => (
+            <span key={tag} className={styles.excludedTagChip}>
+              {tag}
+              <button
+                type="button"
+                className={styles.excludedTagRemove}
+                onClick={() => removeExcludedTag(tag)}
+                aria-label={`Remove ${tag}`}
+              >
+                &times;
+              </button>
+            </span>
+          ))}
+        </div>
+
+        <div className={styles.tagInputWrapper} ref={tagWrapperRef}>
+          <input
+            ref={tagInputRef}
+            type="text"
+            className={styles.tagInput}
+            placeholder={t('settings.excludedTags.placeholder')}
+            value={tagInput}
+            onChange={(e) => {
+              setTagInput(e.target.value);
+              setTagDropdownOpen(e.target.value.trim().length > 0);
+            }}
+            onFocus={() => {
+              if (tagInput.trim().length > 0) setTagDropdownOpen(true);
+            }}
+            onKeyDown={handleTagKeyDown}
+          />
+          {tagDropdownOpen && filteredSuggestions.length > 0 && (
+            <div className={styles.tagDropdown}>
+              {filteredSuggestions.map((item, index) => (
+                <button
+                  key={item.display}
+                  type="button"
+                  className={`${styles.tagDropdownItem} ${index === tagHighlightedIndex ? styles.highlighted : ''}`}
+                  onClick={() => handleTagSelect(item.display)}
+                  onMouseEnter={() => setTagHighlightedIndex(index)}
+                >
+                  <span>
+                    {item.display}
+                    {(() => {
+                      const parts = item.display.split(':');
+                      if (parts.length === 2) {
+                        const ko = translateTag(parts[0], parts[1]);
+                        if (ko) return ` (${ko})`;
+                      }
+                      return null;
+                    })()}
+                  </span>
+                  <span className={styles.tagDropdownItemCount}>{item.count.toLocaleString()}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <p className={styles.excludedTagsDesc} style={{ marginTop: '8px' }}>
+          {t('settings.excludedTags.defaultNote')}
+        </p>
       </div>
 
       <div className={styles.section}>
