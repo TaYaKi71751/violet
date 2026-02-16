@@ -34,34 +34,3 @@ Sisyphus나 oh-my-opencode 에이전트는 Co-author 로 절대 추가하지 않
 ### Staging
 
 사용자가 명시적으로 지정하지 않은 untracked 파일은 절대 staging(git add)하지 않는다
-
-## Theme System
-
-### CSS Variables
-
-- 새로운 CSS를 작성할 때는 하드코딩된 색상 값 대신 **반드시 CSS 변수**를 사용한다
-- `variables.css`에 정의된 시맨틱 변수를 우선적으로 활용한다:
-  - `--color-bg`, `--color-bg-elevated`, `--color-bg-hover`
-  - `--color-text`, `--color-text-secondary`
-  - `--color-primary`, `--color-primary-hover`
-  - `--color-border`, `--color-surface`
-  - `--color-on-primary`: 액센트 색상 위의 텍스트 (예: 버튼 라벨)
-  - `--color-toggle-knob`: 토글 스위치 손잡이 색상
-  - Component-specific 변수: `--color-chip-*`, `--color-pagination-*`, `--color-toast-*` 등
-
-### Light/Dark Mode
-
-- 모든 UI 컴포넌트는 라이트 모드와 다크 모드 **양쪽에서 정상 작동**해야 한다
-- 새로운 색상 변수를 추가할 경우, `variables.css`의 `:root`와 `:root[data-theme="light"]` 블록에 모두 정의한다
-- 컴포넌트를 개발한 뒤에는 양쪽 테마 모두에서 시각적 확인을 권장한다
-
-### Viewer Exception
-
-- **뷰어(이미지 리더) 컴포넌트는 항상 다크 테마를 유지**한다
-- Viewer 관련 파일(`ViewerContainer`, `HorizontalReader`, `VerticalReader`, `ViewerOverlay`, `ViewerSettingsPanel`, `PageThumbnailDialog`, `CropDialog` 등)의 하드코딩 색상은 의도적이며 변경하지 않는다
-- 이미지 위에 표시되는 오버레이 버튼들(`ArticleCard`의 `downloadBtn`, `bookmarkBtn` 등)도 가독성을 위해 고정된 다크 색상을 유지한다
-
-### Testing
-
-- 라이트/다크/시스템 테마를 전환하며 UI가 올바르게 표시되는지 확인한다
-- 시스템 테마 설정을 변경했을 때 자동으로 반영되는지 확인한다 (system 모드)

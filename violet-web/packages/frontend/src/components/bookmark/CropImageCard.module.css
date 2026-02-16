@@ -4,7 +4,7 @@
   border-radius: 8px;
   cursor: pointer;
   break-inside: avoid;
-  background: var(--bg-secondary, #1a1a1a);
+  background: var(--color-surface);
 }
 
 .card:hover .overlay {
