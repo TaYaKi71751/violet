@@ -6,8 +6,8 @@ import { useUserCropBookmarks } from '../hooks/useUserCropBookmarks';
 import { CropBookmarkGrid } from '../components/bookmark/CropBookmarkGrid';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { LocalSearchSection } from '../components/search/LocalSearchSection';
-import { useQueries } from '@tanstack/react-query';
-import { getArticle } from '../api/content';
+import { useQuery } from '@tanstack/react-query';
+import { getArticlesBatch } from '../api/content';
 import { useArticleTagSummary } from '../hooks/useArticleTagSummary';
 import { useLocalArticleSearch } from '../hooks/useLocalArticleSearch';
 import { useLocalSearchState } from '../hooks/useLocalSearchState';
@@ -42,18 +42,13 @@ export function CropBookmarksPage() {
     : (cropBookmarks ?? []);
   const loading = showUserBookmarks ? isUserLoading : isLoading;
 
-  // Fetch articles for tag summary
-  const articleQueries = useQueries({
-    queries: displayCrops.map((crop) => ({
-      queryKey: ['article', crop.Article],
-      queryFn: () => getArticle(crop.Article),
-      enabled: !!crop.Article,
-    })),
+  // Fetch all articles in bulk for tag summary
+  const uniqueArticleIds = [...new Set(displayCrops.map((crop) => crop.Article))];
+  const { data: articles = [] } = useQuery({
+    queryKey: ['articlesBatch', uniqueArticleIds],
+    queryFn: () => getArticlesBatch(uniqueArticleIds),
+    enabled: uniqueArticleIds.length > 0,
   });
-
-  const articles = articleQueries
-    .map((q) => q.data)
-    .filter((a): a is NonNullable<typeof a> => !!a);
 
   const tagSummary = useArticleTagSummary(articles);
   const filteredArticles = useLocalArticleSearch(articles);
