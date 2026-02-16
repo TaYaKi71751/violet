@@ -35,10 +35,10 @@ historyRouter.get('/ids', (_req, res) => {
   const rows = db
     .prepare(`
       SELECT Article FROM (
-        SELECT Article, ROW_NUMBER() OVER (PARTITION BY Article ORDER BY Id DESC) as rn
+        SELECT Article, Id, ROW_NUMBER() OVER (PARTITION BY Article ORDER BY Id DESC) as rn
         FROM ArticleReadLog
       ) WHERE rn = 1
-      ORDER BY rowid DESC
+      ORDER BY Id DESC
     `)
     .all() as { Article: string }[];
   res.json({ articleIds: rows.map((r) => r.Article) });
