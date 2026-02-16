@@ -145,7 +145,8 @@
       "status": "ステータス",
       "notBuilt": "未構築",
       "built": "構築済み",
-      "building": "構築中..."
+      "building": "構築中...",
+      "totalTags": "総タグ数"
     }
   },
   "viewer": {

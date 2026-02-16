@@ -303,14 +303,10 @@ export function SettingsPage() {
           </div>
 
           {cacheStatus?.built && cacheStatus.counts && (
-            <>
-              {Object.entries(cacheStatus.counts).map(([key, count]) => (
-                <div key={key} className={styles.infoRow}>
-                  <span className={styles.label}>{key}:</span>
-                  <span>{count.toLocaleString()}</span>
-                </div>
-              ))}
-            </>
+            <div className={styles.infoRow}>
+              <span className={styles.label}>{t('settings.suggestions.totalTags')}</span>
+              <span>{Object.values(cacheStatus.counts).reduce((sum, c) => sum + (c as number), 0).toLocaleString()}</span>
+            </div>
           )}
         </div>
 

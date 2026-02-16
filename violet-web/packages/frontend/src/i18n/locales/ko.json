@@ -145,7 +145,8 @@
       "status": "상태",
       "notBuilt": "빌드 안됨",
       "built": "빌드됨",
-      "building": "빌드 중..."
+      "building": "빌드 중...",
+      "totalTags": "총 태그 수"
     }
   },
   "viewer": {

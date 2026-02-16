@@ -145,7 +145,8 @@
       "status": "状态",
       "notBuilt": "未构建",
       "built": "已构建",
-      "building": "构建中..."
+      "building": "构建中...",
+      "totalTags": "总标签数"
     }
   },
   "viewer": {

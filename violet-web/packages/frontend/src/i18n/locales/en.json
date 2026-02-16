@@ -145,7 +145,8 @@
       "status": "Status",
       "notBuilt": "Not built",
       "built": "Built",
-      "building": "Building..."
+      "building": "Building...",
+      "totalTags": "Total Tags"
     }
   },
   "viewer": {
