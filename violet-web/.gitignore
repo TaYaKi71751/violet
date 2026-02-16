@@ -10,3 +10,4 @@ dist/
 packages/backend/data/*
 packages/backend/suggestion-cache.json
 .claude/*
+data/*
