@@ -110,6 +110,9 @@ export function SettingsPage() {
             <option value="ko">{t('settings.language.ko')}</option>
             <option value="ja">{t('settings.language.ja')}</option>
             <option value="zh">{t('settings.language.zh')}</option>
+            <option value="eo">{t('settings.language.eo')}</option>
+            <option value="it">{t('settings.language.it')}</option>
+            <option value="pt">{t('settings.language.pt')}</option>
           </select>
         </div>
       </div>
