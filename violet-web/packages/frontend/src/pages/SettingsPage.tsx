@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { HelpCircle } from 'lucide-react';
 
 import { useAppStore } from '../stores/app-store';
 import { useSyncStatus, useTriggerSync, useTriggerFullSync } from '../hooks/useSync';
@@ -15,7 +16,9 @@ const themeColors = [
 
 export function SettingsPage() {
   const { t } = useTranslation();
-  const { contentLanguage, uiLanguage, themeColor, scrollMode, tagTranslation, setContentLanguage, setUILanguage, setThemeColor, setScrollMode, setTagTranslation } = useAppStore();
+  const { contentLanguage, uiLanguage, themeColor, scrollMode, tagTranslation, aiSearchEnabled, setContentLanguage, setUILanguage, setThemeColor, setScrollMode, setTagTranslation, setAiSearchEnabled } = useAppStore();
+  const [showAiSearchHelp, setShowAiSearchHelp] = useState(false);
+  const helpRef = useRef<HTMLDivElement>(null);
   const { data: syncStatus } = useSyncStatus();
   const triggerSync = useTriggerSync();
   const triggerFullSync = useTriggerFullSync();
@@ -60,6 +63,18 @@ export function SettingsPage() {
   };
 
   const isSyncing = syncStatus?.status !== 'idle' && syncStatus?.status !== 'error';
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (helpRef.current && !helpRef.current.contains(e.target as Node)) {
+        setShowAiSearchHelp(false);
+      }
+    };
+    if (showAiSearchHelp) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showAiSearchHelp]);
 
   return (
     <div className={styles.page}>
@@ -148,6 +163,49 @@ export function SettingsPage() {
               type="checkbox"
               checked={tagTranslation}
               onChange={(e) => setTagTranslation(e.target.checked)}
+            />
+            <span className={styles.toggleTrack} />
+          </label>
+        </div>
+      </div>
+
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <h3 className={styles.subheading}>{t('settings.aiSearch.heading')}</h3>
+          <div className={styles.helpWrapper} ref={helpRef}>
+            <button
+              className={styles.helpBtn}
+              onClick={() => setShowAiSearchHelp((v) => !v)}
+              aria-label="Help"
+            >
+              <HelpCircle size={16} />
+            </button>
+            {showAiSearchHelp && (
+              <div className={styles.helpPopover}>
+                <p>{t('settings.aiSearch.helpText')}</p>
+                <a
+                  href="https://github.com/project-violet/violet/tree/dev/violet-search"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.helpLink}
+                >
+                  violet-search GitHub
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className={styles.toggleRow}>
+          <div className={styles.toggleInfo}>
+            <span className={styles.toggleLabel}>{t('settings.aiSearch.enable')}</span>
+            <span className={styles.toggleDesc}>{t('settings.aiSearch.enableDesc')}</span>
+          </div>
+          <label className={styles.toggle}>
+            <input
+              type="checkbox"
+              checked={aiSearchEnabled}
+              onChange={(e) => setAiSearchEnabled(e.target.checked)}
             />
             <span className={styles.toggleTrack} />
           </label>

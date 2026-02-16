@@ -107,6 +107,12 @@
       "korean": "韓国語",
       "koreanDesc": "カードと検索候補でタグを韓国語で表示します"
     },
+    "aiSearch": {
+      "heading": "AI検索",
+      "enable": "AI検索を有効化",
+      "enableDesc": "ナビゲーションにAI検索タブを表示します",
+      "helpText": "AI検索を使用するには、violet-searchサーバーを別途起動する必要があります。この機能を使用するには、violet-searchサービスをセットアップして実行してください。"
+    },
     "sync": {
       "heading": "データベース同期",
       "database": "データベース:",

@@ -107,6 +107,12 @@
       "korean": "韩语",
       "koreanDesc": "在卡片和搜索建议中以韩语显示标签"
     },
+    "aiSearch": {
+      "heading": "AI搜索",
+      "enable": "启用AI搜索",
+      "enableDesc": "在导航栏中显示AI搜索标签页",
+      "helpText": "AI搜索需要单独运行violet-search服务器。要使用此功能，请先设置并运行violet-search服务。"
+    },
     "sync": {
       "heading": "数据库同步",
       "database": "数据库:",

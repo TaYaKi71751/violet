@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import { useAppStore } from '../../stores/app-store';
 import styles from './BottomNav.module.css';
 
 const navItems = [
@@ -14,10 +15,11 @@ const navItems = [
 
 export function BottomNav() {
   const { t } = useTranslation();
+  const { aiSearchEnabled } = useAppStore();
 
   return (
     <nav className={styles.nav}>
-      {navItems.map((item) => (
+      {navItems.filter((item) => item.to !== '/ai-search' || aiSearchEnabled).map((item) => (
         <NavLink
           key={item.to}
           to={item.to}

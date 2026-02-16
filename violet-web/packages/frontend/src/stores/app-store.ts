@@ -23,6 +23,7 @@ interface AppState {
   cropColumnWidth: number;
   scrollMode: ScrollMode;
   tagTranslation: boolean;
+  aiSearchEnabled: boolean;
 
   setContentLanguage: (lang: ContentLanguage) => void;
   setUILanguage: (lang: UILanguage) => void;
@@ -33,6 +34,7 @@ interface AppState {
   setCropColumnWidth: (width: number) => void;
   setScrollMode: (mode: ScrollMode) => void;
   setTagTranslation: (enabled: boolean) => void;
+  setAiSearchEnabled: (enabled: boolean) => void;
 }
 
 // Helper to get system language
@@ -56,6 +58,7 @@ export const useAppStore = create<AppState>()(
       cropColumnWidth: 240,
       scrollMode: 'infinite',
       tagTranslation: true,
+      aiSearchEnabled: false,
 
       setContentLanguage: (contentLanguage) => set({ contentLanguage }),
       setUILanguage: (uiLanguage) => {
@@ -70,6 +73,7 @@ export const useAppStore = create<AppState>()(
       setCropColumnWidth: (cropColumnWidth) => set({ cropColumnWidth }),
       setScrollMode: (scrollMode) => set({ scrollMode }),
       setTagTranslation: (tagTranslation) => set({ tagTranslation }),
+      setAiSearchEnabled: (aiSearchEnabled) => set({ aiSearchEnabled }),
     }),
     { name: 'violet-app-settings' },
   ),

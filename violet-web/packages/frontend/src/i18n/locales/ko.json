@@ -107,6 +107,12 @@
       "korean": "한국어",
       "koreanDesc": "카드 및 검색 자동완성에서 태그를 한국어로 표시합니다"
     },
+    "aiSearch": {
+      "heading": "AI 검색",
+      "enable": "AI 검색 사용",
+      "enableDesc": "내비게이션에 AI 검색 탭을 표시합니다",
+      "helpText": "AI 검색을 사용하려면 violet-search 서버를 별도로 실행해야 합니다. 이 기능을 사용하려면 violet-search 서비스를 설정하고 실행하세요."
+    },
     "sync": {
       "heading": "데이터베이스 동기화",
       "database": "데이터베이스:",

@@ -107,6 +107,12 @@
       "korean": "Korean",
       "koreanDesc": "Display tags in Korean on cards and search suggestions"
     },
+    "aiSearch": {
+      "heading": "AI Search",
+      "enable": "Enable AI Search",
+      "enableDesc": "Show AI Search tab in navigation",
+      "helpText": "AI Search requires the violet-search server to be running separately. You need to set up and run the violet-search service for this feature to work."
+    },
     "sync": {
       "heading": "Database Sync",
       "database": "Database:",
