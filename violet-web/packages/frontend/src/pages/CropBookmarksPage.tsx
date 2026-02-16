@@ -79,31 +79,34 @@ export function CropBookmarksPage() {
     filteredArticleIds.has(crop.Article),
   );
 
+  const cropControls = (
+    <>
+      <label className={styles.toggleRow}>
+        <span className={styles.toggleLabel}>{t('crop.userBookmarks')}</span>
+        <span className={styles.toggle}>
+          <input
+            type="checkbox"
+            checked={showUserBookmarks}
+            onChange={(e) => setShowUserBookmarks(e.target.checked)}
+          />
+          <span className={styles.toggleTrack} />
+        </span>
+      </label>
+      <input
+        type="range"
+        className={styles.sizeSlider}
+        min={120}
+        max={400}
+        step={10}
+        value={cropColumnWidth}
+        onChange={(e) => setCropColumnWidth(Number(e.target.value))}
+      />
+    </>
+  );
+
   return (
     <div>
-      <div className={styles.header}>
-        <h2 className={styles.heading}>Crop Bookmarks</h2>
-        <label className={styles.toggleRow}>
-          <span className={styles.toggleLabel}>{t('crop.userBookmarks')}</span>
-          <span className={styles.toggle}>
-            <input
-              type="checkbox"
-              checked={showUserBookmarks}
-              onChange={(e) => setShowUserBookmarks(e.target.checked)}
-            />
-            <span className={styles.toggleTrack} />
-          </span>
-        </label>
-        <input
-          type="range"
-          className={styles.sizeSlider}
-          min={120}
-          max={400}
-          step={10}
-          value={cropColumnWidth}
-          onChange={(e) => setCropColumnWidth(Number(e.target.value))}
-        />
-      </div>
+      {isMobile && <div className={styles.headerControls}>{cropControls}</div>}
 
       {!isMobile && (
         <LocalSearchSection
@@ -116,6 +119,8 @@ export function CropBookmarksPage() {
           resultCount={filteredCrops.length}
           isLoading={loading}
           showViewControls={false}
+          sticky
+          extraControls={cropControls}
         />
       )}
 

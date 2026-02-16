@@ -120,8 +120,6 @@ export function DownloadsPage() {
 
   return (
     <div className={styles.page}>
-      <h2 className={styles.heading}>{t('downloads.heading')}</h2>
-
       {!isMobile && (
         <LocalSearchSection
           basePath="/downloads"
@@ -132,6 +130,7 @@ export function DownloadsPage() {
           onTagToggle={handleTagToggle}
           resultCount={filteredArticles.length}
           isLoading={isLoading}
+          sticky
         />
       )}
 

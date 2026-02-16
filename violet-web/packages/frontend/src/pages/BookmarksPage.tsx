@@ -112,8 +112,7 @@ export function BookmarksPage() {
 
   return (
     <div>
-      <h2 className={styles.heading}>{t('bookmarks.heading')}</h2>
-      {groups && (
+      {isMobile && groups && (
         <BookmarkGroupList
           groups={groups}
           selectedId={selectedGroupId}
@@ -131,6 +130,16 @@ export function BookmarksPage() {
           onTagToggle={handleTagToggle}
           resultCount={filteredArticles.length}
           isLoading={isLoading}
+          sticky
+          headerContent={
+            groups && (
+              <BookmarkGroupList
+                groups={groups}
+                selectedId={selectedGroupId}
+                onSelect={setSelectedGroupId}
+              />
+            )
+          }
         />
       )}
 

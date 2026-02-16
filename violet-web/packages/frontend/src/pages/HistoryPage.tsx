@@ -72,8 +72,6 @@ export function HistoryPage() {
 
   return (
     <div className={styles.page}>
-      <h2 className={styles.heading}>{t('history.heading')}</h2>
-
       {!isMobile && (
         <LocalSearchSection
           basePath="/history"
@@ -84,6 +82,7 @@ export function HistoryPage() {
           onTagToggle={handleTagToggle}
           resultCount={filteredArticles.length}
           isLoading={isLoading}
+          sticky
         />
       )}
 

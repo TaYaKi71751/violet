@@ -1,10 +1,12 @@
 import type { RefObject } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { SearchBar, type SearchBarRef } from './SearchBar';
 import { TagChips } from './TagChips';
 import type { TagChipData } from '../../hooks/useArticleTagSummary';
 import type { TagEntry } from '@violet-web/shared';
 import { useAppStore } from '../../stores/app-store';
+import { useSearchBarPortal } from '../../contexts/SearchBarPortal';
 import styles from './LocalSearchSection.module.css';
 
 interface LocalSearchSectionProps {
@@ -17,6 +19,9 @@ interface LocalSearchSectionProps {
   resultCount?: number;
   isLoading?: boolean;
   showViewControls?: boolean;
+  sticky?: boolean;
+  headerContent?: React.ReactNode;
+  extraControls?: React.ReactNode;
 }
 
 export function LocalSearchSection({
@@ -29,12 +34,25 @@ export function LocalSearchSection({
   resultCount,
   isLoading,
   showViewControls = true,
+  sticky = false,
+  headerContent,
+  extraControls,
 }: LocalSearchSectionProps) {
   const { t } = useTranslation();
   const { viewMode, setViewMode, cardMinWidth, setCardMinWidth } = useAppStore();
+  const portalTarget = useSearchBarPortal();
 
-  return (
-    <div className={styles.container}>
+  const usePortal = sticky && portalTarget !== null;
+
+  const containerClass = usePortal
+    ? styles.portalContainer
+    : sticky
+      ? styles.stickyContainer
+      : styles.container;
+
+  const content = (
+    <div className={containerClass}>
+      {headerContent}
       <div className={styles.searchBar}>
         <SearchBar
           ref={searchBarRef}
@@ -72,6 +90,7 @@ export function LocalSearchSection({
             </label>
           </>
         )}
+        {extraControls}
       </div>
 
       {!isLoading && tagSummary.length > 0 && (
@@ -83,4 +102,10 @@ export function LocalSearchSection({
       )}
     </div>
   );
+
+  if (usePortal) {
+    return createPortal(content, portalTarget);
+  }
+
+  return content;
 }
