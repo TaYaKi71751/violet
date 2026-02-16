@@ -9,10 +9,10 @@ import { LocalSearchSection } from '../components/search/LocalSearchSection';
 import { useQueries } from '@tanstack/react-query';
 import { getArticle } from '../api/content';
 import { useArticleTagSummary } from '../hooks/useArticleTagSummary';
+import { useLocalArticleSearch } from '../hooks/useLocalArticleSearch';
 import { useLocalSearchState } from '../hooks/useLocalSearchState';
 import { useIsMobile } from '../hooks/useMediaQuery';
 import { useAppStore } from '../stores/app-store';
-import type { Article } from '@violet-web/shared';
 import styles from './CropBookmarksPage.module.css';
 
 export function CropBookmarksPage() {
@@ -56,6 +56,7 @@ export function CropBookmarksPage() {
     .filter((a): a is NonNullable<typeof a> => !!a);
 
   const tagSummary = useArticleTagSummary(articles);
+  const filteredArticles = useLocalArticleSearch(articles);
 
   const handleReset = useCallback(() => {
     navigate('/crop-bookmarks', { replace: true });
@@ -77,35 +78,11 @@ export function CropBookmarksPage() {
     }
   }, [showUserBookmarks, resetTags]);
 
-  // Filter crops based on selected tags
-  const filteredCrops = selectedTags.size === 0
-    ? displayCrops
-    : displayCrops.filter((crop) => {
-        const article = articles.find((a) => a.Id === crop.Article);
-        if (!article) return false;
-
-        // Check if article has ALL selected tags
-        const articleTags = new Set<string>();
-        if (article.Artists) articleTags.add(`artist:${article.Artists}`);
-        if (article.Series) articleTags.add(`series:${article.Series}`);
-        if (article.Type) articleTags.add(`type:${article.Type}`);
-        if (article.Language) articleTags.add(`lang:${article.Language}`);
-        if (article.Tags) {
-          article.Tags.split('|').forEach((tag) => {
-            const [category, name] = tag.split(':');
-            if (category && name) articleTags.add(`${category}:${name}`);
-          });
-        }
-        if (article.Characters) {
-          article.Characters.split('|').forEach((char) => {
-            articleTags.add(`character:${char}`);
-          });
-        }
-
-        return Array.from(selectedTags).every((selectedTag) =>
-          articleTags.has(selectedTag),
-        );
-      });
+  // Filter crops based on filtered articles
+  const filteredArticleIds = new Set(filteredArticles.map((a) => a.Id));
+  const filteredCrops = displayCrops.filter((crop) =>
+    filteredArticleIds.has(crop.Article),
+  );
 
   return (
     <div>
