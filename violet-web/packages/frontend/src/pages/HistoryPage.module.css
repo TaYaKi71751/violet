@@ -29,7 +29,7 @@
   gap: var(--spacing-md);
   padding: 10px 16px;
   position: sticky;
-  bottom: 12px;
+  bottom: 0px;
   width: fit-content;
   margin-top: auto;
   margin-left: auto;
