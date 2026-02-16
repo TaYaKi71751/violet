@@ -72,6 +72,24 @@
     "noResults": "検索結果が見つかりませんでした。",
     "error": "AI検索中にエラーが発生しました。"
   },
+  "crop": {
+    "selectPage": "クロップするページを選択してください",
+    "cancel": "キャンセル",
+    "page": "{{page}}ページ",
+    "dragToSelect": "{{page}}ページ — ドラッグで範囲を選択",
+    "reselect": "再選択",
+    "save": "保存",
+    "savedToast": "{{page}}ページのクロップを保存しました",
+    "saveErrorToast": "クロップの保存に失敗しました",
+    "deletedToast": "クロップブックマークを削除しました",
+    "deleteErrorToast": "クロップブックマークの削除に失敗しました",
+    "userBookmarks": "ユーザーブックマーク"
+  },
+  "bookmark": {
+    "addedToast": "ブックマークに追加しました",
+    "removedToast": "ブックマークを解除しました",
+    "errorToast": "ブックマーク処理に失敗しました"
+  },
   "viewer": {
     "noImages": "このギャラリーの画像が見つかりませんでした。"
   },

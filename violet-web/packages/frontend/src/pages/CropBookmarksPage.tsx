@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCropBookmarks, useDeleteCropBookmark } from '../hooks/useBookmarks';
 import { useUserCropBookmarks } from '../hooks/useUserCropBookmarks';
 import { CropBookmarkGrid } from '../components/bookmark/CropBookmarkGrid';
@@ -12,6 +13,7 @@ export function CropBookmarksPage() {
   const cropColumnWidth = useAppStore((s) => s.cropColumnWidth);
   const setCropColumnWidth = useAppStore((s) => s.setCropColumnWidth);
 
+  const { t } = useTranslation();
   const [showUserBookmarks, setShowUserBookmarks] = useState(false);
   const { data: userCropBookmarks, isLoading: isUserLoading } =
     useUserCropBookmarks(showUserBookmarks);
@@ -34,7 +36,7 @@ export function CropBookmarksPage() {
       <div className={styles.header}>
         <h2 className={styles.heading}>Crop Bookmarks</h2>
         <label className={styles.toggleRow}>
-          <span className={styles.toggleLabel}>유저 북마크</span>
+          <span className={styles.toggleLabel}>{t('crop.userBookmarks')}</span>
           <span className={styles.toggle}>
             <input
               type="checkbox"

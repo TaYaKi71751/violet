@@ -72,6 +72,24 @@
     "noResults": "검색 결과가 없습니다.",
     "error": "AI 검색 중 오류가 발생했습니다."
   },
+  "crop": {
+    "selectPage": "크롭할 페이지를 선택하세요",
+    "cancel": "취소",
+    "page": "{{page}}페이지",
+    "dragToSelect": "{{page}}페이지 — 드래그로 영역을 선택하세요",
+    "reselect": "다시 선택",
+    "save": "저장",
+    "savedToast": "{{page}}페이지 크롭 저장했어요",
+    "saveErrorToast": "크롭 저장 중 오류가 발생했습니다",
+    "deletedToast": "크롭 북마크가 삭제되었습니다",
+    "deleteErrorToast": "크롭 북마크 삭제 중 오류가 발생했습니다",
+    "userBookmarks": "유저 북마크"
+  },
+  "bookmark": {
+    "addedToast": "북마크에 추가되었습니다",
+    "removedToast": "북마크가 해제되었습니다",
+    "errorToast": "북마크 처리 중 오류가 발생했습니다"
+  },
   "viewer": {
     "noImages": "갤러리에서 이미지를 찾을 수 없습니다."
   },

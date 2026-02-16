@@ -72,6 +72,24 @@
     "noResults": "No results found.",
     "error": "An error occurred during AI search."
   },
+  "crop": {
+    "selectPage": "Select a page to crop",
+    "cancel": "Cancel",
+    "page": "Page {{page}}",
+    "dragToSelect": "Page {{page}} — Drag to select area",
+    "reselect": "Reselect",
+    "save": "Save",
+    "savedToast": "Crop saved for page {{page}}",
+    "saveErrorToast": "Failed to save crop",
+    "deletedToast": "Crop bookmark deleted",
+    "deleteErrorToast": "Failed to delete crop bookmark",
+    "userBookmarks": "User Bookmarks"
+  },
+  "bookmark": {
+    "addedToast": "Added to bookmarks",
+    "removedToast": "Removed from bookmarks",
+    "errorToast": "Failed to process bookmark"
+  },
   "viewer": {
     "noImages": "No images found for this gallery."
   },

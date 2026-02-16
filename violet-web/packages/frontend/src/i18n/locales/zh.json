@@ -72,6 +72,24 @@
     "noResults": "未找到搜索结果。",
     "error": "AI搜索时发生错误。"
   },
+  "crop": {
+    "selectPage": "选择要裁剪的页面",
+    "cancel": "取消",
+    "page": "第{{page}}页",
+    "dragToSelect": "第{{page}}页 — 拖动选择区域",
+    "reselect": "重新选择",
+    "save": "保存",
+    "savedToast": "第{{page}}页裁剪已保存",
+    "saveErrorToast": "裁剪保存失败",
+    "deletedToast": "裁剪书签已删除",
+    "deleteErrorToast": "裁剪书签删除失败",
+    "userBookmarks": "用户书签"
+  },
+  "bookmark": {
+    "addedToast": "已添加到书签",
+    "removedToast": "已从书签移除",
+    "errorToast": "书签处理失败"
+  },
   "viewer": {
     "noImages": "未找到该图库的图片。"
   },

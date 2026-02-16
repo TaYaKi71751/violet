@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAddCropBookmark } from '../../hooks/useBookmarks';
 import styles from './CropDialog.module.css';
 
@@ -25,6 +26,7 @@ export function CropDialog({ galleryId, imageUrls, visiblePages, onClose }: Crop
   const [confirmed, setConfirmed] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
   const addCrop = useAddCropBookmark();
+  const { t } = useTranslation();
 
   // Close on Escape
   useEffect(() => {
@@ -133,10 +135,10 @@ export function CropDialog({ galleryId, imageUrls, visiblePages, onClose }: Crop
     return (
       <div className={styles.backdrop}>
         <div className={styles.header}>
-          <span className={styles.headerTitle}>크롭할 페이지를 선택하세요</span>
+          <span className={styles.headerTitle}>{t('crop.selectPage')}</span>
           <div className={styles.headerActions}>
             <button className={styles.headerBtn} onClick={onClose}>
-              취소
+              {t('crop.cancel')}
             </button>
           </div>
         </div>
@@ -148,7 +150,7 @@ export function CropDialog({ galleryId, imageUrls, visiblePages, onClose }: Crop
               onClick={() => setSelectedPage(pageIdx)}
             >
               <img src={imageUrls[pageIdx]} alt={`Page ${pageIdx + 1}`} />
-              <div className={styles.pageSelectLabel}>{pageIdx + 1}페이지</div>
+              <div className={styles.pageSelectLabel}>{t('crop.page', { page: pageIdx + 1 })}</div>
             </div>
           ))}
         </div>
@@ -163,25 +165,25 @@ export function CropDialog({ galleryId, imageUrls, visiblePages, onClose }: Crop
     <div className={styles.backdrop}>
       <div className={styles.header}>
         <span className={styles.headerTitle}>
-          {selectedPage + 1}페이지 — 드래그로 영역을 선택하세요
+          {t('crop.dragToSelect', { page: selectedPage + 1 })}
         </span>
         <div className={styles.headerActions}>
           {confirmed && (
             <>
               <button className={styles.headerBtn} onClick={handleReset}>
-                다시 선택
+                {t('crop.reselect')}
               </button>
               <button
                 className={`${styles.headerBtn} ${styles.saveBtn}`}
                 onClick={handleSave}
                 disabled={addCrop.isPending}
               >
-                저장
+                {t('crop.save')}
               </button>
             </>
           )}
           <button className={styles.headerBtn} onClick={onClose}>
-            취소
+            {t('crop.cancel')}
           </button>
         </div>
       </div>
