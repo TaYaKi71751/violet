@@ -22,6 +22,14 @@ downloadsRouter.post('/', async (req, res) => {
   }
 });
 
+downloadsRouter.get('/ids', (_req, res) => {
+  const db = getUserDb();
+  const rows = db
+    .prepare('SELECT Article FROM Download ORDER BY Id DESC')
+    .all() as { Article: string }[];
+  res.json({ articleIds: rows.map((r) => r.Article) });
+});
+
 downloadsRouter.get('/', (req, res) => {
   const page = parseInt(req.query.page as string) || 0;
   const pageSize = Math.min(parseInt(req.query.pageSize as string) || 30, 100);

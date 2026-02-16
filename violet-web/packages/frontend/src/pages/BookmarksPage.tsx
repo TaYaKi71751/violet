@@ -7,8 +7,7 @@ import { LocalSearchSection } from '../components/search/LocalSearchSection';
 import { SearchResultGrid } from '../components/search/SearchResultGrid';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { InfiniteScroll } from '../components/common/InfiniteScroll';
-import { useQueries } from '@tanstack/react-query';
-import { getArticle } from '../api/content';
+import { useAllArticles } from '../hooks/useAllArticles';
 import { useArticleTagSummary } from '../hooks/useArticleTagSummary';
 import { useLocalArticleSearch } from '../hooks/useLocalArticleSearch';
 import { useLocalSearchState } from '../hooks/useLocalSearchState';
@@ -36,42 +35,37 @@ export function BookmarksPage() {
   const [page, setPage] = useState(0);
 
   const { data: groups, isLoading: groupsLoading } = useBookmarkGroups();
-  const { data: bookmarkArticles, isLoading: articlesLoading } =
+  const { data: bookmarkArticles, isLoading: bookmarksLoading } =
     useBookmarkArticles(selectedGroupId);
 
-  // Determine which bookmark records to fetch based on scroll mode
   const allBookmarks = bookmarkArticles ?? [];
-  const totalPages = Math.ceil(allBookmarks.length / PAGE_SIZE);
+  const articleIds = allBookmarks.map((ba) => ba.Article);
+
+  // Fetch ALL articles in bulk
+  const { data: allArticles, isLoading: articlesLoading } = useAllArticles(
+    `bookmarks-${selectedGroupId}`,
+    articleIds.length > 0 ? articleIds : undefined,
+  );
+
+  const isLoading = groupsLoading || bookmarksLoading || articlesLoading;
+
+  // Tag summary from ALL articles
+  const tagSummary = useArticleTagSummary(allArticles ?? []);
+
+  // Filter articles based on search query
+  const filteredArticles = useLocalArticleSearch(allArticles ?? []);
+
+  // Paginate/slice filtered results for display
+  const totalPages = Math.ceil(filteredArticles.length / PAGE_SIZE);
+  const displayArticles =
+    scrollMode === 'infinite'
+      ? filteredArticles.slice(0, visibleCount)
+      : filteredArticles.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   // Reset page if out of bounds
   useEffect(() => {
     if (page >= totalPages && totalPages > 0) setPage(totalPages - 1);
   }, [page, totalPages]);
-
-  const fetchSlice =
-    scrollMode === 'infinite'
-      ? allBookmarks.slice(0, visibleCount)
-      : allBookmarks.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
-
-  const articleQueries = useQueries({
-    queries: fetchSlice.map((ba) => ({
-      queryKey: ['article', parseInt(ba.Article)],
-      queryFn: () => getArticle(parseInt(ba.Article)),
-      enabled: !!ba.Article,
-    })),
-  });
-
-  const articles = articleQueries
-    .map((q) => q.data)
-    .filter((a): a is NonNullable<typeof a> => !!a);
-
-  const isLoading = groupsLoading || articlesLoading || articleQueries.some((q) => q.isLoading);
-
-  // Extract tag summary from loaded articles
-  const tagSummary = useArticleTagSummary(articles);
-
-  // Filter articles based on URL query parameter
-  const filteredArticles = useLocalArticleSearch(articles);
 
   // Memoize reset callback
   const handleReset = useCallback(() => {
@@ -86,7 +80,7 @@ export function BookmarksPage() {
       onReset: handleReset,
     });
 
-  // Persist selectedGroupId and visibleCount to sessionStorage for scroll restoration
+  // Persist selectedGroupId and visibleCount to sessionStorage
   useEffect(() => {
     if (selectedGroupId !== undefined) {
       sessionStorage.setItem(`bookmarks:group:${location.key}`, String(selectedGroupId));
@@ -114,7 +108,7 @@ export function BookmarksPage() {
     setVisibleCount((prev) => prev + PAGE_SIZE);
   }, []);
 
-  const hasMore = scrollMode === 'infinite' && visibleCount < allBookmarks.length;
+  const hasMore = scrollMode === 'infinite' && visibleCount < filteredArticles.length;
 
   return (
     <div>
@@ -147,12 +141,12 @@ export function BookmarksPage() {
           loading={false}
           onLoadMore={handleLoadMore}
         >
-          <SearchResultGrid articles={filteredArticles} />
+          <SearchResultGrid articles={displayArticles} />
         </InfiniteScroll>
       ) : (
         !isLoading && (
           <>
-            <SearchResultGrid articles={filteredArticles} />
+            <SearchResultGrid articles={displayArticles} />
             {totalPages > 1 && (
               <div className={styles.pagination}>
                 <button

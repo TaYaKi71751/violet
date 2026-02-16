@@ -30,6 +30,20 @@ historyRouter.get('/', (req, res) => {
   res.json({ logs, totalCount: countRow.cnt, page, pageSize });
 });
 
+historyRouter.get('/ids', (_req, res) => {
+  const db = getUserDb();
+  const rows = db
+    .prepare(`
+      SELECT Article FROM (
+        SELECT Article, ROW_NUMBER() OVER (PARTITION BY Article ORDER BY Id DESC) as rn
+        FROM ArticleReadLog
+      ) WHERE rn = 1
+      ORDER BY rowid DESC
+    `)
+    .all() as { Article: string }[];
+  res.json({ articleIds: rows.map((r) => r.Article) });
+});
+
 historyRouter.post('/', (req, res) => {
   const { Article, Type } = req.body;
   const db = getUserDb();

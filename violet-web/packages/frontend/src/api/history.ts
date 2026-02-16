@@ -15,6 +15,11 @@ export async function getHistory(page = 0, pageSize = 30): Promise<HistoryRespon
   return data;
 }
 
+export async function getHistoryIds(): Promise<string[]> {
+  const { data } = await api.get<{ articleIds: string[] }>('/history/ids');
+  return data.articleIds;
+}
+
 export async function insertReadLog(req: InsertReadLogRequest): Promise<{ Id: number }> {
   const { data } = await api.post<{ Id: number }>('/history', req);
   return data;

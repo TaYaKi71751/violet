@@ -1,10 +1,10 @@
-import { useEffect, useCallback, useRef, useMemo } from 'react';
-import { useNavigate, useSearchParams } from 'react-router';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { useDownloadHistory, useInfiniteDownloadHistory } from '../hooks/useDownloads';
-import { useQueries } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
+import { getDownloadIds, getDownloads } from '../api/downloads';
 import type { DownloadRecord } from '@violet-web/shared';
-import { getArticle } from '../api/content';
+import { useAllArticles } from '../hooks/useAllArticles';
 import { LocalSearchSection } from '../components/search/LocalSearchSection';
 import { SearchResultGrid } from '../components/search/SearchResultGrid';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
@@ -18,46 +18,44 @@ import { useAppStore } from '../stores/app-store';
 import { useToastStore } from '../stores/toast-store';
 import styles from './DownloadsPage.module.css';
 
+const PAGE_SIZE = 30;
+
 export function DownloadsPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const addToast = useToastStore((s) => s.addToast);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const page = parseInt(searchParams.get('p') || '0');
   const { scrollMode } = useAppStore();
 
-  // Pagination mode
-  const { data, isLoading } = useDownloadHistory(page, 30, scrollMode === 'pagination');
+  const [page, setPage] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-  // Infinite scroll mode
-  const {
-    data: infiniteData,
-    isLoading: infiniteLoading,
-    hasNextPage,
-    isFetchingNextPage,
-    fetchNextPage,
-  } = useInfiniteDownloadHistory(30, scrollMode === 'infinite');
+  // Fetch all download article IDs
+  const { data: articleIds, isLoading: idsLoading } = useQuery({
+    queryKey: ['downloads', 'ids'],
+    queryFn: getDownloadIds,
+  });
 
-  const handleLoadMore = useCallback(() => {
-    fetchNextPage();
-  }, [fetchNextPage]);
+  // Fetch all articles in bulk
+  const { data: allArticles, isLoading: articlesLoading } = useAllArticles(
+    'downloads',
+    articleIds,
+  );
 
-  const setPage = (updater: number | ((prev: number) => number)) => {
-    const newPage = typeof updater === 'function' ? updater(page) : updater;
-    const newParams = new URLSearchParams(searchParams);
-    if (newPage === 0) {
-      newParams.delete('p');
-    } else {
-      newParams.set('p', String(newPage));
-    }
-    setSearchParams(newParams);
-  };
+  // Also fetch current page downloads for progress tracking
+  const { data: downloadData } = useQuery({
+    queryKey: ['downloads', 'progress'],
+    queryFn: () => getDownloads(0, 10000),
+    refetchInterval: (query) => {
+      const downloads = query.state.data?.downloads;
+      if (downloads?.some((dl) => dl.Status === 'downloading')) {
+        return 2000;
+      }
+      return false;
+    },
+  });
 
-  // Collect download records from either mode
-  const paginationDownloads = data?.downloads ?? [];
-  const infiniteDownloads = infiniteData?.pages.flatMap((p) => p.downloads) ?? [];
-  const currentDownloads = scrollMode === 'infinite' ? infiniteDownloads : paginationDownloads;
+  const currentDownloads = downloadData?.downloads ?? [];
 
   // Build download progress map for context
   const downloadProgressMap = useMemo(() => {
@@ -88,49 +86,37 @@ export function DownloadsPage() {
     prevStatusRef.current = newMap;
   }, [currentDownloads, addToast, t]);
 
-  const articleQueries = useQueries({
-    queries: currentDownloads.map((dl) => ({
-      queryKey: ['article', parseInt(dl.Article)],
-      queryFn: () => getArticle(parseInt(dl.Article)),
-      enabled: !!dl.Article,
-    })),
-  });
+  const isLoading = idsLoading || articlesLoading;
 
-  const articles = articleQueries
-    .map((q) => q.data)
-    .filter((a): a is NonNullable<typeof a> => !!a);
+  // Tag summary from ALL articles
+  const tagSummary = useArticleTagSummary(allArticles ?? []);
 
-  const currentIsLoading = scrollMode === 'infinite' ? infiniteLoading : isLoading;
+  // Filter articles based on search query
+  const filteredArticles = useLocalArticleSearch(allArticles ?? []);
 
-  // Extract tag summary from all articles in current page
-  const tagSummary = useArticleTagSummary(articles);
+  // Paginate/slice filtered results for display
+  const totalPages = Math.ceil(filteredArticles.length / PAGE_SIZE);
+  const displayArticles =
+    scrollMode === 'infinite'
+      ? filteredArticles.slice(0, visibleCount)
+      : filteredArticles.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
-  // Filter articles based on URL query parameter
-  const filteredArticles = useLocalArticleSearch(articles);
+  const handleReset = useCallback(() => {
+    navigate('/downloads', { replace: true });
+  }, [navigate]);
 
-  // Local search state
-  const { selectedTags, searchBarRef, getSuggestions, handleTagToggle, resetTags } =
+  const { selectedTags, searchBarRef, getSuggestions, handleTagToggle } =
     useLocalSearchState({
       basePath: '/downloads',
       tagSummary,
-      onReset: () => {
-        const newParams = new URLSearchParams(searchParams);
-        newParams.delete('q');
-        const newSearch = newParams.toString();
-        navigate('/downloads' + (newSearch ? `?${newSearch}` : ''), { replace: true });
-      },
+      onReset: handleReset,
     });
 
-  const totalPages = data ? Math.ceil(data.totalCount / data.pageSize) : 0;
+  const handleLoadMore = useCallback(() => {
+    setVisibleCount((prev) => prev + PAGE_SIZE);
+  }, []);
 
-  // Reset selected tags when page changes
-  const prevPageRef = useRef(page);
-  useEffect(() => {
-    if (prevPageRef.current !== page) {
-      prevPageRef.current = page;
-      resetTags();
-    }
-  }, [page, resetTags]);
+  const hasMore = scrollMode === 'infinite' && visibleCount < filteredArticles.length;
 
   return (
     <div className={styles.page}>
@@ -145,26 +131,28 @@ export function DownloadsPage() {
           selectedTags={selectedTags}
           onTagToggle={handleTagToggle}
           resultCount={filteredArticles.length}
-          isLoading={currentIsLoading}
+          isLoading={isLoading}
         />
       )}
 
       <DownloadProgressProvider value={downloadProgressMap}>
         {scrollMode === 'infinite' ? (
           <>
-            {infiniteLoading && !infiniteData && <LoadingSpinner />}
-            <InfiniteScroll
-              hasMore={!!hasNextPage}
-              loading={isFetchingNextPage}
-              onLoadMore={handleLoadMore}
-            >
-              <SearchResultGrid articles={filteredArticles} />
-            </InfiniteScroll>
+            {isLoading && <LoadingSpinner />}
+            {!isLoading && (
+              <InfiniteScroll
+                hasMore={hasMore}
+                loading={false}
+                onLoadMore={handleLoadMore}
+              >
+                <SearchResultGrid articles={displayArticles} />
+              </InfiniteScroll>
+            )}
           </>
         ) : (
           <>
             {isLoading && <LoadingSpinner />}
-            {!isLoading && <SearchResultGrid articles={filteredArticles} />}
+            {!isLoading && <SearchResultGrid articles={displayArticles} />}
 
             {totalPages > 1 && (
               <div className={styles.pagination}>

@@ -76,6 +76,33 @@ contentRouter.get('/suggest/status', (req, res) => {
   res.json(status);
 });
 
+contentRouter.post('/batch', (req, res) => {
+  if (!isContentDbReady()) {
+    res.status(503).json({ error: 'Database syncing, please wait.' });
+    return;
+  }
+
+  const ids: number[] = req.body.ids;
+  if (!Array.isArray(ids) || ids.length === 0) {
+    res.json({ articles: [] });
+    return;
+  }
+
+  // Limit to 5000 per request
+  const limited = ids.slice(0, 5000);
+  const db = getContentDb();
+  const placeholders = limited.map(() => '?').join(',');
+  const articles = db
+    .prepare(`SELECT * FROM HitomiColumnModel WHERE Id IN (${placeholders})`)
+    .all(...limited);
+
+  // Preserve original order
+  const articleMap = new Map(articles.map((a: any) => [a.Id, a]));
+  const ordered = limited.map((id) => articleMap.get(id)).filter(Boolean);
+
+  res.json({ articles: ordered });
+});
+
 contentRouter.get('/:id', (req, res) => {
   if (!isContentDbReady()) {
     res.status(503).json({ error: 'Database syncing, please wait.' });
