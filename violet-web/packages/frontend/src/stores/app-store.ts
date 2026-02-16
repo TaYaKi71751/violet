@@ -9,6 +9,7 @@ export type ThemeColor =
   | 'cyan' | 'deepOrange' | 'deepPurple' | 'green' | 'grey'
   | 'indigo' | 'lightBlue' | 'lightGreen' | 'lime' | 'orange'
   | 'pink' | 'red' | 'teal' | 'yellow';
+export type ThemeMode = 'dark' | 'light' | 'system';
 
 export type ViewMode = 'grid' | 'detail';
 export type ScrollMode = 'pagination' | 'infinite';
@@ -17,6 +18,7 @@ interface AppState {
   contentLanguage: ContentLanguage;
   uiLanguage: UILanguage;
   themeColor: ThemeColor;
+  themeMode: ThemeMode;
   sidebarCollapsed: boolean;
   viewMode: ViewMode;
   cardMinWidth: number;
@@ -29,6 +31,7 @@ interface AppState {
   setContentLanguage: (lang: ContentLanguage) => void;
   setUILanguage: (lang: UILanguage) => void;
   setThemeColor: (color: ThemeColor) => void;
+  setThemeMode: (mode: ThemeMode) => void;
   toggleSidebar: () => void;
   setViewMode: (mode: ViewMode) => void;
   setCardMinWidth: (width: number) => void;
@@ -70,6 +73,7 @@ export const useAppStore = create<AppState>()(
       contentLanguage: getDefaultContentLanguage(),
       uiLanguage: 'system',
       themeColor: 'purple',
+      themeMode: 'dark',
       sidebarCollapsed: false,
       viewMode: 'grid',
       cardMinWidth: 200,
@@ -86,6 +90,7 @@ export const useAppStore = create<AppState>()(
         set({ uiLanguage });
       },
       setThemeColor: (themeColor) => set({ themeColor }),
+      setThemeMode: (themeMode) => set({ themeMode }),
       toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
       setViewMode: (viewMode) => set({ viewMode }),
       setCardMinWidth: (cardMinWidth) => set({ cardMinWidth }),

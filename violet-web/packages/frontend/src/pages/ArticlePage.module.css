@@ -58,7 +58,7 @@
 .readBtn {
   padding: var(--spacing-sm) var(--spacing-lg);
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-primary);
   border-radius: var(--radius-sm);
   font-weight: 500;
 }

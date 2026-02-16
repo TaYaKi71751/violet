@@ -22,6 +22,11 @@ export async function getArticle(id: number): Promise<Article> {
   return data;
 }
 
+export async function getArticlesBatch(ids: number[]): Promise<Article[]> {
+  const { data } = await api.post<{ articles: Article[] }>('/content/batch', { ids });
+  return data.articles;
+}
+
 export async function fetchSuggestions(
   q: string,
   limit = 20

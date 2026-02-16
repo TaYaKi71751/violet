@@ -1,21 +1,3 @@
-.heading {
-  font-size: 1.25rem;
-  margin-bottom: var(--spacing-md);
-}
-
-.searchSection {
-  margin: var(--spacing-md) 0 8px 0;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
-.resultCount {
-  color: var(--text-secondary, #666);
-  font-size: 0.9rem;
-  white-space: nowrap;
-}
-
 .pagination {
   display: flex;
   align-items: center;
@@ -28,27 +10,27 @@
   margin-top: auto;
   margin-left: auto;
   margin-right: auto;
-  background: rgba(30, 30, 30, 0.85);
+  background: var(--color-pagination-bg);
   backdrop-filter: blur(8px);
   border-radius: 999px;
   z-index: 10;
-  color: #fff;
+  color: var(--color-pagination-text);
   font-size: 0.85rem;
 }
 
 .pagination button {
   padding: 6px 16px;
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--color-pagination-btn-bg);
   border: none;
   border-radius: 999px;
-  color: #fff;
+  color: var(--color-pagination-text);
   font-size: 0.85rem;
   cursor: pointer;
   transition: background 0.15s;
 }
 
 .pagination button:hover {
-  background: rgba(255, 255, 255, 0.22);
+  background: var(--color-pagination-btn-bg-hover);
 }
 
 .pagination button:disabled {

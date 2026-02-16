@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useAppStore, type ThemeColor } from '../stores/app-store';
+import { useAppStore, type ThemeColor, type ThemeMode } from '../stores/app-store';
 
 const themeColors: Record<ThemeColor, string> = {
   purple: '#8b5cf6',
@@ -25,8 +25,9 @@ const themeColors: Record<ThemeColor, string> = {
 };
 
 export function ThemeProvider() {
-  const { themeColor } = useAppStore();
+  const { themeColor, themeMode } = useAppStore();
 
+  // Handle accent color changes
   useEffect(() => {
     const color = themeColors[themeColor];
     document.documentElement.style.setProperty('--color-primary', color);
@@ -44,6 +45,45 @@ export function ThemeProvider() {
       );
     }
   }, [themeColor]);
+
+  // Handle theme mode changes
+  useEffect(() => {
+    const applyTheme = (mode: 'dark' | 'light') => {
+      // Add transition class
+      document.documentElement.classList.add('theme-transitioning');
+
+      // Set theme attribute
+      if (mode === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+
+      // Remove transition class after animation completes
+      setTimeout(() => {
+        document.documentElement.classList.remove('theme-transitioning');
+      }, 350);
+    };
+
+    if (themeMode === 'dark') {
+      applyTheme('dark');
+    } else if (themeMode === 'light') {
+      applyTheme('light');
+    } else if (themeMode === 'system') {
+      // Match system preference
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
+        applyTheme(e.matches ? 'dark' : 'light');
+      };
+
+      // Apply initial theme
+      handleChange(mediaQuery);
+
+      // Listen for changes
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    }
+  }, [themeMode]);
 
   return null;
 }

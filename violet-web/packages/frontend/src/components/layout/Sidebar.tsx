@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { Home, Bookmark, Crop, History, Download, Settings, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { Home, Bookmark, Crop, History, Download, Settings, ChevronLeft, ChevronRight, Sparkles, Sun, Moon, Monitor } from 'lucide-react';
 import { DiscordIcon } from '../icons/DiscordIcon';
 import { GithubIcon } from '../icons/GithubIcon';
 import { useAppStore } from '../../stores/app-store';
@@ -19,7 +19,7 @@ const navItems = [
 export function Sidebar() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { themeColor, sidebarCollapsed, toggleSidebar, aiSearchEnabled } = useAppStore();
+  const { themeColor, themeMode, sidebarCollapsed, toggleSidebar, setThemeMode, aiSearchEnabled } = useAppStore();
 
   const logoSrc = themeColor === 'purple'
     ? '/logos/logo.png'
@@ -72,6 +72,30 @@ export function Sidebar() {
           <GithubIcon size={20} className={styles.icon} />
           {!sidebarCollapsed && <span>GitHub</span>}
         </a>
+      </div>
+
+      <div className={styles.themeToggle}>
+        <button
+          className={`${styles.themeBtn} ${themeMode === 'light' ? styles.active : ''}`}
+          onClick={() => setThemeMode('light')}
+          title="Light"
+        >
+          <Sun size={18} />
+        </button>
+        <button
+          className={`${styles.themeBtn} ${themeMode === 'dark' ? styles.active : ''}`}
+          onClick={() => setThemeMode('dark')}
+          title="Dark"
+        >
+          <Moon size={18} />
+        </button>
+        <button
+          className={`${styles.themeBtn} ${themeMode === 'system' ? styles.active : ''}`}
+          onClick={() => setThemeMode('system')}
+          title="System"
+        >
+          <Monitor size={18} />
+        </button>
       </div>
 
       <button className={styles.toggleBtn} onClick={toggleSidebar}>

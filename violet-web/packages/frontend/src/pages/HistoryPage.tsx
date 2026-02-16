@@ -1,9 +1,9 @@
-import { useEffect, useCallback, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router';
+import { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { useReadHistory, useInfiniteReadHistory } from '../hooks/useReadHistory';
-import { useQueries } from '@tanstack/react-query';
-import { getArticle } from '../api/content';
+import { useQuery } from '@tanstack/react-query';
+import { getHistoryIds } from '../api/history';
+import { useAllArticles } from '../hooks/useAllArticles';
 import { LocalSearchSection } from '../components/search/LocalSearchSection';
 import { SearchResultGrid } from '../components/search/SearchResultGrid';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
@@ -15,95 +15,63 @@ import { useIsMobile } from '../hooks/useMediaQuery';
 import { useAppStore } from '../stores/app-store';
 import styles from './HistoryPage.module.css';
 
+const PAGE_SIZE = 30;
+
 export function HistoryPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const page = parseInt(searchParams.get('p') || '0');
   const { scrollMode } = useAppStore();
 
-  // Pagination mode
-  const { data, isLoading } = useReadHistory(page, 30, scrollMode === 'pagination');
+  const [page, setPage] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-  // Infinite scroll mode
-  const {
-    data: infiniteData,
-    isLoading: infiniteLoading,
-    hasNextPage,
-    isFetchingNextPage,
-    fetchNextPage,
-  } = useInfiniteReadHistory(30, scrollMode === 'infinite');
-
-  const handleLoadMore = useCallback(() => {
-    fetchNextPage();
-  }, [fetchNextPage]);
-
-  const setPage = (updater: number | ((prev: number) => number)) => {
-    const newPage = typeof updater === 'function' ? updater(page) : updater;
-    const newParams = new URLSearchParams(searchParams);
-    if (newPage === 0) {
-      newParams.delete('p');
-    } else {
-      newParams.set('p', String(newPage));
-    }
-    setSearchParams(newParams);
-  };
-
-  // Collect logs from either mode
-  const paginationLogs = data?.logs ?? [];
-  const infiniteLogs = infiniteData?.pages.flatMap((p) => p.logs) ?? [];
-  const currentLogs = scrollMode === 'infinite' ? infiniteLogs : paginationLogs;
-
-  const articleQueries = useQueries({
-    queries: currentLogs.map((log) => ({
-      queryKey: ['article', parseInt(log.Article)],
-      queryFn: () => getArticle(parseInt(log.Article)),
-      enabled: !!log.Article,
-    })),
+  // Fetch all history article IDs
+  const { data: articleIds, isLoading: idsLoading } = useQuery({
+    queryKey: ['readHistory', 'ids'],
+    queryFn: getHistoryIds,
   });
 
-  const articles = articleQueries
-    .map((q) => q.data)
-    .filter((a): a is NonNullable<typeof a> => !!a);
+  // Fetch all articles in bulk
+  const { data: allArticles, isLoading: articlesLoading } = useAllArticles(
+    'readHistory',
+    articleIds,
+  );
 
-  const currentIsLoading = scrollMode === 'infinite' ? infiniteLoading : isLoading;
+  const isLoading = idsLoading || articlesLoading;
 
-  // Extract tag summary from all articles in current page
-  const tagSummary = useArticleTagSummary(articles);
+  // Tag summary from ALL articles
+  const tagSummary = useArticleTagSummary(allArticles ?? []);
 
-  // Filter articles based on URL query parameter
-  const filteredArticles = useLocalArticleSearch(articles);
+  // Filter articles based on search query
+  const filteredArticles = useLocalArticleSearch(allArticles ?? []);
 
-  // Local search state
-  const { selectedTags, searchBarRef, getSuggestions, handleTagToggle, resetTags } =
+  // Paginate/slice filtered results for display
+  const totalPages = Math.ceil(filteredArticles.length / PAGE_SIZE);
+  const displayArticles =
+    scrollMode === 'infinite'
+      ? filteredArticles.slice(0, visibleCount)
+      : filteredArticles.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
+  const handleReset = useCallback(() => {
+    navigate('/history', { replace: true });
+  }, [navigate]);
+
+  const { selectedTags, searchBarRef, getSuggestions, handleTagToggle } =
     useLocalSearchState({
       basePath: '/history',
       tagSummary,
-      onReset: () => {
-        const newParams = new URLSearchParams(searchParams);
-        newParams.delete('q');
-        const newSearch = newParams.toString();
-        navigate('/history' + (newSearch ? `?${newSearch}` : ''), { replace: true });
-      },
+      onReset: handleReset,
     });
 
-  const totalPages = data ? Math.ceil(data.totalCount / data.pageSize) : 0;
+  const handleLoadMore = useCallback(() => {
+    setVisibleCount((prev) => prev + PAGE_SIZE);
+  }, []);
 
-  // Reset selected tags when page changes (but not on initial mount,
-  // to avoid a replace-navigation that would change location.key and break scroll restoration)
-  const prevPageRef = useRef(page);
-  useEffect(() => {
-    if (prevPageRef.current !== page) {
-      prevPageRef.current = page;
-      resetTags();
-    }
-  }, [page, resetTags]);
+  const hasMore = scrollMode === 'infinite' && visibleCount < filteredArticles.length;
 
   return (
     <div className={styles.page}>
-      <h2 className={styles.heading}>{t('history.heading')}</h2>
-
       {!isMobile && (
         <LocalSearchSection
           basePath="/history"
@@ -113,25 +81,28 @@ export function HistoryPage() {
           selectedTags={selectedTags}
           onTagToggle={handleTagToggle}
           resultCount={filteredArticles.length}
-          isLoading={currentIsLoading}
+          isLoading={isLoading}
+          sticky
         />
       )}
 
       {scrollMode === 'infinite' ? (
         <>
-          {infiniteLoading && !infiniteData && <LoadingSpinner />}
-          <InfiniteScroll
-            hasMore={!!hasNextPage}
-            loading={isFetchingNextPage}
-            onLoadMore={handleLoadMore}
-          >
-            <SearchResultGrid articles={filteredArticles} />
-          </InfiniteScroll>
+          {isLoading && <LoadingSpinner />}
+          {!isLoading && (
+            <InfiniteScroll
+              hasMore={hasMore}
+              loading={false}
+              onLoadMore={handleLoadMore}
+            >
+              <SearchResultGrid articles={displayArticles} />
+            </InfiniteScroll>
+          )}
         </>
       ) : (
         <>
           {isLoading && <LoadingSpinner />}
-          {!isLoading && <SearchResultGrid articles={filteredArticles} />}
+          {!isLoading && <SearchResultGrid articles={displayArticles} />}
 
           {totalPages > 1 && (
             <div className={styles.pagination}>

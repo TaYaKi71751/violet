@@ -1,12 +1,8 @@
-.header {
+.headerControls {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-md);
-}
-
-.heading {
-  font-size: 1.25rem;
 }
 
 .sizeSlider {
@@ -67,7 +63,7 @@
   left: 2px;
   width: 16px;
   height: 16px;
-  background: #fff;
+  background: var(--color-toggle-knob);
   border-radius: 50%;
   transition: transform 0.2s;
 }

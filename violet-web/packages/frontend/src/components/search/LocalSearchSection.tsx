@@ -17,6 +17,9 @@ interface LocalSearchSectionProps {
   resultCount?: number;
   isLoading?: boolean;
   showViewControls?: boolean;
+  sticky?: boolean;
+  headerContent?: React.ReactNode;
+  extraControls?: React.ReactNode;
 }
 
 export function LocalSearchSection({
@@ -29,12 +32,16 @@ export function LocalSearchSection({
   resultCount,
   isLoading,
   showViewControls = true,
+  sticky = false,
+  headerContent,
+  extraControls,
 }: LocalSearchSectionProps) {
   const { t } = useTranslation();
   const { viewMode, setViewMode, cardMinWidth, setCardMinWidth } = useAppStore();
 
   return (
-    <div className={styles.container}>
+    <div className={sticky ? styles.elevated : styles.container}>
+      {headerContent}
       <div className={styles.searchBar}>
         <SearchBar
           ref={searchBarRef}
@@ -72,6 +79,7 @@ export function LocalSearchSection({
             </label>
           </>
         )}
+        {extraControls}
       </div>
 
       {!isLoading && tagSummary.length > 0 && (
