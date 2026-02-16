@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router';
+import { useParams, useNavigate, useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useImageList } from '../hooks/useImageList';
 import { useViewer } from '../hooks/useViewer';
@@ -13,11 +13,13 @@ export function ViewerPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const galleryId = parseInt(id!);
   const { data: imageList, isLoading } = useImageList(galleryId);
 
   const totalPages = imageList?.urls.length ?? 0;
-  const { currentPage, goToPage } = useViewer(totalPages);
+  const initialPage = parseInt(searchParams.get('page') || '0');
+  const { currentPage, goToPage } = useViewer(totalPages, initialPage);
 
   const insertLog = useInsertReadLog();
   const updateLog = useUpdateReadLog();

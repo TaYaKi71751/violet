@@ -1,8 +1,11 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useViewerStore } from '../stores/viewer-store';
 
-export function useViewer(totalPages: number) {
-  const [currentPage, setCurrentPage] = useState(0);
+export function useViewer(totalPages: number, initialPage: number = 0) {
+  const [currentPage, setCurrentPage] = useState(() => {
+    const clamped = Math.max(0, Math.min(initialPage, totalPages - 1));
+    return clamped;
+  });
   const { readDirection } = useViewerStore();
 
   const goToPage = useCallback(
