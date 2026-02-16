@@ -63,6 +63,14 @@ export function ViewerPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
 
+  // Update URL without navigation
+  useEffect(() => {
+    const url = currentPage > 0
+      ? `/viewer/${galleryId}?page=${currentPage}`
+      : `/viewer/${galleryId}`;
+    window.history.replaceState(null, '', url);
+  }, [currentPage, galleryId]);
+
   if (isLoading) {
     return (
       <div style={{
