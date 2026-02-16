@@ -76,18 +76,18 @@ export function Sidebar() {
 
       <div className={styles.themeToggle}>
         <button
-          className={`${styles.themeBtn} ${themeMode === 'dark' ? styles.active : ''}`}
-          onClick={() => setThemeMode('dark')}
-          title="Dark"
-        >
-          <Moon size={18} />
-        </button>
-        <button
           className={`${styles.themeBtn} ${themeMode === 'light' ? styles.active : ''}`}
           onClick={() => setThemeMode('light')}
           title="Light"
         >
           <Sun size={18} />
+        </button>
+        <button
+          className={`${styles.themeBtn} ${themeMode === 'dark' ? styles.active : ''}`}
+          onClick={() => setThemeMode('dark')}
+          title="Dark"
+        >
+          <Moon size={18} />
         </button>
         <button
           className={`${styles.themeBtn} ${themeMode === 'system' ? styles.active : ''}`}
