@@ -9,6 +9,7 @@ interface HorizontalReaderProps {
   currentPage: number;
   onPageChange: (page: number) => void;
   rtl: boolean;
+  galleryId: number;
 }
 
 export function HorizontalReader({
@@ -16,6 +17,7 @@ export function HorizontalReader({
   currentPage,
   onPageChange,
   rtl,
+  galleryId,
 }: HorizontalReaderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -100,7 +102,7 @@ export function HorizontalReader({
     >
       {imageUrls.map((url, i) => (
         <div key={i} className={styles.page}>
-          <ViewerImage src={url} alt={`Page ${i + 1}`} active={isPageActive(i)} />
+          <ViewerImage src={url} alt={`Page ${i + 1}`} active={isPageActive(i)} cacheKey={{ galleryId, page: i }} />
         </div>
       ))}
     </div>

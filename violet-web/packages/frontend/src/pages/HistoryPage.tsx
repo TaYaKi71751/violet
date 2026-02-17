@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { getHistoryIds } from '../api/history';
@@ -13,6 +13,7 @@ import { useLocalArticleSearch } from '../hooks/useLocalArticleSearch';
 import { useLocalSearchState } from '../hooks/useLocalSearchState';
 import { useIsMobile } from '../hooks/useMediaQuery';
 import { useAppStore } from '../stores/app-store';
+import { usePaginationKeyboard } from '../hooks/usePaginationKeyboard';
 import styles from './HistoryPage.module.css';
 
 const PAGE_SIZE = 30;
@@ -23,7 +24,21 @@ export function HistoryPage() {
   const isMobile = useIsMobile();
   const { scrollMode } = useAppStore();
 
-  const [page, setPage] = useState(0);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = parseInt(searchParams.get('p') || '0');
+  const setPage = useCallback(
+    (updater: number | ((prev: number) => number)) => {
+      const newPage = typeof updater === 'function' ? updater(page) : updater;
+      const newParams = new URLSearchParams(searchParams);
+      if (newPage === 0) {
+        newParams.delete('p');
+      } else {
+        newParams.set('p', String(newPage));
+      }
+      setSearchParams(newParams);
+    },
+    [page, searchParams, setSearchParams],
+  );
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   // Fetch all history article IDs
@@ -52,6 +67,8 @@ export function HistoryPage() {
     scrollMode === 'infinite'
       ? filteredArticles.slice(0, visibleCount)
       : filteredArticles.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
+  usePaginationKeyboard(page, totalPages, setPage, scrollMode === 'pagination');
 
   const handleReset = useCallback(() => {
     navigate('/history', { replace: true });

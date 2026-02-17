@@ -39,6 +39,7 @@ export function ViewerContainer({
           rtl={rtl}
           twoPageMode={twoPageMode}
           coverPageMode={coverPageMode}
+          galleryId={galleryId}
         />
       ) : viewMode === 'vertical' ? (
         <VerticalReader
@@ -46,6 +47,7 @@ export function ViewerContainer({
           currentPage={currentPage}
           onPageChange={onPageChange}
           padding={padding}
+          galleryId={galleryId}
         />
       ) : (
         <HorizontalReader
@@ -53,6 +55,7 @@ export function ViewerContainer({
           currentPage={currentPage}
           onPageChange={onPageChange}
           rtl={rtl}
+          galleryId={galleryId}
         />
       )}
       <ViewerOverlay

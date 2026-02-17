@@ -9,6 +9,7 @@ interface VerticalReaderProps {
   currentPage: number;
   onPageChange: (page: number) => void;
   padding: number;
+  galleryId: number;
 }
 
 export function VerticalReader({
@@ -16,6 +17,7 @@ export function VerticalReader({
   currentPage,
   onPageChange,
   padding,
+  galleryId,
 }: VerticalReaderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -86,7 +88,7 @@ export function VerticalReader({
           className={styles.page}
           style={{ padding: `${padding}px 0` }}
         >
-          <ViewerImage src={url} alt={`Page ${i + 1}`} active={isPageActive(i)} />
+          <ViewerImage src={url} alt={`Page ${i + 1}`} active={isPageActive(i)} cacheKey={{ galleryId, page: i }} />
         </div>
       ))}
     </div>

@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useSearch, useInfiniteSearch } from '../hooks/useSearch';
 import { useAppStore } from '../stores/app-store';
+import { usePaginationKeyboard } from '../hooks/usePaginationKeyboard';
 import { SearchResultGrid } from '../components/search/SearchResultGrid';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { InfiniteScroll } from '../components/common/InfiniteScroll';
@@ -15,16 +16,19 @@ export function HomePage() {
   const page = parseInt(searchParams.get('p') || '0');
   const { contentLanguage, scrollMode, excludedTags } = useAppStore();
 
-  const setPage = (updater: number | ((prev: number) => number)) => {
-    const newPage = typeof updater === 'function' ? updater(page) : updater;
-    const newParams = new URLSearchParams(searchParams);
-    if (newPage === 0) {
-      newParams.delete('p');
-    } else {
-      newParams.set('p', String(newPage));
-    }
-    setSearchParams(newParams);
-  };
+  const setPage = useCallback(
+    (updater: number | ((prev: number) => number)) => {
+      const newPage = typeof updater === 'function' ? updater(page) : updater;
+      const newParams = new URLSearchParams(searchParams);
+      if (newPage === 0) {
+        newParams.delete('p');
+      } else {
+        newParams.set('p', String(newPage));
+      }
+      setSearchParams(newParams);
+    },
+    [page, searchParams, setSearchParams],
+  );
 
   useEffect(() => {
     document.title = query ? `${query} - Violet` : 'Violet';
@@ -65,6 +69,8 @@ export function HomePage() {
   const lastTotalPagesRef = useRef(0);
   if (totalPages > 0) lastTotalPagesRef.current = totalPages;
   const displayTotalPages = totalPages || lastTotalPagesRef.current;
+
+  usePaginationKeyboard(page, displayTotalPages, setPage, scrollMode === 'pagination');
 
   if (scrollMode === 'infinite') {
     const allArticles = infiniteData?.pages.flatMap((p) => p.articles) ?? [];

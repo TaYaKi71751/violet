@@ -145,6 +145,20 @@
       "enableDesc": "내비게이션에 AI 검색 탭을 표시합니다",
       "helpText": "AI 검색을 사용하려면 violet-search 서버를 별도로 실행해야 합니다. 이 기능을 사용하려면 violet-search 서비스를 설정하고 실행하세요."
     },
+    "imageCache": {
+      "heading": "이미지 캐시",
+      "enable": "이미지 캐시 사용",
+      "enableDesc": "본 이미지를 로컬에 캐싱하여 즉시 로딩합니다",
+      "helpText": "브라우저의 IndexedDB를 사용하여 본 이미지를 로컬에 저장합니다. 캐시된 이미지는 네트워크 요청 없이 즉시 로딩됩니다. 저장 실패 시에도 서버에서 정상적으로 로드됩니다.",
+      "maxSize": "최대 캐시 크기",
+      "expireDays": "캐시 만료 기간",
+      "expireDaysDesc": "{{days}}일",
+      "cacheSize": "캐시 크기:",
+      "itemCount": "캐시된 이미지:",
+      "items": "{{count}}개",
+      "clearCache": "캐시 지우기",
+      "clearing": "삭제 중..."
+    },
     "sync": {
       "heading": "데이터베이스 동기화",
       "database": "데이터베이스:",
@@ -220,6 +234,16 @@
       },
       "padding": {
         "title": "여백"
+      },
+      "shortcuts": {
+        "title": "단축키",
+        "overlay": "오버레이 표시/숨김",
+        "settings": "설정",
+        "bookmark": "북마크 토글",
+        "thumbnails": "썸네일",
+        "crop": "크롭 도구",
+        "twoPage": "한쪽 / 두쪽 보기",
+        "close": "뷰어 닫기"
       }
     }
   }

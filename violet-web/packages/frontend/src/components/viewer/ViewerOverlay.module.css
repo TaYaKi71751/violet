@@ -157,3 +157,29 @@
 .pageIndicatorAboveSlider {
   bottom: 70px;
 }
+
+.shortcutHint {
+  position: absolute;
+  bottom: 60px;
+  right: var(--spacing-md, 16px);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 10;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.shortcutHint kbd {
+  display: inline-block;
+  min-width: 18px;
+  padding: 1px 5px;
+  margin-right: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 3px;
+  font-family: inherit;
+  font-size: 0.7rem;
+  color: #fff;
+  text-align: center;
+}

@@ -145,6 +145,20 @@
       "enableDesc": "Show AI Search tab in navigation",
       "helpText": "AI Search requires the violet-search server to be running separately. You need to set up and run the violet-search service for this feature to work."
     },
+    "imageCache": {
+      "heading": "Image Cache",
+      "enable": "Enable Image Cache",
+      "enableDesc": "Cache viewed images locally for instant loading",
+      "helpText": "Uses the browser's IndexedDB to store viewed images locally. Cached images load instantly without network requests. Cache is best-effort — if storage fails, images are loaded normally from the server.",
+      "maxSize": "Maximum Cache Size",
+      "expireDays": "Cache Expiry",
+      "expireDaysDesc": "{{days}} days",
+      "cacheSize": "Cache Size:",
+      "itemCount": "Cached Images:",
+      "items": "{{count}} images",
+      "clearCache": "Clear Cache",
+      "clearing": "Clearing..."
+    },
     "sync": {
       "heading": "Database Sync",
       "database": "Database:",
@@ -220,6 +234,16 @@
       },
       "padding": {
         "title": "Padding"
+      },
+      "shortcuts": {
+        "title": "Keyboard Shortcuts",
+        "overlay": "Toggle overlay",
+        "settings": "Settings",
+        "bookmark": "Toggle bookmark",
+        "thumbnails": "Thumbnails",
+        "crop": "Crop tool",
+        "twoPage": "Single / Two-page",
+        "close": "Close viewer"
       }
     }
   }
