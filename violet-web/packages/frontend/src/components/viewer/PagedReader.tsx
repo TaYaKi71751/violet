@@ -172,7 +172,7 @@ export function PagedReader({
   return (
     <div
       ref={setContainerRef}
-      className={`${styles.container} ${isCoverPage ? styles.coverPage : ''} ${isLastSinglePage ? styles.lastSinglePage : ''}`}
+      className={`${styles.container} ${twoPageMode ? styles.twoPage : ''} ${isCoverPage ? styles.coverPage : ''} ${isLastSinglePage ? styles.lastSinglePage : ''}`}
       onClick={handleClick}
       data-rtl={rtl}
     >
