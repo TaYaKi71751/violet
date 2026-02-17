@@ -13,6 +13,8 @@ interface CachedImage {
 }
 
 let dbInstance: IDBDatabase | null = null;
+let evictTimer: ReturnType<typeof setTimeout> | null = null;
+let pendingMaxSize = 0;
 
 function openDB(): Promise<IDBDatabase> {
   if (dbInstance) return Promise.resolve(dbInstance);
@@ -53,9 +55,11 @@ export async function getCachedImage(
       request.onsuccess = () => {
         const result = request.result as CachedImage | undefined;
         if (result) {
-          // Update lastAccessed
-          result.lastAccessed = Date.now();
-          store.put(result);
+          const now = Date.now();
+          if (now - result.lastAccessed > 24 * 60 * 60 * 1000) {
+            result.lastAccessed = now;
+            store.put(result);
+          }
           resolve({ blob: result.blob, contentType: result.contentType });
         } else {
           resolve(null);
@@ -97,7 +101,7 @@ export async function putCachedImage(
       request.onerror = () => reject(request.error);
     });
 
-    await evictIfNeeded(maxSizeBytes);
+    scheduleEviction(maxSizeBytes);
   } catch {
     // best-effort
   }
@@ -165,6 +169,15 @@ export async function clearAllCache(): Promise<void> {
   } catch {
     // best-effort
   }
+}
+
+function scheduleEviction(maxSizeBytes: number) {
+  pendingMaxSize = maxSizeBytes;
+  if (evictTimer) clearTimeout(evictTimer);
+  evictTimer = setTimeout(() => {
+    evictTimer = null;
+    evictIfNeeded(pendingMaxSize).catch(() => {});
+  }, 2000);
 }
 
 async function evictIfNeeded(maxSizeBytes: number): Promise<void> {
