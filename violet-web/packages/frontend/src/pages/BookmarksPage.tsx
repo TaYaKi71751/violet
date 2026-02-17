@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router';
+import { useNavigate, useLocation, useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useBookmarkGroups, useBookmarkArticles } from '../hooks/useBookmarks';
 import { BookmarkGroupList } from '../components/bookmark/BookmarkGroupList';
@@ -33,7 +33,21 @@ export function BookmarksPage() {
     const saved = sessionStorage.getItem(`bookmarks:visible:${location.key}`);
     return saved ? parseInt(saved) : PAGE_SIZE;
   });
-  const [page, setPage] = useState(0);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = parseInt(searchParams.get('p') || '0');
+  const setPage = useCallback(
+    (updater: number | ((prev: number) => number)) => {
+      const newPage = typeof updater === 'function' ? updater(page) : updater;
+      const newParams = new URLSearchParams(searchParams);
+      if (newPage === 0) {
+        newParams.delete('p');
+      } else {
+        newParams.set('p', String(newPage));
+      }
+      setSearchParams(newParams);
+    },
+    [page, searchParams, setSearchParams],
+  );
 
   const { data: groups, isLoading: groupsLoading } = useBookmarkGroups();
   const { data: bookmarkArticles, isLoading: bookmarksLoading } =
