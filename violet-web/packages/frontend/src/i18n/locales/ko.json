@@ -234,6 +234,16 @@
       },
       "padding": {
         "title": "여백"
+      },
+      "shortcuts": {
+        "title": "단축키",
+        "overlay": "오버레이 표시/숨김",
+        "settings": "설정",
+        "bookmark": "북마크 토글",
+        "thumbnails": "썸네일",
+        "crop": "크롭 도구",
+        "twoPage": "한쪽 / 두쪽 보기",
+        "close": "뷰어 닫기"
       }
     }
   }

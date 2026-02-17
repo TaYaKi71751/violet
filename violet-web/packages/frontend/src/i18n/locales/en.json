@@ -234,6 +234,16 @@
       },
       "padding": {
         "title": "Padding"
+      },
+      "shortcuts": {
+        "title": "Keyboard Shortcuts",
+        "overlay": "Toggle overlay",
+        "settings": "Settings",
+        "bookmark": "Toggle bookmark",
+        "thumbnails": "Thumbnails",
+        "crop": "Crop tool",
+        "twoPage": "Single / Two-page",
+        "close": "Close viewer"
       }
     }
   }

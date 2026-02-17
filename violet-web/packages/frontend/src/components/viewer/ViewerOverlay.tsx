@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useViewerStore } from '../../stores/viewer-store';
 import { useIsBookmarked, useToggleBookmark } from '../../hooks/useBookmarks';
@@ -27,12 +27,55 @@ export function ViewerOverlay({
   imageUrls,
 }: ViewerOverlayProps) {
   const { t } = useTranslation();
-  const { showOverlay, showSettings, readDirection, twoPageMode, coverPageMode, toggleOverlay, toggleSettings } = useViewerStore();
+  const { showOverlay, showSettings, readDirection, twoPageMode, coverPageMode, toggleOverlay, toggleSettings, setTwoPageMode } = useViewerStore();
   const { data: isBookmarked } = useIsBookmarked(String(galleryId));
   const toggleBookmark = useToggleBookmark();
   const rtl = readDirection === 'rtl';
   const [showThumbnails, setShowThumbnails] = useState(false);
   const [showCropDialog, setShowCropDialog] = useState(false);
+
+  const handleBookmarkToggle = useCallback(() => {
+    toggleBookmark.mutate({ articleId: String(galleryId), isBookmarked: !!isBookmarked });
+  }, [toggleBookmark, galleryId, isBookmarked]);
+
+  // Keyboard shortcuts (single key, no modifiers)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore when typing in inputs or when dialogs are open
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (showThumbnails || showCropDialog) return;
+
+      switch (e.key.toLowerCase()) {
+        case 'h':
+          e.preventDefault();
+          toggleOverlay();
+          break;
+        case 's':
+          e.preventDefault();
+          toggleSettings();
+          break;
+        case 'b':
+          e.preventDefault();
+          if (!toggleBookmark.isPending) handleBookmarkToggle();
+          break;
+        case 't':
+          e.preventDefault();
+          setShowThumbnails(true);
+          break;
+        case 'c':
+          e.preventDefault();
+          setShowCropDialog(true);
+          break;
+        case 'd':
+          e.preventDefault();
+          setTwoPageMode(!twoPageMode);
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [toggleOverlay, toggleSettings, handleBookmarkToggle, toggleBookmark.isPending, showThumbnails, showCropDialog, setTwoPageMode, twoPageMode]);
 
   const visiblePages = useMemo(() => {
     if (!twoPageMode) return [currentPage];
@@ -152,6 +195,14 @@ export function ViewerOverlay({
             >
               {t('viewer.settings')}
             </button>
+          </div>
+          <div className={styles.shortcutHint}>
+            <span><kbd>H</kbd> {t('viewer.settingsPanel.shortcuts.overlay')}</span>
+            <span><kbd>S</kbd> {t('viewer.settingsPanel.shortcuts.settings')}</span>
+            <span><kbd>B</kbd> {t('viewer.settingsPanel.shortcuts.bookmark')}</span>
+            <span><kbd>T</kbd> {t('viewer.settingsPanel.shortcuts.thumbnails')}</span>
+            <span><kbd>C</kbd> {t('viewer.settingsPanel.shortcuts.crop')}</span>
+            <span><kbd>D</kbd> {t('viewer.settingsPanel.shortcuts.twoPage')}</span>
           </div>
           <div className={styles.bottom}>
             <input
