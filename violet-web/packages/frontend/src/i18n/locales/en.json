@@ -149,6 +149,7 @@
       "heading": "Image Cache",
       "enable": "Enable Image Cache",
       "enableDesc": "Cache viewed images locally for instant loading",
+      "helpText": "Uses the browser's IndexedDB to store viewed images locally. Cached images load instantly without network requests. Cache is best-effort — if storage fails, images are loaded normally from the server.",
       "maxSize": "Maximum Cache Size",
       "expireDays": "Cache Expiry",
       "expireDaysDesc": "{{days}} days",

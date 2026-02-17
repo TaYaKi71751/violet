@@ -21,7 +21,9 @@ export function SettingsPage() {
   const { t } = useTranslation();
   const { contentLanguage, uiLanguage, themeColor, scrollMode, tagTranslation, aiSearchEnabled, excludedTags, imageCacheEnabled, imageCacheMaxSizeMB, imageCacheExpireDays, setContentLanguage, setUILanguage, setThemeColor, setScrollMode, setTagTranslation, setAiSearchEnabled, addExcludedTag, removeExcludedTag, setImageCacheEnabled, setImageCacheMaxSizeMB, setImageCacheExpireDays } = useAppStore();
   const [showAiSearchHelp, setShowAiSearchHelp] = useState(false);
+  const [showImageCacheHelp, setShowImageCacheHelp] = useState(false);
   const helpRef = useRef<HTMLDivElement>(null);
+  const imageCacheHelpRef = useRef<HTMLDivElement>(null);
   const { data: syncStatus } = useSyncStatus();
   const triggerSync = useTriggerSync();
   const triggerFullSync = useTriggerFullSync();
@@ -111,6 +113,18 @@ export function SettingsPage() {
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showAiSearchHelp]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (imageCacheHelpRef.current && !imageCacheHelpRef.current.contains(e.target as Node)) {
+        setShowImageCacheHelp(false);
+      }
+    };
+    if (showImageCacheHelp) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showImageCacheHelp]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -376,7 +390,23 @@ export function SettingsPage() {
       </div>
 
       <div className={styles.section}>
-        <h3 className={styles.subheading}>{t('settings.imageCache.heading')}</h3>
+        <div className={styles.sectionHeader}>
+          <h3 className={styles.subheading}>{t('settings.imageCache.heading')}</h3>
+          <div className={styles.helpWrapper} ref={imageCacheHelpRef}>
+            <button
+              className={styles.helpBtn}
+              onClick={() => setShowImageCacheHelp((v) => !v)}
+              aria-label="Help"
+            >
+              <HelpCircle size={16} />
+            </button>
+            {showImageCacheHelp && (
+              <div className={styles.helpPopover}>
+                <p>{t('settings.imageCache.helpText')}</p>
+              </div>
+            )}
+          </div>
+        </div>
 
         <div className={styles.toggleRow}>
           <div className={styles.toggleInfo}>
