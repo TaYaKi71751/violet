@@ -4,9 +4,11 @@ import { useImageList } from '../hooks/useImageList';
 import { useViewer } from '../hooks/useViewer';
 import { useInsertReadLog, useUpdateReadLog } from '../hooks/useReadHistory';
 import { useViewerStore } from '../stores/viewer-store';
+import { useAppStore } from '../stores/app-store';
 import { ViewerContainer } from '../components/viewer/ViewerContainer';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { getProxyImageUrl } from '../api/proxy';
+import { cleanupExpired } from '../services/image-cache';
 import { useEffect, useRef } from 'react';
 
 export function ViewerPage() {
@@ -26,6 +28,15 @@ export function ViewerPage() {
   const insertLog = useInsertReadLog();
   const updateLog = useUpdateReadLog();
   const logIdRef = useRef<number | null>(null);
+  const { imageCacheEnabled, imageCacheExpireDays } = useAppStore();
+
+  // Cleanup expired cache on mount
+  useEffect(() => {
+    if (imageCacheEnabled) {
+      cleanupExpired(imageCacheExpireDays).catch(() => {});
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Force hide overlay on mount
   useEffect(() => {

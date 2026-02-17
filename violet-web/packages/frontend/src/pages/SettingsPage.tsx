@@ -7,6 +7,7 @@ import { useSyncStatus, useTriggerSync, useTriggerFullSync } from '../hooks/useS
 import { useSuggestionCacheStatus, useRebuildSuggestionCache } from '../hooks/useSuggestionCache';
 import { useSuggestions } from '../hooks/useSuggestions';
 import { useTagTranslation } from '../hooks/useTagTranslation';
+import { getCacheStats, clearAllCache } from '../services/image-cache';
 import styles from './SettingsPage.module.css';
 
 const themeColors = [
@@ -18,7 +19,7 @@ const themeColors = [
 
 export function SettingsPage() {
   const { t } = useTranslation();
-  const { contentLanguage, uiLanguage, themeColor, scrollMode, tagTranslation, aiSearchEnabled, excludedTags, setContentLanguage, setUILanguage, setThemeColor, setScrollMode, setTagTranslation, setAiSearchEnabled, addExcludedTag, removeExcludedTag } = useAppStore();
+  const { contentLanguage, uiLanguage, themeColor, scrollMode, tagTranslation, aiSearchEnabled, excludedTags, imageCacheEnabled, imageCacheMaxSizeMB, imageCacheExpireDays, setContentLanguage, setUILanguage, setThemeColor, setScrollMode, setTagTranslation, setAiSearchEnabled, addExcludedTag, removeExcludedTag, setImageCacheEnabled, setImageCacheMaxSizeMB, setImageCacheExpireDays } = useAppStore();
   const [showAiSearchHelp, setShowAiSearchHelp] = useState(false);
   const helpRef = useRef<HTMLDivElement>(null);
   const { data: syncStatus } = useSyncStatus();
@@ -27,6 +28,25 @@ export function SettingsPage() {
   const [showFullSyncConfirm, setShowFullSyncConfirm] = useState(false);
   const { data: cacheStatus } = useSuggestionCacheStatus();
   const rebuildCache = useRebuildSuggestionCache();
+
+  const [cacheStats, setCacheStats] = useState<{ totalSizeBytes: number; itemCount: number }>({ totalSizeBytes: 0, itemCount: 0 });
+  const [isClearing, setIsClearing] = useState(false);
+
+  useEffect(() => {
+    getCacheStats().then(setCacheStats);
+  }, []);
+
+  const handleClearCache = async () => {
+    setIsClearing(true);
+    await clearAllCache();
+    setCacheStats({ totalSizeBytes: 0, itemCount: 0 });
+    setIsClearing(false);
+  };
+
+  const formatCacheSize = (bytes: number) => {
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
 
   const [tagInput, setTagInput] = useState('');
   const [tagDropdownOpen, setTagDropdownOpen] = useState(false);
@@ -353,6 +373,80 @@ export function SettingsPage() {
             <span className={styles.toggleTrack} />
           </label>
         </div>
+      </div>
+
+      <div className={styles.section}>
+        <h3 className={styles.subheading}>{t('settings.imageCache.heading')}</h3>
+
+        <div className={styles.toggleRow}>
+          <div className={styles.toggleInfo}>
+            <span className={styles.toggleLabel}>{t('settings.imageCache.enable')}</span>
+            <span className={styles.toggleDesc}>{t('settings.imageCache.enableDesc')}</span>
+          </div>
+          <label className={styles.toggle}>
+            <input
+              type="checkbox"
+              checked={imageCacheEnabled}
+              onChange={(e) => setImageCacheEnabled(e.target.checked)}
+            />
+            <span className={styles.toggleTrack} />
+          </label>
+        </div>
+
+        {imageCacheEnabled && (
+          <>
+            <div className={styles.settingGroup}>
+              <label className={styles.settingLabel}>{t('settings.imageCache.maxSize')}</label>
+              <select
+                className={styles.select}
+                value={imageCacheMaxSizeMB}
+                onChange={(e) => setImageCacheMaxSizeMB(Number(e.target.value))}
+              >
+                <option value={100}>100 MB</option>
+                <option value={250}>250 MB</option>
+                <option value={500}>500 MB</option>
+                <option value={1024}>1 GB</option>
+                <option value={2048}>2 GB</option>
+              </select>
+            </div>
+
+            <div className={styles.settingGroup}>
+              <label className={styles.settingLabel}>{t('settings.imageCache.expireDays')}</label>
+              <select
+                className={styles.select}
+                value={imageCacheExpireDays}
+                onChange={(e) => setImageCacheExpireDays(Number(e.target.value))}
+              >
+                <option value={1}>{t('settings.imageCache.expireDaysDesc', { days: 1 })}</option>
+                <option value={3}>{t('settings.imageCache.expireDaysDesc', { days: 3 })}</option>
+                <option value={7}>{t('settings.imageCache.expireDaysDesc', { days: 7 })}</option>
+                <option value={14}>{t('settings.imageCache.expireDaysDesc', { days: 14 })}</option>
+                <option value={30}>{t('settings.imageCache.expireDaysDesc', { days: 30 })}</option>
+              </select>
+            </div>
+
+            <div className={styles.syncInfo}>
+              <div className={styles.infoRow}>
+                <span className={styles.label}>{t('settings.imageCache.cacheSize')}</span>
+                <span>{formatCacheSize(cacheStats.totalSizeBytes)}</span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.label}>{t('settings.imageCache.itemCount')}</span>
+                <span>{t('settings.imageCache.items', { count: cacheStats.itemCount })}</span>
+              </div>
+            </div>
+
+            <div className={styles.syncButtons}>
+              <button
+                className={styles.syncBtn}
+                onClick={handleClearCache}
+                disabled={isClearing || cacheStats.itemCount === 0}
+              >
+                {isClearing ? t('settings.imageCache.clearing') : t('settings.imageCache.clearCache')}
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
       <div className={styles.section}>

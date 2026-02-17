@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { BookmarkCropImage } from '@violet-web/shared';
 import { resolveGallery, getProxyImageUrl } from '../../api/proxy';
 import { useArticle } from '../../hooks/useArticle';
+import { useCachedImage } from '../../hooks/useCachedImage';
 import { ArticleInfoDialog } from '../search/ArticleInfoDialog';
 import styles from './CropImageCard.module.css';
 
@@ -53,12 +54,19 @@ export function CropImageCard({ crop, onDelete }: CropImageCardProps) {
     staleTime: 5 * 60 * 1000,
   });
 
-  const imageUrl = gallery
+  const proxyUrl = gallery
     ? getProxyImageUrl(
         gallery.urls[crop.Page],
         `https://hitomi.la/reader/${crop.Article}.html`,
       )
     : null;
+
+  const { src: cachedSrc, onLoadSuccess } = useCachedImage(
+    proxyUrl ?? '',
+    proxyUrl ? { galleryId: crop.Article, page: crop.Page } : null,
+  );
+
+  const imageUrl = proxyUrl ? cachedSrc : null;
 
   const handleClick = useCallback(() => {
     navigate(`/viewer/${crop.Article}?p=${crop.Page}`);
@@ -84,6 +92,7 @@ export function CropImageCard({ crop, onDelete }: CropImageCardProps) {
               className={styles.image}
               src={imageUrl}
               loading="lazy"
+              onLoad={onLoadSuccess}
               style={{
                 width: `${(1 / cropWidth) * 100}%`,
                 left: `${(-left / cropWidth) * 100}%`,

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useCachedImage } from '../../hooks/useCachedImage';
 import styles from './ViewerImage.module.css';
 
 interface ViewerImageProps {
@@ -7,14 +8,16 @@ interface ViewerImageProps {
   alt?: string;
   active?: boolean; // If false, show placeholder instead of loading image
   onLoad?: () => void;
+  cacheKey?: { galleryId: number; page: number };
 }
 
 const MAX_RETRIES = 10;
 const RETRY_DELAY = 1500; // 1.5 seconds
 const ACTIVE_DEBOUNCE = 150; // ms - prevents loading images during fast scrolling
 
-export function ViewerImage({ src, alt = '', active = true, onLoad }: ViewerImageProps) {
+export function ViewerImage({ src, alt = '', active = true, onLoad, cacheKey }: ViewerImageProps) {
   const { t } = useTranslation();
+  const { src: effectiveSrc, onLoadSuccess } = useCachedImage(src, cacheKey ?? null);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
@@ -27,7 +30,7 @@ export function ViewerImage({ src, alt = '', active = true, onLoad }: ViewerImag
     setLoaded(false);
     setError(false);
     setRetryCount(0);
-  }, [src]);
+  }, [effectiveSrc]);
 
   // Debounce active state: only render after staying active for a short period
   useEffect(() => {
@@ -78,6 +81,7 @@ export function ViewerImage({ src, alt = '', active = true, onLoad }: ViewerImag
 
   const handleLoad = () => {
     setLoaded(true);
+    onLoadSuccess();
     onLoad?.();
   };
 
@@ -86,8 +90,8 @@ export function ViewerImage({ src, alt = '', active = true, onLoad }: ViewerImag
       {!error ? (
         <img
           ref={imgRef}
-          key={`${src}-${retryCount}`}
-          src={src}
+          key={`${effectiveSrc}-${retryCount}`}
+          src={effectiveSrc}
           alt={alt}
           className={`${styles.image} ${loaded ? styles.loaded : ''}`}
           onLoad={handleLoad}

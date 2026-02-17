@@ -27,6 +27,9 @@ interface AppState {
   tagTranslation: boolean;
   aiSearchEnabled: boolean;
   excludedTags: string[];
+  imageCacheEnabled: boolean;
+  imageCacheMaxSizeMB: number;
+  imageCacheExpireDays: number;
 
   setContentLanguage: (lang: ContentLanguage) => void;
   setUILanguage: (lang: UILanguage) => void;
@@ -41,6 +44,9 @@ interface AppState {
   setAiSearchEnabled: (enabled: boolean) => void;
   addExcludedTag: (tag: string) => void;
   removeExcludedTag: (tag: string) => void;
+  setImageCacheEnabled: (enabled: boolean) => void;
+  setImageCacheMaxSizeMB: (size: number) => void;
+  setImageCacheExpireDays: (days: number) => void;
 }
 
 // Helper to get system language
@@ -82,6 +88,9 @@ export const useAppStore = create<AppState>()(
       tagTranslation: getDefaultTagTranslation(),
       aiSearchEnabled: false,
       excludedTags: ['female:snuff', 'female:gore'],
+      imageCacheEnabled: true,
+      imageCacheMaxSizeMB: 500,
+      imageCacheExpireDays: 7,
 
       setContentLanguage: (contentLanguage) => set({ contentLanguage }),
       setUILanguage: (uiLanguage) => {
@@ -108,6 +117,9 @@ export const useAppStore = create<AppState>()(
         set((state) => ({
           excludedTags: state.excludedTags.filter((t) => t !== tag),
         })),
+      setImageCacheEnabled: (imageCacheEnabled) => set({ imageCacheEnabled }),
+      setImageCacheMaxSizeMB: (imageCacheMaxSizeMB) => set({ imageCacheMaxSizeMB }),
+      setImageCacheExpireDays: (imageCacheExpireDays) => set({ imageCacheExpireDays }),
     }),
     { name: 'violet-app-settings' },
   ),

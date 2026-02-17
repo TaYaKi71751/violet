@@ -11,6 +11,7 @@ interface PagedReaderProps {
   rtl: boolean;
   twoPageMode: boolean;
   coverPageMode: 'cover' | 'normal';
+  galleryId: number;
 }
 
 export function PagedReader({
@@ -20,6 +21,7 @@ export function PagedReader({
   rtl,
   twoPageMode,
   coverPageMode,
+  galleryId,
 }: PagedReaderProps) {
   const [containerRef, setContainerRef] = useState<HTMLDivElement | null>(null);
 
@@ -188,6 +190,7 @@ export function PagedReader({
             src={url}
             alt={`Page ${index + 1}`}
             active={isPageActive(index)}
+            cacheKey={{ galleryId, page: index }}
           />
         </div>
       ))}

@@ -145,6 +145,19 @@
       "enableDesc": "Show AI Search tab in navigation",
       "helpText": "AI Search requires the violet-search server to be running separately. You need to set up and run the violet-search service for this feature to work."
     },
+    "imageCache": {
+      "heading": "Image Cache",
+      "enable": "Enable Image Cache",
+      "enableDesc": "Cache viewed images locally for instant loading",
+      "maxSize": "Maximum Cache Size",
+      "expireDays": "Cache Expiry",
+      "expireDaysDesc": "{{days}} days",
+      "cacheSize": "Cache Size:",
+      "itemCount": "Cached Images:",
+      "items": "{{count}} images",
+      "clearCache": "Clear Cache",
+      "clearing": "Clearing..."
+    },
     "sync": {
       "heading": "Database Sync",
       "database": "Database:",

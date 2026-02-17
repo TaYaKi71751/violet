@@ -145,6 +145,19 @@
       "enableDesc": "내비게이션에 AI 검색 탭을 표시합니다",
       "helpText": "AI 검색을 사용하려면 violet-search 서버를 별도로 실행해야 합니다. 이 기능을 사용하려면 violet-search 서비스를 설정하고 실행하세요."
     },
+    "imageCache": {
+      "heading": "이미지 캐시",
+      "enable": "이미지 캐시 사용",
+      "enableDesc": "본 이미지를 로컬에 캐싱하여 즉시 로딩합니다",
+      "maxSize": "최대 캐시 크기",
+      "expireDays": "캐시 만료 기간",
+      "expireDaysDesc": "{{days}}일",
+      "cacheSize": "캐시 크기:",
+      "itemCount": "캐시된 이미지:",
+      "items": "{{count}}개",
+      "clearCache": "캐시 지우기",
+      "clearing": "삭제 중..."
+    },
     "sync": {
       "heading": "데이터베이스 동기화",
       "database": "데이터베이스:",
