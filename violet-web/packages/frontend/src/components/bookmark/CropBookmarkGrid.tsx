@@ -113,7 +113,7 @@ function usePrefetchedCache(crops: BookmarkCropImage[]) {
       crops.forEach((c, i) => {
         const thumb = thumbs.get(thumbKeys[i]);
         if (thumb) {
-          hits.set(`${c.Article}:${c.Page}`, thumb);
+          hits.set(`${c.Article}:${c.Page}:${c.Area}`, thumb);
         } else {
           misses.push(c);
         }
@@ -130,7 +130,7 @@ function usePrefetchedCache(crops: BookmarkCropImage[]) {
               const full = fulls.get(`${c.Article}:${c.Page}`);
               if (!full) return;
               const cropped = await cropImageBlob(full.blob, c.Area);
-              hits.set(`${c.Article}:${c.Page}`, cropped);
+              hits.set(`${c.Article}:${c.Page}:${c.Area}`, cropped);
               // Save thumbnail for next time (fire-and-forget)
               putCropThumbnail(`${c.Article}:${c.Page}:${c.Area}`, cropped).catch(() => {});
             } catch {
@@ -216,7 +216,7 @@ export function CropBookmarkGrid({ crops, columnWidth, onDelete }: CropBookmarkG
             <CropImageCard
               key={crop.Id}
               crop={crop}
-              cachedUrl={cachedUrls.get(`${crop.Article}:${crop.Page}`)}
+              cachedUrl={cachedUrls.get(`${crop.Article}:${crop.Page}:${crop.Area}`)}
               cacheLoading={cacheLoading}
               onDelete={onDelete}
             />
