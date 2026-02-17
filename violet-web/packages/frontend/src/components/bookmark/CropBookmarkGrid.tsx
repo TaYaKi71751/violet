@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import type { BookmarkCropImage } from '@violet-web/shared';
 import { CropImageCard } from './CropImageCard';
 import { useColumnCount } from '../../hooks/useColumnCount';
@@ -48,6 +48,21 @@ function distributeToColumns(crops: BookmarkCropImage[], columnCount: number) {
 
 export function CropBookmarkGrid({ crops, columnWidth, onDelete }: CropBookmarkGridProps) {
   const columnCount = useColumnCount(columnWidth);
+  const [scrolling, setScrolling] = useState(false);
+  const scrollTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolling(true);
+      clearTimeout(scrollTimer.current);
+      scrollTimer.current = setTimeout(() => setScrolling(false), 150);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(scrollTimer.current);
+    };
+  }, []);
 
   const columns = useMemo(
     () => distributeToColumns(crops, columnCount),
@@ -59,7 +74,7 @@ export function CropBookmarkGrid({ crops, columnWidth, onDelete }: CropBookmarkG
   }
 
   return (
-    <div className={styles.grid}>
+    <div className={`${styles.grid} ${scrolling ? styles.scrolling : ''}`}>
       {columns.map((col, colIdx) => (
         <div key={colIdx} className={styles.column}>
           {col.map((crop) => (

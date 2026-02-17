@@ -5,6 +5,8 @@
   cursor: pointer;
   break-inside: avoid;
   background: var(--color-surface);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 200px;
 }
 
 .card:hover .overlay {
