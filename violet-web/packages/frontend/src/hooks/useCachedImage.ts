@@ -8,7 +8,8 @@ export function useCachedImage(
   proxyUrl: string,
   cacheKey: { galleryId: number; page: number } | null,
 ): { src: string; onLoadSuccess: () => void } {
-  const { imageCacheEnabled, imageCacheMaxSizeMB } = useAppStore();
+  const imageCacheEnabled = useAppStore((s) => s.imageCacheEnabled);
+  const imageCacheMaxSizeMB = useAppStore((s) => s.imageCacheMaxSizeMB);
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
   const [cacheChecked, setCacheChecked] = useState(false);
   const blobUrlRef = useRef<string | null>(null);
@@ -29,15 +30,19 @@ export function useCachedImage(
     setCacheChecked(false);
     setBlobUrl(null);
 
-    getCachedImage(galleryId, page).then((cached) => {
-      if (cancelled) return;
-      if (cached) {
-        const url = URL.createObjectURL(cached.blob);
-        blobUrlRef.current = url;
-        setBlobUrl(url);
-      }
-      setCacheChecked(true);
-    });
+    getCachedImage(galleryId, page)
+      .then((cached) => {
+        if (cancelled) return;
+        if (cached) {
+          const url = URL.createObjectURL(cached.blob);
+          blobUrlRef.current = url;
+          setBlobUrl(url);
+        }
+        setCacheChecked(true);
+      })
+      .catch(() => {
+        if (!cancelled) setCacheChecked(true);
+      });
 
     return () => {
       cancelled = true;
@@ -69,8 +74,13 @@ export function useCachedImage(
       });
   }, [enabled, blobUrl, proxyUrl, galleryId, page, imageCacheMaxSizeMB]);
 
-  if (!enabled || !cacheChecked) {
-    return { src: proxyUrl, onLoadSuccess: enabled ? onLoadSuccess : noop };
+  if (!enabled) {
+    return { src: proxyUrl, onLoadSuccess: noop };
+  }
+
+  // Wait for cache check to prevent proxy→blob URL switch (double decode)
+  if (!cacheChecked) {
+    return { src: '', onLoadSuccess: noop };
   }
 
   return {

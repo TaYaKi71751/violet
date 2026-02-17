@@ -87,7 +87,7 @@ export function ViewerImage({ src, alt = '', active = true, onLoad, cacheKey }: 
 
   return (
     <div className={styles.container}>
-      {!error ? (
+      {!error && effectiveSrc ? (
         <img
           ref={imgRef}
           key={`${effectiveSrc}-${retryCount}`}
@@ -97,11 +97,11 @@ export function ViewerImage({ src, alt = '', active = true, onLoad, cacheKey }: 
           onLoad={handleLoad}
           onError={handleError}
         />
-      ) : (
+      ) : error ? (
         <div className={styles.error} onClick={manualRetry}>
           {t('viewer.loadError', { max: MAX_RETRIES })}
         </div>
-      )}
+      ) : null}
       {!loaded && !error && (
         <div className={styles.loading}>
           {retryCount > 0

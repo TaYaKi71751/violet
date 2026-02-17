@@ -5,8 +5,6 @@
   cursor: pointer;
   break-inside: avoid;
   background: var(--color-surface);
-  content-visibility: auto;
-  contain-intrinsic-size: auto 200px;
 }
 
 .card:hover .overlay {
@@ -29,6 +27,12 @@
   left: 0;
   display: block;
   max-width: none;
+}
+
+.croppedImage {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .overlay {
