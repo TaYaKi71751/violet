@@ -13,6 +13,7 @@ import { useLocalArticleSearch } from '../hooks/useLocalArticleSearch';
 import { useLocalSearchState } from '../hooks/useLocalSearchState';
 import { useIsMobile } from '../hooks/useMediaQuery';
 import { useAppStore } from '../stores/app-store';
+import { usePaginationKeyboard } from '../hooks/usePaginationKeyboard';
 import styles from './HistoryPage.module.css';
 
 const PAGE_SIZE = 30;
@@ -52,6 +53,8 @@ export function HistoryPage() {
     scrollMode === 'infinite'
       ? filteredArticles.slice(0, visibleCount)
       : filteredArticles.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
+  usePaginationKeyboard(page, totalPages, setPage, scrollMode === 'pagination');
 
   const handleReset = useCallback(() => {
     navigate('/history', { replace: true });

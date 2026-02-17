@@ -15,6 +15,7 @@ import { useLocalArticleSearch } from '../hooks/useLocalArticleSearch';
 import { useLocalSearchState } from '../hooks/useLocalSearchState';
 import { useIsMobile } from '../hooks/useMediaQuery';
 import { useAppStore } from '../stores/app-store';
+import { usePaginationKeyboard } from '../hooks/usePaginationKeyboard';
 import { useToastStore } from '../stores/toast-store';
 import styles from './DownloadsPage.module.css';
 
@@ -100,6 +101,8 @@ export function DownloadsPage() {
     scrollMode === 'infinite'
       ? filteredArticles.slice(0, visibleCount)
       : filteredArticles.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
+  usePaginationKeyboard(page, totalPages, setPage, scrollMode === 'pagination');
 
   const handleReset = useCallback(() => {
     navigate('/downloads', { replace: true });
