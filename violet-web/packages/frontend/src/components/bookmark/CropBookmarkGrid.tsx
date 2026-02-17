@@ -3,7 +3,11 @@ import type { BookmarkCropImage } from '@violet-web/shared';
 import { CropImageCard } from './CropImageCard';
 import { useColumnCount } from '../../hooks/useColumnCount';
 import { useAppStore } from '../../stores/app-store';
-import { getCachedImage } from '../../services/image-cache';
+import {
+  getCachedImagesBulk,
+  getCropThumbnailsBulk,
+  putCropThumbnail,
+} from '../../services/image-cache';
 import styles from './CropBookmarkGrid.module.css';
 
 interface CropBookmarkGridProps {
@@ -73,52 +77,90 @@ async function cropImageBlob(
 }
 
 /**
- * Pre-fetch all cached images at the grid level and crop them
- * so individual cards never do async work during scroll.
- * Cropped images are exact display size → minimal painting cost.
+ * Two-tier prefetch:
+ * 1. Check crop-thumbnails store (already cropped, small, fast)
+ * 2. For misses, read full images → crop → save thumbnail for next time
+ *
+ * First visit:  full image read + crop + save thumb (~slow)
+ * Second visit: thumbnail read only (~instant)
  */
 function usePrefetchedCache(crops: BookmarkCropImage[]) {
   const imageCacheEnabled = useAppStore((s) => s.imageCacheEnabled);
   const [cachedUrls, setCachedUrls] = useState<Map<string, string>>(new Map);
+  const [loading, setLoading] = useState(false);
   const blobUrlsRef = useRef<string[]>([]);
 
   useEffect(() => {
     if (!imageCacheEnabled || crops.length === 0) {
       setCachedUrls(new Map());
+      setLoading(false);
       return;
     }
 
     let cancelled = false;
+    setLoading(true);
 
-    // Read all cache entries and crop them to display size
-    Promise.all(
-      crops.map(async (c) => {
-        const cached = await getCachedImage(c.Article, c.Page);
-        if (!cached) return null;
-        const cropped = await cropImageBlob(cached.blob, c.Area);
-        return { key: `${c.Article}:${c.Page}`, blob: cropped };
-      }),
-    )
-      .then((results) => {
-        if (cancelled) return;
-        // Revoke previous blob URLs
-        for (const url of blobUrlsRef.current) URL.revokeObjectURL(url);
+    (async () => {
+      // Build thumbnail keys
+      const thumbKeys = crops.map((c) => `${c.Article}:${c.Page}:${c.Area}`);
 
-        const map = new Map<string, string>();
-        const urls: string[] = [];
-        for (const r of results) {
-          if (r) {
-            const url = URL.createObjectURL(r.blob);
-            urls.push(url);
-            map.set(r.key, url);
-          }
+      // 1) Bulk read thumbnails (single transaction, small blobs)
+      const thumbs = await getCropThumbnailsBulk(thumbKeys);
+
+      const hits = new Map<string, Blob>();
+      const misses: BookmarkCropImage[] = [];
+
+      crops.forEach((c, i) => {
+        const thumb = thumbs.get(thumbKeys[i]);
+        if (thumb) {
+          hits.set(`${c.Article}:${c.Page}`, thumb);
+        } else {
+          misses.push(c);
         }
-        blobUrlsRef.current = urls;
-        setCachedUrls(map);
-      })
-      .catch(() => {
-        if (!cancelled) setCachedUrls(new Map());
       });
+
+      // 2) For misses, bulk read full images and crop
+      if (misses.length > 0) {
+        const fullKeys = misses.map((c) => ({ articleId: c.Article, page: c.Page }));
+        const fulls = await getCachedImagesBulk(fullKeys);
+
+        await Promise.all(
+          misses.map(async (c) => {
+            try {
+              const full = fulls.get(`${c.Article}:${c.Page}`);
+              if (!full) return;
+              const cropped = await cropImageBlob(full.blob, c.Area);
+              hits.set(`${c.Article}:${c.Page}`, cropped);
+              // Save thumbnail for next time (fire-and-forget)
+              putCropThumbnail(`${c.Article}:${c.Page}:${c.Area}`, cropped).catch(() => {});
+            } catch {
+              // skip this crop
+            }
+          }),
+        );
+      }
+
+      if (cancelled) return;
+
+      // Revoke previous blob URLs
+      for (const url of blobUrlsRef.current) URL.revokeObjectURL(url);
+
+      const map = new Map<string, string>();
+      const urls: string[] = [];
+      for (const [key, blob] of hits) {
+        const url = URL.createObjectURL(blob);
+        urls.push(url);
+        map.set(key, url);
+      }
+      blobUrlsRef.current = urls;
+      setCachedUrls(map);
+      setLoading(false);
+    })().catch(() => {
+      if (!cancelled) {
+        setCachedUrls(new Map());
+        setLoading(false);
+      }
+    });
 
     return () => {
       cancelled = true;
@@ -133,14 +175,14 @@ function usePrefetchedCache(crops: BookmarkCropImage[]) {
     [],
   );
 
-  return cachedUrls;
+  return { cachedUrls, loading };
 }
 
 export function CropBookmarkGrid({ crops, columnWidth, onDelete }: CropBookmarkGridProps) {
   const columnCount = useColumnCount(columnWidth);
   const gridRef = useRef<HTMLDivElement>(null);
   const scrollTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const cachedUrls = usePrefetchedCache(crops);
+  const { cachedUrls, loading: cacheLoading } = usePrefetchedCache(crops);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -175,6 +217,7 @@ export function CropBookmarkGrid({ crops, columnWidth, onDelete }: CropBookmarkG
               key={crop.Id}
               crop={crop}
               cachedUrl={cachedUrls.get(`${crop.Article}:${crop.Page}`)}
+              cacheLoading={cacheLoading}
               onDelete={onDelete}
             />
           ))}

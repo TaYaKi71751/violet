@@ -1,6 +1,7 @@
 const DB_NAME = 'violet-image-cache';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = 'images';
+const THUMB_STORE = 'crop-thumbnails';
 
 interface CachedImage {
   articleId: number;
@@ -9,6 +10,12 @@ interface CachedImage {
   contentType: string;
   size: number;
   lastAccessed: number;
+  createdAt: number;
+}
+
+interface CropThumbnail {
+  key: string; // "articleId:page:area"
+  blob: Blob;
   createdAt: number;
 }
 
@@ -22,12 +29,15 @@ function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-    request.onupgradeneeded = () => {
+    request.onupgradeneeded = (event) => {
       const db = request.result;
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
+      if ((event.oldVersion as number) < 1) {
         const store = db.createObjectStore(STORE_NAME, { keyPath: ['articleId', 'page'] });
         store.createIndex('lastAccessed', 'lastAccessed', { unique: false });
         store.createIndex('articleId', 'articleId', { unique: false });
+      }
+      if ((event.oldVersion as number) < 2) {
+        db.createObjectStore(THUMB_STORE, { keyPath: 'key' });
       }
     };
 
@@ -70,6 +80,101 @@ export async function getCachedImage(
     });
   } catch {
     return null;
+  }
+}
+
+/**
+ * Bulk read from the full images store in a single transaction.
+ */
+export async function getCachedImagesBulk(
+  keys: Array<{ articleId: number; page: number }>,
+): Promise<Map<string, { blob: Blob; contentType: string }>> {
+  const results = new Map<string, { blob: Blob; contentType: string }>();
+  if (keys.length === 0) return results;
+
+  try {
+    const db = await openDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const store = tx.objectStore(STORE_NAME);
+      let completed = 0;
+
+      for (const key of keys) {
+        const request = store.get([key.articleId, key.page]);
+        request.onsuccess = () => {
+          const result = request.result as CachedImage | undefined;
+          if (result) {
+            results.set(`${key.articleId}:${key.page}`, {
+              blob: result.blob,
+              contentType: result.contentType,
+            });
+          }
+          if (++completed === keys.length) resolve(results);
+        };
+        request.onerror = () => {
+          if (++completed === keys.length) resolve(results);
+        };
+      }
+    });
+  } catch {
+    return results;
+  }
+}
+
+/**
+ * Bulk read crop thumbnails in a single transaction.
+ */
+export async function getCropThumbnailsBulk(
+  keys: string[],
+): Promise<Map<string, Blob>> {
+  const results = new Map<string, Blob>();
+  if (keys.length === 0) return results;
+
+  try {
+    const db = await openDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction(THUMB_STORE, 'readonly');
+      const store = tx.objectStore(THUMB_STORE);
+      let completed = 0;
+
+      for (const key of keys) {
+        const request = store.get(key);
+        request.onsuccess = () => {
+          const result = request.result as CropThumbnail | undefined;
+          if (result) {
+            results.set(key, result.blob);
+          }
+          if (++completed === keys.length) resolve(results);
+        };
+        request.onerror = () => {
+          if (++completed === keys.length) resolve(results);
+        };
+      }
+    });
+  } catch {
+    return results;
+  }
+}
+
+/**
+ * Save a crop thumbnail for fast subsequent loads.
+ */
+export async function putCropThumbnail(
+  key: string,
+  blob: Blob,
+): Promise<void> {
+  try {
+    const db = await openDB();
+    const entry: CropThumbnail = { key, blob, createdAt: Date.now() };
+    await new Promise<void>((resolve) => {
+      const tx = db.transaction(THUMB_STORE, 'readwrite');
+      const store = tx.objectStore(THUMB_STORE);
+      const request = store.put(entry);
+      request.onsuccess = () => resolve();
+      request.onerror = () => resolve();
+    });
+  } catch {
+    // best-effort
   }
 }
 
@@ -160,11 +265,13 @@ export async function clearAllCache(): Promise<void> {
   try {
     const db = await openDB();
     await new Promise<void>((resolve, reject) => {
-      const tx = db.transaction(STORE_NAME, 'readwrite');
-      const store = tx.objectStore(STORE_NAME);
-      const request = store.clear();
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
+      const tx = db.transaction([STORE_NAME, THUMB_STORE], 'readwrite');
+      const imgStore = tx.objectStore(STORE_NAME);
+      const thumbStore = tx.objectStore(THUMB_STORE);
+      imgStore.clear();
+      thumbStore.clear();
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
     });
   } catch {
     // best-effort

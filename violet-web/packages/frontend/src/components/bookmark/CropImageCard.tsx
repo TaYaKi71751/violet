@@ -12,6 +12,7 @@ import styles from './CropImageCard.module.css';
 interface CropImageCardProps {
   crop: BookmarkCropImage;
   cachedUrl?: string;
+  cacheLoading?: boolean;
   onDelete: (id: number) => void;
 }
 
@@ -20,7 +21,7 @@ function parseCropArea(area: string) {
   return { left, top, right, bottom };
 }
 
-export function CropImageCard({ crop, cachedUrl, onDelete }: CropImageCardProps) {
+export function CropImageCard({ crop, cachedUrl, cacheLoading, onDelete }: CropImageCardProps) {
   const navigate = useNavigate();
   const cardRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -52,11 +53,11 @@ export function CropImageCard({ crop, cachedUrl, onDelete }: CropImageCardProps)
   const cropHeight = bottom - top;
   const cropAspectRatio = (cropWidth * crop.AspectRatio) / cropHeight;
 
-  // Only fetch gallery URL if no cached version available
+  // Only fetch gallery URL if no cached version and cache check is done
   const { data: gallery } = useQuery({
     queryKey: ['gallery', crop.Article],
     queryFn: () => resolveGallery(crop.Article),
-    enabled: visible && !cachedUrl,
+    enabled: visible && !cachedUrl && !cacheLoading,
     staleTime: 5 * 60 * 1000,
   });
 
