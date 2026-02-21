@@ -20,8 +20,8 @@
     "test:e2e": "cross-env NODE_ENV=test jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.859.0",
-    "@aws-sdk/s3-presigned-post": "^3.859.0",
+    "@aws-sdk/client-s3": "^3.995.0",
+    "@aws-sdk/s3-presigned-post": "^3.995.0",
     "@golevelup/ts-jest": "^0.7.0",
     "@nestjs/common": "^11.1.5",
     "@nestjs/config": "^4.0.3",
