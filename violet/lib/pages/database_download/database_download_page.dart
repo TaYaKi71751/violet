@@ -5,7 +5,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -21,7 +20,6 @@ import 'package:violet/locale/locale.dart';
 import 'package:violet/log/log.dart';
 import 'package:violet/pages/common/toast.dart';
 import 'package:violet/settings/settings.dart';
-import 'package:violet/src/rust/api/simple.dart';
 import 'package:violet/version/sync.dart';
 
 typedef TagIndexingCallback = dynamic Function(QueryResult);
@@ -81,6 +79,16 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
     downloadFile();
   }
 
+  Future<void> createDummy() async {
+    final dbPath = Platform.isAndroid || Platform.isIOS
+        ? File('${(await getApplicationDocumentsDirectory()).path}/data.db')
+        : File(join(dirname(Platform.resolvedExecutable), 'data', 'data.db'));
+    if (dbPath.existsSync()) {
+      await dbPath.delete();
+    }
+    await dbPath.create(recursive: true);
+  }
+
   Future<void> downloadFile() async {
     try {
       await downloadFileWith('latest', true);
@@ -90,10 +98,6 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
   }
 
   Future<void> downloadFileWith(String target, bool propagateException) async {
-    Dio dio = Dio();
-    int oneMega = 1024 * 1024;
-    int nu = 0;
-    int latest = 0;
     int tlatest = 0;
     int tnu = 0;
 
@@ -130,26 +134,7 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
           tnu = 0;
         }),
       );
-      await dio.download(
-        SyncManager.getLatestDB().getDBDownloadUrl(widget.dbType!),
-        '${dir.path}/db.sql.7z',
-        onReceiveProgress: (rec, total) {
-          nu += rec - latest;
-          tnu += rec - latest;
-          latest = rec;
-          if (nu <= oneMega) return;
-
-          nu = 0;
-
-          setState(() {
-            downloading = true;
-            final progressPercent = (rec / total) * 100;
-            progressString = '${_formatNumberWithComma(progressPercent)}%';
-            downString =
-                '[${_formatNumberWithComma(rec)}/${_formatNumberWithComma(total)}]';
-          });
-        },
-      );
+      await createDummy();
       timer.cancel();
 
       setState(() {
@@ -157,17 +142,6 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
         print(baseString);
         downloading = false;
       });
-
-      if (Platform.isAndroid || Platform.isIOS) {
-        if (await Directory('${dir.path}/data').exists()) {
-          await Directory('${dir.path}/data').delete(recursive: true);
-        }
-      }
-      await decompress7Z(
-        src: '${dir.path}/db.sql.7z',
-        dest: Platform.isAndroid ? '${dir.path}/data' : dir.path,
-      );
-      await File('${dir.path}/db.sql.7z').delete();
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt('db_exists', 1);
