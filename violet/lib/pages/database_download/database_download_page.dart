@@ -87,6 +87,23 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
       await dbPath.delete();
     }
     await dbPath.create(recursive: true);
+    final db = await DataBaseManager.getInstance();
+    await db.execute('''CREATE TABLE HitomiColumnModel (
+      Id integer primary key autoincrement, 
+      Title text, 
+      EHash text,
+      Type text,
+      Artists text,
+      Characters text,
+      Groups text,
+      Language text,
+      Tags text,
+      Uploader text,
+      Published text,
+      Files integer,
+      Class text,
+      ExistOnHitomi integer);
+      ''');
   }
 
   Future<void> downloadFile() async {
