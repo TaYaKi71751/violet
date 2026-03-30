@@ -11,7 +11,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:country_pickers/country.dart';
 import 'package:country_pickers/country_pickers.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -28,7 +27,6 @@ import 'package:violet/database/user/record.dart';
 import 'package:violet/downloader/isolate_downloader.dart';
 import 'package:violet/locale/locale.dart';
 import 'package:violet/log/act_log.dart';
-import 'package:violet/log/log.dart';
 import 'package:violet/other/dialogs.dart';
 import 'package:violet/other/ex_country.dart';
 import 'package:violet/other/named_color.dart';
@@ -161,34 +159,34 @@ class _SplashPageState extends State<SplashPage> {
 
     final prefs = await SharedPreferences.getInstance();
     if (prefs.getInt('db_exists') == 1 && !widget.switching) {
-      if (!connectivityResult.contains(ConnectivityResult.none)) {
-        try {
-          _changeMessage('check sync...');
-          await SyncManager.checkSyncLatest(true);
+      // if (!connectivityResult.contains(ConnectivityResult.none)) {
+      //   try {
+      //     _changeMessage('check sync...');
+      //     await SyncManager.checkSyncLatest(true);
 
-          if (!SyncManager.firstSync && SyncManager.chunkRequire) {
-            setState(() {
-              showMessage = false;
-              showIndicator = true;
-            });
-            await SyncManager.doChunkSync((_, len) async {
-              setState(() {
-                chunkDownloadMax = len;
-                chunkDownloadProgress++;
-              });
-            });
-          }
-        } catch (e, st) {
-          // If an error occurs, stops synchronization immediately.
-          if (Platform.isAndroid || Platform.isIOS) {
-            FirebaseCrashlytics.instance.recordError(e, st);
-          }
-          Logger.error(
-            '[Splash-Navigation] E: $e\n'
-            '$st',
-          );
-        }
-      }
+      //     if (!SyncManager.firstSync && SyncManager.chunkRequire) {
+      //       setState(() {
+      //         showMessage = false;
+      //         showIndicator = true;
+      //       });
+      //       await SyncManager.doChunkSync((_, len) async {
+      //         setState(() {
+      //           chunkDownloadMax = len;
+      //           chunkDownloadProgress++;
+      //         });
+      //       });
+      //     }
+      //   } catch (e, st) {
+      //     // If an error occurs, stops synchronization immediately.
+      //     if (Platform.isAndroid || Platform.isIOS) {
+      //       FirebaseCrashlytics.instance.recordError(e, st);
+      //     }
+      //     Logger.error(
+      //       '[Splash-Navigation] E: $e\n'
+      //       '$st',
+      //     );
+      //   }
+      // }
 
       // We must show main page to user anyway
       Navigator.of(context).pushReplacementNamed('/AfterLoading');
