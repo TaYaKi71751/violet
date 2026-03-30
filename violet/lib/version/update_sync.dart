@@ -50,28 +50,28 @@ class UpdateSyncManager {
   }
 
   static Future<void> checkUpdateSync() async {
-    try {
-      var infoJson = await http.get(updateInfoURL);
+    // try {
+    //   var infoJson = await http.get(updateInfoURL);
 
-      var info = jsonDecode(infoJson.body).cast<String, dynamic>();
+    //   var info = jsonDecode(infoJson.body).cast<String, dynamic>();
 
-      var ver = (info['version'] as String)
-          .split('.')
-          .map((e) => int.parse(e))
-          .toList();
-      if (_checkIsNewVersion(ver)) {
-        updateRequire = true;
-        version = info['version'] as String;
-        updateMessage = info['message'] as String;
-        updateUrl = info['download_link'] as String;
-        print(info);
-      }
-      latestVersion = info['version'] as String;
-    } catch (e, st) {
-      Logger.error(
-        '[Update-check] E: $e\n'
-        '$st',
-      );
-    }
+    //   var ver = (info['version'] as String)
+    //       .split('.')
+    //       .map((e) => int.parse(e))
+    //       .toList();
+    //   if (_checkIsNewVersion(ver)) {
+    //     updateRequire = true;
+    //     version = info['version'] as String;
+    //     updateMessage = info['message'] as String;
+    //     updateUrl = info['download_link'] as String;
+    //     print(info);
+    //   }
+    //   latestVersion = info['version'] as String;
+    // } catch (e, st) {
+    //   Logger.error(
+    //     '[Update-check] E: $e\n'
+    //     '$st',
+    //   );
+    // }
   }
 }
