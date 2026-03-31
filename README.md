@@ -1,3 +1,5 @@
+> DEPRECATED
+
 <p align="center">
     <img width="150px" src="https://raw.githubusercontent.com/TaYaKi71751/violet/dev/violet/assets/images/logo.png" align="center" alt="Violet Logo" />
 </p>
