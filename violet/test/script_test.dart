@@ -19,7 +19,7 @@ sudo cp build/linux/libquickjs_c_bridge_plugin.so /usr/lib/libquickjs_c_bridge_p
 void main() {
   setUp(() async {
     WidgetsFlutterBinding.ensureInitialized();
-    await ScriptManager.init();
+    // await ScriptManager.init();
   });
 
   test('Refresh by V4 NoWebView', () async {

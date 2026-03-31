@@ -5,7 +5,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_js/flutter_js.dart';
-import 'package:html/parser.dart';
+// import 'package:html/parser.dart';
 import 'package:violet/component/hitomi/hitomi.dart';
 import 'package:violet/context/viewer_context.dart';
 import 'package:violet/log/log.dart';
@@ -31,48 +31,48 @@ class ScriptManager {
   static late JavascriptRuntime runtime;
   static late DateTime latestUpdate;
 
-  static Future<void> init() async {
-    Future fallbackFail(Future Function() fn) async {
-      await catchUnwind(fn, (e, st) async {
-        await Logger.warning(
-          '[ScriptManager-init] W: $e\n'
-          '$st',
-        );
-        debugPrint(e.toString());
-      });
-    }
+  // static Future<void> init() async {
+  //   Future fallbackFail(Future Function() fn) async {
+  //     await catchUnwind(fn, (e, st) async {
+  //       await Logger.warning(
+  //         '[ScriptManager-init] W: $e\n'
+  //         '$st',
+  //       );
+  //       debugPrint(e.toString());
+  //     });
+  //   }
 
-    await fallbackFail(() async {
-      final scriptHtml = (await http.get(scriptNoCDNUrl)).body;
-      scriptCache = json.decode(
-        parse(
-          scriptHtml,
-        ).querySelector("script[data-target='react-app.embeddedData']")!.text,
-      )['payload']['blob']['rawBlob'];
-    });
+  //   await fallbackFail(() async {
+  //     final scriptHtml = (await http.get(scriptNoCDNUrl)).body;
+  //     scriptCache = json.decode(
+  //       parse(
+  //         scriptHtml,
+  //       ).querySelector("script[data-target='react-app.embeddedData']")!.text,
+  //     )['payload']['blob']['rawBlob'];
+  //   });
 
-    if (scriptCache == null) {
-      await fallbackFail(() async {
-        scriptCache = (await http.get(scriptUrl)).body;
-      });
-    }
+  //   if (scriptCache == null) {
+  //     await fallbackFail(() async {
+  //       scriptCache = (await http.get(scriptUrl)).body;
+  //     });
+  //   }
 
-    await fallbackFail(() async {
-      v4Cache = (await http.get(scriptV4Url)).body;
-    });
+  //   await fallbackFail(() async {
+  //     v4Cache = (await http.get(scriptV4Url)).body;
+  //   });
 
-    await fallbackFail(() async {
-      final check = (await http.get(enableRefreshV4NoWebViewCheckUrl)).body;
-      enableRefreshV4NoWebView = int.parse(check) == 1;
-      if (enableRefreshV4NoWebView) {
-        await refreshV4NoWebView();
-      }
-    });
+  //   await fallbackFail(() async {
+  //     final check = (await http.get(enableRefreshV4NoWebViewCheckUrl)).body;
+  //     enableRefreshV4NoWebView = int.parse(check) == 1;
+  //     if (enableRefreshV4NoWebView) {
+  //       await refreshV4NoWebView();
+  //     }
+  //   });
 
-    await fallbackFail(() async {
-      initRuntime();
-    });
-  }
+  //   await fallbackFail(() async {
+  //     initRuntime();
+  //   });
+  // }
 
   static Future<void> refresh() async {
     // 1. (V4) NoWebView가 활성화되어 있다면 해당 방법으로 refresh 시도, 아니라면 webview로 시도
