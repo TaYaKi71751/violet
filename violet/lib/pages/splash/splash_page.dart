@@ -7,7 +7,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:android_intent_plus/android_intent.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
+// import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:country_pickers/country.dart';
 import 'package:country_pickers/country_pickers.dart';
 import 'package:file_picker/file_picker.dart';
@@ -31,7 +31,7 @@ import 'package:violet/other/dialogs.dart';
 import 'package:violet/other/ex_country.dart';
 import 'package:violet/other/named_color.dart';
 import 'package:violet/pages/database_download/database_download_page.dart';
-import 'package:violet/script/script_manager.dart';
+// import 'package:violet/script/script_manager.dart';
 import 'package:violet/server/violet_v2.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/variables.dart';
@@ -107,7 +107,7 @@ class _SplashPageState extends State<SplashPage> {
       showMessage = true;
     });
 
-    final connectivityResult = await (Connectivity().checkConnectivity());
+    // final connectivityResult = await (Connectivity().checkConnectivity());
 
     if (!globalInitialized) {
       _changeMessage('init act-logger...');
@@ -134,10 +134,10 @@ class _SplashPageState extends State<SplashPage> {
 
       // this may be slow down to loading
       _changeMessage('check network...');
-      if (!connectivityResult.contains(ConnectivityResult.none)) {
-        _changeMessage('loading script...');
-        await ScriptManager.init();
-      }
+      // if (!connectivityResult.contains(ConnectivityResult.none)) {
+      //   _changeMessage('loading script...');
+      //   await ScriptManager.init();
+      // }
 
       globalInitialized = true;
 
