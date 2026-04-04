@@ -5,6 +5,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -20,6 +21,7 @@ import 'package:violet/locale/locale.dart';
 import 'package:violet/log/log.dart';
 import 'package:violet/pages/common/toast.dart';
 import 'package:violet/settings/settings.dart';
+import 'package:violet/src/rust/api/simple.dart';
 import 'package:violet/version/sync.dart';
 
 typedef TagIndexingCallback = dynamic Function(QueryResult);
@@ -79,33 +81,6 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
     downloadFile();
   }
 
-  Future<void> createDummy() async {
-    final dbPath = Platform.isAndroid || Platform.isIOS
-        ? File('${(await getApplicationDocumentsDirectory()).path}/data.db')
-        : File(join(dirname(Platform.resolvedExecutable), 'data', 'data.db'));
-    if (dbPath.existsSync()) {
-      await dbPath.delete();
-    }
-    await dbPath.create(recursive: true);
-    final db = await DataBaseManager.getInstance();
-    await db.execute('''CREATE TABLE HitomiColumnModel (
-      Id integer primary key autoincrement, 
-      Title text, 
-      EHash text,
-      Type text,
-      Artists text,
-      Characters text,
-      Groups text,
-      Language text,
-      Tags text,
-      Uploader text,
-      Published text,
-      Files integer,
-      Class text,
-      ExistOnHitomi integer);
-      ''');
-  }
-
   Future<void> downloadFile() async {
     try {
       await downloadFileWith('latest', true);
@@ -115,6 +90,10 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
   }
 
   Future<void> downloadFileWith(String target, bool propagateException) async {
+    Dio dio = Dio();
+    int oneMega = 1024 * 1024;
+    int nu = 0;
+    int latest = 0;
     int tlatest = 0;
     int tnu = 0;
 
@@ -151,7 +130,26 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
           tnu = 0;
         }),
       );
-      await createDummy();
+      await dio.download(
+        'https://web.archive.org/web/20201029210829if_/https://github-production-release-asset-2e65be.s3.amazonaws.com/271723612/7c113700-19da-11eb-907e-1b8e3273d476?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20201029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20201029T210829Z&X-Amz-Expires=300&X-Amz-Signature=eb6a3fba3d4fb59ed7475b73e3a68e01722e39a90e7b537e56a68ad5bae3a9b1&X-Amz-SignedHeaders=host&actor_id=0&key_id=0&repo_id=271723612&response-content-disposition=attachment%3B%20filename%3Drawdata.7z&response-content-type=application%2Foctet-stream',
+        '${dir.path}/db.sql.7z',
+        onReceiveProgress: (rec, total) {
+          nu += rec - latest;
+          tnu += rec - latest;
+          latest = rec;
+          if (nu <= oneMega) return;
+
+          nu = 0;
+
+          setState(() {
+            downloading = true;
+            final progressPercent = (rec / total) * 100;
+            progressString = '${_formatNumberWithComma(progressPercent)}%';
+            downString =
+                '[${_formatNumberWithComma(rec)}/${_formatNumberWithComma(total)}]';
+          });
+        },
+      );
       timer.cancel();
 
       setState(() {
@@ -159,6 +157,17 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
         print(baseString);
         downloading = false;
       });
+
+      if (Platform.isAndroid || Platform.isIOS) {
+        if (await Directory('${dir.path}/data').exists()) {
+          await Directory('${dir.path}/data').delete(recursive: true);
+        }
+      }
+      await decompress7Z(
+        src: '${dir.path}/db.sql.7z',
+        dest: Platform.isAndroid ? '${dir.path}/data' : dir.path,
+      );
+      await File('${dir.path}/db.sql.7z').delete();
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt('db_exists', 1);
