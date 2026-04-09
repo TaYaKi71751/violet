@@ -49,6 +49,7 @@ import 'package:violet/style/palette.dart';
 import 'package:violet/variables.dart';
 import 'package:violet/widgets/article_item/article_list_item_widget.dart';
 import 'package:violet/widgets/article_item/image_provider_manager.dart';
+import 'package:violet/pages/reader/reader.dart';
 
 class ArticleInfoPage extends StatelessWidget {
   const ArticleInfoPage({super.key});
@@ -169,7 +170,7 @@ class ArticleInfoPage extends StatelessWidget {
     return height + bottomPadding;
   }
 
-  Row buttonArea(BuildContext context) {
+  Column buttonArea(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final buttonWidth = (width - 32 - 64 - 32) / 2;
     final buttonHeight = Platform.isWindows ? 36.0 : null;
@@ -198,33 +199,147 @@ class ArticleInfoPage extends StatelessWidget {
       );
     }
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Settings.majorColor.value.withAlpha(230),
-          ),
-          onPressed: () async => await downloadButtonEvent(context, data),
-          child: buttonInner(
-            MdiIcons.download,
-            Translations.instance!.trans('download'),
-          ),
+    return Column(
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Settings.majorColor.value.withAlpha(230),
+              ),
+              onPressed: () async => await downloadButtonEvent(context, data),
+              child: buttonInner(
+                MdiIcons.download,
+                Translations.instance!.trans('download'),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: 4.0),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Settings.majorColor.value,
-          ),
-          onPressed: data.lockRead
-              ? null
-              : () async => await readButtonEvent(context, data),
-          child: buttonInner(
-            MdiIcons.bookOpenPageVariant,
-            Translations.instance!.trans('read'),
-          ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Settings.majorColor.value,
+              ),
+              onPressed: data.lockRead
+                  ? null
+                  : () async => await readButtonEvent(context, data),
+              child: buttonInner(
+                MdiIcons.bookOpenPageVariant,
+                Translations.instance!.trans('read'),
+              ),
+            ),
+            const SizedBox(width: 4.0),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Settings.majorColor.value,
+              ),
+              onPressed: () async => await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return ReaderScreen(
+                      readerUrl:
+                          'https://hitomi.la/reader/${data.queryResult.id()}.html#1',
+                    );
+                  },
+                ),
+              ),
+              child: buttonInner(MdiIcons.bookOpenPageVariant, 'Hitomi.la'),
+            ),
+          ],
         ),
+        data.queryResult.ehash() != null
+            ? Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Settings.majorColor.value,
+                    ),
+                    onPressed: () async => await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return ReaderScreen(
+                            readerUrl:
+                                'https://e-hentai.org/g/${data.queryResult.id()}/${data.queryResult.ehash() ?? ''}',
+                          );
+                        },
+                      ),
+                    ),
+                    child: buttonInner(
+                      MdiIcons.bookOpenPageVariant,
+                      'E-Hentai',
+                    ),
+                  ),
+                  const SizedBox(width: 4.0),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Settings.majorColor.value,
+                    ),
+                    onPressed: () async => await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return ReaderScreen(
+                            readerUrl:
+                                'https://exhentai.org/g/${data.queryResult.id()}/${data.queryResult.ehash() ?? ''}',
+                          );
+                        },
+                      ),
+                    ),
+                    child: buttonInner(
+                      MdiIcons.bookOpenPageVariant,
+                      'ExHentai',
+                    ),
+                  ),
+                ],
+              )
+            : Row(),
+        data.queryResult.ehash() != null
+            ? Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Settings.majorColor.value,
+                    ),
+                    onPressed: () async => await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return ReaderScreen(
+                            readerUrl:
+                                'https://e-hentai.org/gallerypopups.php?gid=${data.queryResult.id()}&t=${data.queryResult.ehash() ?? ''}&act=addfav',
+                          );
+                        },
+                      ),
+                    ),
+                    child: buttonInner(MdiIcons.starBox, 'Eh Favorite'),
+                  ),
+                  const SizedBox(width: 4.0),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Settings.majorColor.value,
+                    ),
+                    onPressed: () async => await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return ReaderScreen(
+                            readerUrl:
+                                'https://exhentai.org/gallerypopups.php?gid=${data.queryResult.id()}&t=${data.queryResult.ehash() ?? ''}&act=addfav',
+                          );
+                        },
+                      ),
+                    ),
+                    child: buttonInner(MdiIcons.starBox, 'ExH Favorite'),
+                  ),
+                ],
+              )
+            : Row(),
       ],
     );
   }
