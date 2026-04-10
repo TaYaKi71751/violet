@@ -238,7 +238,7 @@ class ArticleInfoPage extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Settings.majorColor.value,
               ),
-              onPressed: () async => await Navigator.of(context).push(
+              onPressed: () async => await Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
                   builder: (context) {
                     return ReaderScreen(
@@ -261,16 +261,17 @@ class ArticleInfoPage extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Settings.majorColor.value,
                     ),
-                    onPressed: () async => await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return ReaderScreen(
-                            readerUrl:
-                                'https://e-hentai.org/g/${data.queryResult.id()}/${data.queryResult.ehash() ?? ''}',
-                          );
-                        },
-                      ),
-                    ),
+                    onPressed: () async =>
+                        await Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return ReaderScreen(
+                                readerUrl:
+                                    'https://e-hentai.org/g/${data.queryResult.id()}/${data.queryResult.ehash() ?? ''}',
+                              );
+                            },
+                          ),
+                        ),
                     child: buttonInner(
                       MdiIcons.bookOpenPageVariant,
                       'E-Hentai',
@@ -281,16 +282,17 @@ class ArticleInfoPage extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Settings.majorColor.value,
                     ),
-                    onPressed: () async => await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return ReaderScreen(
-                            readerUrl:
-                                'https://exhentai.org/g/${data.queryResult.id()}/${data.queryResult.ehash() ?? ''}',
-                          );
-                        },
-                      ),
-                    ),
+                    onPressed: () async =>
+                        await Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return ReaderScreen(
+                                readerUrl:
+                                    'https://exhentai.org/g/${data.queryResult.id()}/${data.queryResult.ehash() ?? ''}',
+                              );
+                            },
+                          ),
+                        ),
                     child: buttonInner(
                       MdiIcons.bookOpenPageVariant,
                       'ExHentai',
@@ -308,16 +310,17 @@ class ArticleInfoPage extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Settings.majorColor.value,
                     ),
-                    onPressed: () async => await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return ReaderScreen(
-                            readerUrl:
-                                'https://e-hentai.org/gallerypopups.php?gid=${data.queryResult.id()}&t=${data.queryResult.ehash() ?? ''}&act=addfav',
-                          );
-                        },
-                      ),
-                    ),
+                    onPressed: () async =>
+                        await Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return ReaderScreen(
+                                readerUrl:
+                                    'https://e-hentai.org/gallerypopups.php?gid=${data.queryResult.id()}&t=${data.queryResult.ehash() ?? ''}&act=addfav',
+                              );
+                            },
+                          ),
+                        ),
                     child: buttonInner(MdiIcons.starBox, 'Eh Favorite'),
                   ),
                   const SizedBox(width: 4.0),
@@ -325,16 +328,17 @@ class ArticleInfoPage extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Settings.majorColor.value,
                     ),
-                    onPressed: () async => await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return ReaderScreen(
-                            readerUrl:
-                                'https://exhentai.org/gallerypopups.php?gid=${data.queryResult.id()}&t=${data.queryResult.ehash() ?? ''}&act=addfav',
-                          );
-                        },
-                      ),
-                    ),
+                    onPressed: () async =>
+                        await Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return ReaderScreen(
+                                readerUrl:
+                                    'https://exhentai.org/gallerypopups.php?gid=${data.queryResult.id()}&t=${data.queryResult.ehash() ?? ''}&act=addfav',
+                              );
+                            },
+                          ),
+                        ),
                     child: buttonInner(MdiIcons.starBox, 'ExH Favorite'),
                   ),
                 ],
