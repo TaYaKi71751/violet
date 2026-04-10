@@ -12,15 +12,26 @@ class ReaderScreen extends StatefulWidget {
 class _ReaderScreenState extends State<ReaderScreen> {
   final String readerUrl;
 
-  late final WebViewController _controller;
+  late WebViewController _controller;
   _ReaderScreenState(this.readerUrl);
 
   @override
   void initState() {
     super.initState();
     _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(NavigationDelegate(onPageFinished: (url) => {}))
+      ..setJavaScriptMode(JavaScriptMode.unrestricted);
+    _controller = _controller
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onUrlChange: (change) => {
+            if (change.url != null &&
+                Uri.parse(change.url!).host != Uri.parse(readerUrl).host)
+              {
+                {_controller.goBack()},
+              },
+          },
+        ),
+      )
       ..loadRequest(Uri.parse(readerUrl));
   }
 
