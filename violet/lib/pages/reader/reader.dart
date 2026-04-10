@@ -27,7 +27,11 @@ class _ReaderScreenState extends State<ReaderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Reader')),
+      appBar: AppBar(
+        title: null,
+        backgroundColor: Colors.transparent,
+        elevation: 0.0,
+      ),
       body: WebViewWidget(controller: _controller),
     );
   }
