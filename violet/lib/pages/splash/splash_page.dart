@@ -47,7 +47,7 @@ class SplashPage extends StatefulWidget {
   State<SplashPage> createState() => _SplashPageState();
 }
 
-enum Database { userLanguage, all }
+enum Database { all, dummy }
 
 bool globalInitialized = false;
 
@@ -63,6 +63,7 @@ class _SplashPageState extends State<SplashPage> {
   String message = '';
 
   final imgSize = {
+    'dummy': '0MB',
     'global': '320MB',
     'ko': '76MB',
     'en': '100MB',
@@ -73,6 +74,7 @@ class _SplashPageState extends State<SplashPage> {
   final dbSuppors = {'global', 'ko', 'en', 'jp', 'zh'};
 
   final imgZipSize = {
+    'dummy': '0MB',
     'global': '32MB',
     'ko': '9MB',
     'en': '10MB',
@@ -390,6 +392,27 @@ class _SplashPageState extends State<SplashPage> {
                           );
                         },
                       ),
+                      RadioTile(
+                        value: Database.dummy,
+                        groupValue: _database,
+                        setGroupValue: _setDatabase,
+                        title: Text(
+                          'Dummy Database',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                        subtitle: Text(
+                          '${imgZipSize['dummy']}${translations.trans('dbdownloadsize')}',
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                        onLongPress: () {
+                          showOkDialog(
+                            context,
+                            translations
+                                .trans('dballmsg')
+                                .replaceFirst('%s', imgSize['global']!),
+                          );
+                        },
+                      ),
                       _downloadButton(),
                     ],
                   ),
@@ -483,9 +506,7 @@ class _SplashPageState extends State<SplashPage> {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (context) => DataBaseDownloadPage(
-          dbType: _database == Database.all
-              ? 'global'
-              : Translations.instance!.dbLanguageCode,
+          dbType: _database == Database.all ? 'global' : 'dummy',
         ),
       ),
     );
