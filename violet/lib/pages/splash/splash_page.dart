@@ -210,7 +210,7 @@ class _SplashPageState extends State<SplashPage> {
       });
       await Future.delayed(const Duration(milliseconds: 500));
       setState(() {
-        _database = Database.userLanguage;
+        _database = Database.all;
       });
     }
   }
@@ -368,30 +368,6 @@ class _SplashPageState extends State<SplashPage> {
                       _welcomeMessage(),
                       Container(
                         padding: const EdgeInsets.symmetric(vertical: 4.0),
-                      ),
-                      RadioTile(
-                        value: Database.userLanguage,
-                        groupValue: _database,
-                        setGroupValue: _setDatabase,
-                        title: Text(
-                          translations.trans('dbuser'),
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                        subtitle: Text(
-                          '${imgZipSize['ko']}${translations.trans('dbdownloadsize')}',
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                        onLongPress: () {
-                          showOkDialog(
-                            context,
-                            translations
-                                .trans('dbusermsg')
-                                .replaceFirst(
-                                  '%s',
-                                  imgSize[translations.dbLanguageCode]!,
-                                ),
-                          );
-                        },
                       ),
                       RadioTile(
                         value: Database.all,
