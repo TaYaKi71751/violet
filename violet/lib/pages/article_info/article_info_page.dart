@@ -267,7 +267,7 @@ class ArticleInfoPage extends StatelessWidget {
                             builder: (context) {
                               return ReaderScreen(
                                 readerUrl:
-                                    'https://e-hentai.org/g/${data.queryResult.id()}/${data.queryResult.ehash() ?? ''}',
+                                    'https://e-hentai.org/g/${data.queryResult.id()}/${data.queryResult.ehash() ?? ''}?nw=session',
                               );
                             },
                           ),
@@ -288,7 +288,7 @@ class ArticleInfoPage extends StatelessWidget {
                             builder: (context) {
                               return ReaderScreen(
                                 readerUrl:
-                                    'https://exhentai.org/g/${data.queryResult.id()}/${data.queryResult.ehash() ?? ''}',
+                                    'https://exhentai.org/g/${data.queryResult.id()}/${data.queryResult.ehash() ?? ''}?nw=session',
                               );
                             },
                           ),
@@ -827,7 +827,7 @@ class __InfoAreaWidgetState extends State<_InfoAreaWidget> {
           child: Text(Translations.instance!.trans('ok')),
           onPressed: () async {
             if ((await EHSession.postComment(
-                  'https://exhentai.org/g/${widget.queryResult.id()}/${widget.queryResult.ehash()}',
+                  'https://exhentai.org/g/${widget.queryResult.id()}/${widget.queryResult.ehash()}?nw=session',
                   text.text,
                 )).trim() !=
                 '') {

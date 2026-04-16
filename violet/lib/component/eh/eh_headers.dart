@@ -46,7 +46,7 @@ class EHSession {
     if (cookie != null) {
       try {
         final html = await EHSession.requestString(
-          'https://exhentai.org/g/$id/$ehash/?p=0&inline_set=ts_l',
+          'https://exhentai.org/g/$id/$ehash/?p=0&inline_set=ts_l&nw=session',
         );
         return EHParser.parseArticleData(html);
       } catch (_) {}
@@ -55,7 +55,7 @@ class EHSession {
     // 2. 설정된 쿠키가 없거나 exh 요청이 실패하면 eh에서 시도
     try {
       final html = (await http.get(
-        'https://e-hentai.org/g/$id/$ehash/?p=0&inline_set=ts_l',
+        'https://e-hentai.org/g/$id/$ehash/?p=0&inline_set=ts_l&nw=session',
       )).body;
       if (!EHParser.validHtml(html)) {
         return null;

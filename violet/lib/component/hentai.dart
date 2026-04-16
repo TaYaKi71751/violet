@@ -132,7 +132,7 @@ class HentaiManager {
     final id = int.parse(what);
     final hash = await tryGetEhHash(id, false);
     final html = await EHSession.requestString(
-      'https://e-hentai.org/g/$id/$hash/?p=0&inline_set=ts_m',
+      'https://e-hentai.org/g/$id/$hash/?p=0&inline_set=ts_m&nw=session',
     );
     final articleEh = EHParser.parseArticleData(html);
     final meta = {
@@ -149,7 +149,7 @@ class HentaiManager {
     final id = int.parse(what);
     final hash = await tryGetEhHash(id, true);
     final html = await EHSession.requestString(
-      'https://exhentai.org/g/$id/$hash/?p=0&inline_set=ts_m',
+      'https://exhentai.org/g/$id/$hash/?p=0&inline_set=ts_m&nw=session',
     );
     final articleEh = EHParser.parseArticleData(html);
     final meta = {
@@ -304,7 +304,7 @@ class HentaiManager {
   static Future<QueryResult> idQueryEhentai(String id) async {
     final hash = await tryGetEhHash(int.parse(id), false);
     final html = await EHSession.requestString(
-      'https://e-hentai.org/g/$id/$hash/?p=0&inline_set=ts_m',
+      'https://e-hentai.org/g/$id/$hash/?p=0&inline_set=ts_m&nw=session',
     );
     final articleEh = EHParser.parseArticleData(html);
     final meta = {
@@ -319,7 +319,7 @@ class HentaiManager {
   static Future<QueryResult> idQueryExhentai(String id) async {
     final hash = await tryGetEhHash(int.parse(id), true);
     final html = await EHSession.requestString(
-      'https://exhentai.org/g/$id/$hash/?p=0&inline_set=ts_m',
+      'https://exhentai.org/g/$id/$hash/?p=0&inline_set=ts_m&nw=session',
     );
     final articleEh = EHParser.parseArticleData(html);
     final meta = {
@@ -341,7 +341,7 @@ class HentaiManager {
             {
               final ehash = qr.ehash() ?? await tryGetEhHash(qr.id(), false);
               final html = await EHSession.requestString(
-                'https://e-hentai.org/g/${qr.id()}/$ehash/?p=0&inline_set=ts_m',
+                'https://e-hentai.org/g/${qr.id()}/$ehash/?p=0&inline_set=ts_m&nw=session',
               );
               final article = EHParser.parseArticleData(html);
               return EHentaiImageProvider(
@@ -350,7 +350,7 @@ class HentaiManager {
                 pagesUrl: List<String>.generate(
                   (article.length / article.imagesPerPage).ceil(),
                   (index) =>
-                      'https://e-hentai.org/g/${qr.id()}/$ehash/?p=$index',
+                      'https://e-hentai.org/g/${qr.id()}/$ehash/?p=$index&nw=session',
                 ),
                 isEHentai: true,
                 imagesPerPage: article.imagesPerPage,
@@ -361,7 +361,7 @@ class HentaiManager {
             {
               final ehash = qr.ehash() ?? await tryGetEhHash(qr.id(), true);
               final html = await EHSession.requestString(
-                'https://exhentai.org/g/${qr.id()}/$ehash/?p=0&inline_set=ts_m',
+                'https://exhentai.org/g/${qr.id()}/$ehash/?p=0&inline_set=ts_m&nw=session',
               );
               final article = EHParser.parseArticleData(html);
               return EHentaiImageProvider(
@@ -370,7 +370,7 @@ class HentaiManager {
                 pagesUrl: List<String>.generate(
                   (article.length / article.imagesPerPage).ceil(),
                   (index) =>
-                      'https://exhentai.org/g/${qr.id()}/$ehash/?p=$index',
+                      'https://exhentai.org/g/${qr.id()}/$ehash/?p=$index&nw=session',
                 ),
                 isEHentai: false,
                 imagesPerPage: article.imagesPerPage,
