@@ -6,6 +6,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:rhttp/rhttp.dart';
 import 'package:violet/log/log.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/thread/semaphore.dart';
@@ -99,15 +100,14 @@ Future<http.Response> _ehentaiGet(
   while (true) {
     var timeout = false;
 
-    final client = http.Client();
-    final request = http.Request('GET', Uri.parse(url))..followRedirects = true;
+    final client = await RhttpCompatibleClient.create(
+      settings: const ClientSettings(httpVersionPref: HttpVersionPref.http3),
+    );
 
-    if (headers != null) request.headers.addAll(headers);
-
-    StreamedResponse response;
+    http.Response response;
 
     try {
-      final sent = client.send(request);
+      final sent = client.get(Uri.parse(url), headers: headers);
       if (!Settings.ignoreTimeout.value) {
         sent.timeout(
           const Duration(seconds: 3),
@@ -129,10 +129,10 @@ Future<http.Response> _ehentaiGet(
           (timeout && retry > 10)) {
         rethrow;
       }
-      response = StreamedResponse(const Stream.empty(), 200);
+      response = http.Response('', 200);
     }
 
-    final res = await http.Response.fromStream(response);
+    final res = response;
 
     retry++;
 
@@ -170,13 +170,21 @@ Future<http.Response> _scriptGet(
 
   Response res;
   if (timeout == null) {
-    res = await http.get(Uri.parse(url), headers: headers);
+    final client = await RhttpCompatibleClient.create(
+      settings: const ClientSettings(httpVersionPref: HttpVersionPref.http3),
+    );
+
+    res = await client.get(Uri.parse(url), headers: headers);
   } else {
     bool isTimeout = false;
     var retry = 0;
     do {
       isTimeout = false;
-      final sent = http.get(Uri.parse(url), headers: headers);
+
+      final client = await RhttpCompatibleClient.create(
+        settings: const ClientSettings(httpVersionPref: HttpVersionPref.http3),
+      );
+      final sent = client.get(Uri.parse(url), headers: headers);
       if (!Settings.ignoreTimeout.value) {
         sent.timeout(
           timeout,
