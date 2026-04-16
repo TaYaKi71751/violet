@@ -10,7 +10,6 @@ import 'package:violet/component/hitomi/hitomi.dart';
 import 'package:violet/context/viewer_context.dart';
 import 'package:violet/log/log.dart';
 import 'package:violet/network/wrapper.dart' as http;
-import 'package:violet/script/freezed/script_model.dart';
 import 'package:violet/script/script_webview.dart';
 import 'package:violet/util/helper.dart';
 import 'package:violet/widgets/article_item/image_provider_manager.dart';
@@ -171,19 +170,12 @@ class ScriptManager {
   }
 
   static Future<ImageList?> runHitomiGetImageList(int id) async {
-    if (scriptCache == null) return null;
-
     try {
-      final galleryInfoRaw = await getGalleryInfoRaw(id.toString());
-      if (galleryInfoRaw == null) return null;
-      runtime.evaluate(galleryInfoRaw);
-      final jResult = runtime.evaluate('hitomi_get_image_list()').stringResult;
-      final jResultImageList = ScriptImageList.fromJson(jsonDecode(jResult));
-
+      final imageUrls = await HitomiImageResolver.getImages(id);
       return ImageList(
-        urls: jResultImageList.result,
-        bigThumbnails: jResultImageList.btresult,
-        smallThumbnails: jResultImageList.stresult,
+        urls: imageUrls,
+        bigThumbnails: imageUrls,
+        smallThumbnails: imageUrls,
       );
     } catch (e, st) {
       Logger.error(
@@ -203,7 +195,18 @@ class ScriptManager {
       final jResult = runtime
           .evaluate("hitomi_get_header_content('$id')")
           .stringResult;
-      final jResultObject = jsonDecode(jResult);
+      final jResultObject = jsonDecode('''
+      {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:150.0) Gecko/20100101 Firefox/150.0",
+        "Accept": "image/avif,image/webp,image/png,image/svg+xml,image/*;q=0.8,*/*;q=0.5",
+        "Accept-Language": "en-US",
+        "Referer": "https://hitomi.la/",
+        "Sec-Fetch-Dest": "image",
+        "Sec-Fetch-Mode": "no-cors",
+        "Sec-Fetch-Site": "cross-site",
+        "Priority": "u=4, i"
+    }
+      ''');
 
       if (jResultObject is Map<dynamic, dynamic>) {
         return Map<String, String>.from(jResultObject);
@@ -221,6 +224,81 @@ class ScriptManager {
         '$st',
       );
       rethrow;
+    }
+  }
+}
+
+/// 히토미 최신 라우팅(a1, a2 서버 및 AVIF/Webp)을 완벽 지원하는 리졸버
+class HitomiImageResolver {
+  // Credits to https://discord.com/users/1407344738750824459
+  static const String baseDomain = 'gold-usergeneratedcontent.net';
+
+  static Future<List<String>> getImages(
+    int galleryId, {
+    bool useAvif = true,
+  }) async {
+    try {
+      // 1. gg.js 해석 (완벽한 mList 추출 로직 적용)
+      final ggResponse = await http.get('https://ltn.$baseDomain/gg.js');
+      if (ggResponse.statusCode != 200) return [];
+      final ggText = ggResponse.body;
+
+      final bMatch = RegExp(r"b:\s*'([^']+)'").firstMatch(ggText);
+      final bValue = bMatch?.group(1) ?? "";
+
+      final mList = RegExp(
+        r"case (\d+):",
+      ).allMatches(ggText).map((m) => m.group(1)!).toList();
+
+      int o1 = 0;
+      int o2 = 1;
+      final oMatches = RegExp(r"o = (\d+)").allMatches(ggText);
+      if (oMatches.isNotEmpty) {
+        o1 = int.parse(oMatches.first.group(1) ?? "0");
+        o2 = int.parse(oMatches.last.group(1) ?? "1");
+      }
+
+      // 2. 갤러리 메타데이터 로드
+      final galResponse = await http.get(
+        'https://ltn.$baseDomain/galleries/$galleryId.js',
+      );
+      if (galResponse.statusCode != 200) return [];
+
+      String content = galResponse.body.replaceFirst('var galleryinfo = ', '');
+      final Map<String, dynamic> data = json.decode(content);
+      final List<dynamic> files = data['files'] ?? [];
+
+      // 3. 최신 공식 기반 URL 조립
+      List<String> imageUrls = [];
+      String domain = useAvif ? 'a' : 'w';
+      String ext = useAvif ? 'avif' : 'webp';
+
+      for (var file in files) {
+        final String hash = file['hash'];
+        if (hash.isEmpty) continue;
+
+        // [핵심] 해시 문자 재조합 (끝 1글자 + 끝에서 3, 2번째 글자)
+        var part =
+            hash[hash.length - 1] +
+            hash[hash.length - 3] +
+            hash[hash.length - 2];
+        String s = int.parse(part, radix: 16).toString(); // 16진수 -> 10진수
+
+        // 서버 라우팅 계산 (a1 or a2)
+        bool isModern = mList.contains(s);
+        int node = isModern ? o2 : o1;
+        int serverNum = node + 1;
+
+        // 최종 주소 완성 (ex: https://a1.gold.../1775551322/3988/hash.avif)
+        final finalUrl =
+            'https://$domain$serverNum.$baseDomain/$bValue$s/$hash.$ext';
+        imageUrls.add(finalUrl);
+      }
+
+      return imageUrls;
+    } catch (e) {
+      print('[Hitomi Resolver] 에러: $e');
+      return [];
     }
   }
 }
