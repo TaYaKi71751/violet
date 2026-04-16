@@ -90,6 +90,14 @@ jobs:
           python-version: "3.8"
 
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios
+
+      - name: Clean Rust cache
+        run: |
+          rm -rf ~/.rustup/downloads/*
+          rm -rf ~/.cargo/registry/cache/*
+          rm -rf ~/.cargo/git/db/*
 
       - name: Preprocess
         run: |
@@ -100,11 +108,11 @@ jobs:
       - name: Podfile
         run: |
           cd ios
-          rm Podfile.lock
+          rm -f Podfile.lock
           flutter clean
           flutter pub get
-          pod install
-          pod update
+          pod deintegrate || true
+          pod install --repo-update
           cd ..
 
       - name: Build

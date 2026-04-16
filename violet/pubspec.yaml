@@ -89,7 +89,6 @@ dependencies:
     git:
       url: https://github.com/mchome/flutter_colorpicker
       ref: 786d04363f587b818ce585d25b9c2bb62de95aba
-  firebase_core_desktop: ^1.0.2
   flutter_downloader: ^1.11.3
   flutter_heatmap_calendar: ^1.0.5
   flutter_image_compress: ^2.0.4
@@ -156,6 +155,7 @@ dependencies:
   pointer_interceptor_platform_interface: ^0.10.0+1
   pointer_interceptor_web: ^0.10.2+1
   vector_math: ^2.1.4
+  rhttp: ^0.15.1
 
 dev_dependencies:
   flutter_test:

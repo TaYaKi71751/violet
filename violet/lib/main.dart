@@ -22,6 +22,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:fullscreen_window/fullscreen_window.dart';
 import 'package:get/get.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:rhttp/rhttp.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:violet/firebase_options.dart';
 import 'package:violet/locale/locale.dart';
@@ -39,6 +40,7 @@ Future<void> main() async {
   runZonedGuarded<Future<void>>(
     () async {
       await RustLib.init();
+      await Rhttp.init();
       WidgetsFlutterBinding.ensureInitialized();
       await Logger.init();
 

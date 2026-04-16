@@ -19,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:uuid/uuid.dart';
 import 'package:violet/component/eh/eh_headers.dart';
+import 'package:violet/component/hentai.dart';
 import 'package:violet/component/hitomi/related.dart';
 import 'package:violet/component/hitomi/tag_translate.dart';
 import 'package:violet/context/modal_bottom_sheet_context.dart';
@@ -215,12 +216,7 @@ class ArticleInfoPage extends StatelessWidget {
                 Translations.instance!.trans('download'),
               ),
             ),
-          ],
-        ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+            const SizedBox(width: 4.0),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Settings.majorColor.value,
@@ -233,6 +229,28 @@ class ArticleInfoPage extends StatelessWidget {
                 Translations.instance!.trans('read'),
               ),
             ),
+          ],
+        ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Settings.majorColor.value,
+              ),
+              onPressed: () async => await Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return ReaderScreen(
+                      readerUrl:
+                          'https://e-hentai.org/gallerypopups.php?gid=${data.queryResult.id()}&t=${tryGetEhHash(data.queryResult.id(), false)}&act=addfav',
+                    );
+                  },
+                ),
+              ),
+              child: buttonInner(MdiIcons.starBox, 'Eh Favorite'),
+            ),
             const SizedBox(width: 4.0),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -243,107 +261,15 @@ class ArticleInfoPage extends StatelessWidget {
                   builder: (context) {
                     return ReaderScreen(
                       readerUrl:
-                          'https://hitomi.la/reader/${data.queryResult.id()}.html#1',
+                          'https://exhentai.org/gallerypopups.php?gid=${data.queryResult.id()}&t=${tryGetEhHash(data.queryResult.id(), true)}&act=addfav',
                     );
                   },
                 ),
               ),
-              child: buttonInner(MdiIcons.bookOpenPageVariant, 'Hitomi.la'),
+              child: buttonInner(MdiIcons.starBox, 'ExH Favorite'),
             ),
           ],
         ),
-        data.queryResult.ehash() != null
-            ? Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Settings.majorColor.value,
-                    ),
-                    onPressed: () async =>
-                        await Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return ReaderScreen(
-                                readerUrl:
-                                    'https://e-hentai.org/g/${data.queryResult.id()}/${data.queryResult.ehash() ?? ''}?nw=session',
-                              );
-                            },
-                          ),
-                        ),
-                    child: buttonInner(
-                      MdiIcons.bookOpenPageVariant,
-                      'E-Hentai',
-                    ),
-                  ),
-                  const SizedBox(width: 4.0),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Settings.majorColor.value,
-                    ),
-                    onPressed: () async =>
-                        await Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return ReaderScreen(
-                                readerUrl:
-                                    'https://exhentai.org/g/${data.queryResult.id()}/${data.queryResult.ehash() ?? ''}?nw=session',
-                              );
-                            },
-                          ),
-                        ),
-                    child: buttonInner(
-                      MdiIcons.bookOpenPageVariant,
-                      'ExHentai',
-                    ),
-                  ),
-                ],
-              )
-            : Row(),
-        data.queryResult.ehash() != null
-            ? Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Settings.majorColor.value,
-                    ),
-                    onPressed: () async =>
-                        await Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return ReaderScreen(
-                                readerUrl:
-                                    'https://e-hentai.org/gallerypopups.php?gid=${data.queryResult.id()}&t=${data.queryResult.ehash() ?? ''}&act=addfav',
-                              );
-                            },
-                          ),
-                        ),
-                    child: buttonInner(MdiIcons.starBox, 'Eh Favorite'),
-                  ),
-                  const SizedBox(width: 4.0),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Settings.majorColor.value,
-                    ),
-                    onPressed: () async =>
-                        await Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return ReaderScreen(
-                                readerUrl:
-                                    'https://exhentai.org/gallerypopups.php?gid=${data.queryResult.id()}&t=${data.queryResult.ehash() ?? ''}&act=addfav',
-                              );
-                            },
-                          ),
-                        ),
-                    child: buttonInner(MdiIcons.starBox, 'ExH Favorite'),
-                  ),
-                ],
-              )
-            : Row(),
       ],
     );
   }

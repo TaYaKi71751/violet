@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links
   connectivity_plus
+  firebase_core
   flutter_inappwebview_windows
   flutter_js
   fullscreen_window
@@ -15,6 +16,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
+  rhttp
   rust_lib_violet
 )
 
