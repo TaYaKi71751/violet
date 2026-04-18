@@ -6,6 +6,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
+import 'package:violet/component/hentai.dart';
 import 'package:violet/database/query.dart';
 import 'package:violet/database/user/record.dart';
 import 'package:violet/model/article_list_item.dart';
@@ -34,16 +35,54 @@ class RecordViewPage extends StatelessWidget {
         (value) => value.getUserLog().then((value) async {
           var overap = HashSet<String>();
           var rr = <ArticleReadLog>[];
+          var queryResults = <QueryResult>[];
 
           for (var element in value) {
             if (overap.contains(element.articleId())) continue;
             rr.add(element);
             overap.add(element.articleId());
           }
-
-          return await QueryManager.queryIds(
-            rr.map((e) => e.articleId()).toList(),
-          );
+          for (var element in rr) {
+            var result = await HentaiManager.idSearch(element.articleId());
+            var ehash = result.results[0].ehash();
+            try {
+              ehash ??= await tryGetEhHash(
+                int.parse(element.articleId()),
+                false,
+              );
+            } catch (e) {
+              try {
+                ehash = await tryGetEhHash(
+                  int.parse(element.articleId()),
+                  true,
+                );
+              } catch (e) {
+                ehash = null;
+              }
+            }
+            queryResults.add(
+              QueryResult(
+                result: {
+                  'Id': int.parse(element.articleId()),
+                  'Title': result.results[0].title(),
+                  'EHash': ehash,
+                  'Type': result.results[0].type(),
+                  'Artists': result.results[0].artists(),
+                  'Characters': result.results[0].characters(),
+                  'Groups': result.results[0].groups(),
+                  'Language': result.results[0].language(),
+                  'Series': result.results[0].series(),
+                  'Tags': result.results[0].tags(),
+                  'Uploader': result.results[0].uploader(),
+                  'PublishedEH': result.results[0].publishedeh(),
+                  'Files': result.results[0].files(),
+                  'Thumbnail': result.results[0].thumbnail(),
+                  'URL': result.results[0].url(),
+                },
+              ),
+            );
+          }
+          return queryResults;
         }),
       ),
       builder: (context, AsyncSnapshot<List<QueryResult>> snapshot) {
