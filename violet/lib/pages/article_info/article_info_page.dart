@@ -239,16 +239,19 @@ class ArticleInfoPage extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Settings.majorColor.value,
               ),
-              onPressed: () async => await Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (context) {
-                    return ReaderScreen(
-                      readerUrl:
-                          'https://e-hentai.org/gallerypopups.php?gid=${data.queryResult.id()}&t=${tryGetEhHash(data.queryResult.id(), false)}&act=addfav',
-                    );
-                  },
-                ),
-              ),
+              onPressed: () async {
+                final hash = await tryGetEhHash(data.queryResult.id(), false);
+                await Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return ReaderScreen(
+                        readerUrl:
+                            'https://e-hentai.org/gallerypopups.php?gid=${data.queryResult.id()}&t=$hash&act=addfav',
+                      );
+                    },
+                  ),
+                );
+              },
               child: buttonInner(MdiIcons.starBox, 'Eh Favorite'),
             ),
             const SizedBox(width: 4.0),
@@ -256,16 +259,19 @@ class ArticleInfoPage extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Settings.majorColor.value,
               ),
-              onPressed: () async => await Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (context) {
-                    return ReaderScreen(
-                      readerUrl:
-                          'https://exhentai.org/gallerypopups.php?gid=${data.queryResult.id()}&t=${tryGetEhHash(data.queryResult.id(), true)}&act=addfav',
-                    );
-                  },
-                ),
-              ),
+              onPressed: () async {
+                final hash = await tryGetEhHash(data.queryResult.id(), true);
+                await Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return ReaderScreen(
+                        readerUrl:
+                            'https://exhentai.org/gallerypopups.php?gid=${data.queryResult.id()}&t=$hash&act=addfav',
+                      );
+                    },
+                  ),
+                );
+              },
               child: buttonInner(MdiIcons.starBox, 'ExH Favorite'),
             ),
           ],
