@@ -34,12 +34,14 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   static const _loginUrl = 'https://e-hentai.org/bounce_login.php';
+  final WebViewCookieManager cookieManager = WebViewCookieManager();
 
   late final WebViewController _controller;
 
   @override
   void initState() {
     super.initState();
+    cookieManager.clearCookies();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
