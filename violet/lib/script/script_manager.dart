@@ -160,9 +160,8 @@ class ScriptManager {
   }
 
   static Future<String?> getGalleryInfoRaw(String id) async {
-    final downloadUrl = runtime
-        .evaluate("create_download_url('$id')")
-        .stringResult;
+    final downloadUrl =
+        'http://ltn.gold-usergeneratedcontent.net/galleries/$id.js';
     final headers = await runHitomiGetHeaderContent(id.toString());
     final galleryInfo = await http.get(downloadUrl, headers: headers);
     if (galleryInfo.statusCode != 200) return null;
