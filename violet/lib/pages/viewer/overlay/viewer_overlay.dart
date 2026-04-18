@@ -723,7 +723,11 @@ class _ViewerOverlayState extends State<ViewerOverlay> {
     var imageSizes = c.provider.uris.map((e) {
       final image = File(e);
       if (!image.existsSync()) return null;
-      return ImageSizeGetter.getSize(FileInput(image));
+      try {
+        return ImageSizeGetter.getSize(FileInput(image));
+      } catch (_) {
+        return null;
+      }
     }).toList();
 
     _thumbImageStartPos = List.filled(imageSizes.length + 1, 0);
