@@ -60,6 +60,7 @@ import 'package:violet/pages/settings/tag_rebuild_page.dart';
 import 'package:violet/pages/settings/tag_selector.dart';
 import 'package:violet/pages/settings/version_page.dart';
 import 'package:violet/pages/splash/splash_page.dart';
+import 'package:violet/network/cache.dart';
 import 'package:violet/platform/misc.dart';
 import 'package:violet/server/violet.dart';
 import 'package:violet/settings/settings.dart';
@@ -891,6 +892,7 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
               leading: CachedNetworkImage(
                 imageUrl: 'https://e-hentai.org/favicon.ico',
                 width: 25,
+                cacheManager: WrapperCacheManager(),
               ),
               title: const Text('Search Categories'),
               trailing: const Icon(Icons.keyboard_arrow_right),
@@ -2340,6 +2342,7 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
             leading: CachedNetworkImage(
               imageUrl: 'https://e-hentai.org/favicon.ico',
               width: 25,
+              cacheManager: WrapperCacheManager(),
             ),
             title: const Text('E-Hentai/ExHentai'),
             trailing: const Icon(Icons.keyboard_arrow_right),

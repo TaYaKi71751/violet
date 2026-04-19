@@ -7,6 +7,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:violet/network/cache.dart';
 import 'package:violet/pages/segment/card_panel.dart';
 import 'package:violet/pages/viewer/viewer_page_provider.dart';
 import 'package:violet/style/palette.dart';
@@ -216,6 +217,7 @@ class _ViewerGalleryState extends State<ViewerGallery> {
                 httpHeaders: _pageInfo.headers,
                 memCacheWidth: width.toInt() ~/ properties[viewStyle][1],
                 filterQuality: FilterQuality.high,
+                cacheManager: WrapperCacheManager(),
               ),
               Positioned.fill(
                 child: Material(
@@ -285,6 +287,7 @@ class _ViewerGalleryState extends State<ViewerGallery> {
                         memCacheWidth:
                             width.toInt() ~/ properties[viewStyle][1],
                         filterQuality: FilterQuality.high,
+                        cacheManager: WrapperCacheManager(),
                       ),
                       Align(
                         alignment: Alignment.topCenter,

@@ -41,6 +41,7 @@ import 'package:violet/pages/download/download_page.dart';
 import 'package:violet/pages/lab/lab/search_comment_author.dart';
 import 'package:violet/pages/search/search_page.dart';
 import 'package:violet/pages/segment/platform_navigator.dart';
+import 'package:violet/network/cache.dart';
 import 'package:violet/pages/viewer/viewer_page.dart';
 import 'package:violet/pages/viewer/viewer_page_provider.dart';
 import 'package:violet/script/script_manager.dart';
@@ -882,7 +883,12 @@ class __InfoAreaWidgetState extends State<_InfoAreaWidget> {
             crossAxisSpacing: 8,
             mainAxisSpacing: 8,
             children: (snapshot.data as List<String>)
-                .map((e) => CachedNetworkImage(imageUrl: e))
+                .map(
+                  (e) => CachedNetworkImage(
+                    imageUrl: e,
+                    cacheManager: WrapperCacheManager(),
+                  ),
+                )
                 .toList(),
           );
         },

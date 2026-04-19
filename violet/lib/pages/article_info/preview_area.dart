@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:violet/component/image_provider.dart';
 import 'package:violet/database/query.dart';
+import 'package:violet/network/cache.dart';
 import 'package:violet/util/iter_helper.dart';
 import 'package:violet/widgets/article_item/image_provider_manager.dart';
 import 'package:violet/widgets/dots_indicator.dart';
@@ -109,7 +110,11 @@ class PreviewAreaWidget extends StatelessWidget {
       child: Stack(
         children: <Widget>[
           SizedBox.expand(
-            child: CachedNetworkImage(imageUrl: image, httpHeaders: headers),
+            child: CachedNetworkImage(
+              imageUrl: image,
+              httpHeaders: headers,
+              cacheManager: WrapperCacheManager(),
+            ),
           ),
           Align(
             alignment: Alignment.topCenter,

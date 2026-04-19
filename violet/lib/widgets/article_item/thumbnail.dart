@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:uuid/uuid.dart';
+import 'package:violet/network/cache.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/widgets/article_item/article_list_item_widget_controller.dart';
 
@@ -122,6 +123,7 @@ class ThumbnailImageWidget extends StatelessWidget {
             imageUrl: thumbnail,
             fit: BoxFit.cover,
             httpHeaders: headers,
+            cacheManager: WrapperCacheManager(),
             imageBuilder: (context, imageProvider) => Container(
               decoration: BoxDecoration(
                 image: DecorationImage(

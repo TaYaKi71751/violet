@@ -12,6 +12,7 @@ import 'package:photo_view/photo_view_gallery.dart';
 import 'package:violet/pages/segment/platform_navigator.dart';
 import 'package:violet/pages/viewer/image/image_crop_bookmark.dart';
 import 'package:violet/pages/viewer/others/photo_view_gallery.dart';
+import 'package:violet/network/cache.dart';
 import 'package:violet/pages/viewer/viewer_controller.dart';
 import 'package:violet/pages/viewer/widget/tap_litstener.dart';
 import 'package:violet/settings/settings.dart';
@@ -196,7 +197,10 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
             continue;
           }
 
-          CachedNetworkImage.evictFromCache(c.urlCache[target]!.value);
+          CachedNetworkImage.evictFromCache(
+            c.urlCache[target]!.value,
+            cacheManager: WrapperCacheManager(),
+          );
         }
 
         const precache = [-2, -1, 2, 3];
@@ -213,12 +217,14 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
         if (page.toInt() - 2 >= 0 && c.urlCache[page.toInt() - 2] != null) {
           CachedNetworkImage.evictFromCache(
             c.urlCache[page.toInt() - 2]!.value,
+            cacheManager: WrapperCacheManager(),
           );
         }
         if (page.toInt() + 2 < c.maxPage &&
             c.urlCache[page.toInt() + 2] != null) {
           CachedNetworkImage.evictFromCache(
             c.urlCache[page.toInt() + 2]!.value,
+            cacheManager: WrapperCacheManager(),
           );
         }
         await c.precache(context, page.toInt() - 1);
@@ -405,12 +411,10 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
             } else {
               return Obx(
                 () => PhotoView(
-                  imageProvider: ExtendedNetworkImageProvider(
+                  imageProvider: CachedNetworkImageProvider(
                     c.urlCache[index]!.value,
                     headers: c.headerCache[index],
-                    cache: true,
-                    retries: 10,
-                    timeRetry: const Duration(milliseconds: 300),
+                    cacheManager: WrapperCacheManager(),
                   ),
                   filterQuality: SettingsWrapper.getImageQuality(
                     c.imgQuality.value,
@@ -532,12 +536,10 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
   }
 
   Widget imageWidget(int index) {
-    final provider = ExtendedNetworkImageProvider(
+    final provider = CachedNetworkImageProvider(
       c.urlCache[index]!.value,
       headers: c.headerCache[index],
-      cache: true,
-      retries: 10,
-      timeRetry: const Duration(milliseconds: 300),
+      cacheManager: WrapperCacheManager(),
     );
 
     provider
@@ -554,6 +556,10 @@ class _HorizontalViewerPageState extends State<HorizontalViewerPage> {
         Future.delayed(const Duration(milliseconds: 500), () {
           if (mounted) {
             setState(() {
+              CachedNetworkImage.evictFromCache(
+                c.urlCache[index]!.value,
+                cacheManager: WrapperCacheManager(),
+              );
               provider.evict();
               c.imgKeys[index] = GlobalKey();
             });
