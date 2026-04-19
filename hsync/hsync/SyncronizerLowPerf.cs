@@ -55,7 +55,7 @@ namespace hsync
             if (exhentai_lookup_page == null || !int.TryParse(exhentai_lookup_page[0], out exhentaiLookupPage))
                 exhentaiLookupPage = 200;
 
-            db = new SQLiteConnection("data.db");
+            db = new SQLiteConnection("rawdata/data.db");
 
             existsHitomi = new HashSet<int>();
             foreach (var metadata in db.Query<HitomiColumnModel>("SELECT Id FROM HitomiColumnModel WHERE ExistOnHitomi=1"))
@@ -139,7 +139,7 @@ namespace hsync
             dcnt = 0;
             ecnt = 0;
             Console.Write("Running galleries pages...");
-            List<string> js = null;
+            List<string> js = new List<string>();
             if (gpurls.Count != 0)
                 using (var pb = new ProgressBar())
                 {

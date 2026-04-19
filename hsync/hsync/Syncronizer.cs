@@ -94,7 +94,7 @@ namespace hsync
                     continue;
                 var aa = HitomiParser.ParseGalleryBlock(htmls[i]);
                 if (aa.Magic.Contains("-"))
-                    gurls.Add("https://hitomi.la/" + aa.Magic);
+                    gurls.Add("https://hitomi.la" + aa.Magic);
                 else
                     gurls.Add("https://hitomi.la/galleries/" + i + ".html");
             }
