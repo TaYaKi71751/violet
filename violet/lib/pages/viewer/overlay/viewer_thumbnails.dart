@@ -13,6 +13,7 @@ import 'package:violet/component/hitomi/hitomi.dart';
 import 'package:violet/component/hitomi/hitomi_provider.dart';
 import 'package:violet/component/image_provider.dart';
 import 'package:violet/log/log.dart';
+import 'package:violet/network/cache.dart';
 import 'package:violet/pages/viewer/viewer_page_provider.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/variables.dart';
@@ -195,6 +196,7 @@ class _ViewerThumbnailState extends State<ViewerThumbnail> {
                             httpHeaders: snapshot.data!.$2,
                             filterQuality: FilterQuality.high,
                             fit: BoxFit.cover,
+                            cacheManager: WrapperCacheManager(),
                           ),
                         ),
                       ),

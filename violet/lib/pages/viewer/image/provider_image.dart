@@ -2,11 +2,11 @@
 // Copyright (C) 2020-2024. violet-team. Licensed under the Apache-2.0 License.
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:violet/log/log.dart';
 import 'package:violet/pages/segment/platform_navigator.dart';
+import 'package:violet/network/cache.dart';
 import 'package:violet/pages/viewer/viewer_controller.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/settings/settings_wrapper.dart';
@@ -59,27 +59,81 @@ class _ProviderImageState extends State<ProviderImage> {
 
   @override
   void dispose() {
-    clearMemoryImageCache(widget.imgUrl);
+    CachedNetworkImage.evictFromCache(
+      widget.imgUrl,
+      cacheManager: WrapperCacheManager(),
+    );
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final image = ExtendedImage.network(
-      widget.imgUrl,
+    final image = CachedNetworkImage(
       key: widget.imgKey,
-      headers: widget.imgHeader,
-      retries: 100,
-      timeRetry: const Duration(milliseconds: 300),
+      imageUrl: widget.imgUrl,
+      httpHeaders: widget.imgHeader,
+      cacheManager: WrapperCacheManager(),
       fit: BoxFit.cover,
       filterQuality: SettingsWrapper.imageQuality,
-      clearMemoryCacheWhenDispose: true,
-      clearMemoryCacheIfFailed: true,
-      handleLoadingProgress: true,
-      loadStateChanged: _loadStateChanged,
-      cacheHeight: Settings.useLowPerf.value
+      memCacheHeight: Settings.useLowPerf.value
           ? (MediaQuery.of(context).size.width * 2.0).toInt()
           : null,
+      imageBuilder: (context, imageProvider) {
+        if (!_loaded) {
+          _loaded = true;
+          c.isImageLoaded[widget.index] = true;
+        }
+        return widget.imageWidgetBuilder(
+          context,
+          Image(
+            key: widget.imgKey,
+            image: imageProvider,
+            fit: BoxFit.cover,
+            filterQuality: SettingsWrapper.imageQuality,
+          ),
+        );
+      },
+      progressIndicatorBuilder: (context, url, progress) {
+        return SizedBox(
+          height: c.estimatedImgHeight[widget.index] != 0
+              ? c.estimatedImgHeight[widget.index]
+              : 300,
+          child: Center(
+            child: SizedBox(
+              width: 30,
+              height: 30,
+              child: CircularProgressIndicator(
+                value: progress.totalSize == null
+                    ? null
+                    : progress.downloaded / progress.totalSize!,
+              ),
+            ),
+          ),
+        );
+      },
+      errorWidget: (context, url, error) {
+        Logger.error('[viewer-provider_image] URL: $url\nE: $error');
+
+        final iconButton = IconButton(
+          icon: Icon(Icons.refresh, color: Settings.majorColor.value),
+          onPressed: () => setState(() {
+            CachedNetworkImage.evictFromCache(
+              widget.imgUrl,
+              cacheManager: WrapperCacheManager(),
+            );
+            c.imgKeys[widget.index] = GlobalKey();
+          }),
+        );
+
+        return SizedBox(
+          height: c.estimatedImgHeight[widget.index] != 0
+              ? c.estimatedImgHeight[widget.index]
+              : 300,
+          child: Center(
+            child: SizedBox(width: 50, height: 50, child: iconButton),
+          ),
+        );
+      },
     );
 
     return GestureDetector(
@@ -97,61 +151,5 @@ class _ProviderImageState extends State<ProviderImage> {
         );
       },
     );
-  }
-
-  Widget _loadStateChanged(ExtendedImageState state) {
-    if (state.extendedImageLoadState == LoadState.failed) {
-      Logger.error(
-        '[viewer-provider_image] URL: ${widget.imgUrl}\nE: ${state.lastException}',
-      );
-      state.reLoadImage();
-
-      final iconButton = IconButton(
-        icon: Icon(Icons.refresh, color: Settings.majorColor.value),
-        onPressed: () => setState(() {
-          c.imgKeys[widget.index] = GlobalKey();
-        }),
-      );
-
-      return SizedBox(
-        height: c.estimatedImgHeight[widget.index] != 0
-            ? c.estimatedImgHeight[widget.index]
-            : 300,
-        child: Center(
-          child: SizedBox(width: 50, height: 50, child: iconButton),
-        ),
-      );
-    }
-
-    final ImageInfo? imageInfo = state.extendedImageInfo;
-    if ((state.extendedImageLoadState == LoadState.completed ||
-            imageInfo != null) &&
-        !_loaded) {
-      _loaded = true;
-      c.isImageLoaded[widget.index] = true;
-      return widget.imageWidgetBuilder(context, state.completedWidget);
-    } else if (state.extendedImageLoadState == LoadState.loading) {
-      return SizedBox(
-        height: c.estimatedImgHeight[widget.index] != 0
-            ? c.estimatedImgHeight[widget.index]
-            : 300,
-        child: Center(
-          child: SizedBox(
-            width: 30,
-            height: 30,
-            child: CircularProgressIndicator(
-              value: state.loadingProgress == null
-                  ? null
-                  : state.loadingProgress!.cumulativeBytesLoaded /
-                        state.loadingProgress!.expectedTotalBytes!,
-            ),
-          ),
-        ),
-      );
-    }
-
-    c.isImageLoaded[widget.index] = true;
-
-    return state.completedWidget;
   }
 }

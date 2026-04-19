@@ -19,6 +19,7 @@ import 'package:violet/pages/common/toast.dart';
 import 'package:violet/pages/common/utils.dart';
 import 'package:violet/pages/download/download_item_menu.dart';
 import 'package:violet/pages/download/download_routine.dart';
+import 'package:violet/network/cache.dart';
 import 'package:violet/pages/viewer/viewer_page.dart';
 import 'package:violet/pages/viewer/viewer_page_provider.dart';
 import 'package:violet/script/script_manager.dart';
@@ -732,6 +733,7 @@ class _ThumbnailWidget extends StatelessWidget {
             ),
             child: Container(),
           ),
+          cacheManager: WrapperCacheManager(),
           placeholder: (b, c) {
             return _getLoadingAnimation();
           },
@@ -766,6 +768,7 @@ class _ThumbnailWidget extends StatelessWidget {
                     ),
                     child: Container(),
                   ),
+                  cacheManager: WrapperCacheManager(),
                   placeholder: (b, c) {
                     return _getLoadingAnimation();
                   },

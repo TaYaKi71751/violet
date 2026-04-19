@@ -4,6 +4,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
+import 'package:violet/network/cache.dart';
 import 'package:violet/settings/settings.dart';
 
 class ThumbnailViewPage extends StatefulWidget {
@@ -68,6 +69,7 @@ class _ThumbnailViewPageState extends State<ThumbnailViewPage> {
                   imageUrl: widget.thumbnail ?? '',
                   fit: !widget.showUltra ? BoxFit.cover : BoxFit.contain,
                   httpHeaders: widget.headers,
+                  cacheManager: WrapperCacheManager(),
                   placeholder: (b, c) {
                     if (!Settings.simpleItemWidgetLoadingIcon.value) {
                       return const FlareActor(

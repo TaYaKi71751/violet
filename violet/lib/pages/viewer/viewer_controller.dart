@@ -13,6 +13,7 @@ import 'package:violet/component/hitomi/message_search.dart';
 import 'package:violet/log/log.dart';
 import 'package:violet/pages/viewer/others/preload_page_view.dart';
 import 'package:violet/pages/viewer/others/scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:violet/network/cache.dart';
 import 'package:violet/pages/viewer/viewer_page_provider.dart';
 import 'package:violet/server/violet.dart';
 import 'package:violet/settings/settings.dart';
@@ -236,6 +237,7 @@ class ViewerController extends GetxController {
       CachedNetworkImageProvider(
         urlCache[index]!.value,
         headers: headerCache[index],
+        cacheManager: WrapperCacheManager(),
         maxWidth: Settings.useLowPerf.value
             ? (MediaQuery.of(context).size.width * 1.5).toInt()
             : null,
