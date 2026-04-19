@@ -316,6 +316,7 @@
   "cannotuseios": "You cannot use update on iOS :(",
   "exitTheApp": "Exit the app",
   "ignoretimeout": "Ignore Timeout",
+  "usehttp3": "Usa HTTP/3",
   "cropbookmark": "Crop Bookmark",
   "cropbookmarkdesc": "Expore your crop images!"
 }

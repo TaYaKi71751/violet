@@ -316,6 +316,7 @@
   "cannotuseios": "iOS では更新機能は使えません :(",
   "exitTheApp": "Exit the app",
   "ignoretimeout": "時間切れを無視",
+  "usehttp3": "HTTP/3を使用",
   "cropbookmark": "切り取りブックマーク",
   "cropbookmarkdesc": "切り取った画像集を閲覧!"
 }

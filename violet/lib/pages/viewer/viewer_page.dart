@@ -23,7 +23,6 @@ import 'package:violet/pages/viewer/overlay/viewer_overlay.dart';
 import 'package:violet/pages/viewer/vertical_viewer_page.dart';
 import 'package:violet/pages/viewer/viewer_controller.dart';
 import 'package:violet/pages/viewer/viewer_page_provider.dart';
-import 'package:violet/script/script_manager.dart';
 import 'package:violet/server/violet.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/util/call_once.dart';
@@ -232,7 +231,6 @@ class _ViewerPageState extends State<ViewerPage> {
         _inactivateSeconds += DateTime.now()
             .difference(_inactivateTime)
             .inSeconds;
-        await ScriptManager.refresh();
       },
     );
 

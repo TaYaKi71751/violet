@@ -23,7 +23,6 @@ import 'package:violet/pages/article_info/article_info_page.dart';
 import 'package:violet/pages/common/utils.dart';
 import 'package:violet/pages/viewer/viewer_page.dart';
 import 'package:violet/pages/viewer/viewer_page_provider.dart';
-import 'package:violet/script/script_manager.dart';
 import 'package:violet/server/violet_v2.dart';
 import 'package:violet/settings/settings.dart';
 import 'package:violet/style/palette.dart';
@@ -249,8 +248,6 @@ class _ArticleListItemWidgetState extends State<ArticleListItemWidget>
       });
     }
     await (await User.getInstance()).insertUserLog(data.queryResult.id(), 0);
-
-    await ScriptManager.refresh();
 
     if (!ProviderManager.isExists(data.queryResult.id())) {
       return;
