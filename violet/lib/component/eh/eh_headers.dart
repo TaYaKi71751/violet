@@ -13,7 +13,7 @@ class EHSession {
 
   static Future<String?> cookie() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('eh_cookies');
+    return '${prefs.getString('eh_cookies')}; nw=1';
   }
 
   static Future<String> requestString(String url) async {
@@ -46,7 +46,7 @@ class EHSession {
     if (cookie != null) {
       try {
         final html = await EHSession.requestString(
-          'https://exhentai.org/g/$id/$ehash/?p=0&inline_set=ts_l&nw=session',
+          'https://exhentai.org/g/$id/$ehash/?p=0&inline_set=ts_l',
         );
         return EHParser.parseArticleData(html);
       } catch (_) {}
@@ -55,7 +55,7 @@ class EHSession {
     // 2. 설정된 쿠키가 없거나 exh 요청이 실패하면 eh에서 시도
     try {
       final html = (await http.get(
-        'https://e-hentai.org/g/$id/$ehash/?p=0&inline_set=ts_l&nw=session',
+        'https://e-hentai.org/g/$id/$ehash/?p=0&inline_set=ts_l',
       )).body;
       if (!EHParser.validHtml(html)) {
         return null;

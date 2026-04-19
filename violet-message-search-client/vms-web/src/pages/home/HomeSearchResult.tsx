@@ -276,7 +276,7 @@ function HomeSearchResultCard(dto: { e: SearchMessageResultType, keyword: string
                   background="#650612"
                   color="#fd758c"
                   alphabet="E"
-                  url={`https://exhentai.org/g/${dto.e.Id}/${ehash}?nw=session`}
+                  url={`https://exhentai.org/g/${dto.e.Id}/${ehash}`}
                 />
                 <NavigateButton
                   tooltip="히요비 바로가기"

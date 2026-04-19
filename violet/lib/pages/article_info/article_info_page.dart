@@ -759,7 +759,7 @@ class __InfoAreaWidgetState extends State<_InfoAreaWidget> {
           child: Text(Translations.instance!.trans('ok')),
           onPressed: () async {
             if ((await EHSession.postComment(
-                  'https://exhentai.org/g/${widget.queryResult.id()}/${widget.queryResult.ehash()}?nw=session',
+                  'https://exhentai.org/g/${widget.queryResult.id()}/${widget.queryResult.ehash()}',
                   text.text,
                 )).trim() !=
                 '') {

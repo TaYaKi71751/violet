@@ -71,7 +71,7 @@ Page 20: 020.jpg" src="https://exhentai.org/t/66/55/6655fb520e13eff74ebf9aa49c21
 
   test('EHentai Parse Article Data', () async {
     final html = await EHSession.requestString(
-      'https://exhentai.org/g/2504057/6757b3c4b8/?nw=session',
+      'https://exhentai.org/g/2504057/6757b3c4b8/',
     );
     final article = EHParser.parseArticleData(html);
     expect(article.comment!.isNotEmpty, true);
@@ -79,7 +79,7 @@ Page 20: 020.jpg" src="https://exhentai.org/t/66/55/6655fb520e13eff74ebf9aa49c21
 
   test('EHentai Get Images Url', () async {
     final html = await EHSession.requestString(
-      'https://exhentai.org/g/3176408/87646440e1/?p=0&inline_set=ts_m&nw=session',
+      'https://exhentai.org/g/3176408/87646440e1/?p=0&inline_set=ts_m',
     );
     final urls = EHParser.getImagesUrl(html);
     expect(urls.length, 20);
