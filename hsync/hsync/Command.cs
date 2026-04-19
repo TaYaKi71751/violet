@@ -314,18 +314,15 @@ namespace hsync
             {
                 if (!File.Exists("hiddendata.json"))
                 {
-                    Logs.Instance.Push("Welcome to hsync!\r\n\tDownload the necessary data before running the program!");
-                    download_data("https://github.com/project-violet/database/releases/download/rd2020.06.07/hiddendata.json", "hiddendata.json");
+                    download_data("https://github.com/TaYaKi71751/violet-database/releases/download/dummy/hiddendata.json", "hiddendata.json");
                 }
                 if (!File.Exists("metadata.json"))
-                    download_data("https://github.com/project-violet/database/releases/download/rd2020.06.07/metadata.json", "metadata.json");
+                    download_data("https://github.com/TaYaKi71751/violet-database/releases/download/dummy/metadata.json", "metadata.json");
                 if (!File.Exists("ex-hentai-archive.json"))
-                    download_data("https://github.com/project-violet/database/releases/download/rd2020.06.07/ex-hentai-archive.json", "ex-hentai-archive.json");
+                    download_data("https://github.com/TaYaKi71751/violet-database/releases/download/dummy/ex-hentai-archive.json", "ex-hentai-archive.json");
 
                 var sync = new Syncronizer(hitomi_sync_range, hitomi_sync_lookup_range, hitomi_sync_ignore_exists, exhentai_lookup_page);
                 sync.SyncHitomi();
-                if (!sync_only_hitomi)
-                    sync.SyncExHentai();
 
                 if (sync_only) return;
 
@@ -360,8 +357,6 @@ namespace hsync
             {
                 var sync = new SyncronizerLowPerf(hitomi_sync_range, hitomi_sync_lookup_range, exhentai_lookup_page);
                 sync.SyncHitomi();
-                if (!sync_only_hitomi)
-                    sync.SyncExHentai();
                 sync.FlushToMainDatabase();
                 if (use_server) sync.FlushToServerDatabase();
                 if (use_elasticsearch) sync.FlushToElasticSearchServer();

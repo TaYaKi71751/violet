@@ -139,7 +139,7 @@ namespace hsync
             dcnt = 0;
             ecnt = 0;
             Console.Write("Running galleries pages...");
-            List<string> js = null;
+            List<string> js = new List<string>();
             if (gpurls.Count != 0)
                 using (var pb = new ProgressBar())
                 {
