@@ -1523,6 +1523,29 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
           ),
         ),
         InkWell(
+          child: ListTile(
+            leading: Icon(Icons.public, color: Settings.majorColor.value),
+            title: Text(Translations.instance!.trans('usehttp3')),
+            trailing: Switch(
+              value: Settings.useHttp3.value,
+              onChanged: (newValue) async {
+                await Settings.useHttp3.setValue(newValue);
+                setState(() {
+                  _shouldReload = true;
+                });
+              },
+              activeTrackColor: Settings.majorColor.value,
+              activeColor: Settings.majorAccentColor.value,
+            ),
+          ),
+          onTap: () async {
+            await Settings.useHttp3.setValue(!Settings.useHttp3.value);
+            setState(() {
+              _shouldReload = true;
+            });
+          },
+        ),
+        InkWell(
           customBorder: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(8.0),

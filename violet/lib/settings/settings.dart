@@ -28,6 +28,7 @@ class Settings {
 
   // Timeout Settings
   static final ignoreTimeout = SettingItem<bool>('ignoreTimeout', false);
+  static final useHttp3 = SettingItem<bool>('usehttp3', true);
 
   // Color Settings
   static Color get themeColor => themeWhat.value ? Colors.white : Colors.black;

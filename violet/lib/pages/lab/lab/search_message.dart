@@ -13,7 +13,6 @@ import 'package:violet/pages/common/utils.dart';
 import 'package:violet/pages/lab/lab/search_message_rank.dart';
 import 'package:violet/pages/segment/card_panel.dart';
 import 'package:violet/pages/segment/platform_navigator.dart';
-import 'package:violet/script/script_manager.dart';
 import 'package:violet/server/violet.dart';
 import 'package:violet/util/evict_image_urls.dart';
 import 'package:violet/widgets/v_cached_network_image.dart';
@@ -45,8 +44,6 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
         );
         _urls = List<String>.filled(messages.length, '');
       }
-
-      await ScriptManager.refresh();
 
       await MessageSearch.init();
 
@@ -397,8 +394,6 @@ class _LabSearchMessageState extends State<LabSearchMessage> {
     _height = List<double>.filled(messages.length, 0);
     _keys = List<GlobalKey>.generate(messages.length, (index) => GlobalKey());
     _urls = List<String>.filled(messages.length, '');
-
-    await ScriptManager.refresh();
 
     setState(() {});
   }

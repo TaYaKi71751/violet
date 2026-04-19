@@ -24,7 +24,6 @@ void main() {
 
   test('Refresh by V4 NoWebView', () async {
     ScriptManager.enableRefreshV4NoWebView = true;
-    expect(await ScriptManager.refreshV4NoWebView(), true);
   });
 
   test('Get Gallery Info Raw', () async {

@@ -35,6 +35,15 @@ bool _isScriptUrl(String url) {
       !blacklist.any((element) => url.contains(element));
 }
 
+Future<RhttpCompatibleClient> _createCompatibleClient() {
+  if (Settings.useHttp3.value) {
+    return RhttpCompatibleClient.create(
+      settings: const ClientSettings(httpVersionPref: HttpVersionPref.http3),
+    );
+  }
+  return RhttpCompatibleClient.create();
+}
+
 Future<http.Response> get(
   String url, {
   Map<String, String>? headers,
@@ -46,8 +55,17 @@ Future<http.Response> get(
     return await _scriptGet(url, headers: headers, timeout: timeout);
   }
 
+  if (HttpWrapper.cacheResponse[url] != null) {
+    Logger.info('[Http Cache] GET: $url');
+    return HttpWrapper.cacheResponse[url]!;
+  }
+
   Logger.info('[Http Request] GET: $url');
-  final res = await http.get(Uri.parse(url), headers: headers);
+  final client = await _createCompatibleClient();
+  final res = await client.get(Uri.parse(url), headers: headers);
+  if (res.statusCode == 200) {
+    HttpWrapper.cacheResponse[url] = res;
+  }
   if (res.statusCode != 200) {
     Logger.warning('[Http Response] CODE: ${res.statusCode}, GET: $url');
   }
@@ -62,7 +80,8 @@ Future<http.Response> post(
   Encoding? encoding,
 }) async {
   Logger.info('[Http Request] POST: $url');
-  var res = await http.post(
+  final client = await _createCompatibleClient();
+  var res = await client.post(
     Uri.parse(url),
     headers: headers,
     body: body,
@@ -100,9 +119,7 @@ Future<http.Response> _ehentaiGet(
   while (true) {
     var timeout = false;
 
-    final client = await RhttpCompatibleClient.create(
-      settings: const ClientSettings(httpVersionPref: HttpVersionPref.http3),
-    );
+    final client = await _createCompatibleClient();
 
     http.Response response;
 
@@ -170,9 +187,7 @@ Future<http.Response> _scriptGet(
 
   Response res;
   if (timeout == null) {
-    final client = await RhttpCompatibleClient.create(
-      settings: const ClientSettings(httpVersionPref: HttpVersionPref.http3),
-    );
+    final client = await _createCompatibleClient();
 
     res = await client.get(Uri.parse(url), headers: headers);
   } else {
@@ -181,9 +196,7 @@ Future<http.Response> _scriptGet(
     do {
       isTimeout = false;
 
-      final client = await RhttpCompatibleClient.create(
-        settings: const ClientSettings(httpVersionPref: HttpVersionPref.http3),
-      );
+      final client = await _createCompatibleClient();
       final sent = client.get(Uri.parse(url), headers: headers);
       if (!Settings.ignoreTimeout.value) {
         sent.timeout(
