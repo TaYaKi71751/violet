@@ -109,14 +109,10 @@ def clean():
 
 latest_sync_date = ''
 
-def __main__():
-  sync()
-  upload_chunk()
-  cur_date = datetime.utcnow().strftime('%Y.%m.%d')
-  if latest_sync_date != cur_date:
-    latest_sync_date = cur_date
-    clean()
-    release()
-  
-if __name__ == '__main__':
-  __main__()
+sync()
+upload_chunk()
+cur_date = datetime.utcnow().strftime('%Y.%m.%d')
+latest_sync_date = cur_date
+clean()
+release()
+# 1 hour
