@@ -29,28 +29,7 @@ namespace hsync
             if (HitomiData.Instance.metadata_collection != null)
                 HitomiData.Instance.metadata_collection.Clear();
             HitomiData.Instance.Load();
-            ehentaiArticles = JsonConvert.DeserializeObject<List<EHentaiResultArticle>>(File.ReadAllText("ex-hentai-archive.json"));
 
-            // List of all works on ehentai
-            ehIndex = new Dictionary<string, int>();
-
-            // Minimum datetime
-            mindd = ehentaiArticles.Min(x => DateTime.Parse(x.Published));
-
-            var xx1 = new List<double>();
-            var yy1 = new List<double>();
-
-            for (int i = 0; i < ehentaiArticles.Count; i++)
-            {
-                xx1.Add(int.Parse(ehentaiArticles[i].URL.Split('/')[4]));
-                yy1.Add((DateTime.Parse(ehentaiArticles[i].Published) - mindd).TotalMinutes);
-                if (!ehIndex.ContainsKey(ehentaiArticles[i].URL.Split('/')[4]))
-                    ehIndex.Add(ehentaiArticles[i].URL.Split('/')[4], i);
-            }
-
-            // Estimate DateTime
-            datetimeEstimator = new PolynomialRegressionModel(Vector.Create(yy1.ToArray()), Vector.Create(xx1.ToArray()), 100);
-            datetimeEstimator.Fit();
         }
 
         /// <summary>
@@ -68,17 +47,7 @@ namespace hsync
                 onHitomi.Add(HitomiData.Instance.metadata_collection[i].ID, i);
                 ids.Add(HitomiData.Instance.metadata_collection[i].ID);
             }
-
-            onEH = new Dictionary<int, int>();
-            for (int i = 0; i < ehentaiArticles.Count; i++)
-            {
-                var id = int.Parse(ehentaiArticles[i].URL.Split('/')[4]);
-                if (onEH.ContainsKey(id))
-                    continue;
-                onEH.Add(id, i);
-                ids.Add(id);
-            }
-
+            Console.WriteLine($"Hitomi: {onHitomi.Count}");
             articles = ids.ToList();
             articles.Sort((x, y) => x.CompareTo(y));
         }
@@ -123,6 +92,9 @@ namespace hsync
             {
                 if (language == null) return true;
 
+                onHitomi ??= new Dictionary<int,int>();
+                onEH ??= new Dictionary<int,int>();
+
                 var oh = onHitomi.ContainsKey(id);
                 var oe = onEH.ContainsKey(id);
 
@@ -148,7 +120,6 @@ namespace hsync
                 HitomiColumnModel result = null;
 
                 var oh = onHitomi.ContainsKey(id);
-                var oe = onEH.ContainsKey(id);
 
                 if (oh)
                 {
@@ -167,21 +138,6 @@ namespace hsync
                         Published = md.DateTime,
                         ExistOnHitomi = 1,
                     };
-
-                    if (oe)
-                    {
-                        var ii = ehentaiArticles[ehIndex[md.ID.ToString()]];
-                        result.Uploader = ii.Uploader;
-                        result.Published = DateTime.Parse(ii.Published);
-                        result.EHash = ii.URL.Split('/')[5];
-                        result.Files = ii.Files.Split(' ')[0].ToInt();
-                        if (ii.Title.StartsWith("("))
-                        {
-                            result.Class = ii.Title.Split("(")[1].Split(")")[0];
-                        }
-                    }
-                    else if (result.Published == null)
-                        result.Published = mindd.AddMinutes(datetimeEstimator.Predict(md.ID));
                 }
                 else
                 {
