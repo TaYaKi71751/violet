@@ -11,7 +11,7 @@ fi
 
 if [[ "$UNAME_ARCHITECTURE" == "x86_64" ]]; then
     ARCH="amd64"
-elif [[ "$UNAME_ARCHITECTURE" == "arm64" ]]; then
+elif [[ "$UNAME_ARCHITECTURE" == "aarch64" ]]; then
     ARCH="arm64"
 fi
 
