@@ -69,20 +69,6 @@ def release():
   process.wait()
 
   #
-  #   Rename rawdata/data.db
-  #
-  process = Popen(['mv', 'rawdata/data.db', 'rawdata/rawdata.db'])
-  process.wait()
-  process = Popen(['mv', 'rawdata-chinese/data.db', 'rawdata-chinese/rawdata-chinese.db'])
-  process.wait()
-  process = Popen(['mv', 'rawdata-english/data.db', 'rawdata-english/rawdata-english.db'])
-  process.wait()
-  process = Popen(['mv', 'rawdata-japanese/data.db', 'rawdata-japanese/rawdata-japanese.db'])
-  process.wait()
-  process = Popen(['mv', 'rawdata-korean/data.db', 'rawdata-korean/rawdata-korean.db'])
-  process.wait()
-
-  #
   #   Upload
   #
   date = datetime.utcnow().strftime('%Y.%m.%d')
@@ -96,11 +82,6 @@ def release():
     'rawdata-english.7z',
     'rawdata-japanese.7z',
     'rawdata-korean.7z',
-    'rawdata/rawdata.db',
-    'rawdata-chinese/rawdata-chinese.db',
-    'rawdata-english/rawdata-english.db',
-    'rawdata-japanese/rawdata-japanese.db',
-    'rawdata-korean/rawdata-korean.db',
   ])
   process.wait()
 
@@ -128,7 +109,7 @@ def clean():
 
 latest_sync_date = ''
 
-while True:
+def __main__():
   sync()
   upload_chunk()
   cur_date = datetime.utcnow().strftime('%Y.%m.%d')
@@ -136,5 +117,6 @@ while True:
     latest_sync_date = cur_date
     clean()
     release()
-  # 1 hour
-  time.sleep(60 * 60)
+  
+if __name__ == '__main__':
+  __main__()
