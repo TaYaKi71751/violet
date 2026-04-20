@@ -55,6 +55,7 @@ def release():
   #
   #   Compress
   #
+  timestamp = int(datetime.now().timestamp())
   process = Popen(['7za', 'a', 'rawdata.7z', 'rawdata/*'], stdout=open(os.devnull, 'wb'))
   process.wait()
   process = Popen(['7za', 'a', 'rawdata-chinese.7z', 'rawdata-chinese/*'], stdout=open(os.devnull, 'wb'))
