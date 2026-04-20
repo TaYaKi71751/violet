@@ -94,12 +94,6 @@ def remove_exists(path):
     os.remove(path)
 
 def clean():
-  shutil.rmtree('rawdata', ignore_errors=True)
-  shutil.rmtree('rawdata-chinese', ignore_errors=True)
-  shutil.rmtree('rawdata-english', ignore_errors=True)
-  shutil.rmtree('rawdata-japanese', ignore_errors=True)
-  shutil.rmtree('rawdata-korean', ignore_errors=True)
-  
   remove_exists('rawdata.7z')
   remove_exists('rawdata-chinese.7z')
   remove_exists('rawdata-english.7z')
