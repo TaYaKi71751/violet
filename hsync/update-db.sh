@@ -20,4 +20,3 @@ dotnet publish -r ${OS}-${ARCH} -c Release /p:PublishSingleFile=true /p:PublishT
 cp ../sync.py bin/Release/net8.0/${OS}-${ARCH}/publish
 cd bin/Release/net8.0/${OS}-${ARCH}/publish
 ./hsync
-python3 sync.py
