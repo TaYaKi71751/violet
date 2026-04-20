@@ -9,8 +9,7 @@ import shutil
 from subprocess import Popen, PIPE
 from datetime import datetime
 
-token = 'faketoken'
-dbmetapath = '/home/violet.dev.master/violet-server/frontend/build/version.txt'
+dbmetapath = './dbmeta.txt'
 
 def sync():
   #
@@ -30,25 +29,21 @@ def upload_chunk():
   size1 = os.path.getsize(chunkfile1)
   size2 = os.path.getsize(chunkfile2)
 
-  process = Popen(['github-release',
-    'upload', 
-    '--owner=violet-dev',
-    '--repo=chunk',
-    '--tag=' + timestamp,
-    '--release-name=chunk ' + timestamp + '',
-    '--body=""',
-    '--prerelease=false',
-    '--token=' + token,
+  process = Popen([
+    'gh', 'release', 'create', timestamp,
+    '--repo', 'TaYaKi71751/chunk',
+    '--title', 'chunk ' + timestamp,
+    '--notes', '',
     chunkfile1,
     chunkfile2,
   ])
   process.wait()
 
-  url = 'https://github.com/violet-dev/chunk/releases/download/'+timestamp+'/'+filename1
+  url = 'https://github.com/TaYaKi71751/chunk/releases/download/'+timestamp+'/'+filename1
   with open(dbmetapath, "a") as myfile:
     myfile.write('chunk ' + timestamp + ' ' + url + ' ' + str(size1) + '\n')
 
-  url = 'https://github.com/violet-dev/chunk/releases/download/'+timestamp+'/'+filename2
+  url = 'https://github.com/TaYaKi71751/chunk/releases/download/'+timestamp+'/'+filename2
   with open(dbmetapath, "a") as myfile:
     myfile.write('chunkraw ' + timestamp + ' ' + url + ' ' + str(size2) + '\n')
   
@@ -62,15 +57,15 @@ def release():
   #
   #   Compress
   #
-  process = Popen(['7z', 'a', 'rawdata.7z', 'rawdata/*'], stdout=open(os.devnull, 'wb'))
+  process = Popen(['7za', 'a', 'rawdata.7z', 'rawdata/*'], stdout=open(os.devnull, 'wb'))
   process.wait()
-  process = Popen(['7z', 'a', 'rawdata-chinese.7z', 'rawdata-chinese/*'], stdout=open(os.devnull, 'wb'))
+  process = Popen(['7za', 'a', 'rawdata-chinese.7z', 'rawdata-chinese/*'], stdout=open(os.devnull, 'wb'))
   process.wait()
-  process = Popen(['7z', 'a', 'rawdata-english.7z', 'rawdata-english/*'], stdout=open(os.devnull, 'wb'))
+  process = Popen(['7za', 'a', 'rawdata-english.7z', 'rawdata-english/*'], stdout=open(os.devnull, 'wb'))
   process.wait()
-  process = Popen(['7z', 'a', 'rawdata-japanese.7z', 'rawdata-japanese/*'], stdout=open(os.devnull, 'wb'))
+  process = Popen(['7za', 'a', 'rawdata-japanese.7z', 'rawdata-japanese/*'], stdout=open(os.devnull, 'wb'))
   process.wait()
-  process = Popen(['7z', 'a', 'rawdata-korean.7z', 'rawdata-korean/*'], stdout=open(os.devnull, 'wb'))
+  process = Popen(['7za', 'a', 'rawdata-korean.7z', 'rawdata-korean/*'], stdout=open(os.devnull, 'wb'))
   process.wait()
 
   #
@@ -91,15 +86,11 @@ def release():
   #   Upload
   #
   date = datetime.utcnow().strftime('%Y.%m.%d')
-  process = Popen(['github-release',
-    'upload', 
-    '--owner=violet-dev',
-    '--repo=db',
-    '--tag=' + date,
-    '--release-name=db ' + date + '',
-    '--body=""',
-    '--prerelease=false',
-    '--token=' + token,
+  process = Popen([
+    'gh', 'release', 'create', date,
+    '--repo', 'TaYaKi71751/db',
+    '--title', 'db ' + date,
+    '--notes', '',
     'rawdata.7z',
     'rawdata-chinese.7z',
     'rawdata-english.7z',
@@ -114,7 +105,7 @@ def release():
   process.wait()
 
   timestamp = str(int(datetime.now().timestamp()))
-  url = 'https://github.com/violet-dev/db/releases/download/'+date+'/rawdata'
+  url = 'https://github.com/TaYaKi71751/db/releases/download/'+date+'/rawdata'
   with open(dbmetapath, "a") as myfile:
     myfile.write('db ' + timestamp + ' ' + url + '\n')
 
