@@ -43,7 +43,7 @@ class SyncInfoRecord {
 
 class SyncManager {
   static String syncInfoURL(String branch) {
-    return 'https://raw.githubusercontent.com/violet-dev/sync-data/$branch/syncversion.txt';
+    return 'https://raw.githubusercontent.com/TaYaKi71751/sync-data/$branch/syncversion.txt';
   }
 
   static bool firstSync = false;
@@ -54,14 +54,11 @@ class SyncManager {
   static int requestSize = 0;
 
   static Future<void> checkSyncLatest(bool propagateException) async {
-    await checkSync('master', propagateException);
+    await checkSync('main', propagateException);
   }
 
   static Future<void> checkSyncOld(bool propagateException) async {
-    await checkSync(
-      'd2bd5ae068efb26eb4689e5d6281a590e59fc4e2',
-      propagateException,
-    );
+    await checkSync('', propagateException);
   }
 
   static Future<void> checkSync(String branch, bool propagateException) async {

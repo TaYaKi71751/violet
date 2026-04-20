@@ -18,3 +18,10 @@ fi
 cp sync.py hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/
 cd hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/
 python3 sync.py
+cp dbmeta.txt ~/sync-data/syncversion.txt
+cd ~/sync-data
+git config user.name "github-actions"
+git config user.email "github-actions@github.com"
+git add -A
+git commit -m "sync: update dbmeta.txt $(date +%s)"
+git push
