@@ -71,11 +71,11 @@ def release():
   #
   #   Upload
   #
-  date = datetime.utcnow().strftime('%Y.%m.%d')
+  timestamp_str = str(timestamp)
   process = Popen([
-    'gh', 'release', 'create', date,
+    'gh', 'release', 'create', timestamp_str,
     '--repo', 'TaYaKi71751/db',
-    '--title', 'db ' + date,
+    '--title', 'db ' + timestamp_str,
     '--notes', '',
     'rawdata.7z',
     'rawdata-chinese.7z',
@@ -85,10 +85,9 @@ def release():
   ])
   process.wait()
 
-  timestamp = str(int(datetime.now().timestamp()))
-  url = 'https://github.com/TaYaKi71751/db/releases/download/'+date+'/rawdata'
+  url = 'https://github.com/TaYaKi71751/db/releases/download/'+timestamp_str+'/rawdata'
   with open(dbmetapath, "a") as myfile:
-    myfile.write('db ' + timestamp + ' ' + url + '\n')
+    myfile.write('db ' + timestamp_str + ' ' + url + '\n')
 
 def remove_exists(path):
   if os.path.exists(path):
