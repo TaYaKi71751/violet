@@ -19,6 +19,7 @@ cd hsync
 dotnet publish -r ${OS}-${ARCH} -c Release /p:PublishSingleFile=true /p:PublishTrimmed=false /p:PublishReadyToRun=false
 cp ../sync.py bin/Release/net8.0/${OS}-${ARCH}/publish
 cd bin/Release/net8.0/${OS}-${ARCH}/publish
+pkill -9 sqlite3
 ./hsync
 sqlite3 rawdata/data.db << EOF
     DELETE FROM HitomiColumnModel WHERE Type = 'anime';
