@@ -51,8 +51,6 @@ def release():
   #
   #   Create database
   #
-  process = Popen(['./hsync', '-lc'])
-  process.wait()
 
   #
   #   Compress
