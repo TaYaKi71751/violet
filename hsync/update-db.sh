@@ -20,3 +20,23 @@ dotnet publish -r ${OS}-${ARCH} -c Release /p:PublishSingleFile=true /p:PublishT
 cp ../sync.py bin/Release/net8.0/${OS}-${ARCH}/publish
 cd bin/Release/net8.0/${OS}-${ARCH}/publish
 ./hsync
+sqlite3 rawdata/data.db << EOF
+    DELETE FROM HitomiColumnModel WHERE Type = 'anime';
+    VACUUM;
+EOF
+sqlite3 rawdata-chinese/data.db << EOF
+    DELETE FROM HitomiColumnModel WHERE Type = 'anime';
+    VACUUM;
+EOF
+sqlite3 rawdata-japanese/data.db << EOF
+    DELETE FROM HitomiColumnModel WHERE Type = 'anime';
+    VACUUM;
+EOF
+sqlite3 rawdata-english/data.db << EOF
+    DELETE FROM HitomiColumnModel WHERE Type = 'anime';
+    VACUUM;
+EOF
+sqlite3 rawdata-korean/data.db << EOF
+    DELETE FROM HitomiColumnModel WHERE Type = 'anime';
+    VACUUM;
+EOF
