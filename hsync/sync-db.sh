@@ -43,10 +43,10 @@ echo "chunk https://github.com/TaYaKi71751/chunk/releases/download/$TIMESTAMP/$D
 echo "chunk https://github.com/TaYaKi71751/chunk/releases/download/$TIMESTAMP/$JSON_CHUNK_FILE $(python3 -c "import os; print(os.path.getsize('chunk/$JSON_CHUNK_FILE'))")" >> syncversion.txt
 
 7za a rawdata.7z rawdata/* '-xr!*.db-jounal'
-7za a rawdata-chinese.7z rawdata-chinese/* '-xr!*.db-jounal'
-7za a rawdata-english.7z rawdata-english/* '-xr!*.db-jounal'
-7za a rawdata-japanese.7z rawdata-japanese/* '-xr!*.db-jounal'
-7za a rawdata-korean.7z rawdata-korean/* '-xr!*.db-jounal'
+7za a rawdata-chinese.7z rawdata-chinese/* '-xr!*.db-journal'
+7za a rawdata-english.7z rawdata-english/* '-xr!*.db-journal'
+7za a rawdata-japanese.7z rawdata-japanese/* '-xr!*.db-journal'
+7za a rawdata-korean.7z rawdata-korean/* '-xr!*.db-journal'
 TIMESTAMP="$(python3 -c 'import datetime; print(int(datetime.datetime.now().timestamp()))')"
 echo "sync: create db $TIMESTAMP"
 gh release create $TIMESTAMP --repo TaYaKi71751/db --title "db $TIMESTAMP" --notes "" rawdata.7z rawdata-chinese.7z rawdata-english.7z rawdata-japanese.7z rawdata-korean.7z || exit -1
