@@ -1555,6 +1555,35 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
             });
           },
         ),
+        InkWell(
+          customBorder: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(8.0),
+              bottomRight: Radius.circular(8.0),
+            ),
+          ),
+          child: ListTile(
+            leading: Icon(MdiIcons.server, color: Settings.majorColor.value),
+            title: Text(Translations.instance!.trans('usechunksync')),
+            trailing: Switch(
+              value: Settings.useChunkSync.value,
+              onChanged: (newValue) async {
+                await Settings.useChunkSync.setValue(newValue);
+                setState(() {
+                  _shouldReload = true;
+                });
+              },
+              activeTrackColor: Settings.majorColor.value,
+              activeColor: Settings.majorAccentColor.value,
+            ),
+          ),
+          onTap: () async {
+            await Settings.useChunkSync.setValue(!Settings.useChunkSync.value);
+            setState(() {
+              _shouldReload = true;
+            });
+          },
+        ),
       ]),
     ];
   }
