@@ -49,7 +49,7 @@ echo "chunk https://github.com/TaYaKi71751/chunk/releases/download/$TIMESTAMP/$J
 7za a rawdata-korean.7z rawdata-korean/* '-xr!*.db-journal'
 TIMESTAMP="$(python3 -c 'import datetime; print(int(datetime.datetime.now().timestamp()))')"
 echo "sync: create db $TIMESTAMP"
-gh release create $TIMESTAMP --repo TaYaKi71751/db --title "db $TIMESTAMP" --notes "" rawdata.7z rawdata-chinese.7z rawdata-english.7z rawdata-japanese.7z rawdata-korean.7z || exit -1
+gh release create $TIMESTAMP --repo TaYaKi71751/db --title "db $TIMESTAMP" --notes "" $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata.7z $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-chinese.7z $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-english.7z $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-japanese.7z $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-korean.7z || exit -1
 echo "db https://github.com/TaYaKi71751/db/releases/download/$TIMESTAMP/rawdata" >> syncversion.txt
 cp syncversion.txt ~/sync-data/syncversion.txt
 cd ~/sync-data
