@@ -35,7 +35,7 @@ TIMESTAMP="$(python3 -c 'import datetime; print(int(datetime.datetime.now().time
 echo "sync: create chunk $TIMESTAMP"
 
 gh release create $TIMESTAMP --repo TaYaKi71751/chunk --title "chunk $TIMESTAMP" --notes "" chunk/$DB_CHUNK_FILE chunk/$JSON_CHUNK_FILE || exit -1
-echo "chunk $TIMESTAMP https://github.com/TaYaKi71751/chunk/releases/download/$TIMESTAMP/$DB_CHUNK_FILE.db $(python3 -c "import os; print(os.path.getsize('chunk/$DB_CHUNK_FILE'))")" >> syncversion.txt
+echo "chunk $TIMESTAMP https://github.com/TaYaKi71751/chunk/releases/download/$TIMESTAMP/$DB_CHUNK_FILE $(python3 -c "import os; print(os.path.getsize('chunk/$DB_CHUNK_FILE'))")" >> syncversion.txt
 echo "chunk $TIMESTAMP https://github.com/TaYaKi71751/chunk/releases/download/$TIMESTAMP/$JSON_CHUNK_FILE $(python3 -c "import os; print(os.path.getsize('chunk/$JSON_CHUNK_FILE'))")" >> syncversion.txt
 
 cd ~/sync-data
