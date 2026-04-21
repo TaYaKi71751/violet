@@ -19,8 +19,14 @@ fi
 
 cd hsync
 dotnet publish -r ${OS}-${ARCH} -c Release /p:PublishSingleFile=true /p:PublishTrimmed=false /p:PublishReadyToRun=false
-cp ../sync.py bin/Release/net8.0/${OS}-${ARCH}/publish
 cd bin/Release/net8.0/${OS}-${ARCH}/publish
+cp rawdata/data.db rawdata.db.bak
+MAX_ID="$(sqlite3 rawdata/data.db << EOF
+    SELECT MAX(Id) FROM HitomiColumnModel;
+EOF
+)"
+
+
 if [[ "$UNAME_ARCHITECTURE" == "aarch64" ]]; then
     ./hsync
 elif [[ "$UNAME_ARCHITECTURE" == "arm64" ]]; then
@@ -28,6 +34,7 @@ elif [[ "$UNAME_ARCHITECTURE" == "arm64" ]]; then
 elif [[ "$UNAME_ARCHITECTURE" == "x86_64" ]]; then
     ./hsync
 fi
+TIMESTAMP="$(python3 -c 'import datetime; print(int(datetime.datetime.now().timestamp()))')"
 sqlite3 rawdata/data.db << EOF
     DELETE FROM HitomiColumnModel WHERE Type = 'anime';
     VACUUM;
@@ -48,12 +55,60 @@ sqlite3 rawdata-korean/data.db << EOF
     DELETE FROM HitomiColumnModel WHERE Type = 'anime';
     VACUUM;
 EOF
+rm -rf chunk
+sqlite3 rawdata/data.db << EOF
+    DELETE FROM HitomiColumnModel WHERE Id < $MAX_ID OR Id = $MAX_ID;
+    VACUUM INTO 'data-${TIMESTAMP}.db';
+EOF
+python3 << EOF
+import sqlite3
+import json
+import os
+
+conn = sqlite3.connect(f"data-${TIMESTAMP}.db")
+conn.row_factory = sqlite3.Row
+cursor = conn.cursor()
+
+results = cursor.execute(
+    "SELECT * FROM HitomiColumnModel ORDER BY Id DESC"
+).fetchall()
+
+data = [dict(row) for row in results]
+
+with open("data-${TIMESTAMP}.json", "w", encoding="utf-8") as f:
+    json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
+
+conn.close()
+EOF
+
+mkdir -p chunk
+mv data-${TIMESTAMP}.db chunk/
+mv data-${TIMESTAMP}.json chunk/
+
+echo "sync: create chunk $TIMESTAMP"
+gh release create $TIMESTAMP --repo TaYaKi71751/chunk --title "chunk $TIMESTAMP" --notes "" chunk/data-${TIMESTAMP}.db chunk/data-${TIMESTAMP}.json || exit -1
+echo "chunk $TIMESTAMP created"
+
+echo "chunk $TIMESTAMP https://github.com/TaYaKi71751/chunk/releases/download/$TIMESTAMP/data-${TIMESTAMP}.db $(python3 -c "import os; print(os.path.getsize('chunk/data-${TIMESTAMP}.db'))")" >> syncversion.txt
+echo "chunk $TIMESTAMP https://github.com/TaYaKi71751/chunk/releases/download/$TIMESTAMP/data-${TIMESTAMP}.json $(python3 -c "import os; print(os.path.getsize('chunk/data-${TIMESTAMP}.json'))")" >> syncversion.txt
+rm -rf chunk
+
+cp syncversion.txt ~/sync-data/syncversion.txt
+cd ~/sync-data
+git config user.name "github-actions"
+git config user.email "github-actions@github.com"
+git add -A
+git commit -m "sync: update syncversion.txt $TIMESTAMP"
+git push
+
+
+cd ~/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish
+
 rm *.7z
 rm *.7z.*
 
 7za a rawdata.7z rawdata/* '-xr!*.db-jounal'
 ls -la 
-TIMESTAMP="$(python3 -c 'import datetime; print(int(datetime.datetime.now().timestamp()))')"
 echo "sync: create db $TIMESTAMP"
 gh release create $TIMESTAMP --repo TaYaKi71751/db --title "db $TIMESTAMP" --notes "" $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata.7z || exit -1
 rm rawdata.7z
