@@ -38,6 +38,7 @@ gh release create $TIMESTAMP --repo TaYaKi71751/chunk --title "chunk $TIMESTAMP"
 echo "chunk $TIMESTAMP https://github.com/TaYaKi71751/chunk/releases/download/$TIMESTAMP/$DB_CHUNK_FILE $(python3 -c "import os; print(os.path.getsize('chunk/$DB_CHUNK_FILE'))")" >> syncversion.txt
 echo "chunk $TIMESTAMP https://github.com/TaYaKi71751/chunk/releases/download/$TIMESTAMP/$JSON_CHUNK_FILE $(python3 -c "import os; print(os.path.getsize('chunk/$JSON_CHUNK_FILE'))")" >> syncversion.txt
 
+cp syncversion.txt ~/sync-data/syncversion.txt
 cd ~/sync-data
 git config user.name "github-actions"
 git config user.email "github-actions@github.com"
