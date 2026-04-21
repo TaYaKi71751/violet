@@ -58,10 +58,7 @@ class SyncManager {
   }
 
   static Future<void> checkSyncOld(bool propagateException) async {
-    await checkSync(
-      '2d48451fdf5a08a7413439d16353c0167632bb4e',
-      propagateException,
-    );
+    await checkSync('main', propagateException);
   }
 
   static Future<void> checkSync(String branch, bool propagateException) async {
