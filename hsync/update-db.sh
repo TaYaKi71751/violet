@@ -21,9 +21,6 @@ cd hsync
 dotnet publish -r ${OS}-${ARCH} -c Release /p:PublishSingleFile=true /p:PublishTrimmed=false /p:PublishReadyToRun=false
 cp ../sync.py bin/Release/net8.0/${OS}-${ARCH}/publish
 cd bin/Release/net8.0/${OS}-${ARCH}/publish
-rm *.7z
-rm *.7z.*
-rm -rf chunk
 if [[ "$UNAME_ARCHITECTURE" == "aarch64" ]]; then
     ./hsync
 elif [[ "$UNAME_ARCHITECTURE" == "arm64" ]]; then
@@ -31,7 +28,6 @@ elif [[ "$UNAME_ARCHITECTURE" == "arm64" ]]; then
 elif [[ "$UNAME_ARCHITECTURE" == "x86_64" ]]; then
     ./hsync
 fi
-./hsync
 sqlite3 rawdata/data.db << EOF
     DELETE FROM HitomiColumnModel WHERE Type = 'anime';
     VACUUM;
@@ -52,6 +48,8 @@ sqlite3 rawdata-korean/data.db << EOF
     DELETE FROM HitomiColumnModel WHERE Type = 'anime';
     VACUUM;
 EOF
+rm *.7z
+rm *.7z.*
 
 7za a rawdata.7z rawdata/* '-xr!*.db-jounal'
 ls -la 
