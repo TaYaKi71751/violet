@@ -60,6 +60,7 @@ rm rawdata.7z
 7za a rawdata-chinese.7z rawdata-chinese/* '-xr!*.db-journal'
 ls -la 
 gh release upload $TIMESTAMP --repo TaYaKi71751/db --clobber $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-chinese.7z || exit -1
+rm rawdata-chinese.7z
 7za a rawdata-english.7z rawdata-english/* '-xr!*.db-journal'
 ls -la 
 gh release upload $TIMESTAMP --repo TaYaKi71751/db --clobber $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-english.7z || exit -1
@@ -72,7 +73,7 @@ rm rawdata-japanese.7z
 ls -la 
 gh release upload $TIMESTAMP --repo TaYaKi71751/db --clobber $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-korean.7z || exit -1
 rm rawdata-korean.7z
-echo "db https://github.com/TaYaKi71751/db/releases/download/$TIMESTAMP/rawdata" >> syncversion.txt
+echo "db $TIMESTAMP https://github.com/TaYaKi71751/db/releases/download/$TIMESTAMP/rawdata" >> syncversion.txt
 cp syncversion.txt ~/sync-data/syncversion.txt
 
 cd ~/sync-data
