@@ -62,8 +62,8 @@ ls -la
 gh release upload $TIMESTAMP --repo TaYaKi71751/db --clobber $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-chinese.7z || exit -1
 7za a rawdata-english.7z rawdata-english/* '-xr!*.db-journal'
 ls -la 
-rm rawdata-english.7z
 gh release upload $TIMESTAMP --repo TaYaKi71751/db --clobber $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-english.7z || exit -1
+rm rawdata-english.7z
 7za a rawdata-japanese.7z rawdata-japanese/* '-xr!*.db-journal'
 ls -la
 gh release upload $TIMESTAMP --repo TaYaKi71751/db --clobber $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-japanese.7z || exit -1
