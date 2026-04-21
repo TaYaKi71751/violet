@@ -18,6 +18,8 @@ fi
 cp sync.py hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/
 cd hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/
 pkill -9 sqlite3
+rm *.7z
+rm *.7z.*
 python3 sync.py
 cp dbmeta.txt ~/sync-data/syncversion.txt
 cd ~/sync-data
