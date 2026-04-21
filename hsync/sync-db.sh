@@ -43,17 +43,22 @@ echo "chunk https://github.com/TaYaKi71751/chunk/releases/download/$TIMESTAMP/$D
 echo "chunk https://github.com/TaYaKi71751/chunk/releases/download/$TIMESTAMP/$JSON_CHUNK_FILE $(python3 -c "import os; print(os.path.getsize('chunk/$JSON_CHUNK_FILE'))")" >> syncversion.txt
 
 7za a rawdata.7z rawdata/* '-xr!*.db-jounal'
+ls -la 
 TIMESTAMP="$(python3 -c 'import datetime; print(int(datetime.datetime.now().timestamp()))')"
 echo "sync: create db $TIMESTAMP"
 gh release create $TIMESTAMP --repo TaYaKi71751/db --title "db $TIMESTAMP" --notes "" $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata.7z || exit -1
 7za a rawdata-chinese.7z rawdata-chinese/* '-xr!*.db-journal'
-gh release upload $TIMESTAMP --repo TaYaKi71751/db --clobber --notes "" $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-chinese.7z || exit -1
+ls -la 
+gh release upload $TIMESTAMP --repo TaYaKi71751/db --clobber $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-chinese.7z || exit -1
 7za a rawdata-english.7z rawdata-english/* '-xr!*.db-journal'
-gh release upload $TIMESTAMP --repo TaYaKi71751/db --clobber --notes "" $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-english.7z || exit -1
+ls -la 
+gh release upload $TIMESTAMP --repo TaYaKi71751/db --clobber $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-english.7z || exit -1
 7za a rawdata-japanese.7z rawdata-japanese/* '-xr!*.db-journal'
-gh release upload $TIMESTAMP --repo TaYaKi71751/db --clobber --notes "" $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-japanese.7z || exit -1
+ls -la 
+gh release upload $TIMESTAMP --repo TaYaKi71751/db --clobber $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-japanese.7z || exit -1
 7za a rawdata-korean.7z rawdata-korean/* '-xr!*.db-journal'
-gh release upload $TIMESTAMP --repo TaYaKi71751/db --clobber --notes "" $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-korean.7z || exit -1
+ls -la 
+gh release upload $TIMESTAMP --repo TaYaKi71751/db --clobber $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-korean.7z || exit -1
 echo "db https://github.com/TaYaKi71751/db/releases/download/$TIMESTAMP/rawdata" >> syncversion.txt
 cp syncversion.txt ~/sync-data/syncversion.txt
 cd ~/sync-data
