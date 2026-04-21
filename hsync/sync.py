@@ -56,15 +56,16 @@ def release():
   #   Compress
   #
   timestamp = int(datetime.now().timestamp())
-  process = Popen(['7za', 'a', 'rawdata.7z', 'rawdata/*'], stdout=open(os.devnull, 'wb'))
+  process = Popen(['7z', 'a', 'rawdata.7z', 'rawdata/*', '\'-x!*.db-journal\''], stdout=open(os.devnull, 'wb'))
   process.wait()
-  process = Popen(['7za', 'a', 'rawdata-chinese.7z', 'rawdata-chinese/*'], stdout=open(os.devnull, 'wb'))
+
+  process = Popen(['7za', 'a', 'rawdata-chinese.7z', 'rawdata-chinese/*', '\'-x!*.db-journal\''], stdout=open(os.devnull, 'wb'))
   process.wait()
-  process = Popen(['7za', 'a', 'rawdata-english.7z', 'rawdata-english/*'], stdout=open(os.devnull, 'wb'))
+  process = Popen(['7za', 'a', 'rawdata-english.7z', 'rawdata-english/*', '\'-x!*.db-journal\''], stdout=open(os.devnull, 'wb'))
   process.wait()
-  process = Popen(['7za', 'a', 'rawdata-japanese.7z', 'rawdata-japanese/*'], stdout=open(os.devnull, 'wb'))
+  process = Popen(['7za', 'a', 'rawdata-japanese.7z', 'rawdata-japanese/*', '\'-x!*.db-journal\''], stdout=open(os.devnull, 'wb'))
   process.wait()
-  process = Popen(['7za', 'a', 'rawdata-korean.7z', 'rawdata-korean/*'], stdout=open(os.devnull, 'wb'))
+  process = Popen(['7za', 'a', 'rawdata-korean.7z', 'rawdata-korean/*', '\'-x!*.db-journal\''], stdout=open(os.devnull, 'wb'))
   process.wait()
 
   #
