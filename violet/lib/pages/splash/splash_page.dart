@@ -165,7 +165,8 @@ class _SplashPageState extends State<SplashPage> {
     final prefs = await SharedPreferences.getInstance();
     if (prefs.getInt('db_exists') == 1 && !widget.switching) {
       var connectivityResult = await (Connectivity().checkConnectivity());
-      if (!connectivityResult.contains(ConnectivityResult.none)) {
+      if (Settings.useChunkSync.value &&
+          !connectivityResult.contains(ConnectivityResult.none)) {
         try {
           _changeMessage('check sync...');
           await SyncManager.checkSyncLatest(true);

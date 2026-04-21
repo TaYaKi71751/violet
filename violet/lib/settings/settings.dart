@@ -324,6 +324,8 @@ class Settings {
     '',
   );
 
+  static final useChunkSync = SettingItem<bool>('useChunkSync', true);
+
   static Future<void> initFirst() async {
     prefs = await SharedPreferences.getInstance();
 
