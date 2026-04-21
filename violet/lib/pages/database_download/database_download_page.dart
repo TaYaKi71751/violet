@@ -159,7 +159,7 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
       );
       if (widget.dbType! == 'global') {
         await dio.download(
-          'https://web.archive.org/web/20201029210829if_/https://github-production-release-asset-2e65be.s3.amazonaws.com/271723612/7c113700-19da-11eb-907e-1b8e3273d476?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20201029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20201029T210829Z&X-Amz-Expires=300&X-Amz-Signature=eb6a3fba3d4fb59ed7475b73e3a68e01722e39a90e7b537e56a68ad5bae3a9b1&X-Amz-SignedHeaders=host&actor_id=0&key_id=0&repo_id=271723612&response-content-disposition=attachment%3B%20filename%3Drawdata.7z&response-content-type=application%2Foctet-stream',
+          SyncManager.getLatestDB().getDBDownloadUrl(widget.dbType!),
           '${dir.path}/db.sql.7z',
           onReceiveProgress: (rec, total) {
             nu += rec - latest;
