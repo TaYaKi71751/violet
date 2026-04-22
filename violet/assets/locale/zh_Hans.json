@@ -1,6 +1,8 @@
 {
   "exh_favorite": "ExH 收藏",
   "eh_favorite": "EH 收藏",
+  "err_eh_favorite_page": "获取 EH 收藏页面时发生错误。",
+  "err_exh_favorite_page": "获取 ExH 收藏页面时发生错误。",
   "usechunksync": "使用分块同步",
   "title": "Violet",
   "notice": "通知",
