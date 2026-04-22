@@ -16,6 +16,12 @@ elif [[ "$UNAME_ARCHITECTURE" == "aarch64" ]]; then
 elif [[ "$UNAME_ARCHITECTURE" == "arm64" ]]; then
     ARCH="x64"
 fi
+if ( ls ./hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/lock );then
+    echo "Another instance is running."
+    exit -1
+fi
+
+echo "" > ./hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/lock
 
 cd hsync
 dotnet publish -r ${OS}-${ARCH} -c Release /p:PublishSingleFile=true /p:PublishTrimmed=false /p:PublishReadyToRun=false
@@ -25,7 +31,6 @@ MAX_ID="$(sqlite3 rawdata/data.db << EOF
     SELECT MAX(Id) FROM HitomiColumnModel;
 EOF
 )"
-
 
 if [[ "$UNAME_ARCHITECTURE" == "aarch64" ]]; then
     ./hsync
@@ -137,3 +142,6 @@ git config user.email "github-actions@github.com"
 git add -A
 git commit -m "sync: update syncversion.txt $(date +%s)"
 git push
+
+cd ~/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish
+rm lock
