@@ -1,6 +1,8 @@
 {
   "exh_favorite": "ExH 즐겨찾기",
   "eh_favorite": "EH 즐겨찾기",
+  "err_eh_favorite_page": "EH 즐겨찾기 페이지를 가져오는 데 실패했습니다.",
+  "err_exh_favorite_page": "ExH 즐겨찾기 페이지를 가져오는 데 실패했습니다.",
   "usechunksync": "청크 동기화 사용",
   "title": "Violet",
   "notice": "공지",

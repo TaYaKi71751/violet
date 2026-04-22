@@ -1,6 +1,8 @@
 {
   "exh_favorite": "ExH Favorite",
   "eh_favorite": "EH Favorite",
+  "err_eh_favorite_page": "Failed to get EH favorites page.",
+  "err_exh_favorite_page": "Failed to get ExH favorites page.",
   "usechunksync": "Use Chunk Sync",
   "title": "Violet",
   "notice": "Notice",

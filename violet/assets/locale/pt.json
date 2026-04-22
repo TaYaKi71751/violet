@@ -1,6 +1,8 @@
 {
   "exh_favorite": "Favorito de ExH",
   "eh_favorite": "Favorito de EH",
+  "err_eh_favorite_page": "Falha ao obter a página de favoritos do EH.",
+  "err_exh_favorite_page": "Falha ao obter a página de favoritos do ExH.",
   "usechunksync": "Usar sincronização em pedaços",
   "title": "Violet",
   "notice": "Aviso",

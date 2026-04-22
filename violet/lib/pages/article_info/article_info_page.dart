@@ -28,6 +28,7 @@ import 'package:violet/database/user/bookmark.dart';
 import 'package:violet/database/user/download.dart';
 import 'package:violet/database/user/record.dart';
 import 'package:violet/locale/locale.dart';
+import 'package:violet/log/log.dart';
 import 'package:violet/model/article_info.dart';
 import 'package:violet/model/article_list_item.dart';
 import 'package:violet/other/dialogs.dart';
@@ -240,17 +241,29 @@ class ArticleInfoPage extends StatelessWidget {
                 backgroundColor: Settings.majorColor.value,
               ),
               onPressed: () async {
-                final hash = await tryGetEhHash(data.queryResult.id(), false);
-                await Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return ReaderScreen(
-                        readerUrl:
-                            'https://e-hentai.org/gallerypopups.php?gid=${data.queryResult.id()}&t=$hash&act=addfav',
-                      );
-                    },
-                  ),
-                );
+                try {
+                  final hash = await tryGetEhHash(data.queryResult.id(), false);
+                  await Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return ReaderScreen(
+                          readerUrl:
+                              'https://e-hentai.org/gallerypopups.php?gid=${data.queryResult.id()}&t=$hash&act=addfav',
+                        );
+                      },
+                    ),
+                  );
+                } catch (e) {
+                  Logger.error(
+                    '[ArticleInfoPage-buttonArea-EH-Favorite] Error: $e',
+                  );
+                  showToast(
+                    level: ToastLevel.error,
+                    message: Translations.instance!.trans(
+                      'err_eh_favorite_page',
+                    ),
+                  );
+                }
               },
               child: buttonInner(
                 MdiIcons.starBox,
@@ -263,17 +276,29 @@ class ArticleInfoPage extends StatelessWidget {
                 backgroundColor: Settings.majorColor.value,
               ),
               onPressed: () async {
-                final hash = await tryGetEhHash(data.queryResult.id(), true);
-                await Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return ReaderScreen(
-                        readerUrl:
-                            'https://exhentai.org/gallerypopups.php?gid=${data.queryResult.id()}&t=$hash&act=addfav',
-                      );
-                    },
-                  ),
-                );
+                try {
+                  final hash = await tryGetEhHash(data.queryResult.id(), true);
+                  await Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return ReaderScreen(
+                          readerUrl:
+                              'https://exhentai.org/gallerypopups.php?gid=${data.queryResult.id()}&t=$hash&act=addfav',
+                        );
+                      },
+                    ),
+                  );
+                } catch (e) {
+                  Logger.error(
+                    '[ArticleInfoPage-buttonArea-ExH-Favorite] Error: $e',
+                  );
+                  showToast(
+                    level: ToastLevel.error,
+                    message: Translations.instance!.trans(
+                      'err_exh_favorite_page',
+                    ),
+                  );
+                }
               },
               child: buttonInner(
                 MdiIcons.starBox,

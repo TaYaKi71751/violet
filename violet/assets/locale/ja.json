@@ -1,6 +1,8 @@
 {
   "exh_favorite": "ExH お気に入り",
   "eh_favorite": "EH お気に入り",
+  "err_eh_favorite_page": "EH お気に入りページの取得に失敗しました。",
+  "err_exh_favorite_page": "ExH お気に入りページの取得に失敗しました。",
   "usechunksync": "チャンク同期を使用",
   "title": "Violet",
   "notice": "お知らせ",
