@@ -27,11 +27,6 @@ cd hsync
 dotnet publish -r ${OS}-${ARCH} -c Release /p:PublishSingleFile=true /p:PublishTrimmed=false /p:PublishReadyToRun=false
 cd bin/Release/net8.0/${OS}-${ARCH}/publish
 cp rawdata/data.db rawdata.db.bak
-MAX_ID="$(sqlite3 rawdata/data.db << EOF
-    SELECT MAX(Id) FROM HitomiColumnModel;
-EOF
-|| echo "0"
-)"
 
 if [[ "$UNAME_ARCHITECTURE" == "aarch64" ]]; then
     ./hsync
@@ -86,6 +81,19 @@ with open("data-${TIMESTAMP}.json", "w", encoding="utf-8") as f:
 
 conn.close()
 EOF
+
+export MAX_ID="$(sqlite3 rawdata.db.bak << EOF
+    SELECT MAX(Id) FROM HitomiColumnModel;
+EOF
+)"
+if [[ -z "$MAX_ID" ]]; then
+    echo "Failed to get MAX_ID from the database."
+    export MAX_ID="0"
+else
+    export MAX_ID="$(echo $MAX_ID | tr -d '\n')"
+fi
+
+echo "MAX_ID: $MAX_ID"
 
 mkdir -p chunk
 mv data-${TIMESTAMP}.db chunk/
