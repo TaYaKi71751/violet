@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:violet/component/eh/eh_headers.dart';
 import 'package:violet/log/log.dart';
 import 'package:violet/pages/settings/login/ehentai_login.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -22,27 +23,6 @@ class _ReaderScreenState extends State<ReaderScreen> {
   @override
   void initState() {
     super.initState();
-    if (readerUrl.contains('e-hentai.org') ||
-        readerUrl.contains('exhentai.org')) {
-      SharedPreferences.getInstance().then((prefs) async {
-        cookieManager.clearCookies();
-
-        final ehCookies = prefs.getString('eh_cookies');
-        if (ehCookies != null) {
-          final cookies = parseCookies(ehCookies);
-          for (final entry in cookies.entries) {
-            await cookieManager.setCookie(
-              WebViewCookie(
-                name: entry.key,
-                value: entry.value,
-                domain: Uri.parse(readerUrl).host,
-              ),
-            );
-          }
-        }
-        _controller = _controller..loadRequest(Uri.parse(readerUrl));
-      });
-    }
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted);
     _controller = _controller
@@ -158,6 +138,24 @@ class _ReaderScreenState extends State<ReaderScreen> {
           },
         ),
       );
+    if (readerUrl.contains('e-hentai.org') ||
+        readerUrl.contains('exhentai.org')) {
+      EHSession.cookie().then((cookies) async {
+        final parsedCookies = parseCookies(cookies!);
+        for (final entry in parsedCookies.entries) {
+          await cookieManager.setCookie(
+            WebViewCookie(
+              name: entry.key,
+              value: entry.value,
+              domain: Uri.parse(readerUrl).host,
+            ),
+          );
+        }
+        _controller = _controller..loadRequest(Uri.parse(readerUrl));
+      });
+    } else {
+      _controller.loadRequest(Uri.parse(readerUrl));
+    }
   }
 
   @override
