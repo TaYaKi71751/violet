@@ -30,6 +30,7 @@ cp rawdata/data.db rawdata.db.bak
 MAX_ID="$(sqlite3 rawdata/data.db << EOF
     SELECT MAX(Id) FROM HitomiColumnModel;
 EOF
+|| echo "0"
 )"
 
 if [[ "$UNAME_ARCHITECTURE" == "aarch64" ]]; then
