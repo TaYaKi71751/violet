@@ -27,11 +27,6 @@ cd hsync
 dotnet publish -r ${OS}-${ARCH} -c Release /p:PublishSingleFile=true /p:PublishTrimmed=false /p:PublishReadyToRun=false
 cd bin/Release/net8.0/${OS}-${ARCH}/publish
 cp rawdata/data.db rawdata.db.bak
-MAX_ID="$(sqlite3 rawdata/data.db << EOF
-    SELECT MAX(Id) FROM HitomiColumnModel;
-EOF
-|| echo "0"
-)"
 
 if [[ "$UNAME_ARCHITECTURE" == "aarch64" ]]; then
     ./hsync
@@ -62,9 +57,23 @@ sqlite3 rawdata-korean/data.db << EOF
     VACUUM;
 EOF
 rm -rf chunk
-sqlite3 rawdata/data.db << EOF
+
+export MAX_ID="$(sqlite3 rawdata.db.bak << EOF
+    SELECT MAX(Id) FROM HitomiColumnModel;
+EOF
+)"
+if [[ -z "$MAX_ID" ]]; then
+    echo "Failed to get MAX_ID from the database."
+    export MAX_ID="0"
+else
+    export MAX_ID="$(echo $MAX_ID | tr -d '\n')"
+fi
+cp rawdata/data.db data-${TIMESTAMP}.db
+
+echo "MAX_ID: $MAX_ID"
+sqlite3 data-${TIMESTAMP}.db << EOF
     DELETE FROM HitomiColumnModel WHERE Id < $MAX_ID OR Id = $MAX_ID;
-    VACUUM INTO 'data-${TIMESTAMP}.db';
+    VACUUM;
 EOF
 python3 << EOF
 import sqlite3
@@ -86,6 +95,7 @@ with open("data-${TIMESTAMP}.json", "w", encoding="utf-8") as f:
 
 conn.close()
 EOF
+
 
 mkdir -p chunk
 mv data-${TIMESTAMP}.db chunk/
