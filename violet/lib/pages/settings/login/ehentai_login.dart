@@ -33,7 +33,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  static const _loginUrl = 'https://e-hentai.org/bounce_login.php';
+  static const _loginUrl =
+      'https://forums.e-hentai.org/index.php?act=Login&CODE=00';
   final WebViewCookieManager cookieManager = WebViewCookieManager();
 
   late final WebViewController _controller;
