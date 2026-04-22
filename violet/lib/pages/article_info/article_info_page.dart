@@ -252,7 +252,10 @@ class ArticleInfoPage extends StatelessWidget {
                   ),
                 );
               },
-              child: buttonInner(MdiIcons.starBox, 'Eh Favorite'),
+              child: buttonInner(
+                MdiIcons.starBox,
+                Translations.instance!.trans('eh_favorite'),
+              ),
             ),
             const SizedBox(width: 4.0),
             ElevatedButton(
@@ -272,7 +275,10 @@ class ArticleInfoPage extends StatelessWidget {
                   ),
                 );
               },
-              child: buttonInner(MdiIcons.starBox, 'ExH Favorite'),
+              child: buttonInner(
+                MdiIcons.starBox,
+                Translations.instance!.trans('exh_favorite'),
+              ),
             ),
           ],
         ),
