@@ -18,6 +18,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:mdi/mdi.dart';
 import 'package:path_provider/path_provider.dart';
@@ -2134,33 +2135,54 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
           title: Text(Translations.instance!.trans('exportingbookmark')),
           trailing: const Icon(Icons.keyboard_arrow_right),
           onTap: () async {
-            final dir = Platform.isIOS
-                ? await getApplicationSupportDirectory()
-                : (await getApplicationDocumentsDirectory());
-            final bookmarkDatabaseFile = File('${dir.path}/user.db');
+            try {
+              final dir = Platform.isIOS
+                  ? await getApplicationSupportDirectory()
+                  : (await getApplicationDocumentsDirectory());
+              final bookmarkDatabaseFile = File('${dir.path}/user.db');
 
-            if (Platform.isAndroid) {
-              await PlatformMiscMethods.instance.exportFile(
-                bookmarkDatabaseFile.path,
-                mimeType: 'application/vnd.sqlite3',
-                fileNameToSaveAs: 'violet-bookmarks.db',
-              );
-            } else {
-              final selectedPath = await FilePicker.platform.getDirectoryPath();
+              if (Platform.isAndroid) {
+                await PlatformMiscMethods.instance.exportFile(
+                  bookmarkDatabaseFile.path,
+                  mimeType: 'application/vnd.sqlite3',
+                  fileNameToSaveAs: 'violet-bookmarks.db',
+                );
+              } else if (Platform.isIOS) {
+                final bytes = await bookmarkDatabaseFile.readAsBytes();
 
-              if (selectedPath == null) {
-                return;
+                await FlutterFileDialog.saveFile(
+                  params: SaveFileDialogParams(
+                    data: bytes,
+                    fileName: 'bookmark.db',
+                  ),
+                );
+              } else {
+                final selectedPath = await FilePicker.platform
+                    .getDirectoryPath();
+
+                if (selectedPath == null) {
+                  return;
+                }
+
+                final extpath = '$selectedPath/bookmark.db';
+
+                await bookmarkDatabaseFile.copy(extpath);
               }
 
-              final extpath = '$selectedPath/bookmark.db';
-
-              await bookmarkDatabaseFile.copy(extpath);
+              showToast(
+                level: ToastLevel.check,
+                message: Translations.instance!.trans('exportbookmark'),
+              );
+            } catch (e, st) {
+              Logger.error(
+                '[Export Bookmark] $e\n'
+                '$st',
+              );
+              showToast(
+                level: ToastLevel.error,
+                message: Translations.instance!.trans('failexportbookmark'),
+              );
             }
-
-            showToast(
-              level: ToastLevel.check,
-              message: Translations.instance!.trans('exportbookmark'),
-            );
           },
         ),
         InkWell(
