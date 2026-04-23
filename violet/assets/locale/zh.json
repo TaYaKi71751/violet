@@ -161,6 +161,7 @@
   "exportingbookmark": "Export Bookmark",
   "exportingbookmarkgit": "Export Bookmark to Git Repository",
   "failexportbookmark": "Failed to export bookmark",
+  "failimportbookmark": "Failed to import bookmark",
   "noauth": "You do not have permission to run it.",
   "noselectedb": "No database selected.",
   "importbookmark": "Bookmark Imported!",

@@ -161,6 +161,7 @@
   "exportingbookmark": "ブックマークを書き出す",
   "exportingbookmarkgit": "Git リポジトリにブックマークをエクスポート",
   "failexportbookmark": "ブックマークのエクスポートに失敗しました",
+  "failimportbookmark": "ブックマークのインポートに失敗しました",
   "noauth": "権限がないため、実行できません。",
   "noselectedb": "選択されたデータベースがありません。",
   "importbookmark": "ブックマークを読み込みました！",

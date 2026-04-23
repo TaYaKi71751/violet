@@ -2102,32 +2102,41 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
           title: Text(Translations.instance!.trans('importingbookmark')),
           trailing: const Icon(Icons.keyboard_arrow_right),
           onTap: () async {
-            await FilePicker.platform.clearTemporaryFiles();
-            final filePickerResult = await FilePicker.platform.pickFiles();
-            final pickedFilePath = filePickerResult?.files.singleOrNull?.path;
+            try {
+              await FilePicker.platform.clearTemporaryFiles();
+              final filePickerResult = await FilePicker.platform.pickFiles();
+              final pickedFilePath = filePickerResult?.files.singleOrNull?.path;
 
-            if (pickedFilePath == null) {
+              if (pickedFilePath == null) {
+                showToast(
+                  level: ToastLevel.error,
+                  message: Translations.instance!.trans('noselectedb'),
+                );
+
+                return;
+              }
+
+              final pickedFile = File(pickedFilePath);
+              final db = (await getApplicationDocumentsDirectory());
+
+              await pickedFile.copy('${db.path}/user.db');
+
+              await Bookmark.getInstance();
+
+              showToast(
+                level: ToastLevel.check,
+                message: Translations.instance!.trans('importbookmark'),
+              );
+            } catch (e, st) {
+              Logger.error(
+                '[Import Bookmark] $e\n'
+                '$st',
+              );
               showToast(
                 level: ToastLevel.error,
-                message: Translations.instance!.trans('noselectedb'),
+                message: Translations.instance!.trans('failimportbookmark'),
               );
-
-              return;
             }
-
-            final pickedFile = File(pickedFilePath);
-            final db = Platform.isIOS
-                ? await getApplicationSupportDirectory()
-                : (await getApplicationDocumentsDirectory());
-
-            await pickedFile.copy('${db.path}/user.db');
-
-            await Bookmark.getInstance();
-
-            showToast(
-              level: ToastLevel.check,
-              message: Translations.instance!.trans('importbookmark'),
-            );
           },
         ),
         ListTile(
@@ -2136,9 +2145,7 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
           trailing: const Icon(Icons.keyboard_arrow_right),
           onTap: () async {
             try {
-              final dir = Platform.isIOS
-                  ? await getApplicationSupportDirectory()
-                  : (await getApplicationDocumentsDirectory());
+              final dir = (await getApplicationDocumentsDirectory());
               final bookmarkDatabaseFile = File('${dir.path}/user.db');
 
               if (Platform.isAndroid) {
