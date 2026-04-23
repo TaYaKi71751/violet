@@ -161,6 +161,7 @@
   "exportingbookmark": "导出书签",
   "exportingbookmarkgit": "Export Bookmark to Git Repository",
   "failexportbookmark": "Failed to export bookmark",
+  "failimportbookmark": "Failed to import bookmark",
   "noauth": "你没有权限执行此操作.",
   "noselectedb": "没有数据库被选中.",
   "importbookmark": "书签导入成功!",
