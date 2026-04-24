@@ -405,54 +405,62 @@ class HentaiManager {
     int next = 0,
     bool exh = false,
   ]) async {
-    final search = Uri.encodeComponent(
-      '${Settings.includeTagNetwork.value ? '${Settings.includeTags.value} ' : ''}$what${Settings.excludeTagNetwork.value ? ' ${Settings.serializedExcludeTags}' : ''}',
-    );
-    final url =
-        'https://e${exh ? 'x' : '-'}hentai.org/?${next == 0 ? '' : 'next=$next&'}f_cats=${Settings.searchCategory.value}&f_search=$search&advsearch=1&f_sname=on&f_stags=on${Settings.searchExpunged.value ? '&f_sh=on' : ''}&f_spf=&f_spt=';
+    try {
+      final search = Uri.encodeComponent(
+        '${Settings.includeTagNetwork.value ? '${Settings.includeTags.value} ' : ''}$what${Settings.excludeTagNetwork.value ? ' ${Settings.serializedExcludeTags}' : ''}',
+      );
+      final url =
+          'https://e${exh ? 'x' : '-'}hentai.org/?${next == 0 ? '' : 'next=$next&'}f_cats=${Settings.searchCategory.value}&f_search=$search&advsearch=1&f_sname=on&f_stags=on${Settings.searchExpunged.value ? '&f_sh=on' : ''}&f_spf=&f_spt=&inline_set=dm_e';
 
-    final cookie =
-        (await SharedPreferences.getInstance()).getString('eh_cookies') ?? '';
-    final html = (await http.get(
-      url,
-      headers: {'Cookie': '$cookie;sl=dm_2'},
-    )).body;
+      final cookie =
+          (await SharedPreferences.getInstance()).getString('eh_cookies') ?? '';
+      final html = (await http.get(
+        url,
+        headers: {'Cookie': '$cookie;sl=dm_2'},
+      )).body;
 
-    final result = EHParser.parseReulstPageExtendedListView(html);
+      final result = EHParser.parseReulstPageExtendedListView(html);
 
-    return result.map((element) {
-      final tag = <String>[];
+      return result.map((element) {
+        final tag = <String>[];
 
-      final descripts = element.descripts;
+        final descripts = element.descripts;
 
-      tag.addAll(descripts?['female']?.map((e) => 'female:$e') ?? []);
-      tag.addAll(descripts?['male']?.map((e) => 'male:$e') ?? []);
-      tag.addAll(descripts?['misc'] ?? []);
+        tag.addAll(descripts?['female']?.map((e) => 'female:$e') ?? []);
+        tag.addAll(descripts?['male']?.map((e) => 'male:$e') ?? []);
+        tag.addAll(descripts?['misc'] ?? []);
 
-      final map = {
-        'Id': int.parse(element.url!.split('/')[4]),
-        'EHash': element.url!.split('/')[5],
-        'Title': element.title,
-        'Artists': descripts?['artist']?.join('|') ?? 'n/a',
-        'Groups': descripts?['group']?.join('|'),
-        'Characters': descripts?['character']?.join('|'),
-        'Series': descripts?['parody']?.join('|') ?? 'n/a',
-        'Language':
-            descripts?['language']
-                ?.where((element) => !element.contains('translate'))
-                .join('|') ??
-            'n/a',
-        'Tags': tag.join('|'),
-        'Uploader': element.uploader,
-        'PublishedEH': element.published,
-        'Files': element.files,
-        'Thumbnail': element.thumbnail,
-        'Type': element.type,
-        'URL': element.url,
-      };
+        final map = {
+          'Id': int.parse(element.url!.split('/')[4]),
+          'EHash': element.url!.split('/')[5],
+          'Title': element.title,
+          'Artists': descripts?['artist']?.join('|') ?? 'n/a',
+          'Groups': descripts?['group']?.join('|'),
+          'Characters': descripts?['character']?.join('|'),
+          'Series': descripts?['parody']?.join('|') ?? 'n/a',
+          'Language':
+              descripts?['language']
+                  ?.where((element) => !element.contains('translate'))
+                  .join('|') ??
+              'n/a',
+          'Tags': tag.join('|'),
+          'Uploader': element.uploader,
+          'PublishedEH': element.published,
+          'Files': element.files,
+          'Thumbnail': element.thumbnail,
+          'Type': element.type,
+          'URL': element.url,
+        };
 
-      return QueryResult(result: map);
-    }).toList();
+        return QueryResult(result: map);
+      }).toList();
+    } catch (e, st) {
+      Logger.error(
+        '[hentai-searchEHentai] E: $e\n'
+        '$st',
+      );
+      return [];
+    }
   }
 
   static Future<QueryResult> idQueryWeb(String what) async {
