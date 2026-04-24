@@ -2104,7 +2104,10 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
           onTap: () async {
             try {
               await FilePicker.platform.clearTemporaryFiles();
-              final filePickerResult = await FilePicker.platform.pickFiles();
+              final filePickerResult = await FilePicker.platform.pickFiles(
+                type: FileType.any,
+                allowMultiple: false,
+              );
               final pickedFilePath = filePickerResult?.files.singleOrNull?.path;
 
               if (pickedFilePath == null) {
@@ -2151,7 +2154,7 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
               if (Platform.isAndroid) {
                 await PlatformMiscMethods.instance.exportFile(
                   bookmarkDatabaseFile.path,
-                  mimeType: 'application/vnd.sqlite3',
+                  mimeType: 'application/octet-stream',
                   fileNameToSaveAs: 'violet-bookmarks.db',
                 );
               } else if (Platform.isIOS) {
