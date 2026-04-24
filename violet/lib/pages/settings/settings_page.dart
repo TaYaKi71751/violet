@@ -2104,7 +2104,11 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
           onTap: () async {
             try {
               await FilePicker.platform.clearTemporaryFiles();
-              final filePickerResult = await FilePicker.platform.pickFiles();
+              final filePickerResult = await FilePicker.platform.pickFiles(
+                type: FileType.custom,
+                allowedExtensions: ['db'],
+                allowMultiple: false,
+              );
               final pickedFilePath = filePickerResult?.files.singleOrNull?.path;
 
               if (pickedFilePath == null) {
