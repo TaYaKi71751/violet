@@ -75,6 +75,16 @@ sqlite3 data-${TIMESTAMP}.db << EOF
     DELETE FROM HitomiColumnModel WHERE Id < $MAX_ID OR Id = $MAX_ID;
     VACUUM;
 EOF
+CHUNK_COUNT="$(sqlite3 data-${TIMESTAMP}.db << EOF
+    SELECT COUNT(*) FROM HitomiColumnModel;
+EOF
+)"
+if [[ "$CHUNK_COUNT" == "0" ]];then
+    rm data-${TIMESTAMP}.db
+    cd ~/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish
+    rm lock
+    exit -1
+fi
 python3 << EOF
 import sqlite3
 import json
