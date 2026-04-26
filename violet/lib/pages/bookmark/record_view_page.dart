@@ -116,7 +116,14 @@ class RecordViewPage extends StatelessWidget {
         }),
       ),
       builder: (context, AsyncSnapshot<List<QueryResult>> snapshot) {
-        if (!snapshot.hasData) return Container();
+        if (!snapshot.hasData) {
+          return Center(
+            child: CircularProgressIndicator(
+              color: Colors.blue, // Change spinner color
+              strokeWidth: 4.0, // Change thickness
+            ),
+          );
+        }
         return CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: <Widget>[
