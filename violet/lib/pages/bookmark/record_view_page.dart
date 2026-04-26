@@ -9,6 +9,7 @@ import 'package:uuid/uuid.dart';
 import 'package:violet/component/hentai.dart';
 import 'package:violet/database/query.dart';
 import 'package:violet/database/user/record.dart';
+import 'package:violet/log/log.dart';
 import 'package:violet/model/article_list_item.dart';
 import 'package:violet/pages/segment/card_panel.dart';
 import 'package:violet/widgets/article_item/article_list_item_widget.dart';
@@ -35,14 +36,35 @@ class RecordViewPage extends StatelessWidget {
         (value) => value.getUserLog().then((value) async {
           var overap = HashSet<String>();
           var rr = <ArticleReadLog>[];
+          var rrFromWeb = <ArticleReadLog>[];
           var queryResults = <QueryResult>[];
+          var sortedQueryResults = <QueryResult>[];
 
           for (var element in value) {
             if (overap.contains(element.articleId())) continue;
             rr.add(element);
             overap.add(element.articleId());
           }
-          for (var element in rr) {
+          try {
+            queryResults = await QueryManager.queryIds(
+              rr.map((e) => e.articleId()).toList(),
+            );
+          } catch (e, st) {
+            Logger.error('[RecordViewPage] $e\n$st');
+          }
+          for (var readLog in rr) {
+            bool isContains = false;
+            for (var queryResult in queryResults) {
+              if (readLog.articleId() == '${queryResult.id()}') {
+                isContains = true;
+                break;
+              }
+            }
+            if (!isContains) {
+              rrFromWeb.add(readLog);
+            }
+          }
+          for (var element in rrFromWeb) {
             var result = await HentaiManager.idSearch(element.articleId());
             var ehash = result.results[0].ehash();
             try {
@@ -82,7 +104,15 @@ class RecordViewPage extends StatelessWidget {
               ),
             );
           }
-          return queryResults;
+          for (var readLog in rr) {
+            for (var queryResult in queryResults) {
+              if (readLog.articleId() == '${queryResult.id()}') {
+                sortedQueryResults.add(queryResult);
+                break;
+              }
+            }
+          }
+          return sortedQueryResults;
         }),
       ),
       builder: (context, AsyncSnapshot<List<QueryResult>> snapshot) {
