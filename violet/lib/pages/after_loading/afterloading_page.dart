@@ -42,6 +42,14 @@ class AfterLoadingPage extends StatefulWidget {
 class AfterLoadingPageState extends State<AfterLoadingPage>
     with WidgetsBindingObserver {
   static int defaultInitialPage = 0;
+  static const _shareMethodChannel = MethodChannel('xyz.project.violet/share');
+  static const _shareEventChannel = EventChannel(
+    'xyz.project.violet/shareEvent',
+  );
+
+  StreamSubscription? _deeplinkSubscription;
+  StreamSubscription? _shareSubscription;
+  String? _lastHandledArticleKey;
 
   @override
   void initState() {
@@ -50,7 +58,8 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
     FToast().init(context);
 
     if (Platform.isAndroid || Platform.isIOS) {
-      AppLinks().uriLinkStream.listen(handleDeeplink);
+      _listenDeeplink();
+      _listenSharedText();
     }
 
     Future.delayed(const Duration(milliseconds: 200)).then((value) async {
@@ -62,6 +71,14 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
   }
 
   bool _alreadyLocked = false;
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _deeplinkSubscription?.cancel();
+    _shareSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -100,9 +117,117 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
       return;
     }
 
-    if (int.tryParse(uri.host) != null) {
-      showArticleInfoById(context, int.parse(uri.host));
+    _handleArticleUri(uri);
+  }
+
+  Future<void> _listenDeeplink() async {
+    final appLinks = AppLinks();
+    _deeplinkSubscription = appLinks.uriLinkStream.listen(handleDeeplink);
+    handleDeeplink(await appLinks.getInitialLink());
+  }
+
+  Future<void> _listenSharedText() async {
+    if (!Platform.isAndroid) {
+      return;
     }
+
+    _shareSubscription = _shareEventChannel.receiveBroadcastStream().listen((
+      event,
+    ) {
+      if (event is String) {
+        _handleSharedText(event);
+      }
+    });
+
+    final initialSharedText = await _shareMethodChannel.invokeMethod<String>(
+      'getInitialSharedText',
+    );
+    if (initialSharedText != null) {
+      _handleSharedText(initialSharedText);
+    }
+  }
+
+  void _handleSharedText(String text) {
+    final uri = _extractUri(text);
+    if (uri == null) {
+      return;
+    }
+
+    _handleArticleUri(uri);
+  }
+
+  Uri? _extractUri(String text) {
+    final match = RegExp(r'https?://[^\s]+').firstMatch(text.trim());
+    final rawUrl = match?.group(0) ?? text.trim();
+    return Uri.tryParse(rawUrl);
+  }
+
+  void _handleArticleUri(Uri uri) {
+    final articleId = _articleIdFromUri(_unwrapSharedUri(uri));
+    if (articleId == null) {
+      return;
+    }
+
+    final articleKey = articleId.toString();
+    if (_lastHandledArticleKey == articleKey) {
+      return;
+    }
+    _lastHandledArticleKey = articleKey;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      showArticleInfoById(context, articleId);
+    });
+  }
+
+  Uri _unwrapSharedUri(Uri uri) {
+    final isVioletScheme =
+        uri.scheme == 'violet' || uri.scheme == 'xyz.project.violet';
+    if (!isVioletScheme || uri.host != 'share') {
+      return uri;
+    }
+
+    final sharedUrl = uri.queryParameters['url'];
+    if (sharedUrl == null) {
+      return uri;
+    }
+
+    return _extractUri(sharedUrl) ?? uri;
+  }
+
+  int? _articleIdFromUri(Uri uri) {
+    final deeplinkId = int.tryParse(uri.host);
+    if (deeplinkId != null) {
+      return deeplinkId;
+    }
+
+    final host = uri.host.toLowerCase();
+
+    if (host == 'hitomi.la') {
+      final readerMatch = RegExp(r'^/reader/(\d+)\.html$').firstMatch(uri.path);
+      if (readerMatch != null) {
+        return int.tryParse(readerMatch.group(1)!);
+      }
+
+      final galleryMatch = RegExp(
+        r'^/(?:cg|doujinshi|manga|imageset)/.+-(\d+)\.html$',
+      ).firstMatch(uri.path);
+      return galleryMatch == null ? null : int.tryParse(galleryMatch.group(1)!);
+    }
+
+    if (host == 'e-hentai.org' || host == 'exhentai.org') {
+      final galleryMatch = RegExp(r'^/g/(\d+)/[^/]+/?$').firstMatch(uri.path);
+      if (galleryMatch != null) {
+        return int.tryParse(galleryMatch.group(1)!);
+      }
+
+      final imageMatch = RegExp(r'^/s/[^/]+/(\d+)-\d+$').firstMatch(uri.path);
+      return imageMatch == null ? null : int.tryParse(imageMatch.group(1)!);
+    }
+
+    return null;
   }
 
   final PageController _pageController = PageController(

@@ -23,6 +23,8 @@ class MainActivity : FlutterFragmentActivity() {
     private val NATIVELIBDIR_CHANNEL = "xyz.project.violet/nativelibdir"
     private val EXTERNAL_STORAGE_DIRECTORY_CHANNEL = "xyz.project.violet/externalStorageDirectory"
     private val MISC_CHANNEL = "xyz.project.violet/misc"
+    private val SHARE_METHOD_CHANNEL = "xyz.project.violet/share"
+    private val SHARE_EVENT_CHANNEL = "xyz.project.violet/shareEvent"
 
     private val EXTERNAL_STORAGE_DIRECTORY_METHODS = mapOf(
             "getExternalStorageDirectory" to MethodCallHandler { call, result ->
@@ -34,6 +36,7 @@ class MainActivity : FlutterFragmentActivity() {
     )
 
     private var sink: EventChannel.EventSink? = null
+    private var shareSink: EventChannel.EventSink? = null
 
     //
     // Source code from https://github.com/tommy351/eh-redux/commit/0f63f6090c91e06c4ef7241847fad173b4afad86
@@ -64,6 +67,23 @@ class MainActivity : FlutterFragmentActivity() {
                 sink = null
             }
         })
+
+        EventChannel(flutterEngine.dartExecutor.binaryMessenger, SHARE_EVENT_CHANNEL).setStreamHandler(object : EventChannel.StreamHandler {
+            override fun onListen(arguments: Any?, eventSink: EventChannel.EventSink?) {
+                shareSink = eventSink
+            }
+
+            override fun onCancel(arguments: Any?) {
+                shareSink = null
+            }
+        })
+
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, SHARE_METHOD_CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "getInitialSharedText" -> result.success(getSharedText(intent))
+                else -> result.notImplemented()
+            }
+        }
 
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, NATIVELIBDIR_CHANNEL).setMethodCallHandler { call, result ->
             // Note: this method is invoked on the main thread.
@@ -101,6 +121,29 @@ class MainActivity : FlutterFragmentActivity() {
         }
 
         return super.onKeyDown(keyCode, event)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        getSharedText(intent)?.let { shareSink?.success(it) }
+    }
+
+    private fun getSharedText(intent: Intent?): String? {
+        if (intent?.action != Intent.ACTION_SEND || intent.type != "text/plain") {
+            return null
+        }
+
+        return extractFirstUrl(intent.getStringExtra(Intent.EXTRA_TEXT))
+    }
+
+    private fun extractFirstUrl(text: String?): String? {
+        val trimmedText = text?.trim()
+        if (trimmedText.isNullOrEmpty()) {
+            return null
+        }
+
+        return Regex("""https?://\S+""").find(trimmedText)?.value ?: trimmedText
     }
 
     private fun finishMainActivity(call: MethodCall, result: MethodChannel.Result) {
