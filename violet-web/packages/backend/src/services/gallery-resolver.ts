@@ -2,26 +2,35 @@
  * Ported from violet/lib/script/script_manager.dart
  *
  * Resolves a hitomi gallery ID into image URLs by:
- * 1. Fetching the V3/V4 script from project-violet/scripts
- * 2. Evaluating gg.js for CDN routing
- * 3. Running hitomi_get_image_list() to extract URLs
- *
- * Uses Node.js vm module instead of flutter_js.
+ * 1. Evaluating gg.js routing data
+ * 2. Fetching gallery metadata
+ * 3. Building image and thumbnail URLs
  */
 
-import vm from 'node:vm';
 import type { ImageList } from '@violet-web/shared';
 
-const SCRIPT_URL =
-  'https://raw.githubusercontent.com/project-violet/scripts/main/hitomi_get_image_list_v3.js';
-const SCRIPT_V4_URL =
-  'https://github.com/project-violet/scripts/raw/main/hitomi_get_image_list_v4_model.js';
-const GG_JS_URL = 'https://ltn.gold-usergeneratedcontent.net/gg.js';
+const BASE_DOMAIN = 'gold-usergeneratedcontent.net';
+const GG_JS_URL = `https://ltn.${BASE_DOMAIN}/gg.js`;
 
 const USER_AGENT =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
 
-let scriptCache: string | null = null;
+interface GalleryFile {
+  hash?: string;
+}
+
+interface GalleryInfo {
+  files?: GalleryFile[];
+}
+
+interface GgRouting {
+  b: string;
+  mList: Set<string>;
+  o1: number;
+  o2: number;
+}
+
+let routingCache: GgRouting | null = null;
 let latestUpdate = 0;
 
 async function fetchText(url: string, headers?: Record<string, string>): Promise<string> {
@@ -34,29 +43,17 @@ async function fetchText(url: string, headers?: Record<string, string>): Promise
 
 async function tryRefreshV4(): Promise<boolean> {
   try {
-    const ggBody = await fetchText(GG_JS_URL);
-    const ggContext = vm.createContext({});
-    // Remove 'use strict' as it prevents gg instance resolution
-    const ggCode = ggBody.split("'use strict';")[1] || ggBody;
-    vm.runInContext(ggCode, ggContext);
+    const ggText = await fetchText(GG_JS_URL);
+    const b = ggText.match(/b:\s*'([^']+)'/)?.[1] ?? '';
+    const mList = new Set([...ggText.matchAll(/case (\d+):/g)].map((m) => m[1]));
+    const oMatches = [...ggText.matchAll(/o = (\d+)/g)].map((m) => Number(m[1]));
 
-    const ggResult = vm.runInContext(
-      `
-      var r = "";
-      for (var i = 0; i < 4096; i++) {
-        r += gg.m(i).toString();
-        r += ",";
-      }
-      r + '|' + gg.b
-      `,
-      ggContext,
-    ) as string;
-
-    const [ggM, ggB] = ggResult.split('|');
-    let v4Script = await fetchText(SCRIPT_V4_URL);
-    v4Script = v4Script.replaceAll('%%gg.m%', ggM).replaceAll('%%gg.b%', ggB);
-
-    scriptCache = v4Script;
+    routingCache = {
+      b,
+      mList,
+      o1: oMatches[0] ?? 0,
+      o2: oMatches[oMatches.length - 1] ?? 1,
+    };
     latestUpdate = Date.now();
     return true;
   } catch {
@@ -66,55 +63,94 @@ async function tryRefreshV4(): Promise<boolean> {
 
 async function ensureScript(): Promise<void> {
   // Refresh if cache is empty or older than 30 minutes
-  if (scriptCache && Date.now() - latestUpdate < 30 * 60 * 1000) {
+  if (routingCache && Date.now() - latestUpdate < 30 * 60 * 1000) {
     return;
   }
 
-  // Try V4 first
-  if (await tryRefreshV4()) return;
+  if (!(await tryRefreshV4())) {
+    throw new Error('Failed to refresh Hitomi routing data');
+  }
+}
 
-  // Fallback to V3
-  scriptCache = await fetchText(SCRIPT_URL);
-  latestUpdate = Date.now();
+async function getGalleryInfo(id: number): Promise<GalleryInfo> {
+  const body = await fetchText(
+    `https://ltn.${BASE_DOMAIN}/galleries/${id}.js`,
+    getGalleryHeadersSync(),
+  );
+  const json = body
+    .replace(/^var galleryinfo\s*=\s*/, '')
+    .replace(/;\s*$/, '');
+
+  return JSON.parse(json) as GalleryInfo;
+}
+
+function getHashShard(hash: string): string {
+  const part = hash[hash.length - 1] + hash[hash.length - 3] + hash[hash.length - 2];
+  return parseInt(part, 16).toString();
+}
+
+function getServerNum(hashShard: string, routing: GgRouting): number {
+  const node = routing.mList.has(hashShard) ? routing.o2 : routing.o1;
+  return node + 1;
+}
+
+function buildImageUrls(files: GalleryFile[], routing: GgRouting, useAvif = true): string[] {
+  const domain = useAvif ? 'a' : 'w';
+  const ext = useAvif ? 'avif' : 'webp';
+
+  return files.flatMap((file) => {
+    const hash = file.hash;
+    if (!hash) return [];
+
+    const shard = getHashShard(hash);
+    const serverNum = getServerNum(shard, routing);
+    return [`https://${domain}${serverNum}.${BASE_DOMAIN}/${routing.b}${shard}/${hash}.${ext}`];
+  });
+}
+
+function buildThumbnailUrls(files: GalleryFile[], routing: GgRouting, size: 'big' | 'small', useAvif = true): string[] {
+  const firstPath = useAvif
+    ? size === 'big' ? 'avifbigtn' : 'avifsmallsmalltn'
+    : size === 'big' ? 'webpbigtn' : 'webpsmalltn';
+  const ext = useAvif ? 'avif' : 'webp';
+
+  return files.flatMap((file) => {
+    const hash = file.hash;
+    if (!hash) return [];
+
+    const shard = getHashShard(hash);
+    const serverNum = getServerNum(shard, routing);
+    const domain = serverNum === 1 ? 'atn' : 'btn';
+    const secondPath = hash.substring(hash.length - 1);
+    const thirdPath = hash.substring(hash.length - 3, hash.length - 1);
+
+    return [`https://${domain}.${BASE_DOMAIN}/${firstPath}/${secondPath}/${thirdPath}/${hash}.${ext}`];
+  });
+}
+
+function getGalleryHeadersSync(): Record<string, string> {
+  return {
+    'User-Agent': USER_AGENT,
+    Accept: 'image/avif,image/webp,image/png,image/svg+xml,image/*;q=0.8,*/*;q=0.5',
+    'Accept-Language': 'en-US',
+    Referer: 'https://hitomi.la/',
+    'Sec-Fetch-Dest': 'image',
+    'Sec-Fetch-Mode': 'no-cors',
+    'Sec-Fetch-Site': 'cross-site',
+    Priority: 'u=4, i',
+  };
 }
 
 export async function resolveGallery(id: number): Promise<ImageList> {
   await ensureScript();
-  if (!scriptCache) throw new Error('Script not available');
+  if (!routingCache) throw new Error('Hitomi routing data not available');
 
-  const context = vm.createContext({ fetch: globalThis.fetch });
-  vm.runInContext(scriptCache, context);
-
-  // Get download URL
-  const downloadUrl = vm.runInContext(
-    `create_download_url('${id}')`,
-    context,
-  ) as string;
-
-  // Get headers for the gallery info request
-  const headersJson = vm.runInContext(
-    `hitomi_get_header_content('${id}')`,
-    context,
-  ) as string;
-  const headers = JSON.parse(headersJson) as Record<string, string>;
-  headers['User-Agent'] = USER_AGENT;
-
-  // Fetch gallery info
-  const galleryInfo = await fetchText(downloadUrl, headers);
-
-  // Evaluate gallery info and extract image list
-  vm.runInContext(galleryInfo, context);
-  const resultJson = vm.runInContext('hitomi_get_image_list()', context) as string;
-  const result = JSON.parse(resultJson) as {
-    result: string[];
-    btresult: string[];
-    stresult: string[];
-  };
-
+  const galleryInfo = await getGalleryInfo(id);
+  const files = galleryInfo.files ?? [];
   return {
-    urls: result.result,
-    bigThumbnails: result.btresult,
-    smallThumbnails: result.stresult,
+    urls: buildImageUrls(files, routingCache),
+    bigThumbnails: buildThumbnailUrls(files, routingCache, 'big'),
+    smallThumbnails: buildThumbnailUrls(files, routingCache, 'small'),
   };
 }
 
@@ -122,18 +158,7 @@ export async function resolveGallery(id: number): Promise<ImageList> {
  * Get headers required for fetching images from a gallery.
  */
 export async function getGalleryHeaders(
-  id: string,
+  _id: string,
 ): Promise<Record<string, string>> {
-  await ensureScript();
-  if (!scriptCache) return {};
-
-  const context = vm.createContext({});
-  vm.runInContext(scriptCache, context);
-
-  const headersJson = vm.runInContext(
-    `hitomi_get_header_content('${id}')`,
-    context,
-  ) as string;
-
-  return JSON.parse(headersJson) as Record<string, string>;
+  return getGalleryHeadersSync();
 }
