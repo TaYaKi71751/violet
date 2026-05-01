@@ -192,8 +192,8 @@ export class SyncManager {
   }
 
   private async parseSyncVersion(): Promise<SyncInfoRecord[]> {
-    const branch = 'master';
-    const url = `https://raw.githubusercontent.com/violet-dev/sync-data/${branch}/syncversion.txt`;
+    const branch = 'main';
+    const url = `https://raw.githubusercontent.com/TaYaKi71751/sync-data/${branch}/syncversion.txt`;
 
     const response = await fetch(url);
     if (!response.ok) {
