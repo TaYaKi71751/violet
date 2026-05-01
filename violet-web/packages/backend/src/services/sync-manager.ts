@@ -1,11 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import Database from 'better-sqlite3';
+import { execFile } from 'child_process';
 import { fileURLToPath } from 'url';
+import { promisify } from 'util';
 import { getDbPath, getContentDb, closeContentDb, reopenContentDb } from './content-db.js';
 import { buildSuggestionCache } from './suggestion-engine.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const execFileAsync = promisify(execFile);
 
 interface SyncInfoRecord {
   type: 'db' | 'chunk';
@@ -255,15 +258,15 @@ export class SyncManager {
       this.currentProgress = { current: 0, total: contentLength || 100, message: `Downloading database (0/${totalMB} MB)` };
 
       const dbPath = getDbPath();
-      const tempPath = dbPath + '.tmp';
+      const archivePath = dbPath + '.tmp.7z';
 
       if (!response.body) {
         // Fallback: no streaming support
         const buffer = await response.arrayBuffer();
-        fs.writeFileSync(tempPath, Buffer.from(buffer));
+        fs.writeFileSync(archivePath, Buffer.from(buffer));
       } else {
         // Stream to file with progress updates
-        const fileStream = fs.createWriteStream(tempPath);
+        const fileStream = fs.createWriteStream(archivePath);
         const reader = response.body.getReader();
         let received = 0;
 
@@ -290,6 +293,9 @@ export class SyncManager {
         console.log(`[SyncManager] Downloaded ${(received / 1024 / 1024).toFixed(1)}MB`);
       }
 
+      this.currentProgress = { current: contentLength || 100, total: contentLength || 100, message: 'Extracting database' };
+      const extractedDb = await this.extractDatabaseArchive(archivePath, language);
+
       this.currentProgress = { current: contentLength || 100, total: contentLength || 100, message: 'Saving database' };
 
       // Close existing DB connection
@@ -299,7 +305,9 @@ export class SyncManager {
       if (fs.existsSync(dbPath)) {
         fs.unlinkSync(dbPath);
       }
-      fs.renameSync(tempPath, dbPath);
+      fs.renameSync(extractedDb.path, dbPath);
+      fs.rmSync(extractedDb.extractDir, { recursive: true, force: true });
+      fs.unlinkSync(archivePath);
 
       // Reopen DB
       reopenContentDb();
@@ -338,6 +346,49 @@ export class SyncManager {
       this.isSyncing = false;
       this.currentProgress = undefined;
     }
+  }
+
+  private async extractDatabaseArchive(archivePath: string, language: string): Promise<{ path: string; extractDir: string }> {
+    const extractDir = fs.mkdtempSync(path.join(this.dataDir, 'db-extract-'));
+
+    try {
+      await execFileAsync('7za', ['x', archivePath, `-o${extractDir}`, '-y']);
+
+      const dbLanguage = this.translateToLanguage(language);
+      const expectedDbPath = path.join(
+        extractDir,
+        `rawdata${dbLanguage ? `-${dbLanguage}` : ''}`,
+        'data.db',
+      );
+      const extractedDbPath = fs.existsSync(expectedDbPath)
+        ? expectedDbPath
+        : this.findExtractedDb(extractDir);
+
+      if (!extractedDbPath) {
+        throw new Error(`Extracted archive did not contain ${path.relative(extractDir, expectedDbPath)}`);
+      }
+
+      return { path: extractedDbPath, extractDir };
+    } catch (error) {
+      fs.rmSync(extractDir, { recursive: true, force: true });
+      throw error;
+    }
+  }
+
+  private findExtractedDb(dir: string): string | null {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const entryPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        const dbPath = this.findExtractedDb(entryPath);
+        if (dbPath) return dbPath;
+      } else if (entry.isFile() && entry.name.endsWith('.db')) {
+        return entryPath;
+      }
+    }
+
+    return null;
   }
 
   private async syncChunks(chunks: SyncInfoRecord[]): Promise<void> {
@@ -453,11 +504,11 @@ export class SyncManager {
 
   private getDbPostfix(language: string): string {
     const postfixes: Record<string, string> = {
-      global: '.db',
-      ko: '-korean.db',
-      en: '-english.db',
-      ja: '-japanese.db',
-      zh: '-chinese.db',
+      global: '.7z',
+      ko: '-korean.7z',
+      en: '-english.7z',
+      ja: '-japanese.7z',
+      zh: '-chinese.7z',
     };
     return postfixes[language] || '.db';
   }

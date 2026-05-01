@@ -2,7 +2,7 @@
 FROM node:20-alpine AS builder
 
 # Install build dependencies for better-sqlite3
-RUN apk add --no-cache python3 make g++
+RUN apk add --no-cache python3 make g++ p7zip
 
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
@@ -30,6 +30,9 @@ RUN pnpm --filter @violet-web/backend deploy --legacy --prod /prod
 FROM node:20-alpine
 
 WORKDIR /app
+
+# Install runtime dependency for extracting synced .7z databases
+RUN apk add --no-cache p7zip
 
 # Copy standalone backend from builder
 COPY --from=builder /prod /app
