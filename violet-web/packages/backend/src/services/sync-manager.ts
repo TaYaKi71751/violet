@@ -9,6 +9,7 @@ import { buildSuggestionCache } from './suggestion-engine.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const execFileAsync = promisify(execFile);
+const SEVEN_Z_COMMANDS = ['7za', '7z'];
 
 interface SyncInfoRecord {
   type: 'db' | 'chunk';
@@ -352,7 +353,8 @@ export class SyncManager {
     const extractDir = fs.mkdtempSync(path.join(this.dataDir, 'db-extract-'));
 
     try {
-      await execFileAsync('7za', ['x', archivePath, `-o${extractDir}`, '-y']);
+      const sevenZipCommand = this.resolveSevenZipCommand();
+      await execFileAsync(sevenZipCommand, ['x', archivePath, `-o${extractDir}`, '-y']);
 
       const dbLanguage = this.translateToLanguage(language);
       const expectedDbPath = path.join(
@@ -373,6 +375,38 @@ export class SyncManager {
       fs.rmSync(extractDir, { recursive: true, force: true });
       throw error;
     }
+  }
+
+  private resolveSevenZipCommand(): string {
+    const configuredCommand = process.env.SEVEN_Z_BIN;
+    if (configuredCommand) {
+      return configuredCommand;
+    }
+
+    for (const command of SEVEN_Z_COMMANDS) {
+      const resolvedPath = this.findExecutableInPath(command);
+      if (resolvedPath) {
+        return resolvedPath;
+      }
+    }
+
+    throw new Error('7za/7z executable not found. Install p7zip in the runtime image or set SEVEN_Z_BIN.');
+  }
+
+  private findExecutableInPath(command: string): string | null {
+    const pathDirs = (process.env.PATH || '').split(path.delimiter).filter(Boolean);
+
+    for (const dir of pathDirs) {
+      const commandPath = path.join(dir, command);
+      try {
+        fs.accessSync(commandPath, fs.constants.X_OK);
+        return commandPath;
+      } catch {
+        // Keep searching PATH.
+      }
+    }
+
+    return null;
   }
 
   private findExtractedDb(dir: string): string | null {
