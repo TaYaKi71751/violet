@@ -217,6 +217,11 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
       return galleryMatch == null ? null : int.tryParse(galleryMatch.group(1)!);
     }
 
+    if (host == 'litomi.in') {
+      final mangaMatch = RegExp(r'^/manga/(\d+)/?$').firstMatch(uri.path);
+      return mangaMatch == null ? null : int.tryParse(mangaMatch.group(1)!);
+    }
+
     if (host == 'e-hentai.org' || host == 'exhentai.org') {
       final galleryMatch = RegExp(r'^/g/(\d+)/[^/]+/?$').firstMatch(uri.path);
       if (galleryMatch != null) {
