@@ -12,7 +12,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:country_pickers/country.dart';
 import 'package:country_pickers/country_pickers.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -185,9 +184,6 @@ class _SplashPageState extends State<SplashPage> {
           }
         } catch (e, st) {
           // If an error occurs, stops synchronization immediately.
-          if (Platform.isAndroid || Platform.isIOS) {
-            FirebaseCrashlytics.instance.recordError(e, st);
-          }
           Logger.error(
             '[Splash-Navigation] E: $e\n'
             '$st',

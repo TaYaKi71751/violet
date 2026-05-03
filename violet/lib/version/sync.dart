@@ -2,10 +2,8 @@
 // Copyright (C) 2020-2024. violet-team. Licensed under the Apache-2.0 License.
 
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
@@ -262,9 +260,6 @@ class SyncManager {
         '[Sync-chunk] E: $e\n'
         '$st',
       );
-      if (Platform.isAndroid || Platform.isIOS) {
-        FirebaseCrashlytics.instance.recordError(e, st);
-      }
     }
   }
 

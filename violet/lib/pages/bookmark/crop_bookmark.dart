@@ -10,7 +10,6 @@ import 'package:archive/archive_io.dart';
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:extended_image/extended_image.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -59,9 +58,6 @@ class _CropBookmarkPageState extends State<CropBookmarkPage> {
   @override
   void initState() {
     super.initState();
-    if (Platform.isAndroid || Platform.isIOS) {
-      FirebaseAnalytics.instance.logEvent(name: 'open_crop');
-    }
   }
 
   @override

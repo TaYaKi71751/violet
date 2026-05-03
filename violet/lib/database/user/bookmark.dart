@@ -2,9 +2,7 @@
 // Copyright (C) 2020-2024. violet-team. Licensed under the Apache-2.0 License.
 
 import 'dart:collection';
-import 'dart:io';
 
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:violet/database/user/user.dart';
@@ -283,12 +281,6 @@ class Bookmark {
     };
     await db.insert('BookmarkArticle', body);
 
-    if (Platform.isAndroid || Platform.isIOS) {
-      FirebaseAnalytics.instance.logEvent(
-        name: 'bookmark_article',
-        parameters: body,
-      );
-    }
     bookmarkSet ??= HashSet<int>();
     bookmarkSet!.add(int.parse(article));
   }
@@ -353,14 +345,6 @@ class Bookmark {
       'DateTime': datetime.toString(),
     };
     await db.insert('BookmarkCropImage', body);
-    if (logging) {
-      if (Platform.isAndroid || Platform.isIOS) {
-        FirebaseAnalytics.instance.logEvent(
-          name: 'bookmark_crop',
-          parameters: body,
-        );
-      }
-    }
   }
 
   Future<int> createGroup(

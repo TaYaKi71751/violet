@@ -1,9 +1,6 @@
 // This source code is a part of Project Violet.
 // Copyright (C) 2020-2024. violet-team. Licensed under the Apache-2.0 License.
 
-import 'dart:io';
-
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -75,9 +72,6 @@ class _GroupArticleListPageState extends State<GroupArticleListPage> {
   void initState() {
     super.initState();
     refresh();
-    if (Platform.isAndroid || Platform.isIOS) {
-      FirebaseAnalytics.instance.logEvent(name: 'open_bookmark');
-    }
   }
 
   @override

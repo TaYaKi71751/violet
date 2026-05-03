@@ -8,9 +8,6 @@ import 'dart:ui';
 
 import 'package:crypto/crypto.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flare_flutter/flare_cache.dart';
 import 'package:flare_flutter/provider/asset_flare.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,7 +21,6 @@ import 'package:get/get.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:rhttp/rhttp.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:violet/firebase_options.dart';
 import 'package:violet/locale/locale.dart';
 import 'package:violet/log/log.dart';
 import 'package:violet/pages/after_loading/afterloading_page.dart';
@@ -51,9 +47,6 @@ Future<void> main() async {
       FlutterError.onError = recordFlutterError;
 
       await initUserId();
-      if (Platform.isAndroid || Platform.isIOS) {
-        await initFirebase();
-      }
       await Settings.initFirst();
       await warmupFlare();
 
@@ -64,10 +57,6 @@ Future<void> main() async {
     },
     (exception, stack) async {
       Logger.error('[async-error] E: $exception\n$stack');
-
-      if (Platform.isAndroid || Platform.isIOS) {
-        await FirebaseCrashlytics.instance.recordError(exception, stack);
-      }
     },
   );
 }
@@ -88,17 +77,6 @@ Future<void> recordFlutterError(FlutterErrorDetails flutterErrorDetails) async {
     '[unhandled-error] E: ${flutterErrorDetails.exceptionAsString()}\n'
     '${flutterErrorDetails.stack}',
   );
-
-  if (Platform.isAndroid || Platform.isIOS) {
-    await FirebaseCrashlytics.instance.recordFlutterError(flutterErrorDetails);
-  }
-}
-
-Future<void> initFirebase() async {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  var analytics = FirebaseAnalytics.instance;
-  await analytics.setUserId(id: await initUserId());
 }
 
 Future<String> initUserId() async {
@@ -226,9 +204,7 @@ class MyApp extends StatelessWidget {
         ? const LockScreen()
         : const SplashPage();
 
-    final navigatorObservers = Platform.isAndroid || Platform.isIOS
-        ? [FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance)]
-        : <NavigatorObserver>[];
+    final navigatorObservers = <NavigatorObserver>[];
 
     return GetMaterialApp(
       navigatorKey: navigatorKey,
