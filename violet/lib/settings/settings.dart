@@ -345,7 +345,7 @@ class Settings {
   static Future<void> init() async {
     routingRule = (await _getString(
       'routingrule',
-      'Hitomi|EHentai|ExHentai|Hiyobi|NHentai',
+      'Hitomi|EHentai|ExHentai|Litomi|Hiyobi|NHentai',
     )).split('|');
     searchRule = (await _getString(
       'searchrule',
