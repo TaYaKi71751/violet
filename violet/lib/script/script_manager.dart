@@ -198,7 +198,7 @@ class ScriptManager {
       final jResult = '''
       {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:150.0) Gecko/20100101 Firefox/150.0",
-        "Accept": "image/avif,image/webp,image/png,image/svg+xml,image/*;q=0.8,*/*;q=0.5",
+        "Accept": "image/webp,image/png,image/svg+xml,image/*;q=0.8,*/*;q=0.5",
         "Accept-Language": "en-US",
         "Referer": "https://hitomi.la/",
         "Sec-Fetch-Dest": "image",
@@ -236,7 +236,7 @@ class HitomiImageResolver {
 
   static Future<List<String>> getImages(
     int galleryId, {
-    bool useAvif = true,
+    bool useAvif = false,
   }) async {
     try {
       // 1. gg.js 해석 (완벽한 mList 추출 로직 적용)
@@ -305,7 +305,7 @@ class HitomiImageResolver {
 
   static Future<List<String>> getBigThumbnailUrls(
     int galleryId, {
-    bool useAvif = true,
+    bool useAvif = false,
   }) async {
     try {
       final ggResponse = await http.get('https://ltn.$baseDomain/gg.js');
@@ -362,7 +362,7 @@ class HitomiImageResolver {
 
   static Future<List<String>> getSmallThumbnailUrls(
     int galleryId, {
-    bool useAvif = true,
+    bool useAvif = false,
   }) async {
     try {
       // 1. gg.js 해석 (완벽한 mList 추출 로직 적용)
