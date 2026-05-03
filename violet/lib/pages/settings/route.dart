@@ -120,6 +120,8 @@ class _ImageRouteDialogState extends State<ImageRouteDialog> {
                 {
                   'Hitomi':
                       'https://ltn.gold-usergeneratedcontent.net/apple-touch-icon-180x180.png',
+                  'Litomi':
+                      'https://litomi.in/favicon.ico?favicon.08y6-4pb2g7vg.ico?dpl=9eb8d9d7272962ae6d974de8a8c717ebcd5aa459',
                   'EHentai': 'https://e-hentai.org/favicon.ico',
                   'ExHentai': 'https://exhentai.org/favicon.ico',
                   'NHentai': 'https://nhentai.net/favicon.ico',
