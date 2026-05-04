@@ -138,7 +138,7 @@ class _InfoPageState extends State<InfoPage> {
                 null,
                 () async {
                   final url = Uri.parse(
-                    'https://github.com/project-violet/violet',
+                    'https://github.com/TaYaKi71751/violet',
                   );
                   if (await canLaunchUrl(url)) {
                     await launchUrl(url);
