@@ -277,41 +277,92 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   _chunkDownload() {
-    return Visibility(
-      visible: showIndicator || backupBookmark,
-      child: Align(
-        alignment: Alignment.bottomCenter,
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 120),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              if (showIndicator)
-                const Text(
-                  '<< AutoSync >>',
-                  style: TextStyle(color: Colors.white),
-                ),
-              Text(
-                backupBookmark
-                    ? 'Bookmark Backup...'
-                    : chunkDownloadProgress != chunkDownloadMax ||
-                          chunkDownloadMax == 0
-                    ? 'Chunk downloading...[$chunkDownloadProgress/${SyncManager.getSyncRequiredChunkCount()}]'
-                    : 'Extracting...',
-                style: const TextStyle(color: Colors.white),
+    final isCheckingSync = message == 'check sync...';
+    final isChunkDownloading =
+        showIndicator &&
+        (chunkDownloadProgress != chunkDownloadMax || chunkDownloadMax == 0);
+    final isExtracting =
+        showIndicator &&
+        chunkDownloadMax != 0 &&
+        chunkDownloadProgress == chunkDownloadMax;
+    final showSkipButton =
+        !backupBookmark &&
+        (isCheckingSync || isChunkDownloading || isExtracting);
+
+    return Stack(
+      children: [
+        Visibility(
+          visible: showIndicator || backupBookmark,
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 120),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (showIndicator)
+                    const Text(
+                      '<< AutoSync >>',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  Text(
+                    backupBookmark
+                        ? 'Bookmark Backup...'
+                        : chunkDownloadProgress != chunkDownloadMax ||
+                              chunkDownloadMax == 0
+                        ? 'Chunk downloading...[$chunkDownloadProgress/${SyncManager.getSyncRequiredChunkCount()}]'
+                        : 'Extracting...',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  Container(height: 16),
+                  SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: CircularProgressIndicator(
+                      color: Settings.majorColor.value.withAlpha(150),
+                    ),
+                  ),
+                ],
               ),
-              Container(height: 16),
-              SizedBox(
-                width: 30,
-                height: 30,
-                child: CircularProgressIndicator(
-                  color: Settings.majorColor.value.withAlpha(150),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
-      ),
+        Visibility(
+          visible: showSkipButton,
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 16, bottom: 56),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: widget.switching
+                      ? Settings.majorColor.value.withAlpha(200)
+                      : Colors.purple.shade400,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                ),
+                onPressed: _onSkipButtonPressed,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Flexible(
+                      child: Text(
+                        Translations.instance!.trans('skip'),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.keyboard_arrow_right),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -557,79 +608,93 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   _languageSelector() {
-    return AnimatedOpacity(
-      opacity: languageBox ? 1.0 : 0.0,
-      duration: const Duration(milliseconds: 700),
-      child: Align(
-        alignment: Alignment.bottomCenter,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 40),
-          child: InkWell(
-            customBorder: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8.0)),
-            ),
-            child: const SizedBox(
-              width: 150,
-              height: 50,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Icon(Icons.language, size: 35, color: Colors.white70),
-                  Text(
-                    '  Language',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+    final isCheckingSync = message == 'check sync...';
+    final isChunkDownloading =
+        showIndicator &&
+        (chunkDownloadProgress != chunkDownloadMax || chunkDownloadMax == 0);
+    final isExtracting =
+        showIndicator &&
+        chunkDownloadMax != 0 &&
+        chunkDownloadProgress == chunkDownloadMax;
+    final showSkipButton =
+        !backupBookmark &&
+        (isCheckingSync || isChunkDownloading || isExtracting);
+    return Visibility(
+      visible: !showSkipButton,
+      child: AnimatedOpacity(
+        opacity: languageBox ? 1.0 : 0.0,
+        duration: const Duration(milliseconds: 700),
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 40),
+            child: InkWell(
+              customBorder: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(8.0)),
+              ),
+              child: const SizedBox(
+                width: 150,
+                height: 50,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(Icons.language, size: 35, color: Colors.white70),
+                    Text(
+                      '  Language',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => Theme(
+                    data: Theme.of(context).copyWith(primaryColor: Colors.pink),
+                    child: CountryPickerDialog(
+                      titlePadding: const EdgeInsets.symmetric(vertical: 16),
+                      // searchCursorColor: Colors.pinkAccent,
+                      // searchInputDecoration:
+                      //     InputDecoration(hintText: 'Search...'),
+                      // isSearchable: true,
+                      title: const Text('Select Language'),
+                      onValuePicked: (Country country) async {
+                        var exc = country as ExCountry;
+                        await Translations.instance!.load(exc.toString());
+                        await Settings.language.setValue(exc.toString());
+                        await Settings.resetIncludeTags();
+                        setState(() {});
+                      },
+                      itemFilter: (c) => [].contains(c.isoCode),
+                      priorityList: [
+                        ExCountry.create('US'),
+                        ExCountry.create('KR'),
+                        ExCountry.create('JP'),
+                        ExCountry.create('CN', script: 'Hant'),
+                        ExCountry.create('CN', script: 'Hans'),
+                        // ExCountry.create('IT'),
+                        // ExCountry.create('ES'),
+                        // CountryPickerUtils.getCountryByIsoCode('RU'),
+                      ],
+                      itemBuilder: (Country country) {
+                        return Row(
+                          children: <Widget>[
+                            CountryPickerUtils.getDefaultFlagImage(country),
+                            const SizedBox(width: 8.0, height: 30),
+                            Text((country as ExCountry).getDisplayLanguage()),
+                          ],
+                        );
+                      },
                     ),
                   ),
-                ],
-              ),
+                );
+              },
             ),
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (context) => Theme(
-                  data: Theme.of(context).copyWith(primaryColor: Colors.pink),
-                  child: CountryPickerDialog(
-                    titlePadding: const EdgeInsets.symmetric(vertical: 16),
-                    // searchCursorColor: Colors.pinkAccent,
-                    // searchInputDecoration:
-                    //     InputDecoration(hintText: 'Search...'),
-                    // isSearchable: true,
-                    title: const Text('Select Language'),
-                    onValuePicked: (Country country) async {
-                      var exc = country as ExCountry;
-                      await Translations.instance!.load(exc.toString());
-                      await Settings.language.setValue(exc.toString());
-                      await Settings.resetIncludeTags();
-                      setState(() {});
-                    },
-                    itemFilter: (c) => [].contains(c.isoCode),
-                    priorityList: [
-                      ExCountry.create('US'),
-                      ExCountry.create('KR'),
-                      ExCountry.create('JP'),
-                      ExCountry.create('CN', script: 'Hant'),
-                      ExCountry.create('CN', script: 'Hans'),
-                      // ExCountry.create('IT'),
-                      // ExCountry.create('ES'),
-                      // CountryPickerUtils.getCountryByIsoCode('RU'),
-                    ],
-                    itemBuilder: (Country country) {
-                      return Row(
-                        children: <Widget>[
-                          CountryPickerUtils.getDefaultFlagImage(country),
-                          const SizedBox(width: 8.0, height: 30),
-                          Text((country as ExCountry).getDisplayLanguage()),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-              );
-            },
           ),
         ),
       ),
@@ -655,5 +720,9 @@ class _SplashPageState extends State<SplashPage> {
     file = File(filename);
 
     return file.path;
+  }
+
+  void _onSkipButtonPressed() {
+    Navigator.of(context).pushReplacementNamed('/AfterLoading');
   }
 }
