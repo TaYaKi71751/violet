@@ -129,6 +129,18 @@ class _ReaderScreenState extends State<ReaderScreen> {
                       Uri.parse(url).host == 'e-hentai.org') &&
                   Uri.parse(url).path.startsWith('/-1')) {
                 Navigator.pop(context);
+              } else if ((Uri.parse(url).host == 'exhentai.org' ||
+                      Uri.parse(url).host == 'e-hentai.org') &&
+                  Uri.parse(url).path.startsWith('/gallerypopups.php')) {
+                final closeWindow = await _controller
+                    .runJavaScriptReturningResult('''
+                        Boolean(document.querySelector('[style="text-align:center; margin-top:50px"]'))
+                      ''');
+                if (closeWindow == true ||
+                    closeWindow.toString() == 'true' ||
+                    closeWindow.toString().contains('true')) {
+                  Navigator.pop(context);
+                }
               }
             } catch (e) {
               Logger.error('[Reader-WebView-onPageFinished] Error: $e');
