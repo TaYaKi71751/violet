@@ -2666,7 +2666,7 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
             }
 
             final url = Uri.parse(
-              'https://github.com/project-violet/violet/releases/latest',
+              'https://github.com/TaYaKi71751/violet/releases/latest',
             );
             if (await canLaunchUrl(url)) {
               await launchUrl(url);
@@ -2705,7 +2705,7 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
           title: Text('GitHub ${Translations.instance!.trans('project')}'),
           trailing: const Icon(Icons.open_in_new),
           onTap: () async {
-            final url = Uri.parse('https://github.com/project-violet/');
+            final url = Uri.parse('https://github.com/TaYaKi71751/violet');
             if (await canLaunchUrl(url)) {
               await launchUrl(url);
             }
