@@ -4,6 +4,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:app_links/app_links.dart';
@@ -14,6 +15,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:violet/locale/locale.dart';
 import 'package:violet/log/act_log.dart';
+import 'package:violet/network/wrapper.dart' as http;
 import 'package:violet/other/named_color.dart';
 import 'package:violet/pages/bookmark/bookmark_page.dart';
 import 'package:violet/pages/common/toast.dart';
@@ -117,7 +119,7 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
       return;
     }
 
-    _handleArticleUri(uri);
+    unawaited(_handleArticleUri(uri));
   }
 
   Future<void> _listenDeeplink() async {
@@ -153,7 +155,7 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
       return;
     }
 
-    _handleArticleUri(uri);
+    unawaited(_handleArticleUri(uri));
   }
 
   Uri? _extractUri(String text) {
@@ -162,8 +164,8 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
     return Uri.tryParse(rawUrl);
   }
 
-  void _handleArticleUri(Uri uri) {
-    final articleId = _articleIdFromUri(_unwrapSharedUri(uri));
+  Future<void> _handleArticleUri(Uri uri) async {
+    final articleId = await _articleIdFromUri(_unwrapSharedUri(uri));
     if (articleId == null) {
       return;
     }
@@ -197,7 +199,7 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
     return _extractUri(sharedUrl) ?? uri;
   }
 
-  int? _articleIdFromUri(Uri uri) {
+  Future<int?> _articleIdFromUri(Uri uri) async {
     final deeplinkId = int.tryParse(uri.host);
     if (deeplinkId != null) {
       return deeplinkId;
@@ -230,6 +232,16 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
 
       final imageMatch = RegExp(r'^/s/[^/]+/(\d+)-\d+$').firstMatch(uri.path);
       return imageMatch == null ? null : int.tryParse(imageMatch.group(1)!);
+    }
+
+    if (host == 'nhentai.net') {
+      final nHentaiId = uri.path.split('/')[2];
+      final response = await http.get(
+        'https://nhentai-media-id.vercel.app/api/media-id?id=$nHentaiId',
+      );
+      final mediaId = jsonDecode(response.body)['mediaId'];
+
+      return int.tryParse(mediaId);
     }
 
     return null;
