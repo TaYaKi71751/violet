@@ -97,6 +97,7 @@
   "more": "Mais...",
   "database": "Base de Dados",
   "welcome": "Bem vindo ao Violet. Você precisa baixar a base de dados para usar o app.",
+  "fontsizewarning": "Não conseguiu tocar no botão de download?\nTente diminuir o tamanho da fonte",
   "dbuser": "Banco de dados em inglês",
   "dbdownloadsize": "Tamanho do download",
   "dbusermsg": "Pacote de banco de dados contendo o idioma do usuário e n/d. Requer %s de  armazenamento adicional. Este banco de dados contém os dados mais recentes, mas para manter o banco de dados atualizado, você deve seguir as instruções para sincronizar os dados.",

@@ -262,6 +262,19 @@ class _SplashPageState extends State<SplashPage> {
                 height: 100,
               ),
             ),
+            Visibility(
+              visible: showFirst,
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 250),
+                  child: Text(
+                    Translations.instance!.trans('fontsizewarning'),
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
+              ),
+            ),
             _showMessage(),
             _chunkDownload(),
             _firstPage(),

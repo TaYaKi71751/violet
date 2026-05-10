@@ -97,6 +97,7 @@
   "more": "Dettagli...",
   "database": "Database",
   "welcome": "Benvenuto. Devi Scaricare il database prima di usare questa app.",
+  "fontsizewarning": "Non riesci a premere il pulsante di download?\nProva a ridurre la dimensione del testo",
   "dbuser": "Database Inglese",
   "dbdownloadsize": " Grandezza Download",
   "dbusermsg": "Il Database contiene il linguaggio utente e n/a. richiede %s di spazio. Questo database contiene è aggiornato, per tenere il database aggiornato, devi seguire le istruzioni per sincronizzare i dati.",

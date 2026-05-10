@@ -97,6 +97,7 @@
   "more": "More...",
   "database": "Database",
   "welcome": "Welcome to Violet. You must download the database before using this app.",
+  "fontsizewarning": "Couldn't push download button?\nTry change font size to smaller",
   "dbuser": "English Database",
   "dbdownloadsize": " Download Size",
   "dbusermsg": "Database pack containing user language and n/a. The storage requires %s of additional storage space. This database currently contains the latest data, but in order to keep the database up-to-date, you must follow the instructions to synchronize the data.",
