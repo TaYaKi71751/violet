@@ -162,6 +162,7 @@ class RustBuilder {
       );
     } catch (error) {
       print(error);
+      rethrow;
     }
     return path.join(
       environment.targetTempDir,
@@ -172,7 +173,11 @@ class RustBuilder {
 
   Future<Map<String, String>> _buildEnvironment() async {
     if (target.android == null) {
-      return {};
+      final rustcPath = runCommand(
+        'rustup',
+        ['which', 'rustc', '--toolchain', _toolchain],
+      ).stdout.toString().trim();
+      return {'RUSTC': rustcPath};
     } else {
       final sdkPath = environment.androidSdkPath;
       final ndkVersion = environment.androidNdkVersion;
