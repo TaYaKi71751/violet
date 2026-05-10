@@ -35,8 +35,22 @@ target 'Runner' do
 end
 
 post_install do |installer|
+  rust_env = <<~SH
+    export PATH="$HOME/.cargo/bin:$PATH"
+    if [ -z "${RUSTC:-}" ] && command -v rustup >/dev/null 2>&1; then
+      export RUSTC="$(rustup which rustc --toolchain stable)"
+    fi
+  SH
+
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+
+    target.shell_script_build_phases.each do |phase|
+      next unless phase.shell_script.include?('cargokit/build_pod.sh')
+      next if phase.shell_script.include?('rustup which rustc --toolchain stable')
+
+      phase.shell_script = rust_env + phase.shell_script
+    end
     
     target.build_configurations.each do |config|
       # You can enable the permissions needed here. For example to enable camera
