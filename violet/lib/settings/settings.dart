@@ -7,7 +7,6 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:violet/database/user/download.dart';
@@ -172,8 +171,7 @@ class Settings {
 
         if (sdkInt >= 30 && prefs.getBool('android30downpath') == null) {
           await prefs.setBool('android30downpath', true);
-          var ext = await getExternalStorageDirectory();
-          downloadBasePath = ext!.path;
+          downloadBasePath = join(path, '.violet');
         } else if (sdkInt < 30 &&
             downloadBasePath == join(path, 'Violet') &&
             prefs.getBool('downloadbasepathcc1') == null) {
@@ -398,8 +396,9 @@ class Settings {
     var sdkInt = androidInfo.version.sdkInt;
 
     if (sdkInt >= 30) {
-      var ext = await getExternalStorageDirectory();
-      return ext!.path;
+      final ext = await AndroidExternalStorageDirectory.instance
+          .getExternalStorageDirectory();
+      return join(ext, '.violet');
     }
 
     return downloadBasePath.value;
