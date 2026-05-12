@@ -2403,6 +2403,7 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
             trailing: const Icon(Icons.keyboard_arrow_right),
           ),
           onTap: () async {
+            var useExHentai = true;
             var dialog = await showDialog(
               context: context,
               builder: (BuildContext context) => AlertDialog(
@@ -2537,16 +2538,49 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
               if (dialog != null && dialog == true) {
                 final cookie =
                     'sk=${sController.text};ipb_member_id=${imiController.text};ipb_pass_hash=${iphController.text};igneous=${iController.text}';
-
                 await prefs.setString('eh_cookies', cookie);
               }
             }
-
-            Settings.searchRule = 'ExHentai|EHentai|Hitomi|NHentai'.split('|');
-            await prefs.setString(
-              'searchrule',
-              'ExHentai|EHentai|Hitomi|NHentai',
+            final cookie = prefs.getString('eh_cookies') ?? '';
+            final res = await http.get(
+              'https://exhentai.org',
+              headers: {'Cookie': cookie},
             );
+
+            res.body.trim().isEmpty || useExHentai == false
+                ? useExHentai = false
+                : useExHentai = true;
+            (res.headers['set-cookie'] ?? '').split(';')[0] ==
+                        'igneous=mystery' ||
+                    useExHentai == false
+                ? useExHentai = false
+                : useExHentai = true;
+
+            final parsedCookie = parseCookies(cookie);
+            if (parsedCookie['igneous'] == null ||
+                parsedCookie['igneous'] == 'mystery' ||
+                useExHentai == false) {
+              useExHentai = false;
+            } else {
+              useExHentai = true;
+            }
+            if (useExHentai) {
+              Settings.searchRule = 'ExHentai|EHentai|Hitomi|NHentai'.split(
+                '|',
+              );
+              await prefs.setString(
+                'searchrule',
+                'ExHentai|EHentai|Hitomi|NHentai',
+              );
+            } else {
+              Settings.searchRule = 'EHentai|Hitomi|ExHentai|NHentai'.split(
+                '|',
+              );
+              await prefs.setString(
+                'searchrule',
+                'EHentai|Hitomi|ExHentai|NHentai',
+              );
+            }
           },
         ),
       ]),
