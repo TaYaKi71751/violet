@@ -2345,11 +2345,11 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
 
             try {
               var json = jsonDecode(text) as List<dynamic>;
-
+              var groupName = 'Imported at ${DateTime.now().toLocal()}';
               var bookmark = await Bookmark.getInstance();
-              await bookmark.createGroup('Hiyobi', '', Colors.black);
+              await bookmark.createGroup(groupName, '', Colors.black);
               var group = (await bookmark.getGroup())
-                  .where((element) => element.name() == 'Hiyobi')
+                  .where((element) => element.name() == groupName)
                   .first
                   .id();
               for (int j = 0; j < json.length; j++) {
