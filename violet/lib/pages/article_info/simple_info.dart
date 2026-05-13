@@ -46,7 +46,10 @@ class SimpleInfoWidget extends StatelessWidget {
   }
 
   Size thumbnailSize() {
-    final baseSize = Platform.isWindows ? 100.0 : 50.0;
+    final baseSize =
+        (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+        ? 100.0
+        : 50.0;
     final height = 4 * baseSize;
     final width = 3 * baseSize;
     return Size(width, height);

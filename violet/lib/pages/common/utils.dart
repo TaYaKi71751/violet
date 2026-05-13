@@ -60,7 +60,7 @@ Future showArticleInfoRaw({
   final height = MediaQuery.of(context).size.height;
 
   var defaultShowHeight = 400;
-  if (Platform.isWindows) {
+  if ((Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
     defaultShowHeight = (height * 0.85).toInt();
   }
 

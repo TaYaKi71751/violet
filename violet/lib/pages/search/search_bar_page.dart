@@ -306,8 +306,13 @@ class _SearchBarPageState extends State<SearchBarPage>
   }
 
   _chipListView(List<Widget> chips) {
-    final spacing = Platform.isWindows ? 2.0 : 4.0;
-    final runSpacing = Platform.isWindows ? 4.0 : -10.0;
+    final spacing = (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+        ? 2.0
+        : 4.0;
+    final runSpacing =
+        (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+        ? 4.0
+        : -10.0;
 
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 8),

@@ -1798,7 +1798,8 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
                   );
                   if (dialog != null && dialog == true) {
                     try {
-                      if (await Permission.manageExternalStorage.isGranted) {
+                      if (Platform.isAndroid &&
+                          await Permission.manageExternalStorage.isGranted) {
                         var prevDir = Directory(
                           Settings.downloadBasePath.value,
                         );

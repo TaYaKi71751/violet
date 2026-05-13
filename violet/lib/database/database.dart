@@ -39,7 +39,7 @@ class DataBaseManager {
         } else {
           dbPath = Platform.isAndroid
               ? '${(await getApplicationDocumentsDirectory()).path}/data/data.db'
-              : Platform.isIOS
+              : Platform.isIOS || Platform.isMacOS
               ? '${await getDatabasesPath()}/data.db'
               : join(dirname(Platform.resolvedExecutable), 'data/data.db');
         }
