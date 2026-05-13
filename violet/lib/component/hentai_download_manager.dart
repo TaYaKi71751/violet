@@ -116,9 +116,7 @@ class HentaiDonwloadManager {
                 .firstWhere(
                   (group) => group != null && (group as String).isNotEmpty,
                 ),
-            extension: page.contains('fullimg.php')
-                ? 'jpg'
-                : path.extension(page.split('/').last).replaceAll('.', ''),
+            extension: _extensionFromImageUrl(page),
             extractor: 'hentai',
             downloadDate: DateTime.now().toString(),
             className: target.classname(),
@@ -140,5 +138,15 @@ class HentaiDonwloadManager {
     return (paddingToAdd > 0)
         ? "${List.filled(paddingToAdd, '0').join('')}$i"
         : str;
+  }
+
+  static String _extensionFromImageUrl(String url) {
+    if (url.contains('fullimg.php')) return 'jpg';
+
+    final uri = Uri.tryParse(url);
+    final filename = uri == null
+        ? url.split('/').last
+        : path.basename(uri.path);
+    return path.extension(filename).replaceFirst('.', '');
   }
 }
