@@ -475,7 +475,7 @@ class LitomiImageResolver {
         urls.add(image['original']['url']!);
       }
       final firstPageResponse = await http.get(
-        urls[0],
+        'https://http-status-flax.vercel.app/api/status?url=${Uri.encodeComponent(urls[0])}',
         headers: (await ScriptManager.runLitomiGetHeaderContent('$galleryId')),
       );
       if (firstPageResponse.statusCode != 200) {
@@ -502,6 +502,13 @@ class LitomiImageResolver {
       }
       for (var image in json['images']!) {
         urls.add(image['thumbnail']['url']!);
+      }
+      final firstPageResponse = await http.get(
+        'https://http-status-flax.vercel.app/api/status?url=${Uri.encodeComponent(urls[0])}',
+        headers: (await ScriptManager.runLitomiGetHeaderContent('$galleryId')),
+      );
+      if (firstPageResponse.statusCode != 200) {
+        return List.empty();
       }
       return urls;
     } catch (e, st) {
