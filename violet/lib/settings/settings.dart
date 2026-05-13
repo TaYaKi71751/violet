@@ -7,6 +7,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:violet/database/user/download.dart';
@@ -218,6 +219,8 @@ class Settings {
         return downloadBasePath;
       } else if (Platform.isIOS) {
         return 'not supported';
+      } else if (Platform.isMacOS) {
+        return await _defaultMacOSDownloadPath();
       } else {
         // Desktop
         return join(dirname(Platform.resolvedExecutable), 'download');
@@ -357,6 +360,7 @@ class Settings {
 
     await useInnerStorage.load();
     await downloadBasePath.load();
+    await _migrateMacOSDownloadPath();
 
     // main에서 셋팅됨
     if (Platform.isAndroid || Platform.isIOS) {
@@ -392,6 +396,13 @@ class Settings {
   }
 
   static Future<String> getDefaultDownloadPath() async {
+    if (Platform.isMacOS) {
+      return _defaultMacOSDownloadPath();
+    }
+    if (!Platform.isAndroid) {
+      return downloadBasePath.value;
+    }
+
     var androidInfo = await DeviceInfoPlugin().androidInfo;
     var sdkInt = androidInfo.version.sdkInt;
 
@@ -402,6 +413,21 @@ class Settings {
     }
 
     return downloadBasePath.value;
+  }
+
+  static Future<String> _defaultMacOSDownloadPath() async {
+    final dir = await getApplicationDocumentsDirectory();
+    return join(dir.path, 'download');
+  }
+
+  static Future<void> _migrateMacOSDownloadPath() async {
+    if (!Platform.isMacOS) return;
+
+    final appBundlePath = dirname(Platform.resolvedExecutable);
+    if (downloadBasePath.value == join(appBundlePath, 'download') ||
+        downloadBasePath.value.startsWith('$appBundlePath/')) {
+      await downloadBasePath.setValue(await _defaultMacOSDownloadPath());
+    }
   }
 
   static Future<void> setMajorColor(Color color) async {

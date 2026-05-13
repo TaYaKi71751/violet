@@ -89,8 +89,9 @@ class _SplashPageState extends State<SplashPage> {
     final prefs = await SharedPreferences.getInstance();
     if (prefs.getBool('checkauthalready') == null) {
       await prefs.setBool('checkauthalready', true);
-      if (await Permission.manageExternalStorage.request() ==
-          PermissionStatus.denied) {
+      if (Platform.isAndroid &&
+          await Permission.manageExternalStorage.request() ==
+              PermissionStatus.denied) {
         await showOkDialog(context, '파일 권한을 허용하지 않으면 다운로드 기능을 이용할 수 없습니다.');
       }
 

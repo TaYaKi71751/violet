@@ -362,6 +362,15 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
         }
 
         if (widget.item.state() == 0 && widget.item.files() != null) {
+          final files = widget.item.filesWithoutThumbnail();
+          if (files.isEmpty || files.any((file) => !File(file).existsSync())) {
+            showToast(
+              level: ToastLevel.error,
+              message: 'Downloaded files not found. Please recover it.',
+            );
+            return;
+          }
+
           await (await User.getInstance()).insertUserLog(
             int.tryParse(widget.item.url()) ?? -1,
             0,
@@ -375,7 +384,7 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
               builder: (context) {
                 return Provider<ViewerPageProvider>.value(
                   value: ViewerPageProvider(
-                    uris: widget.item.filesWithoutThumbnail(),
+                    uris: files,
                     useFileSystem: true,
                     id: int.tryParse(widget.item.url()) ?? -1,
                     title: widget.item.info()!,

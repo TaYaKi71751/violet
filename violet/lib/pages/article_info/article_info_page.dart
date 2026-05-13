@@ -168,15 +168,23 @@ class ArticleInfoPage extends StatelessWidget {
 
   double simpleInfoHeight() {
     const bottomPadding = 16;
-    final height = Platform.isWindows ? 4 * 100.0 : 4 * 50.0;
+    final height = (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+        ? 4 * 100.0
+        : 4 * 50.0;
     return height + bottomPadding;
   }
 
   Column buttonArea(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final buttonWidth = (width - 32 - 64 - 32) / 2;
-    final buttonHeight = Platform.isWindows ? 36.0 : null;
-    final iconSize = Platform.isWindows ? 20.0 : null;
+    final buttonHeight =
+        (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+        ? 36.0
+        : null;
+    final iconSize =
+        (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+        ? 20.0
+        : null;
     final data = Provider.of<ArticleInfo>(context);
 
     SizedBox buttonInner(IconData icon, String text) {
@@ -312,7 +320,8 @@ class ArticleInfoPage extends StatelessWidget {
   }
 
   downloadButtonEvent(context, data) async {
-    if (!Settings.useInnerStorage.value &&
+    if (Platform.isAndroid &&
+        !Settings.useInnerStorage.value &&
         !await Permission.manageExternalStorage.isGranted) {
       if (await Permission.manageExternalStorage.request() ==
           PermissionStatus.denied) {

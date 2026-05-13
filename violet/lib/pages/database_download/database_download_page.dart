@@ -55,6 +55,8 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
   Future<void> createDummy() async {
     final dbPath = Platform.isAndroid || Platform.isIOS
         ? File('${(await getApplicationDocumentsDirectory()).path}/data.db')
+        : Platform.isMacOS
+        ? File('${await getDatabasesPath()}/data.db')
         : File(join(dirname(Platform.resolvedExecutable), 'data', 'data.db'));
     if (dbPath.existsSync()) {
       await dbPath.delete();
@@ -85,11 +87,11 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
       if (prefs.getInt('db_exists') == 1) {
         final dbPath = Platform.isAndroid
             ? '${(await getApplicationDocumentsDirectory()).path}/data/data.db'
-            : Platform.isIOS
+            : Platform.isIOS || Platform.isMacOS
             ? '${await getDatabasesPath()}/data.db'
             : join(dirname(Platform.resolvedExecutable), 'data/data.db');
         if (await File(dbPath).exists()) await File(dbPath).delete();
-        final dir = Platform.isAndroid || Platform.isIOS
+        final dir = Platform.isAndroid || Platform.isIOS || Platform.isMacOS
             ? await getApplicationDocumentsDirectory()
             : Directory(dirname(Platform.resolvedExecutable));
         if (Platform.isAndroid || Platform.isIOS) {
@@ -125,7 +127,7 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
     int tnu = 0;
 
     try {
-      final dir = Platform.isAndroid || Platform.isIOS
+      final dir = Platform.isAndroid || Platform.isIOS || Platform.isMacOS
           ? await getApplicationDocumentsDirectory()
           : Directory(join(dirname(Platform.resolvedExecutable), 'data'));
       if (await File('${dir.path}/db.sql.7z').exists()) {

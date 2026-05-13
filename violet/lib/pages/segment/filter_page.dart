@@ -258,8 +258,13 @@ class _FilterPageState extends State<FilterPage> {
           .toList();
     }
 
-    final spacing = Platform.isWindows ? -7.0 : -7.0;
-    final runSpacing = Platform.isWindows ? 2.0 : -13.0;
+    final spacing = (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+        ? -7.0
+        : -7.0;
+    final runSpacing =
+        (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
+        ? 2.0
+        : -13.0;
 
     return Wrap(
       // alignment: WrapAlignment.center,

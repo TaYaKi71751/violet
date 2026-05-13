@@ -234,3 +234,60 @@ jobs:
         with:
           name: windows-build
           path: ./violet/build/windows/x64/runner/Release/
+
+  app-macos-build:
+    runs-on: macos-latest
+    needs: [app-format, app-changes]
+    if: ${{ needs.app-changes.outputs.src == 'true' }}
+    defaults:
+      run:
+        working-directory: violet
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.event.merge_group.head_sha }}
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          flutter-version: 3.35.4
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Clean Rust cache
+        run: |
+          rm -rf ~/.rustup/downloads/*
+          rm -rf ~/.cargo/registry/cache/*
+          rm -rf ~/.cargo/git/db/*
+
+      - name: Preprocess
+        run: |
+          cd lib/server
+          wget -q ${{ secrets.SECRET_SALT }} || echo 'String getValid(String vToken) { return vToken; }' > salt.dart
+          wget -q ${{ secrets.SECRET_WSALT }} || echo 'String getValid(String vToken) { return vToken; }' > wsalt.dart
+
+      - name: Podfile
+        run: |
+          cd macos
+          rm -f Podfile.lock
+          flutter clean
+          flutter pub get
+          pod deintegrate || true
+          pod install --repo-update
+          cd ..
+
+      - name: Build
+        run: |
+          flutter build macos --release
+          mv ./build/macos/Build/Products/Release/violet.app ./
+          zip -r -y MacOS-build.zip violet.app
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: ./violet/MacOS-build.zip
