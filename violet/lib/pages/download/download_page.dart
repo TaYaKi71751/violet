@@ -45,6 +45,7 @@ import 'package:violet/style/palette.dart';
 import 'package:violet/util/helper.dart';
 import 'package:violet/util/strings.dart';
 import 'package:violet/widgets/debounce_widget.dart';
+import 'package:violet/widgets/floating_button.dart';
 import 'package:violet/widgets/search_bar.dart';
 import 'package:violet/widgets/theme_switchable_state.dart';
 
@@ -80,6 +81,9 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
     heroKey: 'downloadtype',
   );
   ObjectKey _listKey = ObjectKey(const Uuid().v4());
+  bool checkMode = false;
+  bool checkModePre = false;
+  final List<int> checked = [];
 
   @override
   void initState() {
@@ -110,7 +114,7 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
   void refresh() {
     Future.delayed(const Duration(milliseconds: 500), () async {
       _getDownloadWidgetKey().forEach((key, value) {
-        if (value.currentState != null) value.currentState.thubmanilReload();
+        value.currentState?.thubmanilReload();
       });
       items = await (await Download.getInstance()).getDownloadItems();
       itemsMap = <int, DownloadItemModel>{};
@@ -256,6 +260,25 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
             if (Settings.downloadAlignType.value != 0 &&
                 Settings.downloadResultType.value.isThreeGrid)
               indexBar(),
+            Positioned(
+              right: 16,
+              bottom: 16,
+              child: SizedBox(
+                width: 72,
+                height: 432,
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: Visibility(
+                    visible: checkMode,
+                    child: AnimatedOpacity(
+                      opacity: checkModePre ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 500),
+                      child: _floatingButton(),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -269,7 +292,7 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
   Map<int, GlobalKey<DownloadItemWidgetState>> downloadItemWidgetKeys3 =
       <int, GlobalKey<DownloadItemWidgetState>>{};
 
-  _getDownloadWidgetKey() {
+  Map<int, GlobalKey<DownloadItemWidgetState>> _getDownloadWidgetKey() {
     if (Settings.downloadResultType.value.isGridLike) {
       return downloadItemWidgetKeys1;
     }
@@ -317,10 +340,8 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
             int index,
           ) {
             var e = filterResult[filterResult.length - index - 1];
-            if (!downloadItemWidgetKeys1.containsKey(
-              filterResult[index].id(),
-            )) {
-              downloadItemWidgetKeys1[filterResult[index].id()] =
+            if (!downloadItemWidgetKeys1.containsKey(e.id())) {
+              downloadItemWidgetKeys1[e.id()] =
                   GlobalKey<DownloadItemWidgetState>();
             }
             return DebounceWidget(
@@ -328,7 +349,7 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
                 key: Key('dp${e.id()}${e.url()}'),
                 alignment: Alignment.bottomCenter,
                 child: DownloadItemWidget(
-                  key: downloadItemWidgetKeys1[filterResult[index].id()],
+                  key: downloadItemWidgetKeys1[e.id()],
                   initialStyle: DownloadListItem(
                     showDetail: false,
                     addBottomPadding: false,
@@ -337,6 +358,10 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
                   item: e,
                   download: e.download,
                   refeshCallback: refresh,
+                  isCheckMode: checkMode,
+                  isChecked: checked.contains(e.id()),
+                  checkCallback: (value) => check(e.id(), value),
+                  longPressCallback: () => longpress(e.id()),
                 ),
               ),
             );
@@ -363,17 +388,15 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
             ),
             itemBuilder: (context, index, animation) {
               var e = filterResult[filterResult.length - index - 1];
-              if (!downloadItemWidgetKeys2.containsKey(
-                filterResult[index].id(),
-              )) {
-                downloadItemWidgetKeys2[filterResult[index].id()] =
+              if (!downloadItemWidgetKeys2.containsKey(e.id())) {
+                downloadItemWidgetKeys2[e.id()] =
                     GlobalKey<DownloadItemWidgetState>();
               }
               return Align(
                 key: Key('dp${e.id()}${e.url()}'),
                 alignment: Alignment.center,
                 child: DownloadItemWidget(
-                  key: downloadItemWidgetKeys2[filterResult[index].id()],
+                  key: downloadItemWidgetKeys2[e.id()],
                   initialStyle: DownloadListItem(
                     showDetail: Settings.downloadResultType.value.isDetail,
                     addBottomPadding: true,
@@ -382,6 +405,10 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
                   item: e,
                   download: e.download,
                   refeshCallback: refresh,
+                  isCheckMode: checkMode,
+                  isChecked: checked.contains(e.id()),
+                  checkCallback: (value) => check(e.id(), value),
+                  longPressCallback: () => longpress(e.id()),
                 ),
               );
             },
@@ -409,6 +436,10 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
                   item: e,
                   download: e.download,
                   refeshCallback: refresh,
+                  isCheckMode: checkMode,
+                  isChecked: checked.contains(e.id()),
+                  checkCallback: (value) => check(e.id(), value),
+                  longPressCallback: () => longpress(e.id()),
                 ),
               );
             }).toList(),
@@ -690,7 +721,8 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
                     key: Key('dp${e.id()}${e.url()}'),
                     alignment: Alignment.bottomCenter,
                     child: DownloadItemWidget(
-                      key: downloadItemWidgetKeys1[e.id()],
+                      key: downloadItemWidgetKeys1[e.id()] ??=
+                          GlobalKey<DownloadItemWidgetState>(),
                       initialStyle: DownloadListItem(
                         showDetail: false,
                         addBottomPadding: false,
@@ -699,6 +731,10 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
                       item: e,
                       download: e.download,
                       refeshCallback: refresh,
+                      isCheckMode: checkMode,
+                      isChecked: checked.contains(e.id()),
+                      checkCallback: (value) => check(e.id(), value),
+                      longPressCallback: () => longpress(e.id()),
                     ),
                   ),
                 ),
@@ -721,6 +757,155 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
         delegate: SliverChildListDelegate(groupsWidget),
       ),
     );
+  }
+
+  Widget _floatingButton() {
+    return AnimatedFloatingActionButton(
+      fabButtons: <Widget>[
+        FloatingActionButton(
+          onPressed: () {
+            checked
+              ..clear()
+              ..addAll(filterResult.map((e) => e.id()));
+            setState(() {});
+          },
+          elevation: 4,
+          heroTag: 'download-select-all',
+          child: const Icon(MdiIcons.checkAll),
+        ),
+        FloatingActionButton(
+          onPressed: deleteChecked,
+          elevation: 4,
+          heroTag: 'download-delete',
+          child: const Icon(MdiIcons.delete),
+        ),
+        FloatingActionButton(
+          onPressed: retryChecked,
+          elevation: 4,
+          heroTag: 'download-retry',
+          child: const Icon(MdiIcons.refresh),
+        ),
+        FloatingActionButton(
+          onPressed: recoveryChecked,
+          elevation: 4,
+          heroTag: 'download-recovery',
+          child: const Icon(MdiIcons.rotateLeft),
+        ),
+        FloatingActionButton(
+          onPressed: copyCheckedUrls,
+          elevation: 4,
+          heroTag: 'download-copy-url',
+          child: const Icon(MdiIcons.contentCopy),
+        ),
+      ],
+      animatedIconData: AnimatedIcons.menu_close,
+      exitCallback: exitCheckMode,
+    );
+  }
+
+  void longpress(int id) {
+    if (checkMode) return;
+
+    checked
+      ..clear()
+      ..add(id);
+
+    setState(() {
+      checkMode = true;
+      checkModePre = true;
+    });
+  }
+
+  void check(int id, bool value) {
+    setState(() {
+      if (value) {
+        if (!checked.contains(id)) checked.add(id);
+      } else {
+        checked.removeWhere((element) => element == id);
+      }
+    });
+
+    if (checked.isEmpty) {
+      exitCheckMode();
+    }
+  }
+
+  void exitCheckMode() {
+    setState(() {
+      checkModePre = false;
+      checked.clear();
+    });
+    Future.delayed(const Duration(milliseconds: 500)).then((value) {
+      if (!mounted) return;
+      setState(() {
+        checkMode = false;
+      });
+    });
+  }
+
+  Future<void> deleteChecked() async {
+    if (checked.isEmpty) return;
+
+    if (!await showYesNoDialog(
+      context,
+      Translations.instance!
+          .trans('deletebookmarkmsg')
+          .replaceAll('%s', checked.length.toString()),
+      Translations.instance!.trans('delete'),
+    )) {
+      return;
+    }
+
+    final ids = checked.toList();
+    for (final id in ids) {
+      final state = _getDownloadWidgetKey()[id]?.currentState;
+      if (state != null) {
+        await state.delete();
+      } else {
+        final item =
+            itemsMap[id] ?? items.firstWhereOrNull((e) => e.id() == id);
+        if (item == null) continue;
+        if (item.state() == 0) {
+          for (var file in item.rawFiles()) {
+            if (await File(file).exists()) await File(file).delete();
+          }
+        }
+        await item.delete();
+      }
+    }
+
+    checked.clear();
+    (await Download.getInstance()).refresh();
+    refresh();
+    exitCheckMode();
+  }
+
+  void retryChecked() {
+    for (final id in checked) {
+      _getDownloadWidgetKey()[id]?.currentState?.retry();
+    }
+    exitCheckMode();
+  }
+
+  void recoveryChecked() {
+    for (final id in checked) {
+      _getDownloadWidgetKey()[id]?.currentState?.recovery();
+    }
+    exitCheckMode();
+  }
+
+  void copyCheckedUrls() {
+    final urls = checked
+        .map(
+          (id) => itemsMap[id] ?? items.firstWhereOrNull((e) => e.id() == id),
+        )
+        .nonNulls
+        .map((e) => e.url())
+        .join(', ');
+
+    Clipboard.setData(ClipboardData(text: urls));
+    showToast(level: ToastLevel.check, message: 'URLs Copied!');
+    exitCheckMode();
   }
 
   Widget _urlBar() {
@@ -919,11 +1104,11 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
 
           if (value == 0) {
             _getDownloadWidgetKey().forEach(
-              (key, value) => value.currentState.retryWhenRequired(),
+              (key, value) => value.currentState?.retryWhenRequired(),
             );
           } else if (value == 1) {
             _getDownloadWidgetKey().forEach(
-              (key, value) => value.currentState.recovery(),
+              (key, value) => value.currentState?.recovery(),
             );
           } else if (value == 2) {
             Clipboard.setData(
@@ -1032,8 +1217,9 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
         .then((value) async {
           if (rtype != Settings.downloadAlignType.value) {
             _getDownloadWidgetKey().forEach((key, value) {
-              if (value.currentState != null)
-                value.currentState.thubmanilReload();
+              if (value.currentState != null) {
+                value.currentState?.thubmanilReload();
+              }
             });
             _applyFilter();
           }
@@ -1051,7 +1237,7 @@ class _DownloadPageState extends ThemeSwitchableState<DownloadPage>
       ),
     ).then((value) {
       _getDownloadWidgetKey().forEach((key, value) {
-        if (value.currentState != null) value.currentState.thubmanilReload();
+        value.currentState?.thubmanilReload();
       });
       _applyFilter();
     });

@@ -48,6 +48,10 @@ class DownloadItemWidget extends StatefulWidget {
   final DownloadListItem initialStyle;
   final bool download;
   final VoidCallback refeshCallback;
+  final bool isCheckMode;
+  final bool isChecked;
+  final ValueChanged<bool>? checkCallback;
+  final VoidCallback? longPressCallback;
 
   const DownloadItemWidget({
     super.key,
@@ -56,6 +60,10 @@ class DownloadItemWidget extends StatefulWidget {
     required this.initialStyle,
     required this.download,
     required this.refeshCallback,
+    this.isCheckMode = false,
+    this.isChecked = false,
+    this.checkCallback,
+    this.longPressCallback,
   });
 
   @override
@@ -97,7 +105,7 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
     _downloadProcedure();
   }
 
-  _checkLastRead() {
+  void _checkLastRead() {
     User.getInstance().then(
       (value) => value.getUserLog().then((value) async {
         final x = value.where(
@@ -123,7 +131,7 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
     );
   }
 
-  _styleCallback(DownloadListItem item) {
+  void _styleCallback(DownloadListItem item) {
     style = item;
 
     thisWidth = item.showDetail
@@ -138,7 +146,7 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
     setState(() {});
   }
 
-  _downloadProcedure() {
+  void _downloadProcedure() {
     Future.delayed(const Duration(milliseconds: 500)).then((value) async {
       if (once) return;
       once = true;
@@ -276,6 +284,8 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
   Widget build(BuildContext context) {
     super.build(context);
 
+    final itemScale = widget.isCheckMode && widget.isChecked ? 0.95 : scale;
+
     return GestureDetector(
       child: SizedBox(
         width: thisWidth,
@@ -287,9 +297,29 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
           // padding: EdgeInsets.all(pad),
           transform: Matrix4.identity()
             ..translate(thisWidth / 2, thisHeight / 2)
-            ..scale(scale)
+            ..scale(itemScale)
             ..translate(-thisWidth / 2, -thisHeight / 2),
-          child: buildBody(),
+          child: Stack(
+            children: [
+              buildBody(),
+              if (widget.isCheckMode)
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  child: CircleAvatar(
+                    radius: 14,
+                    backgroundColor: widget.isChecked
+                        ? Settings.majorColor.value
+                        : Colors.black45,
+                    child: Icon(
+                      widget.isChecked ? Icons.check : Icons.circle_outlined,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
       onLongPress: () async {
@@ -297,20 +327,23 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
           scale = 1.0;
         });
 
+        if (widget.isCheckMode) {
+          widget.checkCallback?.call(!widget.isChecked);
+          return;
+        }
+
+        if (widget.longPressCallback != null) {
+          widget.longPressCallback!();
+          return;
+        }
+
         var v = await showDialog(
           context: context,
           builder: (BuildContext context) => const DownloadImageMenu(),
         );
 
         if (v == -1) {
-          // Delete
-          if (widget.item.state() == 0) {
-            for (var file in widget.item.rawFiles()) {
-              if (await File(file).exists()) await File(file).delete();
-            }
-          }
-          await widget.item.delete();
-          (await Download.getInstance()).refresh();
+          await delete();
           widget.refeshCallback();
         } else if (v == 2) {
           // Copy Url
@@ -323,6 +356,11 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
         }
       },
       onTap: () async {
+        if (widget.isCheckMode) {
+          widget.checkCallback?.call(!widget.isChecked);
+          return;
+        }
+
         if (widget.item.state() == 0 && widget.item.files() != null) {
           await (await User.getInstance()).insertUserLog(
             int.tryParse(widget.item.url()) ?? -1,
@@ -375,7 +413,7 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
     );
   }
 
-  _retry() {
+  void _retry() {
     // Retry
     var copy = Map<String, dynamic>.from(widget.item.result);
     copy['State'] = 1;
@@ -388,7 +426,21 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
     });
   }
 
-  _recovery() {
+  Future<void> delete() async {
+    if (widget.item.state() == 0) {
+      for (var file in widget.item.rawFiles()) {
+        if (await File(file).exists()) await File(file).delete();
+      }
+    }
+    await widget.item.delete();
+    (await Download.getInstance()).refresh();
+  }
+
+  void retry() {
+    _retry();
+  }
+
+  void _recovery() {
     // recovery
     var copy = Map<String, dynamic>.from(widget.item.result);
     copy['State'] = 1;
@@ -402,11 +454,11 @@ class DownloadItemWidgetState extends State<DownloadItemWidget>
     });
   }
 
-  retryWhenRequired() {
+  void retryWhenRequired() {
     if (widget.item.state() >= 6) _retry();
   }
 
-  recovery() {
+  void recovery() {
     if (widget.item.thumbnail() != null &&
         (widget.item.thumbnail()!.contains('e-hentai') ||
             widget.item.thumbnail()!.contains('exhentai'))) {
