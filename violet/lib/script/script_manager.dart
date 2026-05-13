@@ -227,6 +227,41 @@ class ScriptManager {
       rethrow;
     }
   }
+
+  static Future<Map<String, String>> runLitomiGetHeaderContent(
+    String id,
+  ) async {
+    try {
+      final jResult = '''
+      {
+      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "Accept-Language": "ko-KR",
+      "Accept-Encoding": "gzip, deflate, br, zstd",
+      "DNT": "1",
+      "Upgrade-Insecure-Requests": "1"
+    }
+      ''';
+      final jResultObject = jsonDecode(jResult);
+
+      if (jResultObject is Map<dynamic, dynamic>) {
+        return Map<String, String>.from(jResultObject);
+      } else {
+        throw Exception(
+          '[script-HitomiGetHeaderContent] E: JSError\n'
+          'Id: $id\n'
+          'Message: $jResult',
+        );
+      }
+    } catch (e, st) {
+      Logger.error(
+        '[script-HitomiGetHeaderContent] E: $e\n'
+        'Id: $id\n'
+        '$st',
+      );
+      rethrow;
+    }
+  }
 }
 
 /// 히토미 최신 라우팅(a1, a2 서버 및 AVIF/Webp)을 완벽 지원하는 리졸버
@@ -418,6 +453,80 @@ class HitomiImageResolver {
     } catch (e) {
       print('[Hitomi Resolver] 에러: $e');
       return [];
+    }
+  }
+}
+
+class LitomiImageResolver {
+  // 'https://vercel.litomi.in/api/proxy/manga/${id}'
+  static Future<List<String>> getImages(int galleryId) async {
+    try {
+      final apiURL = 'https://vercel.litomi.in/api/proxy/manga/$galleryId';
+      final response = await http.get(apiURL);
+      List<String> urls = List.empty(growable: true);
+      if (response.statusCode == 404) {
+        return List.empty();
+      }
+      final json = jsonDecode(response.body);
+      if (json['images'].length != json['count']) {
+        return List.empty();
+      }
+      for (var image in json['images']!) {
+        urls.add(image['original']['url']!);
+      }
+      final firstPageResponse = await http.get(
+        urls[0],
+        headers: (await ScriptManager.runLitomiGetHeaderContent('$galleryId')),
+      );
+      if (firstPageResponse.statusCode != 200) {
+        return List.empty();
+      }
+      return urls;
+    } catch (e, st) {
+      print('[Litomi Resolver] error: $e\n$st');
+      return List.empty();
+    }
+  }
+
+  static Future<List<String>> getSmallThumbnailUrls(int galleryId) async {
+    try {
+      final apiURL = 'https://vercel.litomi.in/api/proxy/manga/$galleryId';
+      final response = await http.get(apiURL);
+      List<String> urls = List.empty(growable: true);
+      if (response.statusCode == 404) {
+        return List.empty();
+      }
+      final json = jsonDecode(response.body);
+      if (json['images'].length != json['count']) {
+        return List.empty();
+      }
+      for (var image in json['images']!) {
+        urls.add(image['thumbnail']['url']!);
+      }
+      return urls;
+    } catch (e, st) {
+      print('[Litomi Resolver] error: $e\n$st');
+      return List.empty();
+    }
+  }
+
+  static Future<ImageList?> getImageList(int id) async {
+    try {
+      final imageUrls = await LitomiImageResolver.getImages(id);
+      final smallThumbnailUrls =
+          await LitomiImageResolver.getSmallThumbnailUrls(id);
+      return ImageList(
+        urls: imageUrls,
+        bigThumbnails: imageUrls,
+        smallThumbnails: smallThumbnailUrls,
+      );
+    } catch (e, st) {
+      Logger.error(
+        '[script-HitomiGetImageList] E: $e\n'
+        'Id: $id\n'
+        '$st',
+      );
+      return null;
     }
   }
 }
