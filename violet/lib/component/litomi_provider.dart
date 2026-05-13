@@ -107,7 +107,8 @@ class LitomiImageProvider extends VioletImageProvider {
 
   @override
   Future<void> refresh() async {
-    imageList = await HitomiManager.getImageList(id);
+    final refreshed = await LitomiImageResolver.getImageList(int.parse(id));
+    if (refreshed != null) imageList = refreshed;
   }
 
   @override
@@ -117,7 +118,8 @@ class LitomiImageProvider extends VioletImageProvider {
       return;
     }
 
-    final turls = await HitomiManager.getImageList(id);
+    final turls = await LitomiImageResolver.getImageList(int.parse(id));
+    if (turls == null) return;
 
     for (var i = 0; i < turls.urls.length; i++) {
       if (target[i]) imageList.urls[i] = turls.urls[i];
