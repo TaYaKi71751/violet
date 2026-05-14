@@ -1,4 +1,5 @@
 #!/bin/bash
+set -Eeuo pipefail
 
 UNAME=$(uname)
 UNAME_ARCHITECTURE=$(uname -m)
@@ -14,14 +15,29 @@ if [[ "$UNAME_ARCHITECTURE" == "x86_64" ]]; then
 elif [[ "$UNAME_ARCHITECTURE" == "aarch64" ]]; then
     ARCH="arm64"
 elif [[ "$UNAME_ARCHITECTURE" == "arm64" ]]; then
-    ARCH="x64"
+    ARCH="arm64"
 fi
-if ( ls ./hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/lock );then
+
+if [[ "$OS" == "unknown" || -z "${ARCH:-}" ]]; then
+    echo "Unsupported platform: ${UNAME}-${UNAME_ARCHITECTURE}"
+    exit -1
+fi
+
+PUBLISH_DIR="$HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish"
+LOCK_FILE="$PUBLISH_DIR/lock"
+
+if [[ -f "$LOCK_FILE" ]];then
     echo "Another instance is running."
     exit -1
 fi
 
-echo "" > ./hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/lock
+cleanup() {
+    rm -f "$LOCK_FILE"
+}
+trap cleanup EXIT
+
+mkdir -p "$PUBLISH_DIR"
+echo "" > "$LOCK_FILE"
 
 GITHUB_USERNAME="$(gh api user --jq .login)"
 
@@ -33,7 +49,7 @@ cp rawdata/data.db rawdata.db.bak
 if [[ "$UNAME_ARCHITECTURE" == "aarch64" ]]; then
     ./hsync
 elif [[ "$UNAME_ARCHITECTURE" == "arm64" ]]; then
-    arch -x86_64 ./hsync
+    ./hsync
 elif [[ "$UNAME_ARCHITECTURE" == "x86_64" ]]; then
     ./hsync
 fi
@@ -82,9 +98,8 @@ CHUNK_COUNT="$(sqlite3 data-${TIMESTAMP}.db << EOF
 EOF
 )"
 if [[ "$CHUNK_COUNT" == "0" ]];then
-    rm data-${TIMESTAMP}.db
-    cd ~/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish
-    rm lock
+    rm -f data-${TIMESTAMP}.db
+    cd "$PUBLISH_DIR"
     exit -1
 fi
 python3 << EOF
@@ -130,10 +145,10 @@ git commit -m "sync: update syncversion.txt $TIMESTAMP"
 git push
 
 
-cd ~/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish
+cd "$PUBLISH_DIR"
 
-rm *.7z
-rm *.7z.*
+rm -f *.7z
+rm -f *.7z.*
 
 7za a rawdata.7z rawdata/* '-xr!*.db-jounal'
 ls -la 
@@ -166,5 +181,4 @@ git add -A
 git commit -m "sync: update syncversion.txt $(date +%s)"
 git push
 
-cd ~/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish
-rm lock
+cd "$PUBLISH_DIR"
