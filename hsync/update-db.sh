@@ -23,6 +23,8 @@ fi
 
 echo "" > ./hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/lock
 
+GITHUB_USERNAME="$(gh api user --jq .login)
+
 cd hsync
 dotnet publish -r ${OS}-${ARCH} -c Release /p:PublishSingleFile=true /p:PublishTrimmed=false /p:PublishReadyToRun=false
 cd bin/Release/net8.0/${OS}-${ARCH}/publish
@@ -112,11 +114,11 @@ mv data-${TIMESTAMP}.db chunk/
 mv data-${TIMESTAMP}.json chunk/
 
 echo "sync: create chunk $TIMESTAMP"
-gh release create $TIMESTAMP --repo TaYaKi71751/chunk --title "chunk $TIMESTAMP" --notes "" chunk/data-${TIMESTAMP}.db chunk/data-${TIMESTAMP}.json || exit -1
+gh release create $TIMESTAMP --repo ${GITHUB_USERNAME}/chunk --title "chunk $TIMESTAMP" --notes "" chunk/data-${TIMESTAMP}.db chunk/data-${TIMESTAMP}.json || exit -1
 echo "chunk $TIMESTAMP created"
 
-echo "chunk $TIMESTAMP https://github.com/TaYaKi71751/chunk/releases/download/$TIMESTAMP/data-${TIMESTAMP}.db $(python3 -c "import os; print(os.path.getsize('chunk/data-${TIMESTAMP}.db'))")" >> syncversion.txt
-echo "chunk $TIMESTAMP https://github.com/TaYaKi71751/chunk/releases/download/$TIMESTAMP/data-${TIMESTAMP}.json $(python3 -c "import os; print(os.path.getsize('chunk/data-${TIMESTAMP}.json'))")" >> syncversion.txt
+echo "chunk $TIMESTAMP https://github.com/${GITHUB_USERNAME}/chunk/releases/download/$TIMESTAMP/data-${TIMESTAMP}.db $(python3 -c "import os; print(os.path.getsize('chunk/data-${TIMESTAMP}.db'))")" >> syncversion.txt
+echo "chunk $TIMESTAMP https://github.com/${GITHUB_USERNAME}/chunk/releases/download/$TIMESTAMP/data-${TIMESTAMP}.json $(python3 -c "import os; print(os.path.getsize('chunk/data-${TIMESTAMP}.json'))")" >> syncversion.txt
 rm -rf chunk
 
 cp syncversion.txt ~/sync-data/syncversion.txt
@@ -136,25 +138,25 @@ rm *.7z.*
 7za a rawdata.7z rawdata/* '-xr!*.db-jounal'
 ls -la 
 echo "sync: create db $TIMESTAMP"
-gh release create $TIMESTAMP --repo TaYaKi71751/db --title "db $TIMESTAMP" --notes "" $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata.7z || exit -1
+gh release create $TIMESTAMP --repo ${GITHUB_USERNAME}/db --title "db $TIMESTAMP" --notes "" $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata.7z || exit -1
 rm rawdata.7z
 7za a rawdata-chinese.7z rawdata-chinese/* '-xr!*.db-journal'
 ls -la 
-gh release upload $TIMESTAMP --repo TaYaKi71751/db --clobber $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-chinese.7z || exit -1
+gh release upload $TIMESTAMP --repo ${GITHUB_USERNAME}/db --clobber $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-chinese.7z || exit -1
 rm rawdata-chinese.7z
 7za a rawdata-english.7z rawdata-english/* '-xr!*.db-journal'
 ls -la 
-gh release upload $TIMESTAMP --repo TaYaKi71751/db --clobber $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-english.7z || exit -1
+gh release upload $TIMESTAMP --repo ${GITHUB_USERNAME}/db --clobber $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-english.7z || exit -1
 rm rawdata-english.7z
 7za a rawdata-japanese.7z rawdata-japanese/* '-xr!*.db-journal'
 ls -la
-gh release upload $TIMESTAMP --repo TaYaKi71751/db --clobber $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-japanese.7z || exit -1
+gh release upload $TIMESTAMP --repo ${GITHUB_USERNAME}/db --clobber $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-japanese.7z || exit -1
 rm rawdata-japanese.7z
 7za a rawdata-korean.7z rawdata-korean/* '-xr!*.db-journal'
 ls -la 
-gh release upload $TIMESTAMP --repo TaYaKi71751/db --clobber $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-korean.7z || exit -1
+gh release upload $TIMESTAMP --repo ${GITHUB_USERNAME}/db --clobber $HOME/violet/hsync/hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/rawdata-korean.7z || exit -1
 rm rawdata-korean.7z
-echo "db $TIMESTAMP https://github.com/TaYaKi71751/db/releases/download/$TIMESTAMP/rawdata" >> syncversion.txt
+echo "db $TIMESTAMP https://github.com/${GITHUB_USERNAME}/db/releases/download/$TIMESTAMP/rawdata" >> syncversion.txt
 cp syncversion.txt ~/sync-data/syncversion.txt
 
 cd ~/sync-data
