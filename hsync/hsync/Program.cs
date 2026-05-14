@@ -5,6 +5,7 @@ using hsync.Log;
 using System;
 using System.Text;
 using System.Globalization;
+using SQLitePCL;
 
 namespace hsync
 {
@@ -13,8 +14,10 @@ namespace hsync
         static void Main(string[] args)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            Batteries_V2.Init();
 
             AppProvider.Initialize();
+            var exitCode = 0;
 
             Logs.Instance.AddLogNotify((s, e) =>
             {
@@ -56,14 +59,14 @@ namespace hsync
             }
             catch (Exception e)
             {
-                Console.WriteLine("An error occured! " + e.Message);
-                Console.WriteLine(e.StackTrace);
+                exitCode = 1;
+                Console.WriteLine("An error occured! " + e);
                 Console.WriteLine("Please, check log.txt file.");
             }
 
             AppProvider.Deinitialize();
 
-            Environment.Exit(0);
+            Environment.Exit(exitCode);
         }
     }
 }
