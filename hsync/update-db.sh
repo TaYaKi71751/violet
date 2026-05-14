@@ -23,7 +23,7 @@ fi
 
 echo "" > ./hsync/bin/Release/net8.0/${OS}-${ARCH}/publish/lock
 
-GITHUB_USERNAME="$(gh api user --jq .login)
+GITHUB_USERNAME="$(gh api user --jq .login)"
 
 cd hsync
 dotnet publish -r ${OS}-${ARCH} -c Release /p:PublishSingleFile=true /p:PublishTrimmed=false /p:PublishReadyToRun=false
