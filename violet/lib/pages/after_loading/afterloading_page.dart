@@ -234,7 +234,7 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
       return imageMatch == null ? null : int.tryParse(imageMatch.group(1)!);
     }
 
-    if (host == 'nhentai.net') {
+    if (host == 'nhentai.net' || host == 'nhentai.to') {
       final nHentaiId = uri.path.split('/')[2];
       final response = await http.get(
         'https://nhentai-media-id.vercel.app/api/media-id?id=$nHentaiId',
