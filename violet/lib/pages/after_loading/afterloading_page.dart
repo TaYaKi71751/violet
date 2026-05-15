@@ -59,7 +59,10 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
     WidgetsBinding.instance.addObserver(this);
     FToast().init(context);
 
-    if (Platform.isAndroid || Platform.isIOS) {
+    if (Platform.isAndroid ||
+        Platform.isIOS ||
+        Platform.isMacOS ||
+        Platform.isWindows) {
       _listenDeeplink();
       _listenSharedText();
     }
