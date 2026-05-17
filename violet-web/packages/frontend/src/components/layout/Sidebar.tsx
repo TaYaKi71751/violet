@@ -63,7 +63,7 @@ export function Sidebar() {
           {!sidebarCollapsed && <span>Discord</span>}
         </a>
         <a
-          href="https://github.com/project-violet/violet"
+          href="https://github.com/TaYaKi71751/violet"
           target="_blank"
           rel="noopener noreferrer"
           className={styles.socialLink}
