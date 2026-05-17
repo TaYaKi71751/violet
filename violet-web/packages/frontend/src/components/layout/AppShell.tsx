@@ -144,6 +144,16 @@ export function AppShell() {
             </label>
           </div>
         )}
+        {isMobile && showSearchBar && (
+          <div className={styles.mobileSearchBar}>
+            <SearchBar ref={searchBarRef} />
+            {data && (
+              <div className={styles.mobileResults}>
+                <span className={styles.count}>{t('home.results', { count: data.totalCount })}</span>
+              </div>
+            )}
+          </div>
+        )}
         <main ref={contentRef} className={styles.content}>
           <Outlet />
         </main>
