@@ -178,6 +178,7 @@
     "noImages": "未找到该图库的图片。",
     "back": "返回",
     "settings": "设置",
+    "openInApp": "在应用中打开",
     "pageInfo": "{{current}} / {{total}}",
     "loading": "加载中...",
     "retrying": "重试中... ({{current}}/{{max}})",

@@ -178,6 +178,7 @@
     "noImages": "Neniuj bildoj trovitaj por ĉi tiu galerio.",
     "back": "Reen",
     "settings": "Agordoj",
+    "openInApp": "Malfermi en aplikaĵo",
     "pageInfo": "{{current}} / {{total}}",
     "loading": "Ŝargante...",
     "retrying": "Reprovas... ({{current}}/{{max}})",
