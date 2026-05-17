@@ -3,6 +3,8 @@
 
 import 'dart:convert';
 
+import 'package:archive/archive.dart';
+import 'package:brotli/brotli.dart' as brotli;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_js/flutter_js.dart';
 // import 'package:html/parser.dart';
@@ -235,10 +237,17 @@ class ScriptManager {
       final jResult = '''
       {
       "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:151.0) Gecko/20100101 Firefox/151.0",
-      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "Accept": "*/*",
       "Accept-Language": "ko-KR",
-      "Accept-Encoding": "gzip, deflate, br, zstd",
+      "Accept-Encoding": "gzip, deflate, br",
+      "Cache-Control": "no-cache",
+      "Pragma": "no-cache",
+      "Origin": "https://litomi.in",
       "DNT": "1",
+      "Connection": "keep-alive",
+      "Sec-Fetch-Dest": "empty",  
+      "Sec-Fetch-Mode": "cors",
+      "Sec-Fetch-Site": "same-site",
       "Upgrade-Insecure-Requests": "1"
     }
       ''';
@@ -459,20 +468,109 @@ class HitomiImageResolver {
 
 class LitomiImageResolver {
   // 'https://vercel.litomi.in/api/proxy/manga/${id}'
+  static const String _apiProxyBaseUrl =
+      'https://vercel.litomi.in/api/proxy/manga';
+  static const String _backupApiProxyBaseUrl =
+      'https://vercel2.litomi.in/api/proxy/manga';
+
+  static Future<dynamic> _getMangaJson(int galleryId) async {
+    final headers = await ScriptManager.runLitomiGetHeaderContent(
+      galleryId.toString(),
+    );
+    final response = await http.get(
+      '$_apiProxyBaseUrl/$galleryId',
+      headers: headers,
+    );
+    if (response.statusCode == 404) {
+      return null;
+    }
+    if (response.statusCode != 200) {
+      final backupResponse = await http.get(
+        '$_backupApiProxyBaseUrl/$galleryId',
+        headers: headers,
+      );
+      if (backupResponse.statusCode == 404) {
+        return null;
+      }
+      if (backupResponse.statusCode != 200) {
+        throw Exception(
+          'Litomi API response code: ${backupResponse.statusCode}',
+        );
+      }
+      return _decodeJsonResponse(
+        backupResponse.bodyBytes,
+        backupResponse.headers,
+      );
+    }
+    return _decodeJsonResponse(response.bodyBytes, response.headers);
+  }
+
+  static dynamic _decodeJsonResponse(
+    List<int> bodyBytes,
+    Map<String, String> headers,
+  ) {
+    final decodedBytes = _decodeResponseBodyBytes(bodyBytes, headers);
+    return jsonDecode(utf8.decode(decodedBytes, allowMalformed: true));
+  }
+
+  static List<int> _decodeResponseBodyBytes(
+    List<int> bodyBytes,
+    Map<String, String> headers,
+  ) {
+    final encodings = headers['content-encoding']
+        ?.split(',')
+        .map((encoding) => encoding.trim().toLowerCase())
+        .where((encoding) => encoding.isNotEmpty)
+        .toList();
+    if (encodings == null || encodings.isEmpty) {
+      return bodyBytes;
+    }
+
+    var decodedBytes = bodyBytes;
+    for (final encoding in encodings.reversed) {
+      switch (encoding) {
+        case 'gzip':
+        case 'x-gzip':
+          decodedBytes = const GZipDecoder().decodeBytes(decodedBytes);
+          break;
+        case 'deflate':
+          decodedBytes = _decodeDeflate(decodedBytes);
+          break;
+        case 'identity':
+          break;
+        case 'br':
+          decodedBytes = brotli.brotliDecode(decodedBytes);
+          break;
+        default:
+          throw UnsupportedError('Unknown content-encoding: $encoding');
+      }
+    }
+    return decodedBytes;
+  }
+
+  static List<int> _decodeDeflate(List<int> bodyBytes) {
+    try {
+      return const ZLibDecoder().decodeBytes(bodyBytes);
+    } catch (_) {
+      return const ZLibDecoder().decodeBytes(bodyBytes, raw: true);
+    }
+  }
+
   static Future<List<String>> getImages(int galleryId) async {
     try {
-      final apiURL = 'https://vercel.litomi.in/api/proxy/manga/$galleryId';
-      final response = await http.get(apiURL);
       List<String> urls = List.empty(growable: true);
-      if (response.statusCode == 404) {
+      final json = await _getMangaJson(galleryId);
+      if (json == null) {
         return List.empty();
       }
-      final json = jsonDecode(response.body);
       if (json['images'].length != json['count']) {
         return List.empty();
       }
       for (var image in json['images']!) {
         urls.add(image['original']['url']!);
+      }
+      if (urls.isEmpty) {
+        return List.empty();
       }
       final firstPageResponse = await http.get(
         'https://http-status-flax.vercel.app/api/status?url=${Uri.encodeComponent(urls[0])}',
@@ -490,18 +588,19 @@ class LitomiImageResolver {
 
   static Future<List<String>> getSmallThumbnailUrls(int galleryId) async {
     try {
-      final apiURL = 'https://vercel.litomi.in/api/proxy/manga/$galleryId';
-      final response = await http.get(apiURL);
       List<String> urls = List.empty(growable: true);
-      if (response.statusCode == 404) {
+      final json = await _getMangaJson(galleryId);
+      if (json == null) {
         return List.empty();
       }
-      final json = jsonDecode(response.body);
       if (json['images'].length != json['count']) {
         return List.empty();
       }
       for (var image in json['images']!) {
         urls.add(image['thumbnail']['url']!);
+      }
+      if (urls.isEmpty) {
+        return List.empty();
       }
       final firstPageResponse = await http.get(
         'https://http-status-flax.vercel.app/api/status?url=${Uri.encodeComponent(urls[0])}',

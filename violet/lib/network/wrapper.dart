@@ -44,6 +44,8 @@ Future<http.Response> get(
     return await _ehentaiGet(url, headers: headers, timeout: timeout);
   } else if (_isScriptUrl(url)) {
     return await _scriptGet(url, headers: headers, timeout: timeout);
+  } else if (url.contains('litomi.in')) {
+    return await _litomiGet(url, headers: headers, timeout: timeout);
   }
 
   Logger.info('[Http Request] GET: $url');
@@ -155,6 +157,76 @@ Future<http.Response> _ehentaiGet(
     release.call();
     return res;
   }
+}
+
+Future<http.Response> _litomiGet(
+  String url, {
+  Map<String, String>? headers,
+  Duration? timeout,
+}) async {
+  Logger.info('[Http Cache] GET: $url');
+  final bypassCache = _shouldBypassCache(headers);
+
+  if (!bypassCache && HttpWrapper.cacheResponse.containsKey(url)) {
+    return HttpWrapper.cacheResponse[url]!;
+  }
+
+  Response res;
+  if (timeout == null) {
+    final client = await RhttpCompatibleClient.create(
+      settings: const ClientSettings(httpVersionPref: HttpVersionPref.http3),
+    );
+
+    res = await client.get(Uri.parse(url), headers: headers);
+  } else {
+    bool isTimeout = false;
+    var retry = 0;
+    do {
+      isTimeout = false;
+
+      final client = await RhttpCompatibleClient.create(
+        settings: const ClientSettings(httpVersionPref: HttpVersionPref.http3),
+      );
+      final sent = client.get(Uri.parse(url), headers: headers);
+      if (!Settings.ignoreTimeout.value) {
+        sent.timeout(
+          timeout,
+          onTimeout: () {
+            isTimeout = true;
+            retry++;
+            return http.Response('', 200);
+          },
+        );
+      }
+      res = await sent;
+    } while (isTimeout && retry < 10);
+  }
+
+  if (res.statusCode != 200) {
+    Logger.warning('[Http Response] CODE: ${res.statusCode}, GET: $url');
+  }
+
+  if (!bypassCache &&
+      !HttpWrapper.cacheResponse.containsKey(url) &&
+      res.statusCode == 200 &&
+      res.bodyBytes.isNotEmpty) {
+    HttpWrapper.cacheResponse[url] = res;
+  }
+
+  return res;
+}
+
+bool _shouldBypassCache(Map<String, String>? headers) {
+  if (headers == null) {
+    return false;
+  }
+
+  return headers.entries.any((entry) {
+    final key = entry.key.toLowerCase();
+    final value = entry.value.toLowerCase();
+    return (key == 'cache-control' && value.contains('no-cache')) ||
+        (key == 'pragma' && value.contains('no-cache'));
+  });
 }
 
 Future<http.Response> _scriptGet(
