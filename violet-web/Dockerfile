@@ -26,7 +26,7 @@ COPY . .
 RUN pnpm build
 
 # Create standalone backend deployment
-RUN pnpm --filter @violet-web/backend deploy --legacy --prod /prod
+RUN pnpm --filter @violet-web/backend deploy --prod /prod
 
 # Stage 2: Runtime
 FROM node:20-alpine
