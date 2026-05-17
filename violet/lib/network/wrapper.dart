@@ -243,7 +243,7 @@ Future<http.Response> _scriptGet(
   Response res;
   if (timeout == null) {
     final client = await RhttpCompatibleClient.create(
-      settings: const ClientSettings(httpVersionPref: HttpVersionPref.http3),
+      settings: const ClientSettings(httpVersionPref: HttpVersionPref.http2),
     );
 
     res = await client.get(Uri.parse(url), headers: headers);
@@ -254,7 +254,7 @@ Future<http.Response> _scriptGet(
       isTimeout = false;
 
       final client = await RhttpCompatibleClient.create(
-        settings: const ClientSettings(httpVersionPref: HttpVersionPref.http3),
+        settings: const ClientSettings(httpVersionPref: HttpVersionPref.http2),
       );
       final sent = client.get(Uri.parse(url), headers: headers);
       if (!Settings.ignoreTimeout.value) {
