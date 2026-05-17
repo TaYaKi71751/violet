@@ -1,11 +1,13 @@
 # Stage 1: Build
 FROM node:20-alpine AS builder
 
+ARG PNPM_VERSION=9.15.9
+
 # Install build dependencies for better-sqlite3
 RUN apk add --no-cache python3 make g++ p7zip
 
 # Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
 
 WORKDIR /app
 
