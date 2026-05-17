@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ArrowLeft, Settings } from 'lucide-react';
 import { useViewerStore } from '../../stores/viewer-store';
 import { useIsBookmarked, useToggleBookmark } from '../../hooks/useBookmarks';
 import { ViewerSettingsPanel } from './ViewerSettingsPanel';
@@ -161,8 +162,13 @@ export function ViewerOverlay({
       {showOverlay && (
         <>
           <div className={styles.top}>
-            <button className={styles.closeBtn} onClick={onClose}>
-              {t('viewer.back')}
+            <button
+              className={styles.closeBtn}
+              onClick={onClose}
+              aria-label={t('viewer.back')}
+              title={t('viewer.back')}
+            >
+              <ArrowLeft size={22} aria-hidden="true" />
             </button>
             <button
               className={`${styles.bookmarkBtn} ${isBookmarked ? styles.bookmarked : ''}`}
@@ -192,8 +198,10 @@ export function ViewerOverlay({
                 e.stopPropagation();
                 toggleSettings();
               }}
+              aria-label={t('viewer.settings')}
+              title={t('viewer.settings')}
             >
-              {t('viewer.settings')}
+              <Settings size={22} aria-hidden="true" />
             </button>
           </div>
           <div className={styles.shortcutHint}>

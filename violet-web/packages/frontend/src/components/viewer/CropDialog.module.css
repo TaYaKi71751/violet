@@ -50,6 +50,15 @@
   background: rgba(255, 255, 255, 0.25);
 }
 
+.iconBtn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .saveBtn {
   background: var(--color-primary);
 }
