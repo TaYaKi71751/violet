@@ -43,13 +43,17 @@
 
 .closeBtn,
 .settingsBtn {
-  padding: var(--spacing-xs) var(--spacing-md);
+  width: 36px;
+  height: 36px;
+  padding: 0;
   background: rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-sm);
   color: #fff;
-  font-size: 0.9rem;
   border: none;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: background 0.2s;
 }
 

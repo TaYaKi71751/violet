@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { X } from 'lucide-react';
 import { useAddCropBookmark } from '../../hooks/useBookmarks';
 import styles from './CropDialog.module.css';
 
@@ -137,8 +138,13 @@ export function CropDialog({ galleryId, imageUrls, visiblePages, onClose }: Crop
         <div className={styles.header}>
           <span className={styles.headerTitle}>{t('crop.selectPage')}</span>
           <div className={styles.headerActions}>
-            <button className={styles.headerBtn} onClick={onClose}>
-              {t('crop.cancel')}
+            <button
+              className={`${styles.headerBtn} ${styles.iconBtn}`}
+              onClick={onClose}
+              aria-label={t('crop.cancel')}
+              title={t('crop.cancel')}
+            >
+              <X size={22} aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -182,8 +188,13 @@ export function CropDialog({ galleryId, imageUrls, visiblePages, onClose }: Crop
               </button>
             </>
           )}
-          <button className={styles.headerBtn} onClick={onClose}>
-            {t('crop.cancel')}
+          <button
+            className={`${styles.headerBtn} ${styles.iconBtn}`}
+            onClick={onClose}
+            aria-label={t('crop.cancel')}
+            title={t('crop.cancel')}
+          >
+            <X size={22} aria-hidden="true" />
           </button>
         </div>
       </div>
