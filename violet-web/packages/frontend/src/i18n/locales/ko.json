@@ -25,7 +25,8 @@
     "allLanguages": "모든 언어",
     "suggestions": "추천",
     "recentSearches": "최근 검색",
-    "clearRecent": "삭제"
+    "clearRecent": "삭제",
+    "openInApp": "앱에서 열기"
   },
   "article": {
     "artist": "작가",

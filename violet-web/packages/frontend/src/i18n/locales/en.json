@@ -25,7 +25,8 @@
     "allLanguages": "All Languages",
     "suggestions": "Suggestions",
     "recentSearches": "Recent Searches",
-    "clearRecent": "Clear"
+    "clearRecent": "Clear",
+    "openInApp": "Open in app"
   },
   "article": {
     "artist": "Artist",

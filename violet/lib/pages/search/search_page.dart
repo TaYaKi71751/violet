@@ -109,6 +109,26 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
     }
   }
 
+  Future<void> searchFromDeeplink(String query) async {
+    if (widget.searchKeyWord != null || query.trim().isEmpty) return;
+
+    try {
+      final db = await SearchLogDatabase.getInstance();
+      await db.insertSearchLog(query);
+    } catch (e, st) {
+      await Logger.error(
+        '[searchFromDeeplink-log] E: ${e.toString()}\n${st.toString()}',
+      );
+    }
+
+    c.latestQuery = (null, query);
+    c.doSearch();
+    if (c.scrollController?.hasClients ?? false) {
+      c.scrollController?.jumpTo(0);
+    }
+    reloadForce();
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();

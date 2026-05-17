@@ -52,6 +52,8 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
   StreamSubscription? _deeplinkSubscription;
   StreamSubscription? _shareSubscription;
   String? _lastHandledArticleKey;
+  String? _lastHandledSearchKey;
+  DateTime? _lastHandledSearchAt;
 
   @override
   void initState() {
@@ -122,7 +124,12 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
       return;
     }
 
-    unawaited(_handleArticleUri(uri));
+    final unwrappedUri = _unwrapSharedUri(uri);
+    if (_handleSearchUri(unwrappedUri)) {
+      return;
+    }
+
+    unawaited(_handleArticleUri(unwrappedUri));
   }
 
   Future<void> _listenDeeplink() async {
@@ -158,7 +165,12 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
       return;
     }
 
-    unawaited(_handleArticleUri(uri));
+    final unwrappedUri = _unwrapSharedUri(uri);
+    if (_handleSearchUri(unwrappedUri)) {
+      return;
+    }
+
+    unawaited(_handleArticleUri(unwrappedUri));
   }
 
   Uri? _extractUri(String text) {
@@ -168,7 +180,7 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
   }
 
   Future<void> _handleArticleUri(Uri uri) async {
-    final articleId = await _articleIdFromUri(_unwrapSharedUri(uri));
+    final articleId = await _articleIdFromUri(uri);
     if (articleId == null) {
       return;
     }
@@ -185,6 +197,66 @@ class AfterLoadingPageState extends State<AfterLoadingPage>
       }
       showArticleInfoById(context, articleId);
     });
+  }
+
+  bool _handleSearchUri(Uri uri) {
+    final isVioletScheme =
+        uri.scheme == 'violet' || uri.scheme == 'xyz.project.violet';
+    if (!isVioletScheme || uri.host != 'search') {
+      return false;
+    }
+
+    final query = uri.queryParameters['q']?.trim();
+    if (query == null || query.isEmpty) {
+      return true;
+    }
+
+    final now = DateTime.now();
+    if (_lastHandledSearchKey == query &&
+        _lastHandledSearchAt != null &&
+        now.difference(_lastHandledSearchAt!) <
+            const Duration(milliseconds: 500)) {
+      return true;
+    }
+    _lastHandledSearchKey = query;
+    _lastHandledSearchAt = now;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _openSearchQuery(query);
+    });
+
+    return true;
+  }
+
+  void _openSearchQuery(String query, [int retryCount = 0]) {
+    if (!mounted) {
+      return;
+    }
+
+    if (!_pageController.hasClients) {
+      if (retryCount >= 10) {
+        return;
+      }
+      Future.delayed(const Duration(milliseconds: 100), () {
+        _openSearchQuery(query, retryCount + 1);
+      });
+      return;
+    }
+
+    _pageController.jumpToPage(0);
+
+    final searchState = _widgetKeys[0].currentState as dynamic;
+    if (searchState == null) {
+      if (retryCount >= 10) {
+        return;
+      }
+      Future.delayed(const Duration(milliseconds: 100), () {
+        _openSearchQuery(query, retryCount + 1);
+      });
+      return;
+    }
+
+    searchState.searchFromDeeplink(query);
   }
 
   Uri _unwrapSharedUri(Uri uri) {
