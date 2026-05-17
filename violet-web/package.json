@@ -1,6 +1,7 @@
 {
   "name": "violet-web",
   "private": true,
+  "packageManager": "pnpm@9.15.9",
   "scripts": {
     "dev": "concurrently \"pnpm --filter @violet-web/backend dev\" \"pnpm --filter @violet-web/frontend dev\"",
     "build": "pnpm --filter @violet-web/shared build && pnpm --filter @violet-web/backend build && pnpm --filter @violet-web/frontend build",
