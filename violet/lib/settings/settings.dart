@@ -346,15 +346,15 @@ class Settings {
   static Future<void> init() async {
     routingRule = (await _getString(
       'routingrule',
-      'Hitomi|EHentai|ExHentai|Litomi|Hiyobi|NHentai',
+      'Hitomi|EHentai|ExHentai|Hiyobi|NHentai',
     )).split('|');
     searchRule = (await _getString(
       'searchrule',
       'Hitomi|EHentai|ExHentai|NHentai',
     )).split('|');
 
-    if (!routingRule.contains('Litomi')) {
-      routingRule.add('Litomi');
+    if (routingRule.contains('Litomi')) {
+      routingRule.remove('Litomi');
       await prefs.setString('routingrule', routingRule.join('|'));
     }
     if (!routingRule.contains('Hiyobi')) {

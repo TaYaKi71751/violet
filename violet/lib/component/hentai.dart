@@ -10,7 +10,6 @@ import 'package:violet/component/hitomi/hitomi.dart';
 import 'package:violet/component/hitomi/hitomi_parser.dart';
 import 'package:violet/component/hitomi/hitomi_provider.dart';
 import 'package:violet/component/image_provider.dart';
-import 'package:violet/component/litomi_provider.dart';
 import 'package:violet/component/query_translate.dart';
 import 'package:violet/database/database.dart';
 import 'package:violet/database/query.dart';
@@ -388,14 +387,6 @@ class HentaiManager {
                 break;
               }
               return HitomiImageProvider(imgList, qr.id().toString());
-            }
-          case 'Litomi':
-            {
-              final imgList = (await LitomiImageResolver.getImageList(qr.id()));
-              if (imgList == null || imgList.urls.isEmpty) {
-                break;
-              }
-              return LitomiImageProvider(imgList, qr.id().toString());
             }
         }
       } catch (e, st) {
