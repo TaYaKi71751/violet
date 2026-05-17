@@ -178,6 +178,7 @@
     "noImages": "このギャラリーの画像が見つかりませんでした。",
     "back": "戻る",
     "settings": "設定",
+    "openInApp": "アプリで開く",
     "pageInfo": "{{current}} / {{total}}",
     "loading": "読み込み中...",
     "retrying": "再試行中... ({{current}}/{{max}})",

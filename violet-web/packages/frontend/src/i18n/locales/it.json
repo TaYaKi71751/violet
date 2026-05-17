@@ -178,6 +178,7 @@
     "noImages": "Nessuna immagine trovata per questa galleria.",
     "back": "Indietro",
     "settings": "Impostazioni",
+    "openInApp": "Apri nell'app",
     "pageInfo": "{{current}} / {{total}}",
     "loading": "Caricamento...",
     "retrying": "Nuovo tentativo... ({{current}}/{{max}})",

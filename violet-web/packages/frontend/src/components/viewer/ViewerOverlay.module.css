@@ -62,7 +62,9 @@
   background: rgba(255, 255, 255, 0.25);
 }
 
-.bookmarkBtn {
+.bookmarkBtn,
+.cropBtn,
+.openInAppBtn {
   width: 36px;
   height: 36px;
   padding: 0;
@@ -79,7 +81,9 @@
   margin-left: var(--spacing-sm);
 }
 
-.bookmarkBtn:hover {
+.bookmarkBtn:hover,
+.cropBtn:hover,
+.openInAppBtn:hover {
   background: rgba(255, 255, 255, 0.25);
   transform: scale(1.1);
 }
@@ -91,28 +95,6 @@
     0 0 4px rgba(255, 235, 153, 0.4),
     0 0 2px rgba(255, 235, 153, 0.3);
   box-shadow: 0 0 0 1px rgba(255, 235, 153, 0.3);
-}
-
-.cropBtn {
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-sm);
-  color: #fff;
-  font-size: 1.2rem;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  margin-left: var(--spacing-sm);
-}
-
-.cropBtn:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: scale(1.1);
 }
 
 .pageInfo {

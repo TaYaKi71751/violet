@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Settings } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Settings } from 'lucide-react';
 import { useViewerStore } from '../../stores/viewer-store';
 import { useIsBookmarked, useToggleBookmark } from '../../hooks/useBookmarks';
 import { ViewerSettingsPanel } from './ViewerSettingsPanel';
@@ -38,6 +38,10 @@ export function ViewerOverlay({
   const handleBookmarkToggle = useCallback(() => {
     toggleBookmark.mutate({ articleId: String(galleryId), isBookmarked: !!isBookmarked });
   }, [toggleBookmark, galleryId, isBookmarked]);
+
+  const handleOpenInApp = useCallback(() => {
+    window.location.href = `violet://${galleryId}`;
+  }, [galleryId]);
 
   // Keyboard shortcuts (single key, no modifiers)
   useEffect(() => {
@@ -190,6 +194,17 @@ export function ViewerOverlay({
               aria-label="Crop"
             >
               ✂
+            </button>
+            <button
+              className={styles.openInAppBtn}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleOpenInApp();
+              }}
+              aria-label={t('viewer.openInApp')}
+              title={t('viewer.openInApp')}
+            >
+              <ExternalLink size={20} aria-hidden="true" />
             </button>
             <div style={{ flex: 1 }} />
             <button

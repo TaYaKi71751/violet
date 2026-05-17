@@ -178,6 +178,7 @@
     "noImages": "Nenhuma imagem encontrada para esta galeria.",
     "back": "Voltar",
     "settings": "Configurações",
+    "openInApp": "Abrir no app",
     "pageInfo": "{{current}} / {{total}}",
     "loading": "Carregando...",
     "retrying": "Tentando novamente... ({{current}}/{{max}})",
