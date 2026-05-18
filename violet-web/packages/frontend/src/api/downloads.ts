@@ -8,6 +8,7 @@ import {
   putDownloadedArticleListItem,
   putDownloadedBase64Image,
 } from '../services/image-cache';
+import { createImagePdf } from '../utils/pdf';
 import { createZip } from '../utils/zip';
 
 const DOWNLOADS_KEY = 'violet-web:downloads';
@@ -35,6 +36,47 @@ function extensionFromContentType(contentType: string): string {
   if (contentType.includes('png')) return 'png';
   if (contentType.includes('gif')) return 'gif';
   return 'jpg';
+}
+
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error('Failed to decode image'));
+    image.src = src;
+  });
+}
+
+async function downloadedImageToJpeg(
+  image: { base64: string; contentType: string },
+): Promise<{ data: Uint8Array; width: number; height: number }> {
+  const src = `data:${image.contentType || 'image/jpeg'};base64,${image.base64}`;
+  const element = await loadImage(src);
+  const width = Math.max(1, element.naturalWidth || element.width);
+  const height = Math.max(1, element.naturalHeight || element.height);
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Canvas is not available');
+
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, width, height);
+  ctx.drawImage(element, 0, 0, width, height);
+
+  const blob = await new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob((result) => {
+      if (result) resolve(result);
+      else reject(new Error('Failed to encode PDF page'));
+    }, 'image/jpeg', 0.92);
+  });
+
+  return {
+    data: new Uint8Array(await blob.arrayBuffer()),
+    width,
+    height,
+  };
 }
 
 export interface DownloadsResponse {
@@ -454,6 +496,35 @@ export async function exportDownloadedArticleZip(articleId: string): Promise<voi
   const anchor = document.createElement('a');
   anchor.href = url;
   anchor.download = `${articleId}.zip`;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
+export async function exportDownloadedArticlePdf(articleId: string): Promise<void> {
+  const downloaded = await getDownloadedArticleListItem(articleId);
+  const legacy = readDownloaded().find((item) => item.id === articleId);
+  const pageCount = downloaded ? downloaded.page - 1 : legacy?.page;
+
+  if (!pageCount || pageCount < 1) {
+    throw new Error('Downloaded article not found');
+  }
+
+  const pages = [];
+
+  for (let page = 1; page <= pageCount; page += 1) {
+    const image = await getDownloadedBase64Image(articleId, page);
+    if (!image) {
+      throw new Error(`Missing downloaded page ${page}`);
+    }
+
+    pages.push(await downloadedImageToJpeg(image));
+  }
+
+  const blob = createImagePdf(pages);
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = `${articleId}.pdf`;
   anchor.click();
   URL.revokeObjectURL(url);
 }

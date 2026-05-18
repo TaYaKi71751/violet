@@ -63,8 +63,11 @@
     "delete": "Forigi",
     "retry": "Reprovi",
     "exportZip": "Eksporti kiel ZIP",
+    "exportPdf": "Eksporti kiel PDF",
     "zipReady": "ZIP elŝuto komenciĝis",
-    "zipError": "Malsukcesis krei ZIP"
+    "zipError": "Malsukcesis krei ZIP",
+    "pdfReady": "PDF elŝuto komenciĝis",
+    "pdfError": "Malsukcesis krei PDF"
   },
   "aiSearch": {
     "heading": "AI-Serĉo",

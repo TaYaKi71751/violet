@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { Archive, Download, Trash2, RotateCw } from 'lucide-react';
+import { Archive, Download, FileText, Trash2, RotateCw } from 'lucide-react';
 import type { Article } from '@violet-web/shared';
 import { parsePipeTags, parseTagTuples, ticksToDate } from '@violet-web/shared';
 import { LazyImage } from '../common/LazyImage';
@@ -11,6 +11,7 @@ import {
   useStartDownload,
   useRetryDownload,
   useDeleteDownload,
+  useExportDownloadPdf,
   useExportDownloadZip,
   useIsDownloaded,
 } from '../../hooks/useDownloads';
@@ -47,6 +48,7 @@ export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription
   const retryDownload = useRetryDownload();
   const deleteDownload = useDeleteDownload();
   const exportZip = useExportDownloadZip();
+  const exportPdf = useExportDownloadPdf();
   const isDownloadsPage = useIsDownloadsPage();
   const { data: isDownloaded } = useIsDownloaded(String(article.Id));
   const downloadRecord = useDownloadProgress(String(article.Id));
@@ -86,6 +88,11 @@ export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription
   const handleExportZip = (e: React.MouseEvent) => {
     e.stopPropagation();
     exportZip.mutate(String(article.Id));
+  };
+
+  const handleExportPdf = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    exportPdf.mutate(String(article.Id));
   };
 
   const handleSearchClick = (category: string, value: string) => (e: React.MouseEvent) => {
@@ -150,6 +157,15 @@ export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription
                 title={t('downloads.exportZip')}
               >
                 <Archive size={14} />
+              </button>
+              <button
+                className={`${styles.downloadBtn} ${styles.pdfBtn}`}
+                onClick={handleExportPdf}
+                disabled={exportPdf.isPending}
+                aria-label={t('downloads.exportPdf')}
+                title={t('downloads.exportPdf')}
+              >
+                <FileText size={14} />
               </button>
               <button
                 className={`${styles.downloadBtn} ${styles.deleteBtn}`}
