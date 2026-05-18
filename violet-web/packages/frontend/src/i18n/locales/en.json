@@ -46,7 +46,9 @@
     "addBookmark": "Add Bookmark",
     "add": "Add",
     "cancel": "Cancel",
-    "uncategorized": "Uncategorized"
+    "uncategorized": "Uncategorized",
+    "import": "Import",
+    "export": "Export"
   },
   "history": {
     "heading": "History"

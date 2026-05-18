@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
+import { Download, Upload } from 'lucide-react';
 import { useBookmarkGroups, useBookmarkArticles } from '../hooks/useBookmarks';
+import { exportBookmarkArticles, importBookmarkArticles } from '../api/bookmarks';
 import { BookmarkGroupList } from '../components/bookmark/BookmarkGroupList';
 import { LocalSearchSection } from '../components/search/LocalSearchSection';
 import { SearchResultGrid } from '../components/search/SearchResultGrid';
@@ -24,6 +27,8 @@ export function BookmarksPage() {
   const location = useLocation();
   const isMobile = useIsMobile();
   const { scrollMode } = useAppStore();
+  const queryClient = useQueryClient();
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>(() => {
     const saved = sessionStorage.getItem(`bookmarks:group:${location.key}`);
@@ -125,16 +130,73 @@ export function BookmarksPage() {
     setVisibleCount((prev) => prev + PAGE_SIZE);
   }, []);
 
+  const handleExportBookmarks = useCallback(() => {
+    const data = exportBookmarkArticles();
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'violet-bookmarks.json';
+    anchor.click();
+    URL.revokeObjectURL(url);
+  }, []);
+
+  const handleImportBookmarks = useCallback(async (file?: File) => {
+    if (!file) return;
+
+    try {
+      const raw = await file.text();
+      const parsed = JSON.parse(raw);
+      importBookmarkArticles(parsed);
+      queryClient.invalidateQueries({ queryKey: ['bookmarkArticles'] });
+      queryClient.invalidateQueries({ queryKey: ['isBookmarked'] });
+    } finally {
+      if (importInputRef.current) {
+        importInputRef.current.value = '';
+      }
+    }
+  }, [queryClient]);
+
   const hasMore = scrollMode === 'infinite' && visibleCount < filteredArticles.length;
+
+  const bookmarkActions = (
+    <div className={styles.actions}>
+      <input
+        ref={importInputRef}
+        className={styles.fileInput}
+        type="file"
+        accept="application/json,.json"
+        onChange={(event) => handleImportBookmarks(event.target.files?.[0])}
+      />
+      <button
+        className={styles.exportBtn}
+        onClick={() => importInputRef.current?.click()}
+      >
+        <Upload size={16} />
+        {t('bookmarks.import')}
+      </button>
+      <button className={styles.exportBtn} onClick={handleExportBookmarks}>
+        <Download size={16} />
+        {t('bookmarks.export')}
+      </button>
+    </div>
+  );
 
   return (
     <div>
-      {isMobile && groups && (
-        <BookmarkGroupList
-          groups={groups}
-          selectedId={selectedGroupId}
-          onSelect={setSelectedGroupId}
-        />
+      {isMobile && (
+        <div className={styles.mobileHeader}>
+          {bookmarkActions}
+          {groups && (
+            <BookmarkGroupList
+              groups={groups}
+              selectedId={selectedGroupId}
+              onSelect={setSelectedGroupId}
+            />
+          )}
+        </div>
       )}
 
       {!isMobile && (
@@ -149,12 +211,17 @@ export function BookmarksPage() {
           isLoading={isLoading}
           sticky
           headerContent={
-            groups && (
-              <BookmarkGroupList
-                groups={groups}
-                selectedId={selectedGroupId}
-                onSelect={setSelectedGroupId}
-              />
+            (
+              <div className={styles.desktopHeader}>
+                {groups && (
+                  <BookmarkGroupList
+                    groups={groups}
+                    selectedId={selectedGroupId}
+                    onSelect={setSelectedGroupId}
+                  />
+                )}
+                {bookmarkActions}
+              </div>
             )
           }
         />

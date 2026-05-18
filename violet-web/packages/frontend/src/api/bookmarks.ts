@@ -127,6 +127,62 @@ export async function checkBookmark(articleId: string): Promise<boolean> {
   );
 }
 
+export function exportBookmarkArticles(): string[] {
+  const seen = new Set<string>();
+  const entries: string[] = [];
+
+  for (const bookmark of readJson<BookmarkArticle[]>(ARTICLES_KEY, [])) {
+    const articleId = String(bookmark.Article);
+    if (seen.has(articleId)) continue;
+
+    seen.add(articleId);
+    entries.push(articleId);
+  }
+
+  return entries;
+}
+
+export function importBookmarkArticles(articleIds: unknown): { added: number; skipped: number } {
+  if (!Array.isArray(articleIds)) {
+    throw new Error('Bookmark import data must be an array');
+  }
+
+  const articles = readJson<BookmarkArticle[]>(ARTICLES_KEY, []);
+  const existing = new Set(articles.map((item) => String(item.Article)));
+  const imported: BookmarkArticle[] = [];
+  let nextArticleId = nextId(articles);
+  let skipped = 0;
+
+  for (const value of articleIds) {
+    if (typeof value !== 'string' && typeof value !== 'number') {
+      skipped += 1;
+      continue;
+    }
+
+    const articleId = String(value).trim();
+    if (!/^\d+$/.test(articleId) || existing.has(articleId)) {
+      skipped += 1;
+      continue;
+    }
+
+    existing.add(articleId);
+    imported.push({
+      Id: nextArticleId,
+      Article: articleId,
+      DateTime: new Date().toISOString(),
+      GroupId: DEFAULT_GROUP.Id,
+    });
+    nextArticleId += 1;
+  }
+
+  if (imported.length > 0) {
+    readGroups();
+    writeJson(ARTICLES_KEY, [...imported, ...articles]);
+  }
+
+  return { added: imported.length, skipped };
+}
+
 // Artists
 export async function getBookmarkArtists(groupId?: number): Promise<BookmarkArtist[]> {
   const artists = readJson<BookmarkArtist[]>(ARTISTS_KEY, []);

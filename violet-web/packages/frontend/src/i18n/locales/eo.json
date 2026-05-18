@@ -46,7 +46,9 @@
     "addBookmark": "Aldoni legosignon",
     "add": "Aldoni",
     "cancel": "Nuligi",
-    "uncategorized": "Nekategoriita"
+    "uncategorized": "Nekategoriita",
+    "import": "Importi",
+    "export": "Eksporti"
   },
   "history": {
     "heading": "Historio"
