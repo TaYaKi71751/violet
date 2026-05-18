@@ -94,7 +94,7 @@ function getServerNum(hashShard: string, routing: GgRouting): number {
   return node + 1;
 }
 
-function buildImageUrls(files: GalleryFile[], routing: GgRouting, useAvif = true): string[] {
+function buildImageUrls(files: GalleryFile[], routing: GgRouting, useAvif = false): string[] {
   const domain = useAvif ? 'a' : 'w';
   const ext = useAvif ? 'avif' : 'webp';
 
@@ -108,7 +108,7 @@ function buildImageUrls(files: GalleryFile[], routing: GgRouting, useAvif = true
   });
 }
 
-function buildThumbnailUrls(files: GalleryFile[], routing: GgRouting, size: 'big' | 'small', useAvif = true): string[] {
+function buildThumbnailUrls(files: GalleryFile[], routing: GgRouting, size: 'big' | 'small', useAvif = false): string[] {
   const firstPath = useAvif
     ? size === 'big' ? 'avifbigtn' : 'avifsmallsmalltn'
     : size === 'big' ? 'webpbigtn' : 'webpsmalltn';
