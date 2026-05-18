@@ -63,6 +63,7 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
 
   late final String getxId;
   late final SearchPageController c;
+  int _searchGeneration = 0;
 
   @override
   void initState() {
@@ -79,12 +80,18 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
   }
 
   doInitialSearch() async {
+    final generation = _searchGeneration;
+
     try {
       final search = HentaiManager.search(widget.searchKeyWord ?? '');
       if (!Settings.ignoreTimeout.value) {
         search.timeout(const Duration(seconds: 5));
       }
       final result = await search;
+
+      if (generation != _searchGeneration) {
+        return;
+      }
 
       c.latestQuery = (result, widget.searchKeyWord ?? '');
       c.queryResult = c.latestQuery!.$1!.results;
@@ -95,6 +102,9 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
 
       if (c.searchTotalResultCount.value == 0) {
         Future.delayed(const Duration(milliseconds: 100)).then((value) async {
+          if (generation != _searchGeneration) {
+            return;
+          }
           c.searchTotalResultCount.value = await HentaiManager.countSearch(
             widget.searchKeyWord ?? '',
           );
@@ -111,6 +121,8 @@ class _SearchPageState extends ThemeSwitchableState<SearchPage>
 
   Future<void> searchFromDeeplink(String query) async {
     if (widget.searchKeyWord != null || query.trim().isEmpty) return;
+
+    _searchGeneration++;
 
     try {
       final db = await SearchLogDatabase.getInstance();
