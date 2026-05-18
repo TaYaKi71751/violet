@@ -46,7 +46,9 @@
     "addBookmark": "ブックマーク追加",
     "add": "追加",
     "cancel": "キャンセル",
-    "uncategorized": "未分類"
+    "uncategorized": "未分類",
+    "import": "読み込み",
+    "export": "書き出し"
   },
   "history": {
     "heading": "履歴"

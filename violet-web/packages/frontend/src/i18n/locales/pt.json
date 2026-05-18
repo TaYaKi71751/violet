@@ -46,7 +46,9 @@
     "addBookmark": "Adicionar favorito",
     "add": "Adicionar",
     "cancel": "Cancelar",
-    "uncategorized": "Sem categoria"
+    "uncategorized": "Sem categoria",
+    "import": "Importar",
+    "export": "Exportar"
   },
   "history": {
     "heading": "Histórico"

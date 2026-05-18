@@ -46,7 +46,9 @@
     "addBookmark": "Aggiungi segnalibro",
     "add": "Aggiungi",
     "cancel": "Annulla",
-    "uncategorized": "Non categorizzato"
+    "uncategorized": "Non categorizzato",
+    "import": "Importa",
+    "export": "Esporta"
   },
   "history": {
     "heading": "Cronologia"

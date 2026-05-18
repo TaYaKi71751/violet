@@ -46,7 +46,9 @@
     "addBookmark": "북마크 추가",
     "add": "추가",
     "cancel": "취소",
-    "uncategorized": "미분류"
+    "uncategorized": "미분류",
+    "import": "가져오기",
+    "export": "내보내기"
   },
   "history": {
     "heading": "기록"
