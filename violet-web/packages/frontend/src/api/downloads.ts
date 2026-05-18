@@ -58,53 +58,118 @@ function updateDownloadRecord(id: number, patch: Partial<DownloadRecord>) {
   );
 }
 
-function blobToBase64(blob: Blob): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(reader.error);
-    reader.onload = () => {
-      const result = String(reader.result);
-      resolve(result.includes(',') ? result.split(',')[1] : result);
-    };
-    reader.readAsDataURL(blob);
-  });
-}
+function bytesToBase64(bytes: Uint8Array): string {
+  let binary = '';
+  const chunkSize = 0x8000;
 
-function dataUrlToBase64(dataUrl: string): string {
-  return dataUrl.includes(',') ? dataUrl.split(',')[1] : dataUrl;
-}
-
-async function blobToStoredImage(blob: Blob): Promise<{ base64: string; contentType: string }> {
-  const bitmap = await createImageBitmap(blob);
-  const attempts = [
-    { maxWidth: 1280, quality: 0.72 },
-    { maxWidth: 960, quality: 0.62 },
-    { maxWidth: 720, quality: 0.52 },
-  ];
-
-  try {
-    for (const attempt of attempts) {
-      const scale = Math.min(1, attempt.maxWidth / bitmap.width);
-      const width = Math.max(1, Math.round(bitmap.width * scale));
-      const height = Math.max(1, Math.round(bitmap.height * scale));
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const context = canvas.getContext('2d');
-      if (!context) continue;
-
-      context.drawImage(bitmap, 0, 0, width, height);
-      const dataUrl = canvas.toDataURL('image/jpeg', attempt.quality);
-      const base64 = dataUrlToBase64(dataUrl);
-      if (base64.length > 0) return { base64, contentType: 'image/jpeg' };
-    }
-  } finally {
-    bitmap.close();
+  for (let index = 0; index < bytes.length; index += chunkSize) {
+    const chunk = bytes.subarray(index, index + chunkSize);
+    binary += String.fromCharCode(...chunk);
   }
 
+  return btoa(binary);
+}
+
+function ascii(bytes: Uint8Array, start: number, length: number): string {
+  let value = '';
+  for (let index = start; index < start + length && index < bytes.length; index += 1) {
+    value += String.fromCharCode(bytes[index]);
+  }
+  return value;
+}
+
+function contentTypeFromBuffer(bytes: Uint8Array): string | null {
+  if (
+    bytes.length >= 3 &&
+    bytes[0] === 0xff &&
+    bytes[1] === 0xd8 &&
+    bytes[2] === 0xff
+  ) {
+    return 'image/jpeg';
+  }
+
+  if (
+    bytes.length >= 8 &&
+    bytes[0] === 0x89 &&
+    bytes[1] === 0x50 &&
+    bytes[2] === 0x4e &&
+    bytes[3] === 0x47 &&
+    bytes[4] === 0x0d &&
+    bytes[5] === 0x0a &&
+    bytes[6] === 0x1a &&
+    bytes[7] === 0x0a
+  ) {
+    return 'image/png';
+  }
+
+  if (bytes.length >= 6) {
+    const signature = ascii(bytes, 0, 6);
+    if (signature === 'GIF87a' || signature === 'GIF89a') {
+      return 'image/gif';
+    }
+  }
+
+  if (
+    bytes.length >= 12 &&
+    ascii(bytes, 0, 4) === 'RIFF' &&
+    ascii(bytes, 8, 4) === 'WEBP'
+  ) {
+    return 'image/webp';
+  }
+
+  if (bytes.length >= 12 && ascii(bytes, 4, 4) === 'ftyp') {
+    const brands = ascii(bytes, 8, Math.min(bytes.length - 8, 64));
+    if (brands.includes('avif') || brands.includes('avis')) {
+      return 'image/avif';
+    }
+  }
+
+  return null;
+}
+
+function contentTypeFromUrl(url: string): string | null {
+  let target = url;
+
+  try {
+    const parsed = new URL(url, window.location.origin);
+    target = parsed.searchParams.get('url') ?? parsed.href;
+  } catch {
+    // Fall through to string matching below.
+  }
+
+  const pathname = (() => {
+    try {
+      return new URL(target).pathname.toLowerCase();
+    } catch {
+      return target.toLowerCase().split('?')[0];
+    }
+  })();
+
+  if (pathname.endsWith('.avif')) return 'image/avif';
+  if (pathname.endsWith('.webp')) return 'image/webp';
+  if (pathname.endsWith('.jpg') || pathname.endsWith('.jpeg')) return 'image/jpeg';
+  if (pathname.endsWith('.png')) return 'image/png';
+  return null;
+}
+
+function contentTypeFromResponse(response: Response): string | null {
+  const contentType = response.headers.get('content-type')?.split(';')[0].trim().toLowerCase();
+  if (!contentType || !contentType.startsWith('image/')) return null;
+  return contentType;
+}
+
+async function responseToStoredImage(
+  response: Response,
+  sourceUrl: string,
+): Promise<{ base64: string; contentType: string }> {
+  const bytes = new Uint8Array(await response.arrayBuffer());
   return {
-    base64: await blobToBase64(blob),
-    contentType: blob.type || 'image/jpeg',
+    base64: bytesToBase64(bytes),
+    contentType:
+      contentTypeFromBuffer(bytes) ||
+      contentTypeFromUrl(sourceUrl) ||
+      contentTypeFromResponse(response) ||
+      'image/jpeg',
   };
 }
 
@@ -205,7 +270,7 @@ async function storeThumbnail(articleId: string, thumbnailUrl: string | undefine
     const response = await fetch(imageUrl);
     if (!response.ok) return;
 
-    const image = await blobToStoredImage(await response.blob());
+    const image = await responseToStoredImage(response, imageUrl);
     await setThumbnailImage(articleId, image);
   } catch {
     // Thumbnail cache is best-effort; page downloads should continue.
@@ -238,7 +303,7 @@ async function storeArticleImages(record: DownloadRecord) {
         throw new Error(`Failed to fetch page ${index + 1}: HTTP ${response.status}`);
       }
 
-      const image = await blobToStoredImage(await response.blob());
+      const image = await responseToStoredImage(response, imageUrl);
       await setPageImage(articleId, index + 1, image);
       updateDownloadRecord(record.Id, { DownloadedPages: index + 1 });
     }
