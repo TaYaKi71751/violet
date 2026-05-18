@@ -84,7 +84,9 @@ export function ViewerImage({ src, alt = '', active = true, onLoad, cacheKey }: 
         type: localImage.contentType || 'image/webp',
       });
 
-      const url = URL.createObjectURL(blob);
+      const safeBlob = new Blob([blob], { type: localImage.contentType || 'image/webp' });
+
+      const url = URL.createObjectURL(safeBlob);
       setImageSrc(url);
     }
     return () => {
