@@ -63,8 +63,11 @@
     "delete": "삭제",
     "retry": "재시도",
     "exportZip": "ZIP으로 내보내기",
+    "exportPdf": "PDF로 내보내기",
     "zipReady": "ZIP 다운로드를 시작했습니다",
-    "zipError": "ZIP 생성에 실패했습니다"
+    "zipError": "ZIP 생성에 실패했습니다",
+    "pdfReady": "PDF 다운로드를 시작했습니다",
+    "pdfError": "PDF 생성에 실패했습니다"
   },
   "aiSearch": {
     "heading": "AI 검색",

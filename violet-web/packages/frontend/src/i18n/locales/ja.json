@@ -63,8 +63,11 @@
     "delete": "削除",
     "retry": "再試行",
     "exportZip": "ZIPとしてエクスポート",
+    "exportPdf": "PDFとしてエクスポート",
     "zipReady": "ZIPダウンロードが開始されました",
-    "zipError": "ZIPの作成に失敗しました"
+    "zipError": "ZIPの作成に失敗しました",
+    "pdfReady": "PDFダウンロードが開始されました",
+    "pdfError": "PDFの作成に失敗しました"
   },
   "aiSearch": {
     "heading": "AI検索",

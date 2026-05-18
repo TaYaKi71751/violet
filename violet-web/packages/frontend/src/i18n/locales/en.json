@@ -63,8 +63,11 @@
     "delete": "Delete",
     "retry": "Retry",
     "exportZip": "Export as ZIP",
+    "exportPdf": "Export as PDF",
     "zipReady": "ZIP download started",
-    "zipError": "Failed to create ZIP"
+    "zipError": "Failed to create ZIP",
+    "pdfReady": "PDF download started",
+    "pdfError": "Failed to create PDF"
   },
   "aiSearch": {
     "heading": "AI Search",

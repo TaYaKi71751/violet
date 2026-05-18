@@ -7,6 +7,7 @@ import {
   retryDownload,
   deleteDownload,
   checkDownloaded,
+  exportDownloadedArticlePdf,
   exportDownloadedArticleZip,
 } from '../api/downloads';
 import { writeArticleCache } from '../api/content';
@@ -126,6 +127,21 @@ export function useExportDownloadZip() {
     },
     onError: () => {
       addToast(t('downloads.zipError'), 'error');
+    },
+  });
+}
+
+export function useExportDownloadPdf() {
+  const { t } = useTranslation();
+  const addToast = useToastStore((s) => s.addToast);
+
+  return useMutation({
+    mutationFn: (articleId: string) => exportDownloadedArticlePdf(articleId),
+    onSuccess: () => {
+      addToast(t('downloads.pdfReady'), 'success');
+    },
+    onError: () => {
+      addToast(t('downloads.pdfError'), 'error');
     },
   });
 }

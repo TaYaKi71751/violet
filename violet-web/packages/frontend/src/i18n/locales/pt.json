@@ -63,8 +63,11 @@
     "delete": "Excluir",
     "retry": "Tentar novamente",
     "exportZip": "Exportar como ZIP",
+    "exportPdf": "Exportar como PDF",
     "zipReady": "Download de ZIP iniciado",
-    "zipError": "Falha ao criar ZIP"
+    "zipError": "Falha ao criar ZIP",
+    "pdfReady": "Download de PDF iniciado",
+    "pdfError": "Falha ao criar PDF"
   },
   "aiSearch": {
     "heading": "Busca IA",
