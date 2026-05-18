@@ -1,4 +1,11 @@
 import type { ArticleReadLog, InsertReadLogRequest, UpdateReadLogRequest } from '@violet-web/shared';
+import {
+  USER_STORES,
+  getAllUserItems,
+  putUserItem,
+  putUserItems,
+  deleteUserItem,
+} from '../services/user-database';
 
 const HISTORY_KEY = 'violet-web:read-history';
 
@@ -9,7 +16,9 @@ export interface HistoryResponse {
   pageSize: number;
 }
 
-function readHistory(): ArticleReadLog[] {
+let migrationPromise: Promise<void> | null = null;
+
+function readLegacyHistory(): ArticleReadLog[] {
   if (typeof window === 'undefined') return [];
 
   try {
@@ -20,14 +29,28 @@ function readHistory(): ArticleReadLog[] {
   }
 }
 
-function writeHistory(logs: ArticleReadLog[]) {
-  window.localStorage.setItem(HISTORY_KEY, JSON.stringify(logs));
+async function ensureMigrated() {
+  if (migrationPromise) return migrationPromise;
+
+  migrationPromise = (async () => {
+    const logs = await getAllUserItems<ArticleReadLog>(USER_STORES.readHistory);
+    if (logs.length === 0) {
+      await putUserItems(USER_STORES.readHistory, readLegacyHistory());
+    }
+  })();
+
+  return migrationPromise;
 }
 
-function getLatestLogsByArticle() {
+async function readHistory(): Promise<ArticleReadLog[]> {
+  await ensureMigrated();
+  return getAllUserItems<ArticleReadLog>(USER_STORES.readHistory);
+}
+
+async function getLatestLogsByArticle() {
   const latest = new Map<string, ArticleReadLog>();
 
-  for (const log of readHistory().sort((a, b) => b.Id - a.Id)) {
+  for (const log of (await readHistory()).sort((a, b) => b.Id - a.Id)) {
     if (!latest.has(log.Article)) {
       latest.set(log.Article, log);
     }
@@ -41,7 +64,7 @@ function nextId(logs: ArticleReadLog[]) {
 }
 
 export async function getHistory(page = 0, pageSize = 30): Promise<HistoryResponse> {
-  const logs = getLatestLogsByArticle();
+  const logs = await getLatestLogsByArticle();
   const start = page * pageSize;
 
   return {
@@ -53,11 +76,11 @@ export async function getHistory(page = 0, pageSize = 30): Promise<HistoryRespon
 }
 
 export async function getHistoryIds(): Promise<string[]> {
-  return getLatestLogsByArticle().map((log) => log.Article);
+  return (await getLatestLogsByArticle()).map((log) => log.Article);
 }
 
 export async function insertReadLog(req: InsertReadLogRequest): Promise<{ Id: number }> {
-  const logs = readHistory();
+  const logs = await readHistory();
   const id = nextId(logs);
   const log: ArticleReadLog = {
     Id: id,
@@ -68,25 +91,23 @@ export async function insertReadLog(req: InsertReadLogRequest): Promise<{ Id: nu
     Type: req.Type ?? 0,
   };
 
-  writeHistory([log, ...logs]);
+  await putUserItem(USER_STORES.readHistory, log);
   return { Id: id };
 }
 
 export async function updateReadLog(id: number, req: UpdateReadLogRequest): Promise<void> {
-  const logs = readHistory();
-  writeHistory(
-    logs.map((log) =>
-      log.Id === id
-        ? {
-            ...log,
-            LastPage: req.LastPage,
-            DateTimeEnd: req.DateTimeEnd ?? new Date().toISOString(),
-          }
-        : log,
-    ),
-  );
+  const logs = await readHistory();
+  const log = logs.find((item) => item.Id === id);
+  if (!log) return;
+
+  await putUserItem(USER_STORES.readHistory, {
+    ...log,
+    LastPage: req.LastPage,
+    DateTimeEnd: req.DateTimeEnd ?? new Date().toISOString(),
+  });
 }
 
 export async function deleteReadLog(id: number): Promise<void> {
-  writeHistory(readHistory().filter((log) => log.Id !== id));
+  await ensureMigrated();
+  await deleteUserItem(USER_STORES.readHistory, id);
 }

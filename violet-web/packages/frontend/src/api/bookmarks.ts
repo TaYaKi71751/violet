@@ -8,6 +8,14 @@ import type {
   AddBookmarkCropImageRequest,
   CreateBookmarkGroupRequest,
 } from '@violet-web/shared';
+import {
+  USER_STORES,
+  getAllUserItems,
+  putUserItem,
+  putUserItems,
+  replaceUserItems,
+  deleteUserItem,
+} from '../services/user-database';
 
 const GROUPS_KEY = 'violet-web:bookmark-groups';
 const ARTICLES_KEY = 'violet-web:bookmark-articles';
@@ -23,7 +31,9 @@ const DEFAULT_GROUP: BookmarkGroup = {
   Gorder: 0,
 };
 
-function readJson<T>(key: string, fallback: T): T {
+let migrationPromise: Promise<void> | null = null;
+
+function readLegacyJson<T>(key: string, fallback: T): T {
   if (typeof window === 'undefined') return fallback;
 
   try {
@@ -34,30 +44,70 @@ function readJson<T>(key: string, fallback: T): T {
   }
 }
 
-function writeJson<T>(key: string, value: T) {
-  window.localStorage.setItem(key, JSON.stringify(value));
-}
-
 function nextId(items: Array<{ Id: number }>) {
   return items.reduce((max, item) => Math.max(max, item.Id), 0) + 1;
 }
 
-function readGroups(): BookmarkGroup[] {
-  const groups = readJson<BookmarkGroup[]>(GROUPS_KEY, []);
+async function ensureMigrated() {
+  if (migrationPromise) return migrationPromise;
+
+  migrationPromise = (async () => {
+    const [groups, articles, artists, crops] = await Promise.all([
+      getAllUserItems<BookmarkGroup>(USER_STORES.bookmarkGroups),
+      getAllUserItems<BookmarkArticle>(USER_STORES.bookmarkArticles),
+      getAllUserItems<BookmarkArtist>(USER_STORES.bookmarkArtists),
+      getAllUserItems<BookmarkCropImage>(USER_STORES.bookmarkCrops),
+    ]);
+
+    if (groups.length === 0) {
+      const legacyGroups = readLegacyJson<BookmarkGroup[]>(GROUPS_KEY, []);
+      await putUserItems(USER_STORES.bookmarkGroups, [
+        DEFAULT_GROUP,
+        ...legacyGroups.filter((group) => group.Id !== DEFAULT_GROUP.Id),
+      ]);
+    }
+
+    if (articles.length === 0) {
+      await putUserItems(
+        USER_STORES.bookmarkArticles,
+        readLegacyJson<BookmarkArticle[]>(ARTICLES_KEY, []),
+      );
+    }
+
+    if (artists.length === 0) {
+      await putUserItems(
+        USER_STORES.bookmarkArtists,
+        readLegacyJson<BookmarkArtist[]>(ARTISTS_KEY, []),
+      );
+    }
+
+    if (crops.length === 0) {
+      await putUserItems(
+        USER_STORES.bookmarkCrops,
+        readLegacyJson<BookmarkCropImage[]>(CROPS_KEY, []),
+      );
+    }
+  })();
+
+  return migrationPromise;
+}
+
+async function readGroups(): Promise<BookmarkGroup[]> {
+  await ensureMigrated();
+  const groups = await getAllUserItems<BookmarkGroup>(USER_STORES.bookmarkGroups);
   if (groups.some((group) => group.Id === DEFAULT_GROUP.Id)) return groups;
 
-  const nextGroups = [DEFAULT_GROUP, ...groups];
-  writeJson(GROUPS_KEY, nextGroups);
-  return nextGroups;
+  await putUserItem(USER_STORES.bookmarkGroups, DEFAULT_GROUP);
+  return [DEFAULT_GROUP, ...groups];
 }
 
 // Groups
 export async function getGroups(): Promise<BookmarkGroup[]> {
-  return readGroups().sort((a, b) => a.Gorder - b.Gorder);
+  return (await readGroups()).sort((a, b) => a.Gorder - b.Gorder);
 }
 
 export async function createGroup(req: CreateBookmarkGroupRequest): Promise<{ Id: number }> {
-  const groups = readGroups();
+  const groups = await readGroups();
   const id = nextId(groups);
   const group: BookmarkGroup = {
     Id: id,
@@ -68,34 +118,44 @@ export async function createGroup(req: CreateBookmarkGroupRequest): Promise<{ Id
     Gorder: groups.reduce((max, item) => Math.max(max, item.Gorder), 0) + 1,
   };
 
-  writeJson(GROUPS_KEY, [...groups, group]);
+  await putUserItem(USER_STORES.bookmarkGroups, group);
   return { Id: id };
 }
 
 export async function deleteGroup(id: number): Promise<void> {
   if (id === DEFAULT_GROUP.Id) return;
 
-  writeJson(GROUPS_KEY, readGroups().filter((group) => group.Id !== id));
-  writeJson(
-    ARTICLES_KEY,
-    readJson<BookmarkArticle[]>(ARTICLES_KEY, []).filter((item) => item.GroupId !== id),
-  );
-  writeJson(
-    ARTISTS_KEY,
-    readJson<BookmarkArtist[]>(ARTISTS_KEY, []).filter((item) => item.GroupId !== id),
-  );
+  await ensureMigrated();
+  await deleteUserItem(USER_STORES.bookmarkGroups, id);
+
+  const [articles, artists] = await Promise.all([
+    getAllUserItems<BookmarkArticle>(USER_STORES.bookmarkArticles),
+    getAllUserItems<BookmarkArtist>(USER_STORES.bookmarkArtists),
+  ]);
+
+  await Promise.all([
+    replaceUserItems(
+      USER_STORES.bookmarkArticles,
+      articles.filter((item) => item.GroupId !== id),
+    ),
+    replaceUserItems(
+      USER_STORES.bookmarkArtists,
+      artists.filter((item) => item.GroupId !== id),
+    ),
+  ]);
 }
 
 // Articles
 export async function getBookmarkArticles(groupId?: number): Promise<BookmarkArticle[]> {
-  const articles = readJson<BookmarkArticle[]>(ARTICLES_KEY, []);
+  await ensureMigrated();
+  const articles = await getAllUserItems<BookmarkArticle>(USER_STORES.bookmarkArticles);
   return articles
     .filter((item) => groupId === undefined || item.GroupId === groupId)
     .sort((a, b) => b.Id - a.Id);
 }
 
 export async function addBookmarkArticle(req: AddBookmarkArticleRequest): Promise<{ Id: number }> {
-  const articles = readJson<BookmarkArticle[]>(ARTICLES_KEY, []);
+  const articles = await getBookmarkArticles();
   const groupId = req.GroupId ?? DEFAULT_GROUP.Id;
   const existing = articles.find(
     (item) => item.Article === req.Article && item.GroupId === groupId,
@@ -110,28 +170,26 @@ export async function addBookmarkArticle(req: AddBookmarkArticleRequest): Promis
     GroupId: groupId,
   };
 
-  writeJson(ARTICLES_KEY, [article, ...articles]);
+  await readGroups();
+  await putUserItem(USER_STORES.bookmarkArticles, article);
   return { Id: id };
 }
 
 export async function deleteBookmarkArticle(id: number): Promise<void> {
-  writeJson(
-    ARTICLES_KEY,
-    readJson<BookmarkArticle[]>(ARTICLES_KEY, []).filter((item) => item.Id !== id),
-  );
+  await ensureMigrated();
+  await deleteUserItem(USER_STORES.bookmarkArticles, id);
 }
 
 export async function checkBookmark(articleId: string): Promise<boolean> {
-  return readJson<BookmarkArticle[]>(ARTICLES_KEY, []).some(
-    (item) => item.Article === articleId,
-  );
+  const articles = await getBookmarkArticles();
+  return articles.some((item) => item.Article === articleId);
 }
 
-export function exportBookmarkArticles(): string[] {
+export async function exportBookmarkArticles(): Promise<string[]> {
   const seen = new Set<string>();
   const entries: string[] = [];
 
-  for (const bookmark of readJson<BookmarkArticle[]>(ARTICLES_KEY, [])) {
+  for (const bookmark of await getBookmarkArticles()) {
     const articleId = String(bookmark.Article);
     if (seen.has(articleId)) continue;
 
@@ -142,12 +200,14 @@ export function exportBookmarkArticles(): string[] {
   return entries;
 }
 
-export function importBookmarkArticles(articleIds: unknown): { added: number; skipped: number } {
+export async function importBookmarkArticles(
+  articleIds: unknown,
+): Promise<{ added: number; skipped: number }> {
   if (!Array.isArray(articleIds)) {
     throw new Error('Bookmark import data must be an array');
   }
 
-  const articles = readJson<BookmarkArticle[]>(ARTICLES_KEY, []);
+  const articles = await getBookmarkArticles();
   const existing = new Set(articles.map((item) => String(item.Article)));
   const imported: BookmarkArticle[] = [];
   let nextArticleId = nextId(articles);
@@ -176,8 +236,8 @@ export function importBookmarkArticles(articleIds: unknown): { added: number; sk
   }
 
   if (imported.length > 0) {
-    readGroups();
-    writeJson(ARTICLES_KEY, [...imported, ...articles]);
+    await readGroups();
+    await putUserItems(USER_STORES.bookmarkArticles, imported);
   }
 
   return { added: imported.length, skipped };
@@ -185,14 +245,15 @@ export function importBookmarkArticles(articleIds: unknown): { added: number; sk
 
 // Artists
 export async function getBookmarkArtists(groupId?: number): Promise<BookmarkArtist[]> {
-  const artists = readJson<BookmarkArtist[]>(ARTISTS_KEY, []);
+  await ensureMigrated();
+  const artists = await getAllUserItems<BookmarkArtist>(USER_STORES.bookmarkArtists);
   return artists
     .filter((item) => groupId === undefined || item.GroupId === groupId)
     .sort((a, b) => b.Id - a.Id);
 }
 
 export async function addBookmarkArtist(req: AddBookmarkArtistRequest): Promise<{ Id: number }> {
-  const artists = readJson<BookmarkArtist[]>(ARTISTS_KEY, []);
+  const artists = await getBookmarkArtists();
   const groupId = req.GroupId ?? DEFAULT_GROUP.Id;
   const existing = artists.find(
     (item) =>
@@ -211,24 +272,26 @@ export async function addBookmarkArtist(req: AddBookmarkArtistRequest): Promise<
     GroupId: groupId,
   };
 
-  writeJson(ARTISTS_KEY, [artist, ...artists]);
+  await readGroups();
+  await putUserItem(USER_STORES.bookmarkArtists, artist);
   return { Id: id };
 }
 
 export async function deleteBookmarkArtist(id: number): Promise<void> {
-  writeJson(
-    ARTISTS_KEY,
-    readJson<BookmarkArtist[]>(ARTISTS_KEY, []).filter((item) => item.Id !== id),
-  );
+  await ensureMigrated();
+  await deleteUserItem(USER_STORES.bookmarkArtists, id);
 }
 
 // Crop Images
 export async function getCropBookmarks(): Promise<BookmarkCropImage[]> {
-  return readJson<BookmarkCropImage[]>(CROPS_KEY, []).sort((a, b) => b.Id - a.Id);
+  await ensureMigrated();
+  return (await getAllUserItems<BookmarkCropImage>(USER_STORES.bookmarkCrops)).sort(
+    (a, b) => b.Id - a.Id,
+  );
 }
 
 export async function addCropBookmark(req: AddBookmarkCropImageRequest): Promise<{ Id: number }> {
-  const crops = readJson<BookmarkCropImage[]>(CROPS_KEY, []);
+  const crops = await getCropBookmarks();
   const id = nextId(crops);
   const crop: BookmarkCropImage = {
     Id: id,
@@ -239,13 +302,11 @@ export async function addCropBookmark(req: AddBookmarkCropImageRequest): Promise
     DateTime: new Date().toISOString(),
   };
 
-  writeJson(CROPS_KEY, [crop, ...crops]);
+  await putUserItem(USER_STORES.bookmarkCrops, crop);
   return { Id: id };
 }
 
 export async function deleteCropBookmark(id: number): Promise<void> {
-  writeJson(
-    CROPS_KEY,
-    readJson<BookmarkCropImage[]>(CROPS_KEY, []).filter((item) => item.Id !== id),
-  );
+  await ensureMigrated();
+  await deleteUserItem(USER_STORES.bookmarkCrops, id);
 }

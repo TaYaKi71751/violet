@@ -130,8 +130,8 @@ export function BookmarksPage() {
     setVisibleCount((prev) => prev + PAGE_SIZE);
   }, []);
 
-  const handleExportBookmarks = useCallback(() => {
-    const data = exportBookmarkArticles();
+  const handleExportBookmarks = useCallback(async () => {
+    const data = await exportBookmarkArticles();
     const blob = new Blob([JSON.stringify(data, null, 2)], {
       type: 'application/json',
     });
@@ -149,7 +149,7 @@ export function BookmarksPage() {
     try {
       const raw = await file.text();
       const parsed = JSON.parse(raw);
-      importBookmarkArticles(parsed);
+      await importBookmarkArticles(parsed);
       queryClient.invalidateQueries({ queryKey: ['bookmarkArticles'] });
       queryClient.invalidateQueries({ queryKey: ['isBookmarked'] });
     } finally {
