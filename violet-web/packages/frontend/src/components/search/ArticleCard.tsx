@@ -59,7 +59,7 @@ export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription
 
   const handleDownloadClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    startDownload.mutate(String(article.Id));
+    startDownload.mutate(article);
   };
 
   const handleRetryDownload = (e: React.MouseEvent) => {

@@ -122,7 +122,9 @@ export function ViewerPage() {
   }
 
   const referer = `https://hitomi.la/reader/${galleryId}.html`;
-  const proxyUrls = imageList.urls.map((url) => getProxyImageUrl(url, referer));
+  const proxyUrls = imageList.urls.map((url) =>
+    url.startsWith('indexeddb://') ? url : getProxyImageUrl(url, referer),
+  );
   const thumbnailUrls = (imageList.smallThumbnails ?? []).map((url) =>
     getProxyImageUrl(url, referer),
   );

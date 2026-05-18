@@ -6,6 +6,7 @@ export function useSearch(query: string, page: number, pageSize = 30) {
     queryKey: ['search', query, page, pageSize],
     queryFn: () => searchArticles(query, page, pageSize),
     enabled: query.length > 0,
+    retry: false,
   });
 }
 
@@ -19,5 +20,6 @@ export function useInfiniteSearch(query: string, pageSize = 30) {
       return allPages.length < totalPages ? allPages.length : undefined;
     },
     enabled: query.length > 0,
+    retry: false,
   });
 }

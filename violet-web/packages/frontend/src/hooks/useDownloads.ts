@@ -1,6 +1,8 @@
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import type { Article } from '@violet-web/shared';
 import { getDownloads, createDownload, retryDownload, deleteDownload, checkDownloaded } from '../api/downloads';
+import { writeArticleCache } from '../api/content';
 import { useToastStore } from '../stores/toast-store';
 
 export function useDownloadHistory(page = 0, pageSize = 30, enabled = true) {
@@ -52,17 +54,23 @@ export function useStartDownload() {
   const addToast = useToastStore((s) => s.addToast);
 
   return useMutation({
-    mutationFn: async (articleId: string) => {
+    mutationFn: async (article: string | Article) => {
+      const articleId = typeof article === 'string' ? article : String(article.Id);
+      if (typeof article !== 'string') {
+        writeArticleCache([article]);
+      }
+
       const already = await checkDownloaded(articleId);
       if (already) {
         throw new Error('already_downloaded');
       }
       return createDownload(articleId);
     },
-    onSuccess: () => {
+    onSuccess: (record) => {
       addToast(t('downloads.startToast'), 'info');
       qc.invalidateQueries({ queryKey: ['downloads'] });
       qc.invalidateQueries({ queryKey: ['downloads-infinite'] });
+      qc.invalidateQueries({ queryKey: ['downloaded', record.Article] });
     },
     onError: (_err) => {
       if (_err instanceof Error && _err.message === 'already_downloaded') {
@@ -79,9 +87,10 @@ export function useRetryDownload() {
 
   return useMutation({
     mutationFn: (id: number) => retryDownload(id),
-    onSuccess: () => {
+    onSuccess: (record) => {
       qc.invalidateQueries({ queryKey: ['downloads'] });
       qc.invalidateQueries({ queryKey: ['downloads-infinite'] });
+      qc.invalidateQueries({ queryKey: ['downloaded', record.Article] });
     },
   });
 }
@@ -94,6 +103,7 @@ export function useDeleteDownload() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['downloads'] });
       qc.invalidateQueries({ queryKey: ['downloads-infinite'] });
+      qc.invalidateQueries({ queryKey: ['downloaded'] });
     },
   });
 }

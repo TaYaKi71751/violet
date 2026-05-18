@@ -59,7 +59,7 @@ export function ArticleInfoDialog({ article, onClose }: ArticleInfoDialogProps) 
   };
 
   const handleDownloadClick = () => {
-    startDownload.mutate(String(article.Id));
+    startDownload.mutate(article);
   };
 
   const handleViewerClick = () => {
