@@ -8,6 +8,7 @@ interface ViewerImageProps {
   src: string;
   alt?: string;
   active?: boolean; // If false, show placeholder instead of loading image
+  visible?: boolean;
   onLoad?: () => void;
   cacheKey?: { galleryId: number; page: number };
 }
@@ -16,7 +17,7 @@ const MAX_RETRIES = 10;
 const RETRY_DELAY = 1500; // 1.5 seconds
 const ACTIVE_DEBOUNCE = 150; // ms - prevents loading images during fast scrolling
 
-export function ViewerImage({ src, alt = '', active = true, onLoad, cacheKey }: ViewerImageProps) {
+export function ViewerImage({ src, alt = '', active = true, visible = true, onLoad, cacheKey }: ViewerImageProps) {
   const { t } = useTranslation();
   const [localImage, setLocalImage] = useState<{ base64: string; contentType: string } | null>(null);
   const [localChecked, setLocalChecked] = useState(!cacheKey);
@@ -31,6 +32,7 @@ export function ViewerImage({ src, alt = '', active = true, onLoad, cacheKey }: 
   const [retryCount, setRetryCount] = useState(0);
   const [shouldRender, setShouldRender] = useState(active);
   const imgRef = useRef<HTMLImageElement>(null);
+  const objectUrlRef = useRef<string | null>(null);
   const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const activeTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -69,30 +71,46 @@ export function ViewerImage({ src, alt = '', active = true, onLoad, cacheKey }: 
   }, [cacheKey?.galleryId, cacheKey?.page]);
 
   useEffect(() => {
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+      objectUrlRef.current = null;
+    }
+
+    if (!visible) {
+      setImageSrc('');
+      if(localImage && !shouldUseRemote) {
+        URL.revokeObjectURL(imageSrc ?? '');
+      }
+      return;
+    }
+
     if (!localImage || shouldUseRemote) {
       setImageSrc(effectiveSrc);
       return;
-    } else {
-      const binary = atob(localImage.base64);
-      const bytes = new Uint8Array(binary.length);
-
-      for (let i = 0; i < binary.length; i++) {
-        bytes[i] = binary.charCodeAt(i);
-      }
-
-      const blob = new Blob([bytes], {
-        type: localImage.contentType || 'image/webp',
-      });
-
-      const url = URL.createObjectURL(blob);
-      setImageSrc(url);
     }
+
+    const binary = atob(localImage.base64);
+    const bytes = new Uint8Array(binary.length);
+
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+
+    const blob = new Blob([bytes], {
+      type: localImage.contentType || 'image/webp',
+    });
+    const url = URL.createObjectURL(blob);
+    objectUrlRef.current = url;
+    setImageSrc(url);
+
     return () => {
-      if (localImage && !shouldUseRemote) {
-        URL.revokeObjectURL(imageSrc);
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        setImageSrc('');
+        objectUrlRef.current = null;
       }
     };
-  }, [cacheKey?.galleryId, cacheKey?.page, effectiveSrc, localImage, shouldUseRemote]);
+  }, [cacheKey?.galleryId, cacheKey?.page, effectiveSrc, localImage, shouldUseRemote, visible]);
 
   // Debounce active state: only render after staying active for a short period
   useEffect(() => {
@@ -117,6 +135,10 @@ export function ViewerImage({ src, alt = '', active = true, onLoad, cacheKey }: 
     return () => {
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current);
+      }
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
       }
     };
   }, []);

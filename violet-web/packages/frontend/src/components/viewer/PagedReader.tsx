@@ -177,23 +177,28 @@ export function PagedReader({
       data-rtl={rtl}
     >
       {/* Render ALL pages, but only load images within prefetch range */}
-      {imageUrls.map((url, index) => (
-        <div
-          key={index}
-          className={styles.pageWrapper}
-          style={{
-            display: visiblePageIndices.has(index) ? 'flex' : 'none',
-            order: orderedVisiblePages.indexOf(index),
-          }}
-        >
-          <ViewerImage
-            src={url}
-            alt={`Page ${index + 1}`}
-            active={isPageActive(index)}
-            cacheKey={{ galleryId, page: index }}
-          />
-        </div>
-      ))}
+      {imageUrls.map((url, index) => {
+        const isVisible = visiblePageIndices.has(index);
+
+        return (
+          <div
+            key={index}
+            className={styles.pageWrapper}
+            style={{
+              display: isVisible ? 'flex' : 'none',
+              order: orderedVisiblePages.indexOf(index),
+            }}
+          >
+            <ViewerImage
+              src={url}
+              alt={`Page ${index + 1}`}
+              active={isPageActive(index)}
+              visible={isVisible}
+              cacheKey={{ galleryId, page: index }}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }
