@@ -107,11 +107,20 @@
 }
 
 .deleteBtn {
+  top: 42px;
   background: rgba(220, 50, 50, 0.6);
 }
 
 .deleteBtn:hover {
   background: rgba(220, 50, 50, 0.85);
+}
+
+.zipBtn {
+  background: rgba(124, 58, 237, 0.72);
+}
+
+.zipBtn:hover {
+  background: rgba(124, 58, 237, 0.9);
 }
 
 .bookmarkBtn {

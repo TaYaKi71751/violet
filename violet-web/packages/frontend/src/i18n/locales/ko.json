@@ -61,7 +61,10 @@
     "errorToast": "다운로드 시작 중 오류가 발생했습니다",
     "alreadyToast": "이미 다운로드한 작품입니다",
     "delete": "삭제",
-    "retry": "재시도"
+    "retry": "재시도",
+    "exportZip": "ZIP으로 내보내기",
+    "zipReady": "ZIP 다운로드를 시작했습니다",
+    "zipError": "ZIP 생성에 실패했습니다"
   },
   "aiSearch": {
     "heading": "AI 검색",

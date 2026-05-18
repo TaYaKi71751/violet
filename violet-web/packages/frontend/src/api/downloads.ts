@@ -3,9 +3,12 @@ import { getProxyImageUrl, resolveGallery } from './proxy';
 import {
   deleteDownloadedArticleListItem,
   deleteDownloadedBase64Images,
+  getDownloadedArticleListItem,
+  getDownloadedBase64Image,
   putDownloadedArticleListItem,
   putDownloadedBase64Image,
 } from '../services/image-cache';
+import { createZip } from '../utils/zip';
 
 const DOWNLOADS_KEY = 'violet-web:downloads';
 const DOWNLOADED_KEY = 'violet-downloaded';
@@ -13,6 +16,25 @@ const DOWNLOADED_KEY = 'violet-downloaded';
 interface DownloadedArticle {
   id: string;
   page: number;
+}
+
+function base64ToBytes(base64: string): Uint8Array {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+
+  return bytes;
+}
+
+function extensionFromContentType(contentType: string): string {
+  if (contentType.includes('avif')) return 'avif';
+  if (contentType.includes('webp')) return 'webp';
+  if (contentType.includes('png')) return 'png';
+  if (contentType.includes('gif')) return 'gif';
+  return 'jpg';
 }
 
 export interface DownloadsResponse {
@@ -401,4 +423,37 @@ export async function checkDownloaded(articleId: string): Promise<boolean> {
       (download) => download.Article === articleId && download.Status === 'completed',
     )
   );
+}
+
+export async function exportDownloadedArticleZip(articleId: string): Promise<void> {
+  const downloaded = await getDownloadedArticleListItem(articleId);
+  const legacy = readDownloaded().find((item) => item.id === articleId);
+  const pageCount = downloaded ? downloaded.page - 1 : legacy?.page;
+
+  if (!pageCount || pageCount < 1) {
+    throw new Error('Downloaded article not found');
+  }
+
+  const width = Math.max(3, String(pageCount).length);
+  const entries = [];
+
+  for (let page = 1; page <= pageCount; page += 1) {
+    const image = await getDownloadedBase64Image(articleId, page);
+    if (!image) {
+      throw new Error(`Missing downloaded page ${page}`);
+    }
+
+    entries.push({
+      name: `${String(page).padStart(width, '0')}.${extensionFromContentType(image.contentType)}`,
+      data: base64ToBytes(image.base64),
+    });
+  }
+
+  const blob = createZip(entries);
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = `${articleId}.zip`;
+  anchor.click();
+  URL.revokeObjectURL(url);
 }

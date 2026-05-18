@@ -61,7 +61,10 @@
     "errorToast": "Failed to start download",
     "alreadyToast": "Already downloaded",
     "delete": "Delete",
-    "retry": "Retry"
+    "retry": "Retry",
+    "exportZip": "Export as ZIP",
+    "zipReady": "ZIP download started",
+    "zipError": "Failed to create ZIP"
   },
   "aiSearch": {
     "heading": "AI Search",

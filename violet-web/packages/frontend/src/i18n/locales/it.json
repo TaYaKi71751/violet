@@ -61,7 +61,10 @@
     "errorToast": "Impossibile avviare il download",
     "alreadyToast": "Già scaricato",
     "delete": "Elimina",
-    "retry": "Riprova"
+    "retry": "Riprova",
+    "exportZip": "Esporta come ZIP",
+    "zipReady": "Download ZIP avviato",
+    "zipError": "Impossibile creare ZIP"
   },
   "aiSearch": {
     "heading": "Ricerca AI",
