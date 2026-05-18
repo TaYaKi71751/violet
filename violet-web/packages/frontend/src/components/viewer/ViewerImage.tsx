@@ -25,11 +25,7 @@ export function ViewerImage({ src, alt = '', active = true, onLoad, cacheKey }: 
     shouldUseRemote ? src : '',
     shouldUseRemote ? cacheKey ?? null : null,
   );
-  const imageSrc = localImage
-    ? `data:${localImage.contentType};base64,${localImage.base64}`
-    : localChecked
-      ? effectiveSrc
-      : '';
+  const [imageSrc, setImageSrc] = useState('');
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
@@ -71,6 +67,32 @@ export function ViewerImage({ src, alt = '', active = true, onLoad, cacheKey }: 
       cancelled = true;
     };
   }, [cacheKey?.galleryId, cacheKey?.page]);
+
+  useEffect(() => {
+    if (!localImage || shouldUseRemote) {
+      setImageSrc(effectiveSrc);
+      return;
+    } else {
+      const binary = atob(localImage.base64);
+      const bytes = new Uint8Array(binary.length);
+
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+
+      const blob = new Blob([bytes], {
+        type: localImage.contentType || 'image/webp',
+      });
+
+      const url = URL.createObjectURL(blob);
+      setImageSrc(url);
+    }
+    return () => {
+      if (localImage && !shouldUseRemote) {
+        URL.revokeObjectURL(imageSrc);
+      }
+    };
+  }, [cacheKey?.galleryId, cacheKey?.page, effectiveSrc, localImage, shouldUseRemote]);
 
   // Debounce active state: only render after staying active for a short period
   useEffect(() => {
