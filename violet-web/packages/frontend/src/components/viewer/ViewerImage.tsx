@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCachedImage } from '../../hooks/useCachedImage';
+import { getDownloadedBase64Image } from '../../services/image-cache';
 import styles from './ViewerImage.module.css';
 
 interface ViewerImageProps {
@@ -17,7 +18,18 @@ const ACTIVE_DEBOUNCE = 150; // ms - prevents loading images during fast scrolli
 
 export function ViewerImage({ src, alt = '', active = true, onLoad, cacheKey }: ViewerImageProps) {
   const { t } = useTranslation();
-  const { src: effectiveSrc, onLoadSuccess } = useCachedImage(src, cacheKey ?? null);
+  const [localImage, setLocalImage] = useState<{ base64: string; contentType: string } | null>(null);
+  const [localChecked, setLocalChecked] = useState(!cacheKey);
+  const shouldUseRemote = localChecked && !localImage;
+  const { src: effectiveSrc, onLoadSuccess } = useCachedImage(
+    shouldUseRemote ? src : '',
+    shouldUseRemote ? cacheKey ?? null : null,
+  );
+  const imageSrc = localImage
+    ? `data:${localImage.contentType};base64,${localImage.base64}`
+    : localChecked
+      ? effectiveSrc
+      : '';
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
@@ -30,7 +42,35 @@ export function ViewerImage({ src, alt = '', active = true, onLoad, cacheKey }: 
     setLoaded(false);
     setError(false);
     setRetryCount(0);
-  }, [effectiveSrc]);
+  }, [imageSrc]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLocalImage(null);
+    setLocalChecked(!cacheKey);
+
+    if (!cacheKey) return () => {
+      cancelled = true;
+    };
+
+    getDownloadedBase64Image(String(cacheKey.galleryId), cacheKey.page + 1)
+      .then((image) => {
+        if (!cancelled) {
+          setLocalImage(image);
+          setLocalChecked(true);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLocalImage(null);
+          setLocalChecked(true);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [cacheKey?.galleryId, cacheKey?.page]);
 
   // Debounce active state: only render after staying active for a short period
   useEffect(() => {
@@ -81,17 +121,17 @@ export function ViewerImage({ src, alt = '', active = true, onLoad, cacheKey }: 
 
   const handleLoad = () => {
     setLoaded(true);
-    onLoadSuccess();
+    if (!localImage) onLoadSuccess();
     onLoad?.();
   };
 
   return (
     <div className={styles.container}>
-      {!error && effectiveSrc ? (
+      {!error && imageSrc ? (
         <img
           ref={imgRef}
-          key={`${effectiveSrc}-${retryCount}`}
-          src={effectiveSrc}
+          key={`${imageSrc}-${retryCount}`}
+          src={imageSrc}
           alt={alt}
           className={`${styles.image} ${loaded ? styles.loaded : ''}`}
           onLoad={handleLoad}

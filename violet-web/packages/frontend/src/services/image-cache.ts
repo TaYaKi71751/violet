@@ -1,7 +1,9 @@
 const DB_NAME = 'violet-image-cache';
-const DB_VERSION = 2;
+const DB_VERSION = 4;
 const STORE_NAME = 'images';
 const THUMB_STORE = 'crop-thumbnails';
+const DOWNLOAD_STORE = 'downloaded-base64-images';
+const DOWNLOAD_LIST_STORE = 'downloaded-article-list';
 
 interface CachedImage {
   articleId: number;
@@ -17,6 +19,19 @@ interface CropThumbnail {
   key: string; // "articleId:page:area"
   blob: Blob;
   createdAt: number;
+}
+
+interface DownloadedBase64Image {
+  key: string; // "articleId:page"
+  articleId: string;
+  page: number | 'thumbnail';
+  base64: string;
+  contentType?: string;
+  createdAt: number;
+}
+
+interface DownloadedArticleListItem {
+  page: number;
 }
 
 let dbInstance: IDBDatabase | null = null;
@@ -38,6 +53,13 @@ function openDB(): Promise<IDBDatabase> {
       }
       if ((event.oldVersion as number) < 2) {
         db.createObjectStore(THUMB_STORE, { keyPath: 'key' });
+      }
+      if ((event.oldVersion as number) < 3) {
+        const store = db.createObjectStore(DOWNLOAD_STORE, { keyPath: 'key' });
+        store.createIndex('articleId', 'articleId', { unique: false });
+      }
+      if ((event.oldVersion as number) < 4) {
+        db.createObjectStore(DOWNLOAD_LIST_STORE);
       }
     };
 
@@ -212,6 +234,135 @@ export async function putCachedImage(
   }
 }
 
+export async function getDownloadedBase64Image(
+  articleId: string,
+  page: number | 'thumbnail',
+): Promise<{ base64: string; contentType: string } | null> {
+  try {
+    const db = await openDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction(DOWNLOAD_STORE, 'readonly');
+      const store = tx.objectStore(DOWNLOAD_STORE);
+      const request = store.get(`${articleId}:${page}`);
+
+      request.onsuccess = () => {
+        const result = request.result as DownloadedBase64Image | undefined;
+        resolve(result ? {
+          base64: result.base64,
+          contentType: result.contentType || 'image/jpeg',
+        } : null);
+      };
+      request.onerror = () => resolve(null);
+    });
+  } catch {
+    return null;
+  }
+}
+
+export async function putDownloadedBase64Image(
+  articleId: string,
+  page: number | 'thumbnail',
+  base64: string,
+  contentType = 'image/jpeg',
+): Promise<void> {
+  const db = await openDB();
+  const entry: DownloadedBase64Image = {
+    key: `${articleId}:${page}`,
+    articleId,
+    page,
+    base64,
+    contentType,
+    createdAt: Date.now(),
+  };
+
+  await new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(DOWNLOAD_STORE, 'readwrite');
+    const store = tx.objectStore(DOWNLOAD_STORE);
+    const request = store.put(entry);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+}
+
+export async function deleteDownloadedBase64Images(articleId: string): Promise<void> {
+  try {
+    const db = await openDB();
+    const keys = await new Promise<IDBValidKey[]>((resolve) => {
+      const tx = db.transaction(DOWNLOAD_STORE, 'readonly');
+      const store = tx.objectStore(DOWNLOAD_STORE);
+      const index = store.index('articleId');
+      const request = index.getAllKeys(articleId);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => resolve([]);
+    });
+
+    if (keys.length === 0) return;
+
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(DOWNLOAD_STORE, 'readwrite');
+      const store = tx.objectStore(DOWNLOAD_STORE);
+      for (const key of keys) {
+        store.delete(key);
+      }
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch {
+    // best-effort
+  }
+}
+
+export async function putDownloadedArticleListItem(
+  articleId: string,
+  page: number,
+): Promise<void> {
+  const db = await openDB();
+  const item: DownloadedArticleListItem = { page };
+
+  await new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(DOWNLOAD_LIST_STORE, 'readwrite');
+    const store = tx.objectStore(DOWNLOAD_LIST_STORE);
+    const request = store.put(item, articleId);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+}
+
+export async function getDownloadedArticleListItem(
+  articleId: string,
+): Promise<{ page: number } | null> {
+  try {
+    const db = await openDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction(DOWNLOAD_LIST_STORE, 'readonly');
+      const store = tx.objectStore(DOWNLOAD_LIST_STORE);
+      const request = store.get(articleId);
+      request.onsuccess = () => {
+        const result = request.result as DownloadedArticleListItem | undefined;
+        resolve(result ? { page: result.page } : null);
+      };
+      request.onerror = () => resolve(null);
+    });
+  } catch {
+    return null;
+  }
+}
+
+export async function deleteDownloadedArticleListItem(articleId: string): Promise<void> {
+  try {
+    const db = await openDB();
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(DOWNLOAD_LIST_STORE, 'readwrite');
+      const store = tx.objectStore(DOWNLOAD_LIST_STORE);
+      const request = store.delete(articleId);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  } catch {
+    // best-effort
+  }
+}
+
 export async function getCacheStats(): Promise<{ totalSizeBytes: number; itemCount: number }> {
   try {
     const db = await openDB();
@@ -265,11 +416,18 @@ export async function clearAllCache(): Promise<void> {
   try {
     const db = await openDB();
     await new Promise<void>((resolve, reject) => {
-      const tx = db.transaction([STORE_NAME, THUMB_STORE], 'readwrite');
+      const tx = db.transaction(
+        [STORE_NAME, THUMB_STORE, DOWNLOAD_STORE, DOWNLOAD_LIST_STORE],
+        'readwrite',
+      );
       const imgStore = tx.objectStore(STORE_NAME);
       const thumbStore = tx.objectStore(THUMB_STORE);
+      const downloadStore = tx.objectStore(DOWNLOAD_STORE);
+      const downloadListStore = tx.objectStore(DOWNLOAD_LIST_STORE);
       imgStore.clear();
       thumbStore.clear();
+      downloadStore.clear();
+      downloadListStore.clear();
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
     });
