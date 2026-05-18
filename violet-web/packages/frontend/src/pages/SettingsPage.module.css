@@ -448,7 +448,7 @@
   border: 1px solid var(--color-border, #e5e7eb);
   border-radius: var(--radius-sm);
   color: var(--color-text);
-  font-size: 0.85rem;
+  font-size: max(0.85rem, 16px);
   box-sizing: border-box;
 }
 
