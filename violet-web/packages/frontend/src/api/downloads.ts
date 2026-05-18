@@ -500,7 +500,7 @@ export async function exportDownloadedArticleZip(articleId: string): Promise<voi
   URL.revokeObjectURL(url);
 }
 
-export async function exportDownloadedArticlePdf(articleId: string): Promise<void> {
+export async function exportDownloadedArticlePdf(articleId: string): Promise<string> {
   const downloaded = await getDownloadedArticleListItem(articleId);
   const legacy = readDownloaded().find((item) => item.id === articleId);
   const pageCount = downloaded ? downloaded.page - 1 : legacy?.page;
@@ -521,10 +521,5 @@ export async function exportDownloadedArticlePdf(articleId: string): Promise<voi
   }
 
   const blob = createImagePdf(pages);
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement('a');
-  anchor.href = url;
-  anchor.download = `${articleId}.pdf`;
-  anchor.click();
-  URL.revokeObjectURL(url);
+  return URL.createObjectURL(blob);
 }

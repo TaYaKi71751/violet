@@ -95,6 +95,15 @@ export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription
     exportPdf.mutate(String(article.Id));
   };
 
+  const handleCardClick = () => {
+    if (isDownloaded) {
+      exportPdf.mutate(String(article.Id));
+      return;
+    }
+
+    navigate(`/viewer/${article.Id}`);
+  };
+
   const handleSearchClick = (category: string, value: string) => (e: React.MouseEvent) => {
     e.stopPropagation();
     const encoded = value.replace(/ /g, '_');
@@ -139,7 +148,7 @@ export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription
     <>
       <div
         className={`${styles.card} ${isDetail ? styles.detailCard : ''}`}
-        onClick={() => navigate(`/viewer/${article.Id}`)}
+        onClick={handleCardClick}
       >
         <div className={styles.imageWrapper}>
           {thumbnailUrl ? (

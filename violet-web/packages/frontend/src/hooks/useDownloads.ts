@@ -136,7 +136,11 @@ export function useExportDownloadPdf() {
   const addToast = useToastStore((s) => s.addToast);
 
   return useMutation({
-    mutationFn: (articleId: string) => exportDownloadedArticlePdf(articleId),
+    mutationFn: async (articleId: string) => {
+      const url = await exportDownloadedArticlePdf(articleId);
+      window.location.href = url;
+      window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    },
     onSuccess: () => {
       addToast(t('downloads.pdfReady'), 'success');
     },
