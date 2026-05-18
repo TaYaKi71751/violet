@@ -1,7 +1,14 @@
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import type { Article } from '@violet-web/shared';
-import { getDownloads, createDownload, retryDownload, deleteDownload, checkDownloaded } from '../api/downloads';
+import {
+  getDownloads,
+  createDownload,
+  retryDownload,
+  deleteDownload,
+  checkDownloaded,
+  exportDownloadedArticleZip,
+} from '../api/downloads';
 import { writeArticleCache } from '../api/content';
 import { useToastStore } from '../stores/toast-store';
 
@@ -104,6 +111,21 @@ export function useDeleteDownload() {
       qc.invalidateQueries({ queryKey: ['downloads'] });
       qc.invalidateQueries({ queryKey: ['downloads-infinite'] });
       qc.invalidateQueries({ queryKey: ['downloaded'] });
+    },
+  });
+}
+
+export function useExportDownloadZip() {
+  const { t } = useTranslation();
+  const addToast = useToastStore((s) => s.addToast);
+
+  return useMutation({
+    mutationFn: (articleId: string) => exportDownloadedArticleZip(articleId),
+    onSuccess: () => {
+      addToast(t('downloads.zipReady'), 'success');
+    },
+    onError: () => {
+      addToast(t('downloads.zipError'), 'error');
     },
   });
 }

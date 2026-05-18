@@ -1,13 +1,19 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { Download, Trash2, RotateCw } from 'lucide-react';
+import { Archive, Download, Trash2, RotateCw } from 'lucide-react';
 import type { Article } from '@violet-web/shared';
 import { parsePipeTags, parseTagTuples, ticksToDate } from '@violet-web/shared';
 import { LazyImage } from '../common/LazyImage';
 import { useThumbnail } from '../../hooks/useThumbnail';
 import { useIsBookmarked, useToggleBookmark } from '../../hooks/useBookmarks';
-import { useStartDownload, useRetryDownload, useDeleteDownload, useIsDownloaded } from '../../hooks/useDownloads';
+import {
+  useStartDownload,
+  useRetryDownload,
+  useDeleteDownload,
+  useExportDownloadZip,
+  useIsDownloaded,
+} from '../../hooks/useDownloads';
 import { useDownloadProgress, useIsDownloadsPage } from '../../contexts/DownloadProgressContext';
 import { useTagTranslation } from '../../hooks/useTagTranslation';
 import { useTagCounts } from '../../hooks/useTagCounts';
@@ -40,6 +46,7 @@ export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription
   const startDownload = useStartDownload();
   const retryDownload = useRetryDownload();
   const deleteDownload = useDeleteDownload();
+  const exportZip = useExportDownloadZip();
   const isDownloadsPage = useIsDownloadsPage();
   const { data: isDownloaded } = useIsDownloaded(String(article.Id));
   const downloadRecord = useDownloadProgress(String(article.Id));
@@ -74,6 +81,11 @@ export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription
     if (downloadRecord) {
       deleteDownload.mutate(downloadRecord.Id);
     }
+  };
+
+  const handleExportZip = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    exportZip.mutate(String(article.Id));
   };
 
   const handleSearchClick = (category: string, value: string) => (e: React.MouseEvent) => {
@@ -129,14 +141,26 @@ export function ArticleCard({ article, viewMode = 'grid', aiScore, aiDescription
             <div className={styles.noImage}>{t('article.noImage')}</div>
           )}
           {isDownloadsPage ? (
-            <button
-              className={`${styles.downloadBtn} ${styles.deleteBtn}`}
-              onClick={handleDeleteDownload}
-              disabled={deleteDownload.isPending}
-              aria-label={t('downloads.delete')}
-            >
-              <Trash2 size={14} />
-            </button>
+            <>
+              <button
+                className={`${styles.downloadBtn} ${styles.zipBtn}`}
+                onClick={handleExportZip}
+                disabled={exportZip.isPending}
+                aria-label={t('downloads.exportZip')}
+                title={t('downloads.exportZip')}
+              >
+                <Archive size={14} />
+              </button>
+              <button
+                className={`${styles.downloadBtn} ${styles.deleteBtn}`}
+                onClick={handleDeleteDownload}
+                disabled={deleteDownload.isPending}
+                aria-label={t('downloads.delete')}
+                title={t('downloads.delete')}
+              >
+                <Trash2 size={14} />
+              </button>
+            </>
           ) : (
             <button
               className={`${styles.downloadBtn} ${isDownloaded ? styles.downloaded : ''}`}

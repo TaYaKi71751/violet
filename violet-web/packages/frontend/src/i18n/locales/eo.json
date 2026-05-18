@@ -61,7 +61,10 @@
     "errorToast": "Malsukcesis komenci elŝuton",
     "alreadyToast": "Jam elŝutita",
     "delete": "Forigi",
-    "retry": "Reprovi"
+    "retry": "Reprovi",
+    "exportZip": "Eksporti kiel ZIP",
+    "zipReady": "ZIP elŝuto komenciĝis",
+    "zipError": "Malsukcesis krei ZIP"
   },
   "aiSearch": {
     "heading": "AI-Serĉo",

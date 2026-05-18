@@ -61,7 +61,10 @@
     "errorToast": "ダウンロードの開始に失敗しました",
     "alreadyToast": "すでにダウンロード済みです",
     "delete": "削除",
-    "retry": "再試行"
+    "retry": "再試行",
+    "exportZip": "ZIPとしてエクスポート",
+    "zipReady": "ZIPダウンロードが開始されました",
+    "zipError": "ZIPの作成に失敗しました"
   },
   "aiSearch": {
     "heading": "AI検索",

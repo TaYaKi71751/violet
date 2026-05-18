@@ -61,7 +61,10 @@
     "errorToast": "Falha ao iniciar download",
     "alreadyToast": "Já baixado",
     "delete": "Excluir",
-    "retry": "Tentar novamente"
+    "retry": "Tentar novamente",
+    "exportZip": "Exportar como ZIP",
+    "zipReady": "Download de ZIP iniciado",
+    "zipError": "Falha ao criar ZIP"
   },
   "aiSearch": {
     "heading": "Busca IA",

@@ -61,7 +61,10 @@
     "errorToast": "下载启动失败",
     "alreadyToast": "已下载的作品",
     "delete": "删除",
-    "retry": "重试"
+    "retry": "重试",
+    "exportZip": "导出为ZIP",
+    "zipReady": "ZIP下载已开始",
+    "zipError": "创建ZIP失败"
   },
   "aiSearch": {
     "heading": "AI搜索",
