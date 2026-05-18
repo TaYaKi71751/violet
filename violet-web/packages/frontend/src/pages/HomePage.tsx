@@ -1,6 +1,7 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import { ExternalLink } from 'lucide-react';
 import { useSearch, useInfiniteSearch } from '../hooks/useSearch';
 import { useAppStore } from '../stores/app-store';
 import { usePaginationKeyboard } from '../hooks/usePaginationKeyboard';
@@ -65,6 +66,10 @@ export function HomePage() {
     fetchNextPage();
   }, [fetchNextPage]);
 
+  const handleOpenInApp = useCallback(() => {
+    window.location.href = `violet://search?q=${encodeURIComponent(query)}`;
+  }, [query]);
+
   const totalPages = data ? Math.ceil(data.totalCount / data.pageSize) : 0;
   const lastTotalPagesRef = useRef(0);
   if (totalPages > 0) lastTotalPagesRef.current = totalPages;
@@ -77,6 +82,20 @@ export function HomePage() {
 
     return (
       <div className={styles.page}>
+        {query && (
+          <div className={styles.actions}>
+            <button
+              type="button"
+              className={styles.openInAppBtn}
+              onClick={handleOpenInApp}
+              aria-label={t('search.openInApp')}
+              title={t('search.openInApp')}
+            >
+              <ExternalLink size={18} aria-hidden="true" />
+              <span>{t('search.openInApp')}</span>
+            </button>
+          </div>
+        )}
         {infiniteLoading && !infiniteData && <LoadingSpinner />}
         <InfiniteScroll
           hasMore={!!hasNextPage}
@@ -91,6 +110,20 @@ export function HomePage() {
 
   return (
     <div className={styles.page}>
+      {query && (
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.openInAppBtn}
+            onClick={handleOpenInApp}
+            aria-label={t('search.openInApp')}
+            title={t('search.openInApp')}
+          >
+            <ExternalLink size={18} aria-hidden="true" />
+            <span>{t('search.openInApp')}</span>
+          </button>
+        </div>
+      )}
       {isLoading && <LoadingSpinner />}
       {data && <SearchResultGrid articles={data.articles} />}
       {displayTotalPages > 1 && (

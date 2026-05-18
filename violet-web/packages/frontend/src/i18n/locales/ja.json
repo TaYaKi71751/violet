@@ -25,7 +25,8 @@
     "allLanguages": "すべての言語",
     "suggestions": "候補",
     "recentSearches": "最近の検索",
-    "clearRecent": "クリア"
+    "clearRecent": "クリア",
+    "openInApp": "アプリで開く"
   },
   "article": {
     "artist": "作家",
