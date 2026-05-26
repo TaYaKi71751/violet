@@ -54,10 +54,13 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
 
   Future<void> createDummy() async {
     final dbPath = Platform.isAndroid || Platform.isIOS
-        ? File('${(await getApplicationDocumentsDirectory()).path}/data.db')
+        ? File(
+            '${(await getApplicationDocumentsDirectory()).path}/data/data.db',
+          )
         : Platform.isMacOS
         ? File('${await getDatabasesPath()}/data.db')
         : File(join(dirname(Platform.resolvedExecutable), 'data', 'data.db'));
+    await DataBaseManager.reloadInstance();
     if (dbPath.existsSync()) {
       await dbPath.delete();
     }
@@ -133,22 +136,24 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
       if (await File('${dir.path}/db.sql.7z').exists()) {
         await File('${dir.path}/db.sql.7z').delete();
       }
-      switch (target) {
-        case 'latest':
-          await SyncManager.checkSyncLatest(propagateException);
-          break;
-        case 'old':
-          await SyncManager.checkSyncOld(propagateException);
-          break;
-        default:
-          {
-            try {
-              await downloadFileWith('latest', true);
-            } catch (e) {
-              await downloadFileWith('old', false);
+      if (widget.dbType! == 'global') {
+        switch (target) {
+          case 'latest':
+            await SyncManager.checkSyncLatest(propagateException);
+            break;
+          case 'old':
+            await SyncManager.checkSyncOld(propagateException);
+            break;
+          default:
+            {
+              try {
+                await downloadFileWith('latest', true);
+              } catch (e) {
+                await downloadFileWith('old', false);
+              }
+              return;
             }
-            return;
-          }
+        }
       }
       Timer timer = Timer.periodic(
         const Duration(seconds: 1),
@@ -208,11 +213,16 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt('db_exists', 1);
       await prefs.setString('databasetype', widget.dbType!);
-      await prefs.setString(
-        'databasesync',
-        SyncManager.getLatestDB().getDateTime().toString(),
-      );
-      await prefs.setInt('synclatest', SyncManager.getLatestDB().timestamp);
+      if (widget.dbType! == 'global') {
+        await prefs.setString(
+          'databasesync',
+          SyncManager.getLatestDB().getDateTime().toString(),
+        );
+        await prefs.setInt('synclatest', SyncManager.getLatestDB().timestamp);
+      } else {
+        await prefs.remove('databasesync');
+        await prefs.remove('synclatest');
+      }
 
       await DataBaseManager.reloadInstance();
 
