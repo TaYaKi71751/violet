@@ -201,6 +201,7 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
       }
       if (widget.dbType! == 'dummy') {
         await createDummy();
+        await Settings.useChunkSync.setValue(false);
       }
       if (widget.dbType! == 'global') {
         await decompress7Z(
@@ -208,6 +209,7 @@ class DataBaseDownloadPageState extends State<DataBaseDownloadPage> {
           dest: Platform.isAndroid ? '${dir.path}/data' : dir.path,
         );
         await File('${dir.path}/db.sql.7z').delete();
+        await Settings.useChunkSync.setValue(true);
       }
 
       final prefs = await SharedPreferences.getInstance();
