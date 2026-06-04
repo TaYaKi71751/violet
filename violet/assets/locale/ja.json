@@ -118,6 +118,7 @@
   "dbdname": "データベースダウンローダー",
   "dbddownloading": "ダウンロード中...",
   "nosearchresult": "検索結果なし :(",
+  "articlenotfound": "作品が見つかりません",
   "inputsearchtoken": "検索語句を入力してください!",
   "closedoubletap": "もう一度押すと終了します。",
   "selectcolor": "色を選択",
