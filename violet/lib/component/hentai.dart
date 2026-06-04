@@ -81,28 +81,21 @@ class HentaiManager {
       return SearchResult(results: queryResult, offset: -1);
     }
 
-    try {
-      return await idSearchHitomi(what);
-    } catch (e, st) {
-      Logger.error(
-        '[hentai-idSearch] E: $e\n'
-        '$st',
-      );
+    for (final route in Settings.searchRule) {
       try {
-        return await idSearchEhentai(what);
+        switch (route) {
+          case 'Hitomi':
+            return await idSearchHitomi(what);
+          case 'EHentai':
+            return await idSearchEhentai(what);
+          case 'ExHentai':
+            return await idSearchExhentai(what);
+        }
       } catch (e, st) {
         Logger.error(
-          '[hentai-idSearch] E: $e\n'
+          '[hentai-idSearch] $route E: $e\n'
           '$st',
         );
-        try {
-          return await idSearchExhentai(what);
-        } catch (e, st) {
-          Logger.error(
-            '[hentai-idSearch] E: $e\n'
-            '$st',
-          );
-        }
       }
     }
 
