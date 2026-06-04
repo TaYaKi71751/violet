@@ -27,7 +27,7 @@ class RecordViewPage extends StatelessWidget {
     );
   }
 
-  Widget future(context, double width) {
+  Widget future(BuildContext context, double width) {
     final windowWidth = MediaQuery.of(context).size.width;
     final columnCount =
         MediaQuery.of(context).orientation == Orientation.landscape ? 4 : 3;
@@ -65,44 +65,41 @@ class RecordViewPage extends StatelessWidget {
             }
           }
           for (var element in rrFromWeb) {
-            var result = await HentaiManager.idSearch(element.articleId());
-            var ehash = result.results[0].ehash();
             try {
-              ehash ??= await tryGetEhHash(
-                int.parse(element.articleId()),
-                false,
-              );
-            } catch (e) {
-              try {
-                ehash = await tryGetEhHash(
-                  int.parse(element.articleId()),
-                  true,
-                );
-              } catch (e) {
-                ehash = null;
+              final result = await HentaiManager.idSearch(element.articleId());
+              if (result.results.isEmpty) {
+                continue;
               }
+
+              final ehash = result.results[0].ehash();
+
+              queryResults.add(
+                QueryResult(
+                  result: {
+                    'Id': int.parse(element.articleId()),
+                    'Title': result.results[0].title(),
+                    'EHash': ehash,
+                    'Type': result.results[0].type(),
+                    'Artists': result.results[0].artists(),
+                    'Characters': result.results[0].characters(),
+                    'Groups': result.results[0].groups(),
+                    'Language': result.results[0].language(),
+                    'Series': result.results[0].series(),
+                    'Tags': result.results[0].tags(),
+                    'Uploader': result.results[0].uploader(),
+                    'PublishedEH': result.results[0].publishedeh(),
+                    'Files': result.results[0].files(),
+                    'Thumbnail': result.results[0].thumbnail(),
+                    'URL': result.results[0].url(),
+                  },
+                ),
+              );
+            } catch (e, st) {
+              Logger.error(
+                '[RecordViewPage] Article not found: '
+                '${element.articleId()}\n$e\n$st',
+              );
             }
-            queryResults.add(
-              QueryResult(
-                result: {
-                  'Id': int.parse(element.articleId()),
-                  'Title': result.results[0].title(),
-                  'EHash': ehash,
-                  'Type': result.results[0].type(),
-                  'Artists': result.results[0].artists(),
-                  'Characters': result.results[0].characters(),
-                  'Groups': result.results[0].groups(),
-                  'Language': result.results[0].language(),
-                  'Series': result.results[0].series(),
-                  'Tags': result.results[0].tags(),
-                  'Uploader': result.results[0].uploader(),
-                  'PublishedEH': result.results[0].publishedeh(),
-                  'Files': result.results[0].files(),
-                  'Thumbnail': result.results[0].thumbnail(),
-                  'URL': result.results[0].url(),
-                },
-              ),
-            );
           }
           for (var readLog in rr) {
             for (var queryResult in queryResults) {
