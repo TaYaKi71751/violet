@@ -130,6 +130,12 @@ class Download {
     return _instance!;
   }
 
+  static Future<void> reloadInstance() async {
+    await lock.synchronized(() async {
+      _instance = null;
+    });
+  }
+
   HashSet<int> _downloadedChecker = HashSet<int>();
   Map<int, DownloadItemModel> _downloadedItems = <int, DownloadItemModel>{};
   Future<void> init() async {

@@ -183,7 +183,7 @@ class BookmarkCropImage {
 }
 
 class Bookmark {
-  static late final Bookmark _instance;
+  static Bookmark? _instance;
   static Future<void> load() async {
     final db = await CommonUserDatabase.getInstance();
     final ee = await db.query(
@@ -266,7 +266,14 @@ class Bookmark {
   }
 
   static Future<Bookmark> getInstance() async {
-    return _instance;
+    if (_instance == null) {
+      await load();
+    }
+    return _instance!;
+  }
+
+  static Future<void> reloadInstance() async {
+    _instance = null;
   }
 
   Future<void> insertArticle(

@@ -55,7 +55,7 @@ class ArticleReadLog {
 }
 
 class User {
-  static late final User _instance;
+  static User? _instance;
   static Future<void> load() async {
     var db = await CommonUserDatabase.getInstance();
     var ee = await db.query(
@@ -82,7 +82,14 @@ class User {
   }
 
   static Future<User> getInstance() async {
-    return _instance;
+    if (_instance == null) {
+      await load();
+    }
+    return _instance!;
+  }
+
+  static Future<void> reloadInstance() async {
+    _instance = null;
   }
 
   List<ArticleReadLog>? cachedReadLog;

@@ -53,6 +53,12 @@ class SearchLogDatabase {
     return _instance!;
   }
 
+  static Future<void> reloadInstance() async {
+    await lock.synchronized(() async {
+      _instance = null;
+    });
+  }
+
   Future<List<SearchLog>> getSearchLog() async {
     return (await (await CommonUserDatabase.getInstance()).query(
       'SELECT * FROM SearchLog',

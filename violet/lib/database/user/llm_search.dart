@@ -75,6 +75,12 @@ class LLMSearchLogDatabase {
     return _instance!;
   }
 
+  static Future<void> reloadInstance() async {
+    await _lock.synchronized(() async {
+      _instance = null;
+    });
+  }
+
   Future<int> insert(LLMSearchLog log) async {
     final db = await CommonUserDatabase.getInstance();
     return await db.insert('LLMSearchLog', log.toMap());
