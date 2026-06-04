@@ -9,10 +9,21 @@ import 'package:uuid/uuid.dart';
 import 'package:violet/component/hentai.dart';
 import 'package:violet/database/query.dart';
 import 'package:violet/database/user/record.dart';
+import 'package:violet/locale/locale.dart';
 import 'package:violet/log/log.dart';
 import 'package:violet/model/article_list_item.dart';
+import 'package:violet/pages/common/utils.dart';
 import 'package:violet/pages/segment/card_panel.dart';
 import 'package:violet/widgets/article_item/article_list_item_widget.dart';
+
+class RecordArticleItem {
+  final ArticleReadLog readLog;
+  final QueryResult? queryResult;
+
+  const RecordArticleItem({required this.readLog, this.queryResult});
+
+  bool get isNotFound => queryResult == null;
+}
 
 class RecordViewPage extends StatelessWidget {
   const RecordViewPage({super.key});
@@ -109,10 +120,21 @@ class RecordViewPage extends StatelessWidget {
               }
             }
           }
-          return sortedQueryResults;
+          return rr.map((readLog) {
+            for (var queryResult in sortedQueryResults) {
+              if (readLog.articleId() == '${queryResult.id()}') {
+                return RecordArticleItem(
+                  readLog: readLog,
+                  queryResult: queryResult,
+                );
+              }
+            }
+
+            return RecordArticleItem(readLog: readLog);
+          }).toList();
         }),
       ),
-      builder: (context, AsyncSnapshot<List<QueryResult>> snapshot) {
+      builder: (context, AsyncSnapshot<List<RecordArticleItem>> snapshot) {
         if (!snapshot.hasData) {
           return Center(
             child: CircularProgressIndicator(
@@ -135,25 +157,32 @@ class RecordViewPage extends StatelessWidget {
                 ),
                 delegate: SliverChildListDelegate(
                   snapshot.data!.map((e) {
+                    final itemWidth = (windowWidth - 4.0 - 48) / columnCount;
                     return Padding(
-                      key: Key('record/${e.id()}'),
+                      key: Key('record/${e.readLog.articleId()}'),
                       padding: EdgeInsets.zero,
                       child: Align(
                         alignment: Alignment.bottomCenter,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: <Widget>[
-                            snapshot.hasData
+                            e.isNotFound
+                                ? RecordArticleNotFoundItem(
+                                    articleId: e.readLog.articleId(),
+                                    width: itemWidth,
+                                  )
+                                : snapshot.hasData
                                 ? Provider<ArticleListItem>.value(
                                     value: ArticleListItem.fromArticleListItem(
-                                      queryResult: e,
+                                      queryResult: e.queryResult!,
                                       addBottomPadding: false,
                                       showDetail: false,
-                                      width:
-                                          (windowWidth - 4.0 - 48) /
-                                          columnCount,
+                                      width: itemWidth,
                                       thumbnailTag: const Uuid().v4(),
-                                      usableTabList: snapshot.data,
+                                      usableTabList: snapshot.data!
+                                          .map((e) => e.queryResult)
+                                          .whereType<QueryResult>()
+                                          .toList(),
                                     ),
                                     child: const ArticleListItemWidget(),
                                   )
@@ -248,6 +277,56 @@ class RecordViewPage extends StatelessWidget {
       },
       //   );
       // },
+    );
+  }
+}
+
+class RecordArticleNotFoundItem extends StatelessWidget {
+  final String articleId;
+  final double width;
+
+  const RecordArticleNotFoundItem({
+    super.key,
+    required this.articleId,
+    required this.width,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: const BorderRadius.all(Radius.circular(3)),
+      onTap: () {
+        showArticleInfoNotFound(
+          context,
+          int.parse(articleId),
+          title: Translations.instance!.trans('articlenotfound'),
+        );
+      },
+      child: SizedBox(
+        width: width,
+        height: width * 4 / 3,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.grey.withValues(alpha: 0.3),
+            borderRadius: const BorderRadius.all(Radius.circular(3)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withValues(alpha: 0.18),
+                spreadRadius: 3,
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Center(
+            child: Icon(
+              Icons.error_outline,
+              size: 48,
+              color: Theme.of(context).colorScheme.error,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

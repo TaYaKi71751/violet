@@ -11,6 +11,7 @@ import 'package:violet/component/image_provider.dart';
 import 'package:violet/database/query.dart';
 import 'package:violet/database/user/bookmark.dart';
 import 'package:violet/database/user/record.dart';
+import 'package:violet/locale/locale.dart';
 import 'package:violet/model/article_info.dart';
 import 'package:violet/pages/article_info/article_info_page.dart';
 import 'package:violet/pages/viewer/viewer_page.dart';
@@ -159,4 +160,72 @@ Future<void> showViewer(BuildContext context, int articleId, int page) async {
       overlays: SystemUiOverlay.values,
     );
   });
+}
+
+Future<void> showArticleInfoNotFound(
+  BuildContext context,
+  int id, {
+  String? title,
+}) async {
+  if (!context.mounted) return;
+
+  final height = MediaQuery.of(context).size.height;
+
+  var defaultShowHeight = 400;
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    defaultShowHeight = (height * 0.85).toInt();
+  }
+
+  final fallbackQueryResult = QueryResult(
+    result: {
+      'Id': id,
+      'Title': title ?? Translations.instance!.trans('articlenotfound'),
+      'Artists': '',
+      'Characters': '',
+      'Groups': '',
+      'Language': null,
+      'Series': '',
+      'Tags': '',
+      'Uploader': '',
+      'Class': '',
+      'Type': '',
+      'EHash': null,
+      'PublishedEH': null,
+      'Files': null,
+      'Thumbnail': null,
+      'URL': '',
+    },
+  );
+
+  final isBookmarked = await (await Bookmark.getInstance()).isBookmark(id);
+
+  if (!context.mounted) return;
+  Provider<ArticleInfo>? cache;
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    builder: (_) {
+      return DraggableScrollableSheet(
+        initialChildSize: defaultShowHeight / height,
+        minChildSize: 400 / height,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (_, controller) {
+          cache ??= Provider<ArticleInfo>.value(
+            value: ArticleInfo.fromArticleInfo(
+              queryResult: fallbackQueryResult,
+              thumbnail: null,
+              headers: null,
+              heroKey: heroKey,
+              isBookmarked: isBookmarked,
+              controller: controller,
+              lockRead: true,
+            ),
+            child: const ArticleInfoPage(key: ObjectKey(pageKey)),
+          );
+          return cache!;
+        },
+      );
+    },
+  );
 }
