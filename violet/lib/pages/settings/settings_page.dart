@@ -2566,20 +2566,20 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
               useExHentai = true;
             }
             if (useExHentai) {
-              Settings.searchRule = 'ExHentai|EHentai|Hitomi|NHentai'.split(
+              Settings.searchRule = 'Hitomi|ExHentai|EHentai|NHentai'.split(
                 '|',
               );
               await prefs.setString(
                 'searchrule',
-                'ExHentai|EHentai|Hitomi|NHentai',
+                'Hitomi|ExHentai|EHentai|NHentai',
               );
             } else {
-              Settings.searchRule = 'EHentai|Hitomi|ExHentai|NHentai'.split(
+              Settings.searchRule = 'Hitomi|EHentai|ExHentai|NHentai'.split(
                 '|',
               );
               await prefs.setString(
                 'searchrule',
-                'EHentai|Hitomi|ExHentai|NHentai',
+                'Hitomi|EHentai|ExHentai|NHentai',
               );
             }
           },
