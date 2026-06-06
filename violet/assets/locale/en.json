@@ -326,5 +326,6 @@
   "exitTheApp": "Exit the app",
   "ignoretimeout": "Ignore Timeout",
   "cropbookmark": "Crop Bookmark",
-  "cropbookmarkdesc": "Expore your crop images!"
+  "cropbookmarkdesc": "Expore your crop images!",
+  "recordsearchdatabaseonly": "Use database search only in read record"
 }

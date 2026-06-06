@@ -326,5 +326,6 @@
   "exitTheApp": "Exit the app",
   "ignoretimeout": "時間切れを無視",
   "cropbookmark": "切り取りブックマーク",
-  "cropbookmarkdesc": "切り取った画像集を閲覧!"
+  "cropbookmarkdesc": "切り取った画像集を閲覧!",
+  "recordsearchdatabaseonly": "Use database search only in read history"
 }

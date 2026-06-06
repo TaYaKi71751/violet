@@ -748,6 +748,36 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
           },
         ),
         InkWell(
+          child: ListTile(
+            leading: Icon(
+              MdiIcons.databaseSearch,
+              color: Settings.majorColor.value,
+            ),
+            title: Text(
+              Translations.instance!.trans('recordsearchdatabaseonly'),
+            ),
+            trailing: Switch(
+              value: Settings.recordSearchDatabaseOnly.value,
+              onChanged: (newValue) async {
+                await Settings.recordSearchDatabaseOnly.setValue(newValue);
+                setState(() {
+                  _shouldReload = true;
+                });
+              },
+              activeTrackColor: Settings.majorColor.value,
+              activeThumbColor: Settings.majorAccentColor.value,
+            ),
+          ),
+          onTap: () async {
+            await Settings.recordSearchDatabaseOnly.setValue(
+              !Settings.recordSearchDatabaseOnly.value,
+            );
+            setState(() {
+              _shouldReload = true;
+            });
+          },
+        ),
+        InkWell(
           customBorder: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(8.0),

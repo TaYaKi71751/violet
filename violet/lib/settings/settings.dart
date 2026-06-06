@@ -265,6 +265,10 @@ class Settings {
   );
   static final searchShowCount = SettingItem<bool>('searchshowcount', true);
   static final searchPure = SettingItem<bool>('searchPure', false);
+  static final recordSearchDatabaseOnly = SettingItem<bool>(
+    'recordSearchDatabaseOnly',
+    false,
+  );
 
   static late String userAppId;
 
