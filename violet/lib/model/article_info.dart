@@ -49,7 +49,7 @@ class ArticleInfo {
         'N/A';
 
     if (artist == 'N/A') {
-      final group = queryResult.groups()?.split('|')[1] ?? '';
+      final group = _firstPipeValue(queryResult.groups());
       if (group != '') artist = group;
     }
 
@@ -76,5 +76,10 @@ class ArticleInfo {
     } else {
       await (await Bookmark.getInstance()).unbookmark(queryResult.id());
     }
+  }
+
+  static String _firstPipeValue(String? value) {
+    if (value == null) return '';
+    return value.split('|').where((item) => item.isNotEmpty).firstOrNull ?? '';
   }
 }

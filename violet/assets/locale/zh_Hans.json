@@ -202,6 +202,7 @@
   "mainbookmark": "书签",
   "maindownload": "下载",
   "usewebsearch": "在网路上搜寻",
+  "fetchworkinfoweb": "Fetch Article Info from Web",
   "usesearchexpunged": "Search for Expunged",
   "includetagnetwork": "Use Default Tag on Web",
   "excludetagnetwork": "Use Excluded Tag on Web",

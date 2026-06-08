@@ -202,6 +202,7 @@
   "mainbookmark": "북마크 수",
   "maindownload": "다운로드 수",
   "usewebsearch": "웹에서 검색하기",
+  "fetchworkinfoweb": "웹에서 작품 정보 가져오기",
   "usesearchexpunged": "Search for Expunged",
   "includetagnetwork": "Use Default Tag on Web",
   "excludetagnetwork": "Use Excluded Tag on Web",

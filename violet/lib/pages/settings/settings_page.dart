@@ -247,7 +247,7 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
                 });
               },
               activeTrackColor: Settings.majorColor.value,
-              activeColor: Settings.majorAccentColor.value,
+              activeThumbColor: Settings.majorAccentColor.value,
             ),
           ),
           onTap: () async {
@@ -423,7 +423,7 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
                     }
                   : null,
               activeTrackColor: Settings.majorColor.value,
-              activeColor: Settings.majorAccentColor.value,
+              activeThumbColor: Settings.majorAccentColor.value,
             ),
           ),
         ),
@@ -802,6 +802,40 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
           onTap: () async {
             await Settings.searchNetwork.setValue(
               !Settings.searchNetwork.value,
+            );
+            setState(() {
+              _shouldReload = true;
+            });
+          },
+        ),
+        InkWell(
+          customBorder: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(8.0),
+              bottomRight: Radius.circular(8.0),
+            ),
+          ),
+          child: ListTile(
+            leading: Icon(
+              MdiIcons.databaseSearch,
+              color: Settings.majorColor.value,
+            ),
+            title: Text(Translations.instance!.trans('fetchworkinfoweb')),
+            trailing: Switch(
+              value: Settings.fetchWorkInfoNetwork.value,
+              onChanged: (newValue) async {
+                await Settings.fetchWorkInfoNetwork.setValue(newValue);
+                setState(() {
+                  _shouldReload = true;
+                });
+              },
+              activeTrackColor: Settings.majorColor.value,
+              activeThumbColor: Settings.majorAccentColor.value,
+            ),
+          ),
+          onTap: () async {
+            await Settings.fetchWorkInfoNetwork.setValue(
+              !Settings.fetchWorkInfoNetwork.value,
             );
             setState(() {
               _shouldReload = true;
