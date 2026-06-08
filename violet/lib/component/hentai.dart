@@ -1,6 +1,8 @@
 // This source code is a part of Project Violet.
 // Copyright (C) 2020-2024. violet-team. Licensed under the Apache-2.0 License.
 
+import 'dart:convert';
+
 import 'package:html/parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:violet/component/eh/eh_headers.dart';
@@ -78,7 +80,22 @@ class HentaiManager {
     )).map((e) => QueryResult(result: e)).toList();
 
     if (queryResult.isNotEmpty) {
-      return SearchResult(results: queryResult, offset: -1);
+      if (!Settings.fetchWorkInfoNetwork.value) {
+        return SearchResult(results: queryResult, offset: -1);
+      }
+
+      try {
+        final webResult = await idQueryWeb(what);
+        final merged = _mergeQueryResult(queryResult.first, webResult);
+        await _persistMergedMetadata(merged);
+        return SearchResult(results: [merged], offset: -1);
+      } catch (e, st) {
+        Logger.error(
+          '[hentai-idSearch-webMerge] E: $e\n'
+          '$st',
+        );
+        return SearchResult(results: queryResult, offset: -1);
+      }
     }
 
     for (final route in Settings.searchRule) {
@@ -112,11 +129,21 @@ class HentaiManager {
       headers: headers,
     );
     final article = await HitomiParser.parseGalleryBlock(hh.body);
+    final gallery = await _tryFetchHitomiGalleryInfo(id);
     final meta = {
       'Id': id,
       'Title': article['Title'],
-      'Artists': article['Artists']?.join('|'),
+      'Artists': _encodePipeValues(article['Artists']),
+      'Groups': _encodePipeValues(gallery['Groups']),
+      'Characters': _encodePipeValues(gallery['Characters']),
+      'Series': _encodePipeValues(article['Series']),
+      'Tags': _encodePipeValues(article['Tags']),
+      'Type': article['Type'],
       'Language': article['Language'],
+      'Published': article['Published'],
+      'Files': gallery['Files'],
+      'Thumbnail': article['Thumbnail'],
+      'ExistOnHitomi': 1,
     };
     return SearchResult(results: [QueryResult(result: meta)], offset: -1);
   }
@@ -286,10 +313,21 @@ class HentaiManager {
     );
 
     final article = await HitomiParser.parseGalleryBlock(res.body);
+    final gallery = await _tryFetchHitomiGalleryInfo(int.parse(id));
     final meta = {
       'Id': int.parse(id),
       'Title': article['Title'],
-      'Artists': article['Artists'].join('|'),
+      'Artists': _encodePipeValues(article['Artists']),
+      'Groups': _encodePipeValues(gallery['Groups']),
+      'Characters': _encodePipeValues(gallery['Characters']),
+      'Series': _encodePipeValues(article['Series']),
+      'Tags': _encodePipeValues(article['Tags']),
+      'Type': article['Type'],
+      'Language': article['Language'],
+      'Published': article['Published'],
+      'Files': gallery['Files'],
+      'Thumbnail': article['Thumbnail'],
+      'ExistOnHitomi': 1,
     };
     return QueryResult(result: meta);
   }
@@ -465,6 +503,141 @@ class HentaiManager {
       } catch (_) {
         return await idQueryExhentai(what);
       }
+    }
+  }
+
+  static QueryResult _mergeQueryResult(QueryResult base, QueryResult overlay) {
+    final merged = Map<String, dynamic>.from(base.result);
+
+    for (final entry in overlay.result.entries) {
+      if (_isMeaningfulValue(entry.value)) {
+        merged[entry.key] = entry.value;
+      }
+    }
+
+    return QueryResult(result: merged);
+  }
+
+  static bool _isMeaningfulValue(dynamic value) {
+    if (value == null) return false;
+    if (value is String) {
+      final normalized = value.trim().toLowerCase();
+      return normalized.isNotEmpty && normalized != 'n/a' && normalized != 'na';
+    }
+    if (value is Iterable) return value.isNotEmpty;
+    return true;
+  }
+
+  static String? _encodePipeValues(dynamic values) {
+    if (values is! Iterable) return null;
+
+    final list = values
+        .whereType<String>()
+        .map((value) => value.trim())
+        .where((value) => value.isNotEmpty)
+        .toList();
+    if (list.isEmpty) return null;
+
+    return '|${list.join('|')}|';
+  }
+
+  static Future<Map<String, dynamic>> _tryFetchHitomiGalleryInfo(int id) async {
+    try {
+      final raw = await ScriptManager.getGalleryInfoRaw(id.toString());
+      if (raw == null) return {};
+
+      final jsonText = raw
+          .split('var galleryinfo = ')
+          .last
+          .replaceFirst(RegExp(r';\s*$'), '');
+      final info = jsonDecode(jsonText);
+      if (info is! Map<String, dynamic>) return {};
+
+      return {
+        'Groups': _readGalleryInfoList(info['groups'], 'group'),
+        'Characters': _readGalleryInfoList(info['characters'], 'character'),
+        'Artists': _readGalleryInfoList(info['artists'], 'artist'),
+        'Series': _readGalleryInfoList(info['parodys'], 'parody'),
+        'Tags': _readGalleryInfoTags(info['tags']),
+        'Type': info['type'],
+        'Language': info['language'],
+        'Files': info['files'] is List ? (info['files'] as List).length : null,
+      };
+    } catch (e, st) {
+      Logger.error(
+        '[hentai-_tryFetchHitomiGalleryInfo] E: $e\n'
+        'Id: $id\n'
+        '$st',
+      );
+      return {};
+    }
+  }
+
+  static List<String> _readGalleryInfoList(dynamic value, String key) {
+    if (value is! List) return [];
+
+    return value
+        .map((item) => item is Map ? item[key] : null)
+        .whereType<String>()
+        .where((item) => item.trim().isNotEmpty)
+        .toList();
+  }
+
+  static List<String> _readGalleryInfoTags(dynamic value) {
+    if (value is! List) return [];
+
+    return value
+        .map((item) {
+          if (item is! Map) return null;
+
+          final tag = item['tag'];
+          if (tag is! String || tag.trim().isEmpty) return null;
+
+          final normalized = tag.trim().toLowerCase().replaceAll(' ', '_');
+          if (item['female'] == '1') return 'female:$normalized';
+          if (item['male'] == '1') return 'male:$normalized';
+          return normalized;
+        })
+        .whereType<String>()
+        .toList();
+  }
+
+  static Future<void> _persistMergedMetadata(QueryResult queryResult) async {
+    final updates = <String, dynamic>{};
+    const fields = [
+      'Title',
+      'Artists',
+      'Groups',
+      'Characters',
+      'Series',
+      'Tags',
+      'Type',
+      'Language',
+      'Files',
+      'Thumbnail',
+      'ExistOnHitomi',
+    ];
+
+    for (final field in fields) {
+      final value = queryResult.result[field];
+      if (_isMeaningfulValue(value)) updates[field] = value;
+    }
+
+    if (updates.isEmpty) return;
+
+    try {
+      await (await DataBaseManager.getInstance()).update(
+        'HitomiColumnModel',
+        updates,
+        'Id = ?',
+        [queryResult.id()],
+      );
+    } catch (e, st) {
+      Logger.error(
+        '[hentai-_persistMergedMetadata] E: $e\n'
+        'Id: ${queryResult.id()}\n'
+        '$st',
+      );
     }
   }
 }

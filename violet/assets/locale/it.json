@@ -202,6 +202,7 @@
   "mainbookmark": "Segnalibro",
   "maindownload": "Download",
   "usewebsearch": "Cerca Sul Web",
+  "fetchworkinfoweb": "Fetch Article Info from Web",
   "usesearchexpunged": "Search for Expunged",
   "includetagnetwork": "Use Default Tag on Web",
   "excludetagnetwork": "Use Excluded Tag on Web",

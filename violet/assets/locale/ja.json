@@ -202,6 +202,7 @@
   "mainbookmark": "ブックマーク数",
   "maindownload": "ダウンロード数",
   "usewebsearch": "ウェブで検索する",
+  "fetchworkinfoweb": "ウェブから作品情報を取得",
   "usesearchexpunged": "削除された作品も探す",
   "includetagnetwork": "ウェブで初期設定のタグを使用",
   "excludetagnetwork": "ウェブで除外するタグを使用",

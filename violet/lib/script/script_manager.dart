@@ -161,10 +161,16 @@ class ScriptManager {
 
   static Future<String?> getGalleryInfoRaw(String id) async {
     final downloadUrl =
-        'http://ltn.gold-usergeneratedcontent.net/galleries/$id.js';
+        'https://ltn.gold-usergeneratedcontent.net/galleries/$id.js';
     final headers = await runHitomiGetHeaderContent(id.toString());
     final galleryInfo = await http.get(downloadUrl, headers: headers);
-    if (galleryInfo.statusCode != 200) return null;
+    if (galleryInfo.statusCode != 200) {
+      Logger.warning(
+        '[Script Manager] Failed to get gallery info: '
+        '${galleryInfo.statusCode}, Id: $id',
+      );
+      return null;
+    }
     return galleryInfo.body;
   }
 

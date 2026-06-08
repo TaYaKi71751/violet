@@ -119,9 +119,7 @@ class ArticleListItemWidgetController extends GetxController {
         .join(',');
 
     if (artist == 'N/A') {
-      var group = articleListItem.queryResult.groups() != null
-          ? articleListItem.queryResult.groups().split('|')[1]
-          : '';
+      var group = _firstPipeValue(articleListItem.queryResult.groups());
       if (group != '') artist = group;
     }
 
@@ -139,5 +137,10 @@ class ArticleListItemWidgetController extends GetxController {
     thumbnail.value = await provider.getThumbnailUrl();
     headers.value = await provider.getHeader(0);
     imageCount.value = provider.length();
+  }
+
+  String _firstPipeValue(String? value) {
+    if (value == null) return '';
+    return value.split('|').where((item) => item.isNotEmpty).firstOrNull ?? '';
   }
 }

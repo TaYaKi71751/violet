@@ -81,6 +81,10 @@ class Settings {
   static late List<String> routingRule; // image routing rule
   static late List<String> searchRule;
   static final searchNetwork = SettingItem<bool>('searchNetwork', false);
+  static final fetchWorkInfoNetwork = SettingItem<bool>(
+    'fetchWorkInfoNetwork',
+    false,
+  );
   static final includeTagNetwork = SettingItem<bool>(
     'includeTagNetwork',
     false,
