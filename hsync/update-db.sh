@@ -44,7 +44,14 @@ GITHUB_USERNAME="$(gh api user --jq .login)"
 cd hsync
 dotnet publish -r ${OS}-${ARCH} -c Release /p:PublishSingleFile=true /p:PublishTrimmed=false /p:PublishReadyToRun=false
 cd bin/Release/net8.0/${OS}-${ARCH}/publish
-cp rawdata/data.db rawdata.db.bak
+if ( ls rawdata/data.db 1> /dev/null 2>&1 ); then
+    export DB_EXISTS="true"
+else
+    export DB_EXISTS="false"
+fi
+if [[ "$DB_EXISTS" == "true" ]]; then
+    cp rawdata/data.db rawdata.db.bak
+fi
 
 if [[ "$UNAME_ARCHITECTURE" == "aarch64" ]]; then
     ./hsync
@@ -74,8 +81,9 @@ sqlite3 rawdata-korean/data.db << EOF
     DELETE FROM HitomiColumnModel WHERE Type = 'anime';
     VACUUM;
 EOF
-rm -rf chunk
 
+if [[ "$DB_EXISTS" == "true" ]]; then
+rm -rf chunk
 export MAX_ID="$(sqlite3 rawdata.db.bak << EOF
     SELECT MAX(Id) FROM HitomiColumnModel;
 EOF
@@ -135,7 +143,6 @@ echo "chunk $TIMESTAMP created"
 echo "chunk $TIMESTAMP https://github.com/${GITHUB_USERNAME}/chunk/releases/download/$TIMESTAMP/data-${TIMESTAMP}.db $(python3 -c "import os; print(os.path.getsize('chunk/data-${TIMESTAMP}.db'))")" >> syncversion.txt
 echo "chunk $TIMESTAMP https://github.com/${GITHUB_USERNAME}/chunk/releases/download/$TIMESTAMP/data-${TIMESTAMP}.json $(python3 -c "import os; print(os.path.getsize('chunk/data-${TIMESTAMP}.json'))")" >> syncversion.txt
 rm -rf chunk
-
 cp syncversion.txt ~/sync-data/syncversion.txt
 cd ~/sync-data
 git config user.name "github-actions"
@@ -143,6 +150,8 @@ git config user.email "github-actions@github.com"
 git add -A
 git commit -m "sync: update syncversion.txt $TIMESTAMP"
 git push
+fi
+
 
 
 cd "$PUBLISH_DIR"
