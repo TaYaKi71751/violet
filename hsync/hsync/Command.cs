@@ -323,6 +323,8 @@ namespace hsync
 
                 var sync = new Syncronizer(hitomi_sync_range, hitomi_sync_lookup_range, hitomi_sync_ignore_exists, exhentai_lookup_page);
                 sync.SyncHitomi();
+                if (!sync_only_hitomi)
+                    sync.SyncExHentai();
 
                 if (sync_only) return;
 
@@ -357,6 +359,8 @@ namespace hsync
             {
                 var sync = new SyncronizerLowPerf(hitomi_sync_range, hitomi_sync_lookup_range, exhentai_lookup_page);
                 sync.SyncHitomi();
+                if (!sync_only_hitomi)
+                    sync.SyncExHentai();
                 sync.FlushToMainDatabase();
                 if (use_server) sync.FlushToServerDatabase();
                 if (use_elasticsearch) sync.FlushToElasticSearchServer();
@@ -1037,7 +1041,7 @@ namespace hsync
                     wc.Encoding = Encoding.UTF8;
                     wc.Headers.Add(HttpRequestHeader.Accept, "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
                     wc.Headers.Add(HttpRequestHeader.UserAgent, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36");
-                    wc.Headers.Add(HttpRequestHeader.Cookie, "igneous=30e0c0a66;ipb_member_id=2742770;ipb_pass_hash=6042be35e994fed920ee7dd11180b65f;sl=dm_2");
+                    wc.Headers.Add(HttpRequestHeader.Cookie, "ipb_member_id=9928466; ipb_pass_hash=b48e4a315434af871954ecea228b5948; igneous=fqeq9yv88d95hl1s2;sl=dm_2");
                     var html = wc.DownloadString(url);
 
                     //File.WriteAllText($"ex/{target[i].Id}.html", html);
