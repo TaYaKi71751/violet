@@ -5,6 +5,7 @@ using hsync.Utils;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -199,6 +200,79 @@ namespace hsync.Component
 
     public class HitomiParser
     {
+        static string[] ReadGalleryInfoArray(JToken token, string arrayName, string propertyName)
+        {
+            var array = token[arrayName] as JArray;
+            if (array == null || array.Count == 0)
+                return null;
+
+            return array
+                .Select(x =>
+                {
+                    if (x.Type == JTokenType.String)
+                        return x.Value<string>();
+                    return x[propertyName]?.Value<string>();
+                })
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Select(x => x.Trim())
+                .ToArray();
+        }
+
+        static string[] ReadGalleryInfoTags(JToken token)
+        {
+            var array = token["tags"] as JArray;
+            if (array == null || array.Count == 0)
+                return null;
+
+            return array
+                .Select(x =>
+                {
+                    var tag = x["tag"]?.Value<string>();
+                    if (string.IsNullOrWhiteSpace(tag))
+                        return null;
+                    if (x["female"] != null && x["female"].ToString() == "1")
+                        return "female:" + tag.Trim();
+                    if (x["male"] != null && x["male"].ToString() == "1")
+                        return "male:" + tag.Trim();
+                    return HitomiLegalize.LegalizeTag(tag);
+                })
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToArray();
+        }
+
+        static public void FillGalleryInfo(string source, HitomiArticle article)
+        {
+            var jsonStart = source.IndexOf('{');
+            var jsonEnd = source.LastIndexOf('}');
+            if (jsonStart < 0 || jsonEnd <= jsonStart)
+                return;
+
+            var galleryInfo = JObject.Parse(source.Substring(jsonStart, jsonEnd - jsonStart + 1));
+
+            article.Magic ??= galleryInfo["id"]?.Value<string>();
+            article.Title ??= galleryInfo["title"]?.Value<string>();
+            article.Type ??= galleryInfo["type"]?.Value<string>();
+            article.Language ??= galleryInfo["language"]?.Value<string>();
+            article.DateTime ??= galleryInfo["date"]?.Value<string>() ?? galleryInfo["datepublished"]?.Value<string>();
+
+            var artists = ReadGalleryInfoArray(galleryInfo, "artists", "artist");
+            var groups = ReadGalleryInfoArray(galleryInfo, "groups", "group");
+            var characters = ReadGalleryInfoArray(galleryInfo, "characters", "character");
+            var parodies = ReadGalleryInfoArray(galleryInfo, "parodys", "parody")
+                ?? ReadGalleryInfoArray(galleryInfo, "parodies", "parody");
+            var tags = ReadGalleryInfoTags(galleryInfo);
+
+            if (artists != null) article.Artists = artists;
+            if (groups != null) article.Groups = groups;
+            if (characters != null) article.Characters = characters;
+            if (parodies != null) article.Series = parodies;
+            if (tags != null) article.Tags = tags;
+
+            var files = galleryInfo["files"] as JArray;
+            if (files != null)
+                article.Files = files.Count.ToString();
+        }
+
         static public HitomiArticle ParseGalleryBlock(string source)
         {
             HitomiArticle article = new HitomiArticle();

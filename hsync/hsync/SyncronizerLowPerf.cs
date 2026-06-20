@@ -76,6 +76,33 @@ namespace hsync
             Console.WriteLine("latest_id: " + latestId);
         }
 
+        private static int GetHitomiGalleryId(HitomiArticle article)
+        {
+            var magic = article.Magic ?? "";
+            if (magic.Contains("-"))
+                return Convert.ToInt32(magic.Split('-').Last().Split('.')[0]);
+            if (magic.Contains("galleries"))
+                return Convert.ToInt32(magic.Split('/').Last().Split('.')[0]);
+            return Convert.ToInt32(magic);
+        }
+
+        private static string GetHitomiGalleryUrl(HitomiArticle article)
+        {
+            var magic = article.Magic ?? "";
+            if (magic.StartsWith("http"))
+                return magic;
+            if (magic.StartsWith("/"))
+                return "https://hitomi.la" + magic;
+            if (magic.Contains("-"))
+                return "https://hitomi.la/" + magic;
+            return $"https://hitomi.la/galleries/{GetHitomiGalleryId(article)}.html";
+        }
+
+        private static string GetHitomiGalleryInfoUrl(HitomiArticle article)
+        {
+            return $"https://ltn.gold-usergeneratedcontent.net/galleries/{GetHitomiGalleryId(article)}.js";
+        }
+
         public void SyncHitomi()
         {
             var gburls = Enumerable.Range(useManualRange ? starts : latestId - hitomiSyncRange, useManualRange ? ends - starts + 1 : hitomiSyncRange * 2)
@@ -105,16 +132,8 @@ namespace hsync
                 if (htmls[i] == null)
                     continue;
                 var aa = HitomiParser.ParseGalleryBlock(htmls[i]);
-                if (aa.Magic.Contains("-"))
-                {
-                    gurls.Add("https://hitomi.la/" + aa.Magic);
-                    gpurls.Add("https://ltn.gold-usergeneratedcontent.net/galleries/" + aa.Magic.Split("-").Last().Split(".").First() + ".js");
-                }
-                else
-                {
-                    gurls.Add("https://hitomi.la/galleries/" + i + ".html");
-                    gpurls.Add("https://ltn.gold-usergeneratedcontent.net/galleries/" + i + ".js");
-                }
+                gurls.Add(GetHitomiGalleryUrl(aa));
+                gpurls.Add(GetHitomiGalleryInfoUrl(aa));
             }
 
             dcnt = 0;
@@ -182,8 +201,7 @@ namespace hsync
                 {
                     try
                     {
-                        var json = js[j].Split("var galleryinfo = ")[1].Split(";")[0];
-                        aa.Files = JObject.Parse(json)["files"].Count().ToString();
+                        HitomiParser.FillGalleryInfo(js[j], aa);
                     } catch
                     {
                         Console.WriteLine("parse-galleryinfo: " + gpurls[j]);
@@ -192,12 +210,7 @@ namespace hsync
                 }
                 try
                 {
-                    if (aa.Magic.Contains("-"))
-                        newedDataHitomi.Add(Convert.ToInt32(aa.Magic.Split('-').Last().Split('.')[0]));
-                    else if (aa.Magic.Contains("galleries"))
-                        newedDataHitomi.Add(Convert.ToInt32(aa.Magic.Split('/').Last().Split('.')[0]));
-                    else
-                        newedDataHitomi.Add(Convert.ToInt32(aa.Magic));
+                    newedDataHitomi.Add(GetHitomiGalleryId(aa));
                 }
                 catch
                 {
@@ -341,12 +354,7 @@ namespace hsync
 
                 try
                 {
-                    if (hitomiArticles[i].Magic.Contains("-"))
-                        id = Convert.ToInt32(hitomiArticles[i].Magic.Split('-').Last().Split('.')[0]);
-                    else if (hitomiArticles[i].Magic.Contains("galleries"))
-                        id = Convert.ToInt32(hitomiArticles[i].Magic.Split('/').Last().Split('.')[0]);
-                    else
-                        id = Convert.ToInt32(hitomiArticles[i].Magic);
+                    id = GetHitomiGalleryId(hitomiArticles[i]);
                 }
                 catch
                 {

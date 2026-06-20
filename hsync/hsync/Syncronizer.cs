@@ -60,6 +60,33 @@ namespace hsync
             this.hitomi_sync_ignore_exists = hitomi_sync_ignore_exists;
         }
 
+        private static int GetHitomiGalleryId(HitomiArticle article)
+        {
+            var magic = article.Magic ?? "";
+            if (magic.Contains("-"))
+                return Convert.ToInt32(magic.Split('-').Last().Split('.')[0]);
+            if (magic.Contains("galleries"))
+                return Convert.ToInt32(magic.Split('/').Last().Split('.')[0]);
+            return Convert.ToInt32(magic);
+        }
+
+        private static string GetHitomiGalleryUrl(HitomiArticle article)
+        {
+            var magic = article.Magic ?? "";
+            if (magic.StartsWith("http"))
+                return magic;
+            if (magic.StartsWith("/"))
+                return "https://hitomi.la" + magic;
+            if (magic.Contains("-"))
+                return "https://hitomi.la/" + magic;
+            return $"https://hitomi.la/galleries/{GetHitomiGalleryId(article)}.html";
+        }
+
+        private static string GetHitomiGalleryInfoUrl(HitomiArticle article)
+        {
+            return $"https://ltn.gold-usergeneratedcontent.net/galleries/{GetHitomiGalleryId(article)}.js";
+        }
+
         public void SyncHitomi()
         {
             var exists = new HashSet<int>();
@@ -88,15 +115,14 @@ namespace hsync
             Console.WriteLine("Complete");
 
             var gurls = new List<string>(gburls.Count);
+            var gpurls = new List<string>(gburls.Count);
             for (int i = 0; i < gburls.Count; i++)
             {
                 if (htmls[i] == null)
                     continue;
                 var aa = HitomiParser.ParseGalleryBlock(htmls[i]);
-                if (aa.Magic.Contains("-"))
-                    gurls.Add("https://hitomi.la" + aa.Magic);
-                else
-                    gurls.Add("https://hitomi.la/galleries/" + i + ".html");
+                gurls.Add(GetHitomiGalleryUrl(aa));
+                gpurls.Add(GetHitomiGalleryInfoUrl(aa));
             }
 
             dcnt = 0;
@@ -107,6 +133,25 @@ namespace hsync
                 using (var pb = new ProgressBar())
                 {
                     htmls2 = NetTools.DownloadStrings(gurls, "",
+                    () =>
+                    {
+                        pb.Report(gburls.Count, Interlocked.Increment(ref dcnt), ecnt);
+                    },
+                    () =>
+                    {
+                        pb.Report(gburls.Count, dcnt, Interlocked.Increment(ref ecnt));
+                    }).Result;
+                }
+            Console.WriteLine("Complete");
+
+            dcnt = 0;
+            ecnt = 0;
+            Console.Write("Running galleries pages... ");
+            List<string> js = new List<string>();
+            if (gpurls.Count != 0)
+                using (var pb = new ProgressBar())
+                {
+                    js = NetTools.DownloadStrings(gpurls, "",
                     () =>
                     {
                         pb.Report(gburls.Count, Interlocked.Increment(ref dcnt), ecnt);
@@ -149,14 +194,21 @@ namespace hsync
                         aa.Characters = ab.Characters;
                     }
                 }
+                if (js[j] != null)
+                {
+                    try
+                    {
+                        HitomiParser.FillGalleryInfo(js[j], aa);
+                    }
+                    catch
+                    {
+                        Console.WriteLine("parse-galleryinfo: " + gpurls[j]);
+                        Console.WriteLine(js[j]);
+                    }
+                }
                 try
                 {
-                    if (aa.Magic.Contains("-"))
-                        newedDataHitomi.Add(Convert.ToInt32(aa.Magic.Split('-').Last().Split('.')[0]));
-                    else if (aa.Magic.Contains("galleries"))
-                        newedDataHitomi.Add(Convert.ToInt32(aa.Magic.Split('/').Last().Split('.')[0]));
-                    else
-                        newedDataHitomi.Add(Convert.ToInt32(aa.Magic));
+                    newedDataHitomi.Add(GetHitomiGalleryId(aa));
                 }
                 catch
                 {
