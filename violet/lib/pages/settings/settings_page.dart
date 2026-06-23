@@ -30,6 +30,11 @@ import 'package:violet/component/eh/eh_bookmark.dart';
 import 'package:violet/component/index.dart';
 import 'package:violet/database/database.dart';
 import 'package:violet/database/user/bookmark.dart';
+import 'package:violet/database/user/download.dart';
+import 'package:violet/database/user/llm_search.dart';
+import 'package:violet/database/user/record.dart';
+import 'package:violet/database/user/search.dart';
+import 'package:violet/database/user/user.dart';
 import 'package:violet/downloader/isolate_downloader.dart';
 import 'package:violet/locale/locale.dart';
 import 'package:violet/log/log.dart';
@@ -2168,8 +2173,10 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
           trailing: const Icon(Icons.keyboard_arrow_right),
           onTap: () async {
             try {
-              await FilePicker.platform.clearTemporaryFiles();
-              final filePickerResult = await FilePicker.platform.pickFiles();
+              final filePickerResult = await FilePicker.platform.pickFiles(
+                type: FileType.custom,
+                allowedExtensions: ['db', 'sqlite', 'sqlite3'],
+              );
               final pickedFilePath = filePickerResult?.files.singleOrNull?.path;
 
               if (pickedFilePath == null) {
@@ -2184,9 +2191,22 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
               final pickedFile = File(pickedFilePath);
               final db = (await getApplicationDocumentsDirectory());
 
+              await CommonUserDatabase.reloadInstance();
               await pickedFile.copy('${db.path}/user.db');
 
-              await Bookmark.getInstance();
+              await Bookmark.reloadInstance();
+              await User.reloadInstance();
+              await SearchLogDatabase.reloadInstance();
+              await LLMSearchLogDatabase.reloadInstance();
+              await Download.reloadInstance();
+
+              await Bookmark.load();
+              await User.load();
+              await SearchLogDatabase.getInstance();
+              await LLMSearchLogDatabase.getInstance();
+              await Download.getInstance();
+
+              ThemeSwitchableStateTargetStore.doChange();
 
               showToast(
                 level: ToastLevel.check,
@@ -2229,16 +2249,19 @@ class _SettingsPageState extends ThemeSwitchableState<SettingsPage>
                   ),
                 );
               } else {
-                final selectedPath = await FilePicker.platform
-                    .getDirectoryPath();
+                final selectedPath = await FilePicker.platform.saveFile(
+                  dialogTitle: Translations.instance!.trans(
+                    'exportingbookmark',
+                  ),
+                  fileName: 'bookmark.db',
+                  type: FileType.custom,
+                  allowedExtensions: ['db'],
+                  bytes: await bookmarkDatabaseFile.readAsBytes(),
+                );
 
                 if (selectedPath == null) {
                   return;
                 }
-
-                final extpath = '$selectedPath/bookmark.db';
-
-                await bookmarkDatabaseFile.copy(extpath);
               }
 
               showToast(

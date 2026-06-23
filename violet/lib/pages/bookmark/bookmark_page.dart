@@ -35,7 +35,11 @@ class _BookmarkPageState extends ThemeSwitchableState<BookmarkPage>
   bool reorder = false;
 
   @override
-  VoidCallback? get shouldReloadCallback => null;
+  VoidCallback? get shouldReloadCallback => () {
+    if (mounted) {
+      setState(() {});
+    }
+  };
 
   static const int _kReservedPreIndex = 2;
 

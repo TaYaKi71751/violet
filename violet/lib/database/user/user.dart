@@ -21,4 +21,13 @@ class CommonUserDatabase extends DataBaseManager {
     });
     return _instance!;
   }
+
+  static Future<void> reloadInstance() async {
+    await instanceLock.synchronized(() async {
+      final db = _instance?.db;
+      _instance?.db = null;
+      _instance = null;
+      await db?.close();
+    });
+  }
 }
